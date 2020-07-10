@@ -52,6 +52,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                },
                 "location-id" => {
                     call = call.location_id(value.unwrap_or(""));
                 },
@@ -74,7 +77,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "language-code", "location-id"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "language-code", "location-id", "parent"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -110,10 +113,13 @@ impl<'n> Engine<'n> {
 
     fn _locations_info_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.locations().info_types_list(opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.locations().info_types_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
+                },
                 "language-code" => {
                     call = call.language_code(value.unwrap_or(""));
                 },
@@ -133,7 +139,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "language-code"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "language-code", "location-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -920,7 +926,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateDeidentifyTemplateRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.organizations().locations_deidentify_templates_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.organizations().locations_deidentify_templates_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1076,7 +1082,7 @@ impl<'n> Engine<'n> {
 
     fn _organizations_locations_deidentify_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.organizations().locations_deidentify_templates_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.organizations().locations_deidentify_templates_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1088,6 +1094,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1102,7 +1111,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1273,7 +1282,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateInspectTemplateRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.organizations().locations_inspect_templates_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.organizations().locations_inspect_templates_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1429,7 +1438,7 @@ impl<'n> Engine<'n> {
 
     fn _organizations_locations_inspect_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.organizations().locations_inspect_templates_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.organizations().locations_inspect_templates_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1441,6 +1450,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1455,7 +1467,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1633,7 +1645,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateStoredInfoTypeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.organizations().locations_stored_info_types_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.organizations().locations_stored_info_types_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1789,7 +1801,7 @@ impl<'n> Engine<'n> {
 
     fn _organizations_locations_stored_info_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.organizations().locations_stored_info_types_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.organizations().locations_stored_info_types_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1801,6 +1813,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1815,7 +1830,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4340,7 +4355,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2DeidentifyContentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_content_deidentify(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_content_deidentify(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4435,7 +4450,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2InspectContentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_content_inspect(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_content_inspect(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4531,7 +4546,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2ReidentifyContentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_content_reidentify(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_content_reidentify(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4622,7 +4637,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateDeidentifyTemplateRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_deidentify_templates_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_deidentify_templates_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4778,7 +4793,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_locations_deidentify_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_deidentify_templates_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_deidentify_templates_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4790,6 +4805,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -4804,7 +4822,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5089,7 +5107,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateDlpJobRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_dlp_jobs_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_dlp_jobs_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5426,7 +5444,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_locations_dlp_jobs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_dlp_jobs_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_dlp_jobs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5441,6 +5459,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -5458,7 +5479,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "type", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "filter", "page-token", "location-id", "type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5536,7 +5557,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2RedactImageRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_image_redact(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_image_redact(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5633,7 +5654,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateInspectTemplateRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_inspect_templates_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_inspect_templates_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5789,7 +5810,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_locations_inspect_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_inspect_templates_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_inspect_templates_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5801,6 +5822,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -5815,7 +5839,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6104,7 +6128,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateJobTriggerRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_job_triggers_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_job_triggers_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6357,7 +6381,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_locations_job_triggers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_job_triggers_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_job_triggers_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6369,6 +6393,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
@@ -6386,7 +6413,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "filter", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6592,7 +6619,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::GooglePrivacyDlpV2CreateStoredInfoTypeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_stored_info_types_create(request, opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_stored_info_types_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6748,7 +6775,7 @@ impl<'n> Engine<'n> {
 
     fn _projects_locations_stored_info_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_stored_info_types_list(opt.value_of("parent").unwrap_or(""), opt.value_of("location-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_stored_info_types_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6760,6 +6787,9 @@ impl<'n> Engine<'n> {
                 },
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
+                },
+                "location-id" => {
+                    call = call.location_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -6774,7 +6804,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "location-id", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -7704,10 +7734,10 @@ fn main() {
         learn more."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dlp2_cli/locations_info-types-list",
                   vec![
-                    (Some(r##"location-id"##),
+                    (Some(r##"parent"##),
                      None,
-                     Some(r##"The geographic location to list info types. Reserved for future
-        extensions."##),
+                     Some(r##"The parent resource name.
+        - Format:locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -7735,8 +7765,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -7818,8 +7851,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -7875,8 +7911,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -7955,8 +7994,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8012,15 +8054,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the deidentification template. Reserved
-        for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8102,15 +8140,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where deidentifications templates will be retrieved
-        from. Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8166,15 +8200,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the inspection template. Reserved for
-        future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8253,15 +8283,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where inspection templates will be retrieved from.
-        Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8316,15 +8342,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the stored infoType. Reserved for
-        future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8406,15 +8428,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where stored infoTypes will be retrieved from.
-        Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8471,8 +8489,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8554,8 +8575,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8620,7 +8644,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name, for example projects/my-project-id."##),
+                     Some(r##"Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8656,7 +8682,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name, for example projects/my-project-id."##),
+                     Some(r##"Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8687,7 +8715,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name."##),
+                     Some(r##"Required. The parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8718,8 +8748,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8801,8 +8834,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8894,7 +8930,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -8974,7 +9012,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9003,7 +9043,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name, for example projects/my-project-id."##),
+                     Some(r##"The parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9033,8 +9075,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9113,8 +9158,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9199,7 +9247,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9276,7 +9326,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example `projects/my-project-id`."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9335,14 +9387,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name, for example projects/my-project-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to process de-identification. Reserved for future
-        extensions."##),
+                     Some(r##"Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9378,16 +9425,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name, for example projects/my-project-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to process content inspection. Reserved for future
-        extensions.
-        When inspecting images location is restricted to 'global', 'us', 'asia',
-        and 'europe'."##),
+                     Some(r##"Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9418,14 +9458,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to process content reidentification.  Reserved for
-        future extensions."##),
+                     Some(r##"Required. The parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9456,15 +9491,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the deidentification template. Reserved
-        for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9546,15 +9577,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where deidentifications templates will be retrieved
-        from. Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9646,14 +9673,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store and process the job. Reserved for
-        future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9799,14 +9821,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where jobs will be retrieved from.
-        Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9835,15 +9852,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name, for example projects/my-project-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to process the request. Reserved for future
-        extensions.
-        Location is restricted to 'global', 'us', 'asia', and 'europe'."##),
+                     Some(r##"The parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9873,15 +9884,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the inspection template. Reserved for
-        future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -9960,15 +9967,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where inspection templates will be retrieved from.
-        Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10053,14 +10056,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the job trigger. Reserved for
-        future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10171,14 +10169,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example `projects/my-project-id`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where job triggers will be retrieved from.
-        Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10232,15 +10225,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location to store the stored infoType. Reserved for
-        future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10322,15 +10311,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"location-id"##),
-                     None,
-                     Some(r##"The geographic location where stored infoTypes will be retrieved from.
-        Use `-` for all locations. Reserved for future extensions."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10387,8 +10372,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10470,8 +10458,11 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name, for example projects/my-project-id or
-        organizations/my-org-id."##),
+                     Some(r##"Required. Parent resource name.
+        - Format:projects/[PROJECT-ID]
+        - Format:organizations/[ORGANIZATION-ID]
+        - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+        - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]"##),
                      Some(true),
                      Some(false)),
         
@@ -10526,7 +10517,7 @@ fn main() {
     
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200405")
+           .version("1.0.14+20200706")
            .about("Provides methods for detection, risk analysis, and de-identification of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")

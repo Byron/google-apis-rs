@@ -377,6 +377,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "application-settings.cookie-domain" => Some(("applicationSettings.cookieDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application-settings.access-denied-page-settings.access-denied-page-uri" => Some(("applicationSettings.accessDeniedPageSettings.accessDeniedPageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application-settings.csm-settings.rctoken-aud" => Some(("applicationSettings.csmSettings.rctokenAud", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.cors-settings.allow-http-options" => Some(("accessSettings.corsSettings.allowHttpOptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -395,7 +396,7 @@ impl<'n> Engine<'n> {
                     "access-settings.gcip-settings.tenant-ids" => Some(("accessSettings.gcipSettings.tenantIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "application-settings", "client-id", "cors-settings", "csm-settings", "gcip-settings", "iam-permission", "iam-service-name", "id", "labels", "login-hint", "login-page-uri", "name", "oauth-settings", "policy-delegation-settings", "policy-name", "rctoken-aud", "region", "resource", "service", "tenant-ids", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "application-settings", "client-id", "cookie-domain", "cors-settings", "csm-settings", "gcip-settings", "iam-permission", "iam-service-name", "id", "labels", "login-hint", "login-page-uri", "name", "oauth-settings", "policy-delegation-settings", "policy-name", "rctoken-aud", "region", "resource", "service", "tenant-ids", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1352,7 +1353,7 @@ fn main() {
                      Some(r##"Required. Path to create the client in.
         In the following format:
         projects/{project_number/id}/brands/{brand}.
-        The project must belong to a GSuite account."##),
+        The project must belong to a G Suite account."##),
                      Some(true),
                      Some(false)),
         
@@ -1508,7 +1509,7 @@ fn main() {
     
     let mut app = App::new("iap1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200406")
+           .version("1.0.14+20200629")
            .about("Controls access to cloud applications running on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iap1_cli")
            .arg(Arg::with_name("url")

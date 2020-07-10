@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Hosting* crate version *1.0.13+20200325*, where *20200325* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Firebase Hosting* crate version *1.0.14+20200709*, where *20200709* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Firebase Hosting* *v1_beta1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/hosting/).
@@ -12,9 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.FirebaseHosting.html) ... 
 //! 
 //! * projects
-//!  * [*operations get*](struct.ProjectOperationGetCall.html), [*sites channels releases create*](struct.ProjectSiteChannelReleaseCreateCall.html), [*sites channels releases list*](struct.ProjectSiteChannelReleaseListCall.html), [*sites releases create*](struct.ProjectSiteReleaseCreateCall.html) and [*sites releases list*](struct.ProjectSiteReleaseListCall.html)
+//!  * [*operations get*](struct.ProjectOperationGetCall.html), [*sites channels releases create*](struct.ProjectSiteChannelReleaseCreateCall.html), [*sites channels releases list*](struct.ProjectSiteChannelReleaseListCall.html), [*sites domains create*](struct.ProjectSiteDomainCreateCall.html), [*sites domains delete*](struct.ProjectSiteDomainDeleteCall.html), [*sites domains get*](struct.ProjectSiteDomainGetCall.html), [*sites domains list*](struct.ProjectSiteDomainListCall.html), [*sites domains update*](struct.ProjectSiteDomainUpdateCall.html), [*sites get config*](struct.ProjectSiteGetConfigCall.html), [*sites releases create*](struct.ProjectSiteReleaseCreateCall.html), [*sites releases list*](struct.ProjectSiteReleaseListCall.html), [*sites update config*](struct.ProjectSiteUpdateConfigCall.html), [*sites versions create*](struct.ProjectSiteVersionCreateCall.html), [*sites versions delete*](struct.ProjectSiteVersionDeleteCall.html), [*sites versions files list*](struct.ProjectSiteVersionFileListCall.html), [*sites versions list*](struct.ProjectSiteVersionListCall.html), [*sites versions patch*](struct.ProjectSiteVersionPatchCall.html) and [*sites versions populate files*](struct.ProjectSiteVersionPopulateFileCall.html)
 //! * sites
-//!  * [*channels releases create*](struct.SiteChannelReleaseCreateCall.html), [*channels releases list*](struct.SiteChannelReleaseListCall.html), [*domains create*](struct.SiteDomainCreateCall.html), [*domains delete*](struct.SiteDomainDeleteCall.html), [*domains get*](struct.SiteDomainGetCall.html), [*domains list*](struct.SiteDomainListCall.html), [*domains update*](struct.SiteDomainUpdateCall.html), [*get config*](struct.SiteGetConfigCall.html), [*releases create*](struct.SiteReleaseCreateCall.html), [*releases list*](struct.SiteReleaseListCall.html), [*update config*](struct.SiteUpdateConfigCall.html), [*versions clone*](struct.SiteVersionCloneCall.html), [*versions create*](struct.SiteVersionCreateCall.html), [*versions delete*](struct.SiteVersionDeleteCall.html), [*versions files list*](struct.SiteVersionFileListCall.html), [*versions list*](struct.SiteVersionListCall.html), [*versions patch*](struct.SiteVersionPatchCall.html) and [*versions populate files*](struct.SiteVersionPopulateFileCall.html)
+//!  * [*channels releases create*](struct.SiteChannelReleaseCreateCall.html), [*channels releases list*](struct.SiteChannelReleaseListCall.html), [*domains create*](struct.SiteDomainCreateCall.html), [*domains delete*](struct.SiteDomainDeleteCall.html), [*domains get*](struct.SiteDomainGetCall.html), [*domains list*](struct.SiteDomainListCall.html), [*domains update*](struct.SiteDomainUpdateCall.html), [*get config*](struct.SiteGetConfigCall.html), [*releases create*](struct.SiteReleaseCreateCall.html), [*releases list*](struct.SiteReleaseListCall.html), [*update config*](struct.SiteUpdateConfigCall.html), [*versions create*](struct.SiteVersionCreateCall.html), [*versions delete*](struct.SiteVersionDeleteCall.html), [*versions files list*](struct.SiteVersionFileListCall.html), [*versions list*](struct.SiteVersionListCall.html), [*versions patch*](struct.SiteVersionPatchCall.html) and [*versions populate files*](struct.SiteVersionPopulateFileCall.html)
 //! 
 //! 
 //! 
@@ -49,10 +49,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.sites().channels_releases_create(...).doit()
-//! let r = hub.projects().sites_releases_create(...).doit()
-//! let r = hub.projects().sites_channels_releases_create(...).doit()
-//! let r = hub.sites().releases_create(...).doit()
+//! let r = hub.sites().domains_create(...).doit()
+//! let r = hub.projects().sites_domains_update(...).doit()
+//! let r = hub.projects().sites_domains_create(...).doit()
+//! let r = hub.sites().domains_update(...).doit()
+//! let r = hub.sites().domains_get(...).doit()
+//! let r = hub.projects().sites_domains_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -86,7 +88,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
-//! use firebasehosting1_beta1::Release;
+//! use firebasehosting1_beta1::Domain;
 //! use firebasehosting1_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -108,13 +110,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Release::default();
+//! let mut req = Domain::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.sites().channels_releases_create(req, "parent")
-//!              .version_name("sed")
+//! let result = hub.sites().domains_create(req, "parent")
 //!              .doit();
 //! 
 //! match result {
@@ -282,7 +283,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
-/// use firebasehosting1_beta1::Release;
+/// use firebasehosting1_beta1::Domain;
 /// use firebasehosting1_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -304,13 +305,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Release::default();
+/// let mut req = Domain::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().channels_releases_create(req, "parent")
-///              .version_name("dolores")
+/// let result = hub.sites().domains_create(req, "parent")
 ///              .doit();
 /// 
 /// match result {
@@ -348,7 +348,7 @@ impl<'a, C, A> FirebaseHosting<C, A>
         FirebaseHosting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
@@ -362,7 +362,7 @@ impl<'a, C, A> FirebaseHosting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -390,9 +390,9 @@ impl<'a, C, A> FirebaseHosting<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A [`redirect`](/docs/hosting/full-config#redirects) represents the
-/// configuration for returning an HTTP redirect response given a matching
-/// request URL path.
+/// A [`redirect`](/docs/hosting/full-config#redirects) object specifies a URL
+/// pattern that, if matched to the request URL path, triggers Hosting to
+/// respond with a redirect to the specified destination path.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -401,8 +401,8 @@ pub struct Redirect {
     /// The user-supplied RE2 regular expression to match against the request
     /// URL path.
     pub regex: Option<String>,
-    /// The user-supplied [glob
-    /// pattern](/docs/hosting/full-config#glob_pattern_matching) to match
+    /// The user-supplied
+    /// [glob](/docs/hosting/full-config#glob_pattern_matching) to match
     /// against the request URL path.
     pub glob: Option<String>,
     /// Required. The value to put in the HTTP location header of the response.
@@ -423,13 +423,14 @@ pub struct Redirect {
 impl Part for Redirect {}
 
 
-/// There is no detailed description.
+/// The request to populate a Version's Files.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [sites versions populate files projects](struct.ProjectSiteVersionPopulateFileCall.html) (request)
 /// * [versions populate files sites](struct.SiteVersionPopulateFileCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -527,6 +528,7 @@ impl Part for ActingUser {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [versions files list sites](struct.SiteVersionFileListCall.html) (response)
+/// * [sites versions files list projects](struct.ProjectSiteVersionFileListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListVersionFilesResponse {
@@ -549,6 +551,8 @@ impl ResponseResult for ListVersionFilesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [versions create sites](struct.SiteVersionCreateCall.html) (request|response)
+/// * [sites versions create projects](struct.ProjectSiteVersionCreateCall.html) (request|response)
+/// * [sites versions patch projects](struct.ProjectSiteVersionPatchCall.html) (request|response)
 /// * [versions patch sites](struct.SiteVersionPatchCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -658,7 +662,7 @@ impl RequestValue for Release {}
 impl ResponseResult for Release {}
 
 
-/// There is no detailed description.
+/// The response to listing Domains.
 /// 
 /// # Activities
 /// 
@@ -666,6 +670,7 @@ impl ResponseResult for Release {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [domains list sites](struct.SiteDomainListCall.html) (response)
+/// * [sites domains list projects](struct.ProjectSiteDomainListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDomainsResponse {
@@ -696,39 +701,14 @@ impl ResponseResult for ListDomainsResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [sites domains delete projects](struct.ProjectSiteDomainDeleteCall.html) (response)
+/// * [sites versions delete projects](struct.ProjectSiteVersionDeleteCall.html) (response)
 /// * [domains delete sites](struct.SiteDomainDeleteCall.html) (response)
 /// * [versions delete sites](struct.SiteVersionDeleteCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [sites channels releases list projects](struct.ProjectSiteChannelReleaseListCall.html) (response)
-/// * [sites releases list projects](struct.ProjectSiteReleaseListCall.html) (response)
-/// * [releases list sites](struct.SiteReleaseListCall.html) (response)
-/// * [channels releases list sites](struct.SiteChannelReleaseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListReleasesResponse {
-    /// If there are additional releases remaining beyond the ones in this
-    /// response, then supply this token in the next
-    /// [`list`](../sites.versions.files/list) call to continue with the next set
-    /// of releases.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of hashes of files that still need to be uploaded, if any exist.
-    pub releases: Option<Vec<Release>>,
-}
-
-impl ResponseResult for ListReleasesResponse {}
 
 
 /// The `Status` type defines a logical error model that is suitable for
@@ -757,19 +737,6 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// A representation of filter path.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PathFilter {
-    /// An array of regexes to filter by.
-    pub regexes: Option<Vec<String>>,
-}
-
-impl Part for PathFilter {}
-
-
 /// Defines the behavior of a domain-level redirect. Domain redirects preserve
 /// the path of the redirect but replace the requested domain with the one
 /// specified in the redirect configuration.
@@ -789,32 +756,31 @@ pub struct DomainRedirect {
 impl Part for DomainRedirect {}
 
 
-/// The request sent to CloneVersion.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [versions clone sites](struct.SiteVersionCloneCall.html) (request)
+/// * [sites channels releases list projects](struct.ProjectSiteChannelReleaseListCall.html) (response)
+/// * [sites releases list projects](struct.ProjectSiteReleaseListCall.html) (response)
+/// * [releases list sites](struct.SiteReleaseListCall.html) (response)
+/// * [channels releases list sites](struct.SiteChannelReleaseListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CloneVersionRequest {
-    /// Required. The name of the version to be cloned, in the format:
-    /// `sites/{site}/versions/{version}`
-    #[serde(rename="sourceVersion")]
-    pub source_version: Option<String>,
-    /// If provided, only paths that do not match any of the regexes in this
-    /// list will be included in the new version.
-    pub exclude: Option<PathFilter>,
-    /// If provided, only paths that match one or more regexes in this list
-    /// will be included in the new version.
-    pub include: Option<PathFilter>,
-    /// If true, immediately finalize the version after cloning is complete.
-    pub finalize: Option<bool>,
+pub struct ListReleasesResponse {
+    /// If there are additional releases remaining beyond the ones in this
+    /// response, then supply this token in the next
+    /// [`list`](../sites.versions.files/list) call to continue with the next set
+    /// of releases.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of hashes of files that still need to be uploaded, if any exist.
+    pub releases: Option<Vec<Release>>,
 }
 
-impl RequestValue for CloneVersionRequest {}
+impl ResponseResult for ListReleasesResponse {}
 
 
 /// The current certificate provisioning status information for a domain.
@@ -854,10 +820,9 @@ pub struct DomainProvisioning {
 impl Part for DomainProvisioning {}
 
 
-/// A [`rewrite`](/docs/hosting/full-config#rewrites) represents an internal
-/// content rewrite on the version. If the pattern matches, the request will be
-/// handled as if it were to the destination path specified in the
-/// configuration.
+/// A [`rewrite`](/docs/hosting/full-config#rewrites) object specifies a URL
+/// pattern that, if matched to the request URL path, triggers Hosting to
+/// respond as if the service were given the specified destination URL.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -876,8 +841,8 @@ pub struct Rewrite {
     /// The request will be forwarded to Firebase Dynamic Links.
     #[serde(rename="dynamicLinks")]
     pub dynamic_links: Option<bool>,
-    /// The user-supplied [glob
-    /// pattern](/docs/hosting/full-config#glob_pattern_matching) to match
+    /// The user-supplied
+    /// [glob](/docs/hosting/full-config#glob_pattern_matching) to match
     /// against the request URL path.
     pub glob: Option<String>,
 }
@@ -893,7 +858,9 @@ impl Part for Rewrite {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [sites update config projects](struct.ProjectSiteUpdateConfigCall.html) (request|response)
 /// * [update config sites](struct.SiteUpdateConfigCall.html) (request|response)
+/// * [sites get config projects](struct.ProjectSiteGetConfigCall.html) (response)
 /// * [get config sites](struct.SiteGetConfigCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -905,6 +872,10 @@ pub struct SiteConfig {
     /// created with an unlimited number of max_versions by default.
     #[serde(rename="maxVersions")]
     pub max_versions: Option<String>,
+    /// Whether or not web requests made by site visitors are logged via Cloud
+    /// Logging.
+    #[serde(rename="cloudLoggingEnabled")]
+    pub cloud_logging_enabled: Option<bool>,
 }
 
 impl RequestValue for SiteConfig {}
@@ -918,6 +889,7 @@ impl ResponseResult for SiteConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [sites versions populate files projects](struct.ProjectSiteVersionPopulateFileCall.html) (response)
 /// * [versions populate files sites](struct.SiteVersionPopulateFileCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -964,6 +936,7 @@ impl Part for PreviewConfig {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [versions list sites](struct.SiteVersionListCall.html) (response)
+/// * [sites versions list projects](struct.ProjectSiteVersionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListVersionsResponse {
@@ -977,8 +950,9 @@ pub struct ListVersionsResponse {
 impl ResponseResult for ListVersionsResponse {}
 
 
-/// A [`header`](/docs/hosting/full-config#headers) defines custom headers to
-/// add to a response should the request URL path match the pattern.
+/// A [`header`](/docs/hosting/full-config#headers) is an object that specifies
+/// a URL pattern that, if matched to the request URL path, triggers Hosting to
+/// apply the specified custom response headers.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -989,8 +963,8 @@ pub struct Header {
     pub regex: Option<String>,
     /// Required. The additional headers to add to the response.
     pub headers: Option<HashMap<String, String>>,
-    /// The user-supplied [glob
-    /// pattern](/docs/hosting/full-config#glob_pattern_matching) to match
+    /// The user-supplied
+    /// [glob](/docs/hosting/full-config#glob_pattern_matching) to match
     /// against the request URL path.
     pub glob: Option<String>,
 }
@@ -999,8 +973,9 @@ impl Part for Header {}
 
 
 /// The configuration for how incoming requests to a site should be routed and
-/// processed before serving content. The patterns are matched and applied
-/// according to a specific
+/// processed before serving content. The URL request paths are matched against
+/// the specified URL patterns in the configuration, then Hosting applies the
+/// applicable configuration according to a specific
 /// [priority order](/docs/hosting/full-config#hosting_priority_order).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1010,11 +985,13 @@ pub struct ServingConfig {
     /// Defines whether to drop the file extension from uploaded files.
     #[serde(rename="cleanUrls")]
     pub clean_urls: Option<bool>,
-    /// A list of custom response headers that are added to the content if the
-    /// request URL path matches the glob.
+    /// An array of objects, where each object specifies a URL pattern that, if
+    /// matched to the request URL path, triggers Hosting to apply the specified
+    /// custom response headers.
     pub headers: Option<Vec<Header>>,
-    /// A list of globs that will cause the response to redirect to another
-    /// location.
+    /// An array of objects (called redirect rules), where each rule specifies a
+    /// URL pattern that, if matched to the request URL path, triggers Hosting to
+    /// respond with a redirect to the specified destination path.
     pub redirects: Option<Vec<Redirect>>,
     /// How to handle well known App Association files.
     #[serde(rename="appAssociation")]
@@ -1022,8 +999,9 @@ pub struct ServingConfig {
     /// Defines how to handle a trailing slash in the URL path.
     #[serde(rename="trailingSlashBehavior")]
     pub trailing_slash_behavior: Option<String>,
-    /// A list of rewrites that will act as if the service were given the
-    /// destination URL.
+    /// An array of objects (called rewrite rules), where each rule specifies a URL
+    /// pattern that, if matched to the request URL path, triggers Hosting to
+    /// respond as if the service were given the specified destination URL.
     pub rewrites: Option<Vec<Rewrite>>,
 }
 
@@ -1054,9 +1032,12 @@ impl Part for CertHttpChallenge {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [domains get sites](struct.SiteDomainGetCall.html) (response)
-/// * [domains update sites](struct.SiteDomainUpdateCall.html) (request|response)
 /// * [domains create sites](struct.SiteDomainCreateCall.html) (request|response)
+/// * [sites domains update projects](struct.ProjectSiteDomainUpdateCall.html) (request|response)
+/// * [sites domains create projects](struct.ProjectSiteDomainCreateCall.html) (request|response)
+/// * [domains update sites](struct.SiteDomainUpdateCall.html) (request|response)
+/// * [domains get sites](struct.SiteDomainGetCall.html) (response)
+/// * [sites domains get projects](struct.ProjectSiteDomainGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Domain {
@@ -1090,7 +1071,6 @@ impl ResponseResult for Domain {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [versions clone sites](struct.SiteVersionCloneCall.html) (response)
 /// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1153,7 +1133,7 @@ impl ResponseResult for Operation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `channels_releases_create(...)`, `channels_releases_list(...)`, `domains_create(...)`, `domains_delete(...)`, `domains_get(...)`, `domains_list(...)`, `domains_update(...)`, `get_config(...)`, `releases_create(...)`, `releases_list(...)`, `update_config(...)`, `versions_clone(...)`, `versions_create(...)`, `versions_delete(...)`, `versions_files_list(...)`, `versions_list(...)`, `versions_patch(...)` and `versions_populate_files(...)`
+/// // like `channels_releases_create(...)`, `channels_releases_list(...)`, `domains_create(...)`, `domains_delete(...)`, `domains_get(...)`, `domains_list(...)`, `domains_update(...)`, `get_config(...)`, `releases_create(...)`, `releases_list(...)`, `update_config(...)`, `versions_create(...)`, `versions_delete(...)`, `versions_files_list(...)`, `versions_list(...)`, `versions_patch(...)` and `versions_populate_files(...)`
 /// // to build up your call.
 /// let rb = hub.sites();
 /// # }
@@ -1197,7 +1177,7 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The site that the release belongs to, in the format:
+    /// * `parent` - Required. The site that the release belongs to, in the format:
     ///              <code>sites/<var>site-name</var></code>
     pub fn channels_releases_create(&self, request: Release, parent: &str) -> SiteChannelReleaseCreateCall<'a, C, A> {
         SiteChannelReleaseCreateCall {
@@ -1219,7 +1199,7 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The site that the release belongs to, in the format:
+    /// * `parent` - Required. The site that the release belongs to, in the format:
     ///              <code>sites/<var>site-name</var></code>
     pub fn releases_create(&self, request: Release, parent: &str) -> SiteReleaseCreateCall<'a, C, A> {
         SiteReleaseCreateCall {
@@ -1256,6 +1236,7 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds content files to a version.
+    /// Each file must be under 2 GB.
     /// 
     /// # Arguments
     ///
@@ -1329,6 +1310,7 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
             _page_size: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1395,26 +1377,6 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
             _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates a new version on the target site using the content
-    /// of the specified version.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. The target site where the cloned version will reside,
-    ///              in the format: `sites/{site}`
-    pub fn versions_clone(&self, request: CloneVersionRequest, parent: &str) -> SiteVersionCloneCall<'a, C, A> {
-        SiteVersionCloneCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _delegate: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -1563,7 +1525,7 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `operations_get(...)`, `sites_channels_releases_create(...)`, `sites_channels_releases_list(...)`, `sites_releases_create(...)` and `sites_releases_list(...)`
+/// // like `operations_get(...)`, `sites_channels_releases_create(...)`, `sites_channels_releases_list(...)`, `sites_domains_create(...)`, `sites_domains_delete(...)`, `sites_domains_get(...)`, `sites_domains_list(...)`, `sites_domains_update(...)`, `sites_get_config(...)`, `sites_releases_create(...)`, `sites_releases_list(...)`, `sites_update_config(...)`, `sites_versions_create(...)`, `sites_versions_delete(...)`, `sites_versions_files_list(...)`, `sites_versions_list(...)`, `sites_versions_patch(...)` and `sites_versions_populate_files(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1577,6 +1539,28 @@ pub struct ProjectMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
 impl<'a, C, A> ProjectMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the versions that have been created on the specified site.
+    /// Will include filtering in the future.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent for which to list files, in the format:
+    ///              <code>sites/<var>site-name</var></code>
+    pub fn sites_versions_list(&self, parent: &str) -> ProjectSiteVersionListCall<'a, C, A> {
+        ProjectSiteVersionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1600,13 +1584,90 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Sets the Hosting metadata for a specific site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The site for which to update the SiteConfig, in the format:
+    ///            <code>sites/<var>site-name</var>/config</code>
+    pub fn sites_update_config(&self, request: SiteConfig, name: &str) -> ProjectSiteUpdateConfigCall<'a, C, A> {
+        ProjectSiteUpdateConfigCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the existing domain mapping on the specified site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the domain association to delete.
+    pub fn sites_domains_delete(&self, name: &str) -> ProjectSiteDomainDeleteCall<'a, C, A> {
+        ProjectSiteDomainDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the version to be deleted, in the format:
+    ///            <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    pub fn sites_versions_delete(&self, name: &str) -> ProjectSiteVersionDeleteCall<'a, C, A> {
+        ProjectSiteVersionDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the specified domain mapping, creating the mapping as if it does
+    /// not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the domain association to update or create, if an
+    ///            association doesn't already exist.
+    pub fn sites_domains_update(&self, request: Domain, name: &str) -> ProjectSiteDomainUpdateCall<'a, C, A> {
+        ProjectSiteDomainUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a new release which makes the content of the specified version
     /// actively display on the appropriate URL(s).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The site that the release belongs to, in the format:
+    /// * `parent` - Required. The site that the release belongs to, in the format:
     ///              <code>sites/<var>site-name</var></code>
     pub fn sites_releases_create(&self, request: Release, parent: &str) -> ProjectSiteReleaseCreateCall<'a, C, A> {
         ProjectSiteReleaseCreateCall {
@@ -1647,7 +1708,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The site that the release belongs to, in the format:
+    /// * `parent` - Required. The site that the release belongs to, in the format:
     ///              <code>sites/<var>site-name</var></code>
     pub fn sites_channels_releases_create(&self, request: Release, parent: &str) -> ProjectSiteChannelReleaseCreateCall<'a, C, A> {
         ProjectSiteChannelReleaseCreateCall {
@@ -1675,6 +1736,173 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the remaining files to be uploaded for the specified version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent to list files for, in the format:
+    ///              <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    pub fn sites_versions_files_list(&self, parent: &str) -> ProjectSiteVersionFileListCall<'a, C, A> {
+        ProjectSiteVersionFileListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _status: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds content files to a version.
+    /// Each file must be under 2 GB.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The version to add files to, in the format:
+    ///              <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    pub fn sites_versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> ProjectSiteVersionPopulateFileCall<'a, C, A> {
+        ProjectSiteVersionPopulateFileCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a domain mapping on the specified site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the domain configuration to get.
+    pub fn sites_domains_get(&self, name: &str) -> ProjectSiteDomainGetCall<'a, C, A> {
+        ProjectSiteDomainGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the Hosting metadata for a specific site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The site for which to get the SiteConfig, in the format:
+    ///            <code>sites/<var>site-name</var>/config</code>
+    pub fn sites_get_config(&self, name: &str) -> ProjectSiteGetConfigCall<'a, C, A> {
+        ProjectSiteGetConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a domain mapping on the specified site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent to create the domain association for, in the format:
+    ///              <code>sites/<var>site-name</var></code>
+    pub fn sites_domains_create(&self, request: Domain, parent: &str) -> ProjectSiteDomainCreateCall<'a, C, A> {
+        ProjectSiteDomainCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the specified metadata for a version. Note that this method will
+    /// fail with `FAILED_PRECONDITION` in the event of an invalid state
+    /// transition. The only valid transition for a version is currently from a
+    /// `CREATED` status to a `FINALIZED` status.
+    /// Use [`DeleteVersion`](../sites.versions/delete) to set the status of a
+    /// version to `DELETED`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The unique identifier for a version, in the format:
+    ///            <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    ///            This name is provided in the response body when you call the
+    ///            [`CreateVersion`](../sites.versions/create) endpoint.
+    pub fn sites_versions_patch(&self, request: Version, name: &str) -> ProjectSiteVersionPatchCall<'a, C, A> {
+        ProjectSiteVersionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the domains for the specified site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent for which to list domains, in the format:
+    ///              <code>sites/<var>site-name</var></code>
+    pub fn sites_domains_list(&self, parent: &str) -> ProjectSiteDomainListCall<'a, C, A> {
+        ProjectSiteDomainListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new version for a site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent to create the version for, in the format:
+    ///              <code>sites/<var>site-name</var></code>
+    pub fn sites_versions_create(&self, request: Version, parent: &str) -> ProjectSiteVersionCreateCall<'a, C, A> {
+        ProjectSiteVersionCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _version_id: Default::default(),
+            _size_bytes: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1718,9 +1946,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_files_list("parent")
-///              .status("accusam")
-///              .page_token("takimata")
-///              .page_size(-70)
+///              .status("et")
+///              .page_token("dolores")
+///              .page_size(-63)
 ///              .doit();
 /// # }
 /// ```
@@ -2017,7 +2245,7 @@ impl<'a, C, A> SiteVersionFileListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().channels_releases_create(req, "parent")
-///              .version_name("erat")
+///              .version_name("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -2200,7 +2428,7 @@ impl<'a, C, A> SiteChannelReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// The site that the release belongs to, in the format:
+    /// Required. The site that the release belongs to, in the format:
     /// <code>sites/<var>site-name</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -2322,7 +2550,7 @@ impl<'a, C, A> SiteChannelReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().releases_create(req, "parent")
-///              .version_name("sea")
+///              .version_name("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -2505,7 +2733,7 @@ impl<'a, C, A> SiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// The site that the release belongs to, in the format:
+    /// Required. The site that the release belongs to, in the format:
     /// <code>sites/<var>site-name</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -2620,8 +2848,8 @@ impl<'a, C, A> SiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().channels_releases_list("parent")
-///              .page_token("dolores")
-///              .page_size(-61)
+///              .page_token("labore")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -2872,6 +3100,7 @@ impl<'a, C, A> SiteChannelReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
 /// Adds content files to a version.
+/// Each file must be under 2 GB.
 ///
 /// A builder for the *versions.populateFiles* method supported by a *site* resource.
 /// It is not used directly, but through a `SiteMethods` instance.
@@ -3728,9 +3957,9 @@ impl<'a, C, A> SiteDomainUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_list("parent")
-///              .page_token("justo")
-///              .page_size(-21)
-///              .filter("et")
+///              .page_token("aliquyam")
+///              .page_size(-66)
+///              .filter("no")
 ///              .doit();
 /// # }
 /// ```
@@ -3744,6 +3973,7 @@ pub struct SiteVersionListCall<'a, C, A>
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for SiteVersionListCall<'a, C, A> {}
@@ -3787,17 +4017,8 @@ impl<'a, C, A> SiteVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/versions";
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -3830,10 +4051,24 @@ impl<'a, C, A> SiteVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -3965,6 +4200,29 @@ impl<'a, C, A> SiteVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
 }
 
 
@@ -4007,7 +4265,7 @@ impl<'a, C, A> SiteVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_patch(req, "name")
-///              .update_mask("diam")
+///              .update_mask("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -4560,8 +4818,8 @@ impl<'a, C, A> SiteVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().releases_list("parent")
-///              .page_token("et")
-///              .page_size(-70)
+///              .page_token("diam")
+///              .page_size(-55)
 ///              .doit();
 /// # }
 /// ```
@@ -4808,264 +5066,6 @@ impl<'a, C, A> SiteReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         self
     }
-}
-
-
-/// Creates a new version on the target site using the content
-/// of the specified version.
-///
-/// A builder for the *versions.clone* method supported by a *site* resource.
-/// It is not used directly, but through a `SiteMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
-/// use firebasehosting1_beta1::CloneVersionRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use firebasehosting1_beta1::FirebaseHosting;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CloneVersionRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.sites().versions_clone(req, "parent")
-///              .doit();
-/// # }
-/// ```
-pub struct SiteVersionCloneCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a FirebaseHosting<C, A>,
-    _request: CloneVersionRequest,
-    _parent: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-}
-
-impl<'a, C, A> CallBuilder for SiteVersionCloneCall<'a, C, A> {}
-
-impl<'a, C, A> SiteVersionCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "firebasehosting.sites.versions.clone",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/versions:clone";
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloneVersionRequest) -> SiteVersionCloneCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The target site where the cloned version will reside,
-    /// in the format: `sites/{site}`
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionCloneCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SiteVersionCloneCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCloneCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
 }
 
 
@@ -5637,8 +5637,8 @@ impl<'a, C, A> SiteDomainCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().domains_list("parent")
-///              .page_token("erat")
-///              .page_size(-95)
+///              .page_token("aliquyam")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -5922,8 +5922,8 @@ impl<'a, C, A> SiteDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().versions_create(req, "parent")
-///              .version_id("eirmod")
-///              .size_bytes("elitr")
+///              .version_id("eos")
+///              .size_bytes("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -6234,7 +6234,7 @@ impl<'a, C, A> SiteVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.sites().update_config(req, "name")
-///              .update_mask("no")
+///              .update_mask("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -6756,6 +6756,304 @@ impl<'a, C, A> SiteDomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Lists the versions that have been created on the specified site.
+/// Will include filtering in the future.
+///
+/// A builder for the *sites.versions.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_versions_list("parent")
+///              .page_token("amet")
+///              .page_size(-60)
+///              .filter("labore")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteVersionListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteVersionListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListVersionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.versions.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/versions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent for which to list files, in the format:
+    /// <code>sites/<var>site-name</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token from a previous request, if provided.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of versions to return. The service may return fewer than
+    /// this value.
+    /// If unspecified, at most 25 versions will be returned.
+    /// The maximum value is 100; values above 100 will be coerced to 100
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The filter string used to return a subset of versions in the response.
+    /// Currently supported fields for filtering are: name, status,
+    /// and create_time. Filter processing will be implemented in accordance
+    /// with go/filtering.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteVersionListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists the releases that have been created on the specified site.
 ///
 /// A builder for the *sites.channels.releases.list* method supported by a *project* resource.
@@ -7035,6 +7333,1104 @@ impl<'a, C, A> ProjectSiteChannelReleaseListCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
+/// Sets the Hosting metadata for a specific site.
+///
+/// A builder for the *sites.updateConfig* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::SiteConfig;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SiteConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_update_config(req, "name")
+///              .update_mask("accusam")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteUpdateConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: SiteConfig,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteUpdateConfigCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteUpdateConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SiteConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.updateConfig",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SiteConfig) -> ProjectSiteUpdateConfigCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The site for which to update the SiteConfig, in the format:
+    /// <code>sites/<var>site-name</var>/config</code>
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// A set of field names from your [site configuration](../sites.SiteConfig)
+    /// that you want to update.
+    /// <br>A field will be overwritten if, and only if, it's in the mask.
+    /// <br>If a mask is not provided then a default mask of only
+    /// [`max_versions`](../sites.SiteConfig.max_versions) will be used.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteUpdateConfigCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteUpdateConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteUpdateConfigCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the existing domain mapping on the specified site.
+///
+/// A builder for the *sites.domains.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_domains_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteDomainDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteDomainDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteDomainDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.domains.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the domain association to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteDomainDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the specified version.
+///
+/// A builder for the *sites.versions.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_versions_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteVersionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteVersionDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.versions.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the version to be deleted, in the format:
+    /// <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteVersionDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates the specified domain mapping, creating the mapping as if it does
+/// not exist.
+///
+/// A builder for the *sites.domains.update* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::Domain;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Domain::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_domains_update(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteDomainUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: Domain,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteDomainUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteDomainUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Domain)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.domains.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the domain association to update or create, if an
+    /// association doesn't already exist.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainUpdateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteDomainUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates a new release which makes the content of the specified version
 /// actively display on the appropriate URL(s).
 ///
@@ -7070,7 +8466,7 @@ impl<'a, C, A> ProjectSiteChannelReleaseListCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_releases_create(req, "parent")
-///              .version_name("accusam")
+///              .version_name("et")
 ///              .doit();
 /// # }
 /// ```
@@ -7253,7 +8649,7 @@ impl<'a, C, A> ProjectSiteReleaseCreateCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// The site that the release belongs to, in the format:
+    /// Required. The site that the release belongs to, in the format:
     /// <code>sites/<var>site-name</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -7814,7 +9210,7 @@ impl<'a, C, A> ProjectSiteChannelReleaseCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The site that the release belongs to, in the format:
+    /// Required. The site that the release belongs to, in the format:
     /// <code>sites/<var>site-name</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -7930,7 +9326,7 @@ impl<'a, C, A> ProjectSiteChannelReleaseCreateCall<'a, C, A> where C: BorrowMut<
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sites_releases_list("parent")
 ///              .page_token("et")
-///              .page_size(-40)
+///              .page_size(-45)
 ///              .doit();
 /// # }
 /// ```
@@ -8169,6 +9565,2280 @@ impl<'a, C, A> ProjectSiteReleaseListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the remaining files to be uploaded for the specified version.
+///
+/// A builder for the *sites.versions.files.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_versions_files_list("parent")
+///              .status("ea")
+///              .page_token("sed")
+///              .page_size(-3)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteVersionFileListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _parent: String,
+    _status: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteVersionFileListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteVersionFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListVersionFilesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.versions.files.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._status {
+            params.push(("status", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "status", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/files";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent to list files for, in the format:
+    /// <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The type of files in the version that should be listed.
+    ///
+    /// Sets the *status* query property to the given value.
+    pub fn status(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, C, A> {
+        self._status = Some(new_value.to_string());
+        self
+    }
+    /// The next_page_token from a previous request, if provided. This will be the
+    /// encoded version of a firebase.hosting.proto.metadata.ListFilesPageToken.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The page size to return. Defaults to 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionFileListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteVersionFileListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionFileListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionFileListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Adds content files to a version.
+/// Each file must be under 2 GB.
+///
+/// A builder for the *sites.versions.populateFiles* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::PopulateVersionFilesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = PopulateVersionFilesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_versions_populate_files(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteVersionPopulateFileCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: PopulateVersionFilesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteVersionPopulateFileCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteVersionPopulateFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PopulateVersionFilesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.versions.populateFiles",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}:populateFiles";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> ProjectSiteVersionPopulateFileCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The version to add files to, in the format:
+    /// <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionPopulateFileCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteVersionPopulateFileCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPopulateFileCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPopulateFileCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets a domain mapping on the specified site.
+///
+/// A builder for the *sites.domains.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_domains_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteDomainGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteDomainGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteDomainGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Domain)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.domains.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the domain configuration to get.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteDomainGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the Hosting metadata for a specific site.
+///
+/// A builder for the *sites.getConfig* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_get_config("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteGetConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteGetConfigCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SiteConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.getConfig",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The site for which to get the SiteConfig, in the format:
+    /// <code>sites/<var>site-name</var>/config</code>
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteGetConfigCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteGetConfigCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetConfigCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetConfigCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a domain mapping on the specified site.
+///
+/// A builder for the *sites.domains.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::Domain;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Domain::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_domains_create(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteDomainCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: Domain,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteDomainCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteDomainCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Domain)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.domains.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/domains";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent to create the domain association for, in the format:
+    /// <code>sites/<var>site-name</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteDomainCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates the specified metadata for a version. Note that this method will
+/// fail with `FAILED_PRECONDITION` in the event of an invalid state
+/// transition. The only valid transition for a version is currently from a
+/// `CREATED` status to a `FINALIZED` status.
+/// Use [`DeleteVersion`](../sites.versions/delete) to set the status of a
+/// version to `DELETED`.
+///
+/// A builder for the *sites.versions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::Version;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Version::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_versions_patch(req, "name")
+///              .update_mask("voluptua.")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteVersionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: Version,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteVersionPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Version)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.versions.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The unique identifier for a version, in the format:
+    /// <code>sites/<var>site-name</var>/versions/<var>versionID</var></code>
+    /// This name is provided in the response body when you call the
+    /// [`CreateVersion`](../sites.versions/create) endpoint.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// A set of field names from your [version](../sites.versions) that you want
+    /// to update.
+    /// <br>A field will be overwritten if, and only if, it's in the mask.
+    /// <br>If a mask is not provided then a default mask of only
+    /// [`status`](../sites.versions#Version.FIELDS.status) will be used.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteVersionPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the domains for the specified site.
+///
+/// A builder for the *sites.domains.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_domains_list("parent")
+///              .page_token("gubergren")
+///              .page_size(-20)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteDomainListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteDomainListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDomainsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.domains.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/domains";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::FirebaseReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent for which to list domains, in the format:
+    /// <code>sites/<var>site-name</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token from a previous request, if provided.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The page size to return. Defaults to 50.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteDomainListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteDomainListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::FirebaseReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a new version for a site.
+///
+/// A builder for the *sites.versions.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
+/// use firebasehosting1_beta1::Version;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasehosting1_beta1::FirebaseHosting;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Version::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().sites_versions_create(req, "parent")
+///              .version_id("vero")
+///              .size_bytes("diam")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSiteVersionCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseHosting<C, A>,
+    _request: Version,
+    _parent: String,
+    _version_id: Option<String>,
+    _size_bytes: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSiteVersionCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSiteVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Version)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasehosting.projects.sites.versions.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._version_id {
+            params.push(("versionId", value.to_string()));
+        }
+        if let Some(value) = self._size_bytes {
+            params.push(("sizeBytes", value.to_string()));
+        }
+        for &field in ["alt", "parent", "versionId", "sizeBytes"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/versions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent to create the version for, in the format:
+    /// <code>sites/<var>site-name</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// A unique id for the new version. This is only specified for legacy version
+    /// creations.
+    ///
+    /// Sets the *version id* query property to the given value.
+    pub fn version_id(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, C, A> {
+        self._version_id = Some(new_value.to_string());
+        self
+    }
+    /// The self-reported size of the version. This value is used for a pre-emptive
+    /// quota check for legacy version uploads.
+    ///
+    /// Sets the *size bytes* query property to the given value.
+    pub fn size_bytes(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, C, A> {
+        self._size_bytes = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSiteVersionCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

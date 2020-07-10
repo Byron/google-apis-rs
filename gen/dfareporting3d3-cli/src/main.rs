@@ -22576,13 +22576,13 @@ fn main() {
                   vec![
                     (Some(r##"profile-id"##),
                      None,
-                     Some(r##"The DFA user profile ID."##),
+                     Some(r##"The DFA profile ID."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"report-id"##),
                      None,
-                     Some(r##"The ID of the report."##),
+                     Some(r##"The ID of the parent report."##),
                      Some(true),
                      Some(false)),
         
@@ -23712,7 +23712,7 @@ fn main() {
     
     let mut app = App::new("dfareporting3d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200326")
+           .version("1.0.14+20200514")
            .about("Manages your DoubleClick Campaign Manager ad campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3d3_cli")
            .arg(Arg::with_name("url")

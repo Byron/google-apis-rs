@@ -4,12 +4,12 @@
 [package]
 
 name = "google-commentanalyzer1_alpha1"
-version = "1.0.13+20200405"
+version = "1.0.14+20200405"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Comment Analyzer (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/commentanalyzer1_alpha1"
 homepage = "https://github.com/conversationai/perspectiveapi/blob/master/README.md"
-documentation = "https://docs.rs/google-commentanalyzer1_alpha1/1.0.13+20200405"
+documentation = "https://docs.rs/google-commentanalyzer1_alpha1/1.0.14+20200405"
 license = "MIT"
 keywords = ["commentanalyzer", "google", "protocol", "web", "api"]
 autobins = false

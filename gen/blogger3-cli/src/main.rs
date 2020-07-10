@@ -444,7 +444,7 @@ impl<'n> Engine<'n> {
                     call = call.view(value.unwrap_or(""));
                 },
                 "status" => {
-                    call = call.add_status(value.unwrap_or(""));
+                    call = call.status(value.unwrap_or(""));
                 },
                 "start-date" => {
                     call = call.start_date(value.unwrap_or(""));
@@ -2524,12 +2524,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Blogger::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -2553,18 +2556,18 @@ fn main() {
     let arg_data = [
         ("blog-user-infos", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Gets one blog and user info pair by blogId and userId."##),
+                    Some(r##"Gets one blog and user info pair by blog id and user id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blog-user-infos_get",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the blog to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2584,12 +2587,12 @@ fn main() {
         
         ("blogs", "methods: 'get', 'get-by-url' and 'list-by-user'", vec![
             ("get",
-                    Some(r##"Gets one blog by ID."##),
+                    Some(r##"Gets a blog by id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blogs_get",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the blog to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2606,12 +2609,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-by-url",
-                    Some(r##"Retrieve a Blog by URL."##),
+                    Some(r##"Gets a blog by url."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blogs_get-by-url",
                   vec![
                     (Some(r##"url"##),
                      None,
-                     Some(r##"The URL of the blog to retrieve."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2628,12 +2631,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-by-user",
-                    Some(r##"Retrieves a list of blogs, possibly filtered."##),
+                    Some(r##"Lists blogs by user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blogs_list-by-user",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2653,24 +2656,24 @@ fn main() {
         
         ("comments", "methods: 'approve', 'delete', 'get', 'list', 'list-by-blog', 'mark-as-spam' and 'remove-content'", vec![
             ("approve",
-                    Some(r##"Marks a comment as not spam."##),
+                    Some(r##"Marks a comment as not spam by blog id, post id and comment id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_approve",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"comment-id"##),
                      None,
-                     Some(r##"The ID of the comment to mark as not spam."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2687,24 +2690,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Delete a comment by ID."##),
+                    Some(r##"Deletes a comment by blog id, post id and comment id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_delete",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"comment-id"##),
                      None,
-                     Some(r##"The ID of the comment to delete."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2715,24 +2718,24 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Gets one comment by ID."##),
+                    Some(r##"Gets a comment by id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_get",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to containing the comment."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"ID of the post to fetch posts from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"comment-id"##),
                      None,
-                     Some(r##"The ID of the comment to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2749,18 +2752,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the comments for a post, possibly filtered."##),
+                    Some(r##"Lists comments."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_list",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch comments from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"ID of the post to fetch posts from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2777,12 +2780,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-by-blog",
-                    Some(r##"Retrieves the comments for a blog, across all posts, possibly filtered."##),
+                    Some(r##"Lists comments by blog."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_list-by-blog",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch comments from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2799,24 +2802,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("mark-as-spam",
-                    Some(r##"Marks a comment as spam."##),
+                    Some(r##"Marks a comment as spam by blog id, post id and comment id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_mark-as-spam",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"comment-id"##),
                      None,
-                     Some(r##"The ID of the comment to mark as spam."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2833,24 +2836,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("remove-content",
-                    Some(r##"Removes the content of a comment."##),
+                    Some(r##"Removes the content of a comment by blog id, post id and comment id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_remove-content",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"comment-id"##),
                      None,
-                     Some(r##"The ID of the comment to delete content from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2870,12 +2873,12 @@ fn main() {
         
         ("page-views", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Retrieve pageview stats for a Blog."##),
+                    Some(r##"Gets page views by blog id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/page-views_get",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the blog to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2895,18 +2898,18 @@ fn main() {
         
         ("pages", "methods: 'delete', 'get', 'insert', 'list', 'patch', 'publish', 'revert' and 'update'", vec![
             ("delete",
-                    Some(r##"Delete a page by ID."##),
+                    Some(r##"Deletes a page by blog id and page id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_delete",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"page-id"##),
                      None,
-                     Some(r##"The ID of the Page."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2917,18 +2920,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Gets one blog page by ID."##),
+                    Some(r##"Gets a page by blog id and page id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_get",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog containing the page."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"page-id"##),
                      None,
-                     Some(r##"The ID of the page to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2945,12 +2948,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Add a page."##),
+                    Some(r##"Inserts a page."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_insert",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to add the page to."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2973,12 +2976,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves the pages for a blog, optionally including non-LIVE statuses."##),
+                    Some(r##"Lists pages."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_list",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch Pages from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2995,18 +2998,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update a page. This method supports patch semantics."##),
+                    Some(r##"Patches a page."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_patch",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"page-id"##),
                      None,
-                     Some(r##"The ID of the Page."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3029,18 +3032,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("publish",
-                    Some(r##"Publishes a draft page."##),
+                    Some(r##"Publishes a page."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_publish",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"page-id"##),
                      None,
-                     Some(r##"The ID of the page."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3057,18 +3060,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("revert",
-                    Some(r##"Revert a published or scheduled page to draft state."##),
+                    Some(r##"Reverts a published or scheduled page to draft state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_revert",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"page-id"##),
                      None,
-                     Some(r##"The ID of the page."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3085,18 +3088,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update a page."##),
+                    Some(r##"Updates a page by blog id and page id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_update",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"page-id"##),
                      None,
-                     Some(r##"The ID of the Page."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3122,24 +3125,24 @@ fn main() {
         
         ("post-user-infos", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user."##),
+                    Some(r##"Gets one post and user info pair, by post_id and user_id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/post-user-infos_get",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the post to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3156,18 +3159,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user."##),
+                    Some(r##"Lists post and user info pairs."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/post-user-infos_list",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch posts from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3187,18 +3190,18 @@ fn main() {
         
         ("posts", "methods: 'delete', 'get', 'get-by-path', 'insert', 'list', 'patch', 'publish', 'revert', 'search' and 'update'", vec![
             ("delete",
-                    Some(r##"Delete a post by ID."##),
+                    Some(r##"Deletes a post by blog id and post id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_delete",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3209,18 +3212,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Get a post by ID."##),
+                    Some(r##"Gets a post by blog id and post id"##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_get",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch the post from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the post"##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3237,18 +3240,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-by-path",
-                    Some(r##"Retrieve a Post by Path."##),
+                    Some(r##"Gets a post by path."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_get-by-path",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch the post from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"path"##),
                      None,
-                     Some(r##"Path of the Post to retrieve."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3265,12 +3268,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Add a post."##),
+                    Some(r##"Inserts a post."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_insert",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to add the post to."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3293,12 +3296,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of posts, possibly filtered."##),
+                    Some(r##"Lists posts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_list",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch posts from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3315,18 +3318,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update a post. This method supports patch semantics."##),
+                    Some(r##"Patches a post."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_patch",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3349,18 +3352,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("publish",
-                    Some(r##"Publishes a draft post, optionally at the specific time of the given publishDate parameter."##),
+                    Some(r##"Publishes a post."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_publish",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3377,18 +3380,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("revert",
-                    Some(r##"Revert a published or scheduled post to draft state."##),
+                    Some(r##"Reverts a published or scheduled post to draft state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_revert",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3405,18 +3408,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Search for a post."##),
+                    Some(r##"Searches for posts matching given query terms in the specified blog."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_search",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"ID of the blog to fetch the post from."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"q"##),
                      None,
-                     Some(r##"Query terms to search this blog for matching posts."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3433,18 +3436,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update a post."##),
+                    Some(r##"Updates a post by blog id and post id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_update",
                   vec![
                     (Some(r##"blog-id"##),
                      None,
-                     Some(r##"The ID of the Blog."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"post-id"##),
                      None,
-                     Some(r##"The ID of the Post."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3470,12 +3473,12 @@ fn main() {
         
         ("users", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Gets one user by ID."##),
+                    Some(r##"Gets one user by user_id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/users_get",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"The ID of the user to get."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -3497,8 +3500,9 @@ fn main() {
     
     let mut app = App::new("blogger3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20150422")
-           .about("API for access to the data within Blogger.")
+           .version("1.0.14+20200707")
+           .about("The Blogger API provides access to posts, comments and pages of a
+               Blogger blog.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_blogger3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

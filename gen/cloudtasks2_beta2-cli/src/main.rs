@@ -2708,7 +2708,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200615")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli")
            .arg(Arg::with_name("url")

@@ -46,6 +46,732 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _projects_locations_datasets_annotation_stores_annotations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "annotation-source.cloud-healthcare-source.name" => Some(("annotationSource.cloudHealthcareSource.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-annotation.label" => Some(("resourceAnnotation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-data" => Some(("customData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "image-annotation.frame-index" => Some(("imageAnnotation.frameIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation-source", "cloud-healthcare-source", "custom-data", "frame-index", "image-annotation", "label", "name", "resource-annotation"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Annotation = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_annotations_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_annotations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_annotations_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_annotations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_annotations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_annotations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_annotations_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size", "view"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_annotations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "annotation-source.cloud-healthcare-source.name" => Some(("annotationSource.cloudHealthcareSource.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-annotation.label" => Some(("resourceAnnotation.label", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-data" => Some(("customData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "image-annotation.frame-index" => Some(("imageAnnotation.frameIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation-source", "cloud-healthcare-source", "custom-data", "frame-index", "image-annotation", "label", "name", "resource-annotation"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Annotation = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_annotations_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AnnotationStore = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "annotation-store-id" => {
+                    call = call.annotation_store_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["annotation-store-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_evaluate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "info-type-config.ignore-list.info-types" => Some(("infoTypeConfig.ignoreList.infoTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "info-type-config.strict-matching" => Some(("infoTypeConfig.strictMatching", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "info-type-config.evaluate-list.info-types" => Some(("infoTypeConfig.evaluateList.infoTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "bigquery-destination.table-uri" => Some(("bigqueryDestination.tableUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-destination.schema-type" => Some(("bigqueryDestination.schemaType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-destination.force" => Some(("bigqueryDestination.force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "golden-info-type-mapping" => Some(("goldenInfoTypeMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "eval-info-type-mapping" => Some(("evalInfoTypeMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "golden-store" => Some(("goldenStore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "eval-info-type-mapping", "evaluate-list", "force", "golden-info-type-mapping", "golden-store", "ignore-list", "info-type-config", "info-types", "schema-type", "strict-matching", "table-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EvaluateAnnotationStoreRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_evaluate(request, opt.value_of("eval-store").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "bigquery-destination.table-uri" => Some(("bigqueryDestination.tableUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-destination.schema-type" => Some(("bigqueryDestination.schemaType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-destination.force" => Some(("bigqueryDestination.force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gcs-destination.uri-prefix" => Some(("gcsDestination.uriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "force", "gcs-destination", "schema-type", "table-uri", "uri-prefix"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ExportAnnotationsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_export(request, opt.value_of("annotation-store").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_datasets_annotation_stores_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_datasets_annotation_stores_get_iam_policy(opt.value_of("resource").unwrap_or(""));
@@ -69,6 +795,243 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["options-requested-policy-version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "gcs-source.uri" => Some(("gcsSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcs-source", "uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ImportAnnotationsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_import(request, opt.value_of("annotation-store").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_annotation_stores_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AnnotationStore = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_annotation_stores_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -393,8 +1356,10 @@ impl<'n> Engine<'n> {
                     "config.dicom.skip-id-redaction" => Some(("config.dicom.skipIdRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.dicom.keep-list.tags" => Some(("config.dicom.keepList.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.image.text-redaction-mode" => Some(("config.image.textRedactionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.annotation.store-quote" => Some(("config.annotation.storeQuote", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.annotation.annotation-store-name" => Some(("config.annotation.annotationStoreName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config", "destination-dataset", "dicom", "filter-profile", "image", "keep-list", "remove-list", "skip-id-redaction", "tags", "text-redaction-mode"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation", "annotation-store-name", "config", "destination-dataset", "dicom", "filter-profile", "image", "keep-list", "remove-list", "skip-id-redaction", "store-quote", "tags", "text-redaction-mode"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -627,8 +1592,10 @@ impl<'n> Engine<'n> {
                     "config.dicom.skip-id-redaction" => Some(("config.dicom.skipIdRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.dicom.keep-list.tags" => Some(("config.dicom.keepList.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.image.text-redaction-mode" => Some(("config.image.textRedactionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.annotation.store-quote" => Some(("config.annotation.storeQuote", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.annotation.annotation-store-name" => Some(("config.annotation.annotationStoreName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config", "destination-store", "dicom", "filter-config", "filter-profile", "image", "keep-list", "remove-list", "resource-paths-gcs-uri", "skip-id-redaction", "tags", "text-redaction-mode"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation", "annotation-store-name", "config", "destination-store", "dicom", "filter-config", "filter-profile", "image", "keep-list", "remove-list", "resource-paths-gcs-uri", "skip-id-redaction", "store-quote", "tags", "text-redaction-mode"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2580,8 +3547,10 @@ impl<'n> Engine<'n> {
                     "config.dicom.skip-id-redaction" => Some(("config.dicom.skipIdRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.dicom.keep-list.tags" => Some(("config.dicom.keepList.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.image.text-redaction-mode" => Some(("config.image.textRedactionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.annotation.store-quote" => Some(("config.annotation.storeQuote", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.annotation.annotation-store-name" => Some(("config.annotation.annotationStoreName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["config", "destination-store", "dicom", "filter-profile", "image", "keep-list", "remove-list", "resource-filter", "resources", "skip-id-redaction", "tags", "text-redaction-mode"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation", "annotation-store-name", "config", "destination-store", "dicom", "filter-profile", "image", "keep-list", "remove-list", "resource-filter", "resources", "skip-id-redaction", "store-quote", "tags", "text-redaction-mode"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2749,6 +3718,139 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_fhir_stores_fhir__concept_map_search_translate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__concept_map_search_translate(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "url" => {
+                    call = call.url(value.unwrap_or(""));
+                },
+                "target" => {
+                    call = call.target(value.unwrap_or(""));
+                },
+                "system" => {
+                    call = call.system(value.unwrap_or(""));
+                },
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                "concept-map-version" => {
+                    call = call.concept_map_version(value.unwrap_or(""));
+                },
+                "code" => {
+                    call = call.code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["code", "target", "url", "system", "source", "concept-map-version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_datasets_fhir_stores_fhir__concept_map_translate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__concept_map_translate(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "system" => {
+                    call = call.system(value.unwrap_or(""));
+                },
+                "concept-map-version" => {
+                    call = call.concept_map_version(value.unwrap_or(""));
+                },
+                "code" => {
+                    call = call.code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["code", "concept-map-version", "system"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4196,62 +5298,6 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_locations_datasets_fhir_stores_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_datasets_fhir_stores_search(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "resource-type" => {
-                    call = call.resource_type(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["resource-type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6250,8 +7296,47 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-datasets-annotation-stores-annotations-create", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_annotations_create(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-annotations-delete", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_annotations_delete(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-annotations-get", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_annotations_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-annotations-list", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_annotations_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-annotations-patch", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_annotations_patch(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-create", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_create(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-delete", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_delete(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-evaluate", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_evaluate(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-export", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_export(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-get", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_get(opt, dry_run, &mut err);
+                    },
                     ("locations-datasets-annotation-stores-get-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_datasets_annotation_stores_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-import", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_import(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-list", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-annotation-stores-patch", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_annotation_stores_patch(opt, dry_run, &mut err);
                     },
                     ("locations-datasets-annotation-stores-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_datasets_annotation_stores_set_iam_policy(opt, dry_run, &mut err);
@@ -6373,6 +7458,12 @@ impl<'n> Engine<'n> {
                     ("locations-datasets-fhir-stores-export", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_export(opt, dry_run, &mut err);
                     },
+                    ("locations-datasets-fhir-stores-fhir--concept-map-search-translate", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir__concept_map_search_translate(opt, dry_run, &mut err);
+                    },
+                    ("locations-datasets-fhir-stores-fhir--concept-map-translate", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_fhir__concept_map_translate(opt, dry_run, &mut err);
+                    },
                     ("locations-datasets-fhir-stores-fhir--observation-lastn", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_fhir__observation_lastn(opt, dry_run, &mut err);
                     },
@@ -6435,9 +7526,6 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-datasets-fhir-stores-patch", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_patch(opt, dry_run, &mut err);
-                    },
-                    ("locations-datasets-fhir-stores-search", Some(opt)) => {
-                        call_result = self._projects_locations_datasets_fhir_stores_search(opt, dry_run, &mut err);
                     },
                     ("locations-datasets-fhir-stores-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_set_iam_policy(opt, dry_run, &mut err);
@@ -6611,7 +7699,288 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-datasets-annotation-stores-get-iam-policy', 'locations-datasets-annotation-stores-set-iam-policy', 'locations-datasets-annotation-stores-test-iam-permissions', 'locations-datasets-create', 'locations-datasets-deidentify', 'locations-datasets-delete', 'locations-datasets-dicom-stores-create', 'locations-datasets-dicom-stores-deidentify', 'locations-datasets-dicom-stores-delete', 'locations-datasets-dicom-stores-export', 'locations-datasets-dicom-stores-get', 'locations-datasets-dicom-stores-get-iam-policy', 'locations-datasets-dicom-stores-import', 'locations-datasets-dicom-stores-list', 'locations-datasets-dicom-stores-patch', 'locations-datasets-dicom-stores-search-for-instances', 'locations-datasets-dicom-stores-search-for-series', 'locations-datasets-dicom-stores-search-for-studies', 'locations-datasets-dicom-stores-set-iam-policy', 'locations-datasets-dicom-stores-store-instances', 'locations-datasets-dicom-stores-studies-delete', 'locations-datasets-dicom-stores-studies-retrieve-metadata', 'locations-datasets-dicom-stores-studies-retrieve-study', 'locations-datasets-dicom-stores-studies-search-for-instances', 'locations-datasets-dicom-stores-studies-search-for-series', 'locations-datasets-dicom-stores-studies-series-delete', 'locations-datasets-dicom-stores-studies-series-instances-delete', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-instance', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-retrieve-series', 'locations-datasets-dicom-stores-studies-series-search-for-instances', 'locations-datasets-dicom-stores-studies-store-instances', 'locations-datasets-dicom-stores-test-iam-permissions', 'locations-datasets-fhir-stores-create', 'locations-datasets-fhir-stores-deidentify', 'locations-datasets-fhir-stores-delete', 'locations-datasets-fhir-stores-export', 'locations-datasets-fhir-stores-fhir--observation-lastn', 'locations-datasets-fhir-stores-fhir--patient-everything', 'locations-datasets-fhir-stores-fhir--resource-purge', 'locations-datasets-fhir-stores-fhir-capabilities', 'locations-datasets-fhir-stores-fhir-conditional-delete', 'locations-datasets-fhir-stores-fhir-conditional-patch', 'locations-datasets-fhir-stores-fhir-conditional-update', 'locations-datasets-fhir-stores-fhir-create', 'locations-datasets-fhir-stores-fhir-delete', 'locations-datasets-fhir-stores-fhir-execute-bundle', 'locations-datasets-fhir-stores-fhir-history', 'locations-datasets-fhir-stores-fhir-patch', 'locations-datasets-fhir-stores-fhir-read', 'locations-datasets-fhir-stores-fhir-search', 'locations-datasets-fhir-stores-fhir-update', 'locations-datasets-fhir-stores-fhir-vread', 'locations-datasets-fhir-stores-get', 'locations-datasets-fhir-stores-get-iam-policy', 'locations-datasets-fhir-stores-import', 'locations-datasets-fhir-stores-list', 'locations-datasets-fhir-stores-patch', 'locations-datasets-fhir-stores-search', 'locations-datasets-fhir-stores-set-iam-policy', 'locations-datasets-fhir-stores-test-iam-permissions', 'locations-datasets-get', 'locations-datasets-get-iam-policy', 'locations-datasets-hl7-v2-stores-create', 'locations-datasets-hl7-v2-stores-delete', 'locations-datasets-hl7-v2-stores-get', 'locations-datasets-hl7-v2-stores-get-iam-policy', 'locations-datasets-hl7-v2-stores-list', 'locations-datasets-hl7-v2-stores-messages-create', 'locations-datasets-hl7-v2-stores-messages-delete', 'locations-datasets-hl7-v2-stores-messages-get', 'locations-datasets-hl7-v2-stores-messages-ingest', 'locations-datasets-hl7-v2-stores-messages-list', 'locations-datasets-hl7-v2-stores-messages-patch', 'locations-datasets-hl7-v2-stores-patch', 'locations-datasets-hl7-v2-stores-set-iam-policy', 'locations-datasets-hl7-v2-stores-test-iam-permissions', 'locations-datasets-list', 'locations-datasets-operations-cancel', 'locations-datasets-operations-get', 'locations-datasets-operations-list', 'locations-datasets-patch', 'locations-datasets-set-iam-policy', 'locations-datasets-test-iam-permissions', 'locations-get' and 'locations-list'", vec![
+        ("projects", "methods: 'locations-datasets-annotation-stores-annotations-create', 'locations-datasets-annotation-stores-annotations-delete', 'locations-datasets-annotation-stores-annotations-get', 'locations-datasets-annotation-stores-annotations-list', 'locations-datasets-annotation-stores-annotations-patch', 'locations-datasets-annotation-stores-create', 'locations-datasets-annotation-stores-delete', 'locations-datasets-annotation-stores-evaluate', 'locations-datasets-annotation-stores-export', 'locations-datasets-annotation-stores-get', 'locations-datasets-annotation-stores-get-iam-policy', 'locations-datasets-annotation-stores-import', 'locations-datasets-annotation-stores-list', 'locations-datasets-annotation-stores-patch', 'locations-datasets-annotation-stores-set-iam-policy', 'locations-datasets-annotation-stores-test-iam-permissions', 'locations-datasets-create', 'locations-datasets-deidentify', 'locations-datasets-delete', 'locations-datasets-dicom-stores-create', 'locations-datasets-dicom-stores-deidentify', 'locations-datasets-dicom-stores-delete', 'locations-datasets-dicom-stores-export', 'locations-datasets-dicom-stores-get', 'locations-datasets-dicom-stores-get-iam-policy', 'locations-datasets-dicom-stores-import', 'locations-datasets-dicom-stores-list', 'locations-datasets-dicom-stores-patch', 'locations-datasets-dicom-stores-search-for-instances', 'locations-datasets-dicom-stores-search-for-series', 'locations-datasets-dicom-stores-search-for-studies', 'locations-datasets-dicom-stores-set-iam-policy', 'locations-datasets-dicom-stores-store-instances', 'locations-datasets-dicom-stores-studies-delete', 'locations-datasets-dicom-stores-studies-retrieve-metadata', 'locations-datasets-dicom-stores-studies-retrieve-study', 'locations-datasets-dicom-stores-studies-search-for-instances', 'locations-datasets-dicom-stores-studies-search-for-series', 'locations-datasets-dicom-stores-studies-series-delete', 'locations-datasets-dicom-stores-studies-series-instances-delete', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-instance', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-retrieve-series', 'locations-datasets-dicom-stores-studies-series-search-for-instances', 'locations-datasets-dicom-stores-studies-store-instances', 'locations-datasets-dicom-stores-test-iam-permissions', 'locations-datasets-fhir-stores-create', 'locations-datasets-fhir-stores-deidentify', 'locations-datasets-fhir-stores-delete', 'locations-datasets-fhir-stores-export', 'locations-datasets-fhir-stores-fhir--concept-map-search-translate', 'locations-datasets-fhir-stores-fhir--concept-map-translate', 'locations-datasets-fhir-stores-fhir--observation-lastn', 'locations-datasets-fhir-stores-fhir--patient-everything', 'locations-datasets-fhir-stores-fhir--resource-purge', 'locations-datasets-fhir-stores-fhir-capabilities', 'locations-datasets-fhir-stores-fhir-conditional-delete', 'locations-datasets-fhir-stores-fhir-conditional-patch', 'locations-datasets-fhir-stores-fhir-conditional-update', 'locations-datasets-fhir-stores-fhir-create', 'locations-datasets-fhir-stores-fhir-delete', 'locations-datasets-fhir-stores-fhir-execute-bundle', 'locations-datasets-fhir-stores-fhir-history', 'locations-datasets-fhir-stores-fhir-patch', 'locations-datasets-fhir-stores-fhir-read', 'locations-datasets-fhir-stores-fhir-search', 'locations-datasets-fhir-stores-fhir-update', 'locations-datasets-fhir-stores-fhir-vread', 'locations-datasets-fhir-stores-get', 'locations-datasets-fhir-stores-get-iam-policy', 'locations-datasets-fhir-stores-import', 'locations-datasets-fhir-stores-list', 'locations-datasets-fhir-stores-patch', 'locations-datasets-fhir-stores-set-iam-policy', 'locations-datasets-fhir-stores-test-iam-permissions', 'locations-datasets-get', 'locations-datasets-get-iam-policy', 'locations-datasets-hl7-v2-stores-create', 'locations-datasets-hl7-v2-stores-delete', 'locations-datasets-hl7-v2-stores-get', 'locations-datasets-hl7-v2-stores-get-iam-policy', 'locations-datasets-hl7-v2-stores-list', 'locations-datasets-hl7-v2-stores-messages-create', 'locations-datasets-hl7-v2-stores-messages-delete', 'locations-datasets-hl7-v2-stores-messages-get', 'locations-datasets-hl7-v2-stores-messages-ingest', 'locations-datasets-hl7-v2-stores-messages-list', 'locations-datasets-hl7-v2-stores-messages-patch', 'locations-datasets-hl7-v2-stores-patch', 'locations-datasets-hl7-v2-stores-set-iam-policy', 'locations-datasets-hl7-v2-stores-test-iam-permissions', 'locations-datasets-list', 'locations-datasets-operations-cancel', 'locations-datasets-operations-get', 'locations-datasets-operations-list', 'locations-datasets-patch', 'locations-datasets-set-iam-policy', 'locations-datasets-test-iam-permissions', 'locations-get' and 'locations-list'", vec![
+            ("locations-datasets-annotation-stores-annotations-create",
+                    Some(r##"Creates a new Annotation record. It is
+        valid to create Annotation objects for the same source more than once since
+        a unique ID is assigned to each record by this service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-annotations-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name of the Annotation store this annotation belongs to. For example,
+        `projects/my-project/locations/us-central1/datasets/mydataset/annotationStores/myannotationstore`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-annotations-delete",
+                    Some(r##"Deletes an Annotation or returns
+        NOT_FOUND if it does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-annotations-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the Annotation to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-annotations-get",
+                    Some(r##"Gets an Annotation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-annotations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the Annotation to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-annotations-list",
+                    Some(r##"Lists the Annotations in the given
+        Annotation store for a source
+        resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-annotations-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Name of the Annotation store to retrieve Annotations from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-annotations-patch",
+                    Some(r##"Updates the Annotation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-annotations-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Resource name of the Annotation, of the form
+        `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}/annotations/{annotation_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-create",
+                    Some(r##"Creates a new Annotation store within the parent dataset."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name of the dataset this Annotation store belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-delete",
+                    Some(r##"Deletes the specified Annotation store and removes all annotations that are
+        contained within it."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the Annotation store to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-evaluate",
+                    Some(r##"Evaluate an Annotation store against a
+        ground truth Annotation store.
+        When the operation finishes successfully, a detailed response is returned
+        of type EvaluateAnnotationStoreResponse, contained in the response. The metadata field type is
+        OperationMetadata.
+        Errors are logged to Cloud Logging
+        (see [Viewing logs](/healthcare/docs/how-tos/logging))."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-evaluate",
+                  vec![
+                    (Some(r##"eval-store"##),
+                     None,
+                     Some(r##"The Annotation store to compare against `golden_store`, in the format of
+        `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-export",
+                    Some(r##"Export
+        Annotations from
+        the Annotation
+        store.
+        If the request is successful, a detailed response is returned of type
+        ExportAnnotationsResponse, contained in the
+        response field when the
+        operation finishes.
+        The metadata field type is
+        OperationMetadata.
+        If errors occur, the error
+        field type is ImportAnnotationsErrorDetails.
+        Errors are also logged to Cloud Logging
+        (see [Viewing logs](/healthcare/docs/how-tos/logging))."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-export",
+                  vec![
+                    (Some(r##"annotation-store"##),
+                     None,
+                     Some(r##"The name of the Annotation store to export annotations to, in
+        the format of
+        `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-get",
+                    Some(r##"Gets the specified Annotation store or returns NOT_FOUND if it does not
+        exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the Annotation store to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-datasets-annotation-stores-get-iam-policy",
                     Some(r##"Gets the access control policy for a resource.
         Returns an empty policy if the resource exists and does not have a policy
@@ -6637,11 +8006,106 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-datasets-annotation-stores-import",
+                    Some(r##"Import
+        Annotations to
+        the Annotation
+        store by
+        loading data from the specified sources.
+        If the request is successful, a detailed response is returned as of type
+        ImportAnnotationsResponse, contained in the
+        response field when the
+        operation finishes.
+        The metadata field type is
+        OperationMetadata.
+        If errors occur, the error
+        field type is ImportAnnotationsErrorDetails.
+        Errors are also logged to Cloud Logging
+        (see [Viewing logs](/healthcare/docs/how-tos/logging))."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-import",
+                  vec![
+                    (Some(r##"annotation-store"##),
+                     None,
+                     Some(r##"The name of the Annotation store to which the server imports annotations,
+        in the format
+        `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-list",
+                    Some(r##"Lists the Annotation stores in the given dataset for a source store."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Name of the dataset."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-annotation-stores-patch",
+                    Some(r##"Updates the specified Annotation store."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Resource name of the Annotation store, of the form
+        `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-datasets-annotation-stores-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -6672,7 +8136,7 @@ fn main() {
             ("locations-datasets-annotation-stores-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -6754,8 +8218,8 @@ fn main() {
         DICOM instances. The new de-identified dataset will not contain these
         failed resources. Failed resource totals are tracked in
         DeidentifySummary.failure_resource_count.
-        Error details are also logged to Stackdriver Logging. For more information,
-        see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging)."##),
+        Error details are also logged to Cloud Logging. For more information,
+        see [Viewing logs](/healthcare/docs/how-tos/logging)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-deidentify",
                   vec![
                     (Some(r##"source-dataset"##),
@@ -6850,8 +8314,8 @@ fn main() {
         DICOM instances. The output DICOM store will not contain
         these failed resources. Failed resource totals are tracked in
         DeidentifySummary.failure_resource_count.
-        Error details are also logged to Stackdriver
-        (see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging))."##),
+        Error details are also logged to Cloud Logging
+        (see [Viewing logs](/healthcare/docs/how-tos/logging))."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-deidentify",
                   vec![
                     (Some(r##"source-store"##),
@@ -6905,8 +8369,8 @@ fn main() {
             ("locations-datasets-dicom-stores-export",
                     Some(r##"Exports data to the specified destination by copying it from the DICOM
         store.
-        Errors are also logged to Stackdriver Logging. For more information,
-        see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging).
+        Errors are also logged to Cloud Logging. For more information,
+        see [Viewing logs](/healthcare/docs/how-tos/logging).
         The metadata field type is
         OperationMetadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-export",
@@ -6988,9 +8452,8 @@ fn main() {
                     Some(r##"Imports data into the DICOM store by copying it from the specified source.
         For errors, the Operation is populated with error details (in the form
         of ImportDicomDataErrorDetails in error.details), which hold
-        finer-grained error information. Errors are also logged to Stackdriver
-        Logging. For more information,
-        see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging).
+        finer-grained error information. Errors are also logged to Cloud Logging.
+        For more information, see [Viewing logs](/healthcare/docs/how-tos/logging).
         The metadata field type is
         OperationMetadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-import",
@@ -7049,7 +8512,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of the DICOM store, of the form
+                     Some(r##"Resource name of the DICOM store, of the form
         `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`."##),
                      Some(true),
                      Some(false)),
@@ -7074,7 +8537,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-search-for-instances",
                     Some(r##"SearchForInstances returns a list of matching instances. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-search-for-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -7106,7 +8569,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-search-for-series",
                     Some(r##"SearchForSeries returns a list of matching series. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-search-for-series",
                   vec![
                     (Some(r##"parent"##),
@@ -7137,7 +8600,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-search-for-studies",
                     Some(r##"SearchForStudies returns a list of matching studies. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-search-for-studies",
                   vec![
                     (Some(r##"parent"##),
@@ -7169,7 +8632,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -7200,7 +8663,8 @@ fn main() {
             ("locations-datasets-dicom-stores-store-instances",
                     Some(r##"StoreInstances stores DICOM instances associated with study instance unique
         identifiers (SUID). See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5."##),
+        [Store
+        Transaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-store-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -7267,7 +8731,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-retrieve-metadata",
                     Some(r##"RetrieveStudyMetadata returns instance associated with the given study
         presented as metadata with the bulk data removed. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-retrieve-metadata",
                   vec![
                     (Some(r##"parent"##),
@@ -7298,7 +8762,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-retrieve-study",
                     Some(r##"RetrieveStudy returns all instances within the given study. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-retrieve-study",
                   vec![
                     (Some(r##"parent"##),
@@ -7329,7 +8793,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-search-for-instances",
                     Some(r##"SearchForInstances returns a list of matching instances. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-search-for-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -7361,7 +8825,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-search-for-series",
                     Some(r##"SearchForSeries returns a list of matching series. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-search-for-series",
                   vec![
                     (Some(r##"parent"##),
@@ -7425,7 +8889,9 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-delete",
                     Some(r##"DeleteInstance deletes an instance associated with the given study, series,
         and SOP Instance UID. Delete requests are equivalent to the GET requests
-        specified in the Retrieve transaction."##),
+        specified in the Retrieve transaction.
+        Study and series search results can take a few seconds to be updated after
+        an instance is deleted using DeleteInstance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-delete",
                   vec![
                     (Some(r##"parent"##),
@@ -7457,7 +8923,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames",
                     Some(r##"RetrieveFrames returns instances associated with the given study, series,
         SOP Instance UID and frame numbers. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames",
                   vec![
                     (Some(r##"parent"##),
@@ -7490,7 +8956,7 @@ fn main() {
                     Some(r##"RetrieveRenderedFrames returns instances associated with the given study,
         series, SOP Instance UID and frame numbers in an acceptable Rendered Media
         Type. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered",
                   vec![
                     (Some(r##"parent"##),
@@ -7522,7 +8988,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-retrieve-instance",
                     Some(r##"RetrieveInstance returns instance associated with the given study, series,
         and SOP Instance UID. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-instance",
                   vec![
                     (Some(r##"parent"##),
@@ -7555,7 +9021,7 @@ fn main() {
                     Some(r##"RetrieveInstanceMetadata returns instance associated with the given study,
         series, and SOP Instance UID presented as metadata with the bulk data
         removed. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata",
                   vec![
                     (Some(r##"parent"##),
@@ -7587,7 +9053,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered",
                     Some(r##"RetrieveRenderedInstance returns instance associated with the given study,
         series, and SOP Instance UID in an acceptable Rendered Media Type. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered",
                   vec![
                     (Some(r##"parent"##),
@@ -7619,7 +9085,7 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-series-retrieve-metadata",
                     Some(r##"RetrieveSeriesMetadata returns instance associated with the given study and
         series, presented as metadata with the bulk data removed. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-retrieve-metadata",
                   vec![
                     (Some(r##"parent"##),
@@ -7650,7 +9116,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-series-retrieve-series",
                     Some(r##"RetrieveSeries returns all instances within the given study and series. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-retrieve-series",
                   vec![
                     (Some(r##"parent"##),
@@ -7681,7 +9147,7 @@ fn main() {
                   ]),
             ("locations-datasets-dicom-stores-studies-series-search-for-instances",
                     Some(r##"SearchForInstances returns a list of matching instances. See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.6."##),
+        [RetrieveTransaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.4)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-series-search-for-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -7714,7 +9180,8 @@ fn main() {
             ("locations-datasets-dicom-stores-studies-store-instances",
                     Some(r##"StoreInstances stores DICOM instances associated with study instance unique
         identifiers (SUID). See
-        http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5."##),
+        [Store
+        Transaction](http://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_10.5)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-dicom-stores-studies-store-instances",
                   vec![
                     (Some(r##"parent"##),
@@ -7752,7 +9219,7 @@ fn main() {
             ("locations-datasets-dicom-stores-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -7822,8 +9289,8 @@ fn main() {
         error
         details field type is
         DeidentifyErrorDetails.
-        Errors are also logged to Stackdriver
-        (see [Viewing logs](/healthcare/docs/how-tos/stackdriver-logging))."##),
+        Errors are also logged to Cloud Logging
+        (see [Viewing logs](/healthcare/docs/how-tos/logging))."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-deidentify",
                   vec![
                     (Some(r##"source-store"##),
@@ -7882,8 +9349,8 @@ fn main() {
         
         Immediate fatal errors appear in the
         error field, errors are also logged
-        to Stackdriver (see [Viewing
-        logs](/healthcare/docs/how-tos/stackdriver-logging)).
+        to Cloud Logging (see [Viewing
+        logs](/healthcare/docs/how-tos/logging)).
         Otherwise, when the operation finishes, a detailed response of type
         ExportResourcesResponse is returned in the
         response field.
@@ -7893,8 +9360,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the FHIR store to export resource from. The name should be in
-        the format of
+                     Some(r##"The name of the FHIR store to export resource from, in the format of
         `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
                      Some(true),
                      Some(false)),
@@ -7917,14 +9383,84 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-datasets-fhir-stores-fhir--concept-map-search-translate",
+                    Some(r##"Translates a code from one value set to another by searching for
+        appropriate concept maps.
+        
+        Implements the FHIR standard $translate operation
+        ([DSTU2](https://www.hl7.org/fhir/DSTU2/operation-conceptmap-translate.html),
+        [STU3](https://www.hl7.org/fhir/STU3/operation-conceptmap-translate.html),
+        [R4](https://www.hl7.org/fhir/R4/operation-conceptmap-translate.html)).
+        
+        On success, the response body contains a JSON-encoded representation
+        of a FHIR Parameters resource, which includes the translation result.
+        Errors generated by the FHIR store contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--concept-map-search-translate",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name for the FHIR store containing the concept map(s) to use for the
+        translation."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-datasets-fhir-stores-fhir--concept-map-translate",
+                    Some(r##"Translates a code from one value set to another using a concept map.
+        
+        Implements the FHIR standard $translate operation
+        ([DSTU2](https://www.hl7.org/fhir/DSTU2/operation-conceptmap-translate.html),
+        [STU3](https://www.hl7.org/fhir/STU3/operation-conceptmap-translate.html),
+        [R4](https://www.hl7.org/fhir/R4/operation-conceptmap-translate.html)).
+        
+        On success, the response body contains a JSON-encoded representation
+        of a FHIR Parameters resource, which includes the translation result.
+        Errors generated by the FHIR store contain a JSON-encoded
+        `OperationOutcome` resource describing the reason for the error. If the
+        request cannot be mapped to a valid API method on a FHIR store, a generic
+        GCP error might be returned instead."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--concept-map-translate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The URL for the concept map to use for the translation."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-datasets-fhir-stores-fhir--observation-lastn",
                     Some(r##"Retrieves the N most recent `Observation` resources for a subject matching
         search criteria specified as query parameters, grouped by
         `Observation.code`, sorted from most recent to oldest.
         
         Implements the FHIR extended operation Observation-lastn
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn),
-        [R4](http://hl7.org/implement/standards/fhir/R4/observation-operations.html#lastn)).
+        ([STU3](https://hl7.org/implement/standards/fhir/STU3/observation-operations.html#lastn),
+        [R4](https://hl7.org/implement/standards/fhir/R4/observation-operations.html#lastn)).
         
         DSTU2 doesn't define the Observation-lastn method, but the server supports
         it the same way it supports STU3.
@@ -7947,10 +9483,10 @@ fn main() {
         constrain these searches using Observation search parameters such as
         `_lastUpdated` or `date`.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of a `Bundle` resource of type `searchset`, containing the results of the
         operation.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -7975,13 +9511,32 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-datasets-fhir-stores-fhir--patient-everything",
-                    Some(r##"On success, the response body will contain a JSON-encoded representation
+                    Some(r##"Retrieves a Patient resource and resources related to that patient.
+        
+        Implements the FHIR extended operation Patient-everything
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/patient-operations.html#everything),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/patient-operations.html#everything),
+        [R4](https://hl7.org/implement/standards/fhir/R4/patient-operations.html#everything)).
+        
+        On success, the response body contains a JSON-encoded representation
         of a `Bundle` resource of type `searchset`, containing the results of the
         operation.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
-        GCP error might be returned instead."##),
+        GCP error might be returned instead.
+        
+        The resources in scope for the response are:
+        
+        * The patient resource itself.
+        * All the resources directly referenced by the patient resource.
+        * Resources directly referencing the patient resource that meet the
+          inclusion criteria. The inclusion criteria are based on the membership
+          rules in the patient compartment definition
+          ([DSTU2](https://hl7.org/fhir/DSTU2/compartment-patient.html),
+          [STU3](http://www.hl7.org/fhir/stu3/compartmentdefinition-patient.html),
+          [R4](https://hl7.org/fhir/R4/compartmentdefinition-patient.html)), which
+          details the eligible resource types and referencing search parameters."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--patient-everything",
                   vec![
                     (Some(r##"name"##),
@@ -8030,21 +9585,21 @@ fn main() {
                   ]),
             ("locations-datasets-fhir-stores-fhir-capabilities",
                     Some(r##"Gets the FHIR capability statement
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/capabilitystatement.html)),
+        ([STU3](https://hl7.org/implement/standards/fhir/STU3/capabilitystatement.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/capabilitystatement.html)),
         or the [conformance
-        statement](http://hl7.org/implement/standards/fhir/DSTU2/conformance.html)
+        statement](https://hl7.org/implement/standards/fhir/DSTU2/conformance.html)
         in the DSTU2 case for the store, which contains a description of
         functionality supported by the server.
         
         Implements the FHIR standard capabilities interaction
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#capabilities),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#capabilities)),
+        ([STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#capabilities),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#capabilities)),
         or the [conformance
-        interaction](http://hl7.org/implement/standards/fhir/DSTU2/http.html#conformance)
+        interaction](https://hl7.org/implement/standards/fhir/DSTU2/http.html#conformance)
         in the DSTU2 case.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of a `CapabilityStatement` resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-capabilities",
                   vec![
@@ -8070,20 +9625,23 @@ fn main() {
                     Some(r##"Deletes FHIR resources that match a search query.
         
         Implements the FHIR standard conditional delete interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.12.1),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#3.1.0.7.1)).
-        If multiple resources match, all of them will be deleted.
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.12.1),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.13.1),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#3.1.0.7.1)).
+        If multiple resources match, all matching resources are deleted.
         
         Search terms are provided as query parameters following the same pattern as
         the search method.
         
         Note: Unless resource versioning is disabled by setting the
         disable_resource_versioning flag
-        on the FHIR store, the deleted resources will be moved to a history
+        on the FHIR store, the deleted resources are moved to a history
         repository that can still be retrieved through vread
         and related methods, unless they are removed by the
-        purge method."##),
+        purge method.
+        
+        This method requires the`healthcare.fhirStores.searchResources` and
+        `healthcare.fhirResources.delete` permissions on the parent FHIR store."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-delete",
                   vec![
                     (Some(r##"parent"##),
@@ -8096,9 +9654,9 @@ fn main() {
                      None,
                      Some(r##"The FHIR resource type to delete, such as Patient or Observation. For a
         complete list, see the FHIR Resource Index
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/resourcelist.html))."##),
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html))."##),
                      Some(true),
                      Some(false)),
         
@@ -8120,8 +9678,8 @@ fn main() {
         specified in a [JSON Patch](http://jsonpatch.com/) document.
         
         Implements the FHIR standard conditional patch interaction
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#patch),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#patch)).
+        ([STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#patch),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#patch)).
         
         DSTU2 doesn't define a conditional patch method, but the server supports it
         in the same way it supports STU3.
@@ -8129,18 +9687,22 @@ fn main() {
         Search terms are provided as query parameters following the same pattern as
         the search method.
         
-        If the search criteria identify more than one match, the request will
-        return a `412 Precondition Failed` error.
+        If the search criteria identify more than one match, the request
+        returns a `412 Precondition Failed` error.
         
         The request body must contain a JSON Patch document, and the request
         headers must contain `Content-Type: application/json-patch+json`.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the updated resource, including the server-assigned version ID.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
-        GCP error might be returned instead."##),
+        GCP error might be returned instead.
+        
+        This method requires the`healthcare.fhirStores.searchResources` permission
+        on the parent FHIR store and the `healthcare.fhirResources.patch`
+        permission on the requested FHIR store resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-patch",
                   vec![
                     (Some(r##"parent"##),
@@ -8153,9 +9715,9 @@ fn main() {
                      None,
                      Some(r##"The FHIR resource type to update, such as Patient or Observation. For a
         complete list, see the FHIR Resource Index
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/resourcelist.html))."##),
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html))."##),
                      Some(true),
                      Some(false)),
         
@@ -8182,32 +9744,35 @@ fn main() {
         parameters, updates the entire contents of that resource.
         
         Implements the FHIR standard conditional update interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.10.2),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#cond-update),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#cond-update)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.10.2),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#cond-update),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#cond-update)).
         
         Search terms are provided as query parameters following the same pattern as
         the search method.
         
-        If the search criteria identify more than one match, the request will
-        return a `412 Precondition Failed` error.
+        If the search criteria identify more than one match, the request
+        returns a `412 Precondition Failed` error.
         If the search criteria identify zero matches, and the supplied resource
         body contains an `id`, and the FHIR store has
         enable_update_create set, creates the
         resource with the client-specified ID. If the search criteria identify zero
         matches, and the supplied resource body does not contain an `id`, the
-        resource will be created with a server-assigned ID as per the
+        resource is created with a server-assigned ID as per the
         create method.
         
         The request body must contain a JSON-encoded FHIR resource, and the request
         headers must contain `Content-Type: application/fhir+json`.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the updated resource, including the server-assigned version ID.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
-        GCP error might be returned instead."##),
+        GCP error might be returned instead.
+        
+        This method requires the`healthcare.fhirStores.searchResources` and
+        `healthcare.fhirResources.update` permissions on the parent FHIR store."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-conditional-update",
                   vec![
                     (Some(r##"parent"##),
@@ -8220,9 +9785,9 @@ fn main() {
                      None,
                      Some(r##"The FHIR resource type to update, such as Patient or Observation. For a
         complete list, see the FHIR Resource Index
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
         Must match the resource type in the provided content."##),
                      Some(true),
                      Some(false)),
@@ -8249,15 +9814,15 @@ fn main() {
                     Some(r##"Creates a FHIR resource.
         
         Implements the FHIR standard create interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#create),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#create),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#create)),
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#create),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#create),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#create)),
         which creates a new resource with a server-assigned resource ID.
         
         Also supports the FHIR standard conditional create interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#ccreate),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#ccreate)),
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#ccreate),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#ccreate),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#ccreate)),
         specified by supplying an `If-None-Exist` header containing a FHIR search
         query. If no resources match this search query, the server processes the
         create operation as normal.
@@ -8265,10 +9830,10 @@ fn main() {
         The request body must contain a JSON-encoded FHIR resource, and the request
         headers must contain `Content-Type: application/fhir+json`.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the resource as it was created on the server, including the
         server-assigned resource ID and version ID.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -8284,9 +9849,9 @@ fn main() {
                      None,
                      Some(r##"The FHIR resource type to create, such as Patient or Observation. For a
         complete list, see the FHIR Resource Index
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
         Must match the resource type in the provided content."##),
                      Some(true),
                      Some(false)),
@@ -8313,13 +9878,13 @@ fn main() {
                     Some(r##"Deletes a FHIR resource.
         
         Implements the FHIR standard delete interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#delete),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#delete),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#delete)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#delete),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#delete),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#delete)).
         
         Note: Unless resource versioning is disabled by setting the
         disable_resource_versioning flag
-        on the FHIR store, the deleted resources will be moved to a history
+        on the FHIR store, the deleted resources are moved to a history
         repository that can still be retrieved through vread
         and related methods, unless they are removed by the
         purge method."##),
@@ -8347,32 +9912,40 @@ fn main() {
                     Some(r##"Executes all the requests in the given Bundle.
         
         Implements the FHIR standard batch/transaction interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#transaction),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#transaction),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#transaction)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#transaction),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#transaction),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#transaction)).
         
         Supports all interactions within a bundle, except search. This method
         accepts Bundles of type `batch` and `transaction`, processing them
         according to the batch processing rules
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.16.1),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#brules))
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.16.1),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.1),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#brules))
         and transaction processing rules
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.16.2),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#trules)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#2.1.0.16.2),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#2.21.0.17.2),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#trules)).
         
         The request body must contain a JSON-encoded FHIR `Bundle` resource, and
         the request headers must contain `Content-Type: application/fhir+json`.
         
-        For a batch bundle or a successful transaction the response body will
-        contain a JSON-encoded representation of a `Bundle` resource of type
+        For a batch bundle or a successful transaction the response body
+        contains a JSON-encoded representation of a `Bundle` resource of type
         `batch-response` or `transaction-response` containing one entry for each
         entry in the request, with the outcome of processing the entry. In the
-        case of an error for a transaction bundle, the response body will contain
+        case of an error for a transaction bundle, the response body contains
         a JSON-encoded `OperationOutcome` resource describing the reason for the
         error. If the request cannot be mapped to a valid API method on a FHIR
-        store, a generic GCP error might be returned instead."##),
+        store, a generic GCP error might be returned instead.
+        
+        This method requires permission for executing the requests in the bundle.
+        The `executeBundle` permission grants permission to execute the request in
+        the bundle but you must grant sufficient permissions to execute the
+        individual requests in the bundle. For example, if the bundle contains a
+        `create` request, you must have permission to execute the `create` request.
+        
+        Logging is available for the `executeBundle` permission."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir-execute-bundle",
                   vec![
                     (Some(r##"parent"##),
@@ -8404,14 +9977,14 @@ fn main() {
         deleted versions) from the FHIR store.
         
         Implements the per-resource form of the FHIR standard history interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#history),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#history),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#history)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#history),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#history),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#history)).
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of a `Bundle` resource of type `history`, containing the version history
         sorted from most recent to oldest versions.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -8440,8 +10013,8 @@ fn main() {
         in a [JSON Patch](http://jsonpatch.com/) document.
         
         Implements the FHIR standard patch interaction
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#patch),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#patch)).
+        ([STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#patch),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#patch)).
         
         DSTU2 doesn't define a patch method, but the server supports it in the same
         way it supports STU3.
@@ -8449,9 +10022,9 @@ fn main() {
         The request body must contain a JSON Patch document, and the request
         headers must contain `Content-Type: application/json-patch+json`.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the updated resource, including the server-assigned version ID.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -8485,20 +10058,20 @@ fn main() {
                     Some(r##"Gets the contents of a FHIR resource.
         
         Implements the FHIR standard read interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#read),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#read),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#read)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#read),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#read),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#read)).
         
         Also supports the FHIR standard conditional read interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#cread),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#cread),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#cread))
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#cread),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#cread),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#cread))
         specified by supplying an `If-Modified-Since` header with a date/time value
         or an `If-None-Match` header with an ETag value.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the resource.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -8527,13 +10100,13 @@ fn main() {
         specified as query parameters.
         
         Implements the FHIR standard search interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#search),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#search),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#search))
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#search),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#search),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#search))
         using the search semantics described in the FHIR Search specification
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/search.html),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/search.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/search.html)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/search.html),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/search.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/search.html)).
         
         Supports three methods of search defined by the specification:
         
@@ -8546,10 +10119,10 @@ fn main() {
         The `GET` methods do not support compartment searches. The `POST` method
         does not support `application/x-www-form-urlencoded` search parameters.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of a `Bundle` resource of type `searchset`, containing the results of the
         search.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead.
@@ -8559,8 +10132,8 @@ fn main() {
         are supported on each FHIR resource. A list of all search parameters
         defined by the specification can be found in the FHIR Search Parameter
         Registry
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/searchparameter-registry.html)).
+        ([STU3](https://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html),
+        [R4](https://hl7.org/implement/standards/fhir/R4/searchparameter-registry.html)).
         FHIR search parameters for DSTU2 can be found on each resource's definition
         page.
         
@@ -8572,7 +10145,7 @@ fn main() {
         
         The maximum number of search results returned defaults to 100, which can
         be overridden by the `_count` parameter up to a maximum limit of 1000. If
-        there are additional results, the returned `Bundle` will contain
+        there are additional results, the returned `Bundle` contains
         pagination links.
         
         Resources with a total size larger than 5MB or a field count larger than
@@ -8612,9 +10185,9 @@ fn main() {
                     Some(r##"Updates the entire contents of a resource.
         
         Implements the FHIR standard update interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#update),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#update),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#update)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#update),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#update),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#update)).
         
         If the specified resource does
         not exist and the FHIR store has
@@ -8626,9 +10199,9 @@ fn main() {
         must contain an `id` element having an identical value to the ID in the
         REST path of the request.
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the updated resource, including the server-assigned version ID.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -8663,13 +10236,13 @@ fn main() {
         by version ID.
         
         Implements the FHIR standard vread interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#vread),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#vread),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#vread)).
+        ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/http.html#vread),
+        [STU3](https://hl7.org/implement/standards/fhir/STU3/http.html#vread),
+        [R4](https://hl7.org/implement/standards/fhir/R4/http.html#vread)).
         
-        On success, the response body will contain a JSON-encoded representation
+        On success, the response body contains a JSON-encoded representation
         of the resource.
-        Errors generated by the FHIR store will contain a JSON-encoded
+        Errors generated by the FHIR store contain a JSON-encoded
         `OperationOutcome` resource describing the reason for the error. If the
         request cannot be mapped to a valid API method on a FHIR store, a generic
         GCP error might be returned instead."##),
@@ -8749,8 +10322,8 @@ fn main() {
         where this method is not appropriate, consider using ExecuteBundle to
         load data.
         
-        Every resource in the input must contain a client-supplied ID, and will be
-        stored using that ID regardless of the
+        Every resource in the input must contain a client-supplied ID. Each
+        resource is stored using the supplied ID regardless of the
         enable_update_create setting on the FHIR
         store.
         
@@ -8763,7 +10336,7 @@ fn main() {
         be imported, the FHIR store might be left in a state that violates
         referential integrity.
         
-        The import process does not trigger PubSub notification or BigQuery
+        The import process does not trigger Cloud Pub/Sub notification or BigQuery
         streaming update, regardless of how those are configured on the FHIR store.
         
         If a resource with the specified ID already exists, the most recent
@@ -8776,10 +10349,10 @@ fn main() {
         
         The import operation is idempotent unless the input data contains multiple
         valid resources with the same ID but different contents. In that case,
-        after the import completes, the store will contain exactly one resource
+        after the import completes, the store contains exactly one resource
         with that ID but there is no ordering guarantee on which version of the
         contents it will have. The operation result counters do not count
-        duplicate IDs as an error and will count one success for each resource in
+        duplicate IDs as an error and count one success for each resource in
         the input, which might result in a success count larger than the number
         of resources in the FHIR store. This often occurs when importing data
         organized in bundles produced by Patient-everything
@@ -8808,8 +10381,8 @@ fn main() {
         
         Immediate fatal errors appear in the
         error field, errors are also logged
-        to Stackdriver (see [Viewing
-        logs](/healthcare/docs/how-tos/stackdriver-logging)). Otherwise, when the
+        to Cloud Logging (see [Viewing
+        logs](/healthcare/docs/how-tos/logging)). Otherwise, when the
         operation finishes, a detailed response of type ImportResourcesResponse
         is returned in the response field.
         The metadata field type for this
@@ -8818,8 +10391,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the FHIR store to import FHIR resources to. The name should be
-        in the format of
+                     Some(r##"The name of the FHIR store to import FHIR resources to, in the format of
         `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
                      Some(true),
                      Some(false)),
@@ -8893,91 +10465,11 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-datasets-fhir-stores-search",
-                    Some(r##"Searches for resources in the given FHIR store according to criteria
-        specified as query parameters.
-        
-        Implements the FHIR standard search interaction
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/http.html#search),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/http.html#search),
-        [R4](http://hl7.org/implement/standards/fhir/R4/http.html#search))
-        using the search semantics described in the FHIR Search specification
-        ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/search.html),
-        [STU3](http://hl7.org/implement/standards/fhir/STU3/search.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/search.html)).
-        
-        Supports three methods of search defined by the specification:
-        
-        *  `GET [base]?[parameters]` to search across all resources.
-        *  `GET [base]/[type]?[parameters]` to search resources of a specified
-        type.
-        *  `POST [base]/[type]/_search?[parameters]` as an alternate form having
-        the same semantics as the `GET` method.
-        
-        The `GET` methods do not support compartment searches. The `POST` method
-        does not support `application/x-www-form-urlencoded` search parameters.
-        
-        On success, the response body will contain a JSON-encoded representation
-        of a `Bundle` resource of type `searchset`, containing the results of the
-        search.
-        Errors generated by the FHIR store will contain a JSON-encoded
-        `OperationOutcome` resource describing the reason for the error. If the
-        request cannot be mapped to a valid API method on a FHIR store, a generic
-        GCP error might be returned instead.
-        
-        The server's capability statement, retrieved through
-        capabilities, indicates what search parameters
-        are supported on each FHIR resource. A list of all search parameters
-        defined by the specification can be found in the FHIR Search Parameter
-        Registry
-        ([STU3](http://hl7.org/implement/standards/fhir/STU3/searchparameter-registry.html),
-        [R4](http://hl7.org/implement/standards/fhir/R4/searchparameter-registry.html)).
-        FHIR search parameters for DSTU2 can be found on each resource's definition
-        page.
-        
-        Supported search modifiers: `:missing`, `:exact`, `:contains`, `:text`,
-        `:in`, `:not-in`, `:above`, `:below`, `:[type]`, `:not`, and `:recurse`.
-        
-        Supported search result parameters: `_sort`, `_count`, `_include`,
-        `_revinclude`, `_summary=text`, `_summary=data`, and `_elements`.
-        
-        The maximum number of search results returned defaults to 100, which can
-        be overridden by the `_count` parameter up to a maximum limit of 1000. If
-        there are additional results, the returned `Bundle` will contain
-        pagination links.
-        
-        Resources with a total size larger than 5MB or a field count larger than
-        50,000 might not be fully searchable as the server might trim its generated
-        search index in those cases.
-        
-        Note: FHIR resources are indexed asynchronously, so there might be a slight
-        delay between the time a resource is created or changes and when the change
-        is reflected in search results."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-search",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Name of the FHIR store to retrieve resources from."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-datasets-fhir-stores-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -9008,7 +10500,7 @@ fn main() {
             ("locations-datasets-fhir-stores-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -9117,8 +10609,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-datasets-hl7-v2-stores-delete",
-                    Some(r##"Deletes the specified HL7v2 store and removes all messages that are
-        contained within it."##),
+                    Some(r##"Deletes the specified HL7v2 store and removes all messages that it
+        contains."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-hl7-v2-stores-delete",
                   vec![
                     (Some(r##"name"##),
@@ -9345,7 +10837,7 @@ fn main() {
                     Some(r##"Update the message.
         
         The contents of the message in Message.data and data extracted from
-        the contents such as Message.create_time cannot be altered. Only the
+        the contents such as Message.create_time can't be altered. Only the
         Message.labels field is allowed to be updated. The labels in the
         request are merged with the existing set of labels. Existing labels with
         the same keys are updated."##),
@@ -9383,7 +10875,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of the HL7v2 store, of the form
+                     Some(r##"Resource name of the HL7v2 store, of the form
         `projects/{project_id}/datasets/{dataset_id}/hl7V2Stores/{hl7v2_store_id}`."##),
                      Some(true),
                      Some(false)),
@@ -9410,7 +10902,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-hl7-v2-stores-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -9441,7 +10933,7 @@ fn main() {
             ("locations-datasets-hl7-v2-stores-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -9594,7 +11086,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of the dataset, of the form
+                     Some(r##"Resource name of the dataset, of the form
         `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`."##),
                      Some(true),
                      Some(false)),
@@ -9621,7 +11113,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -9652,7 +11144,7 @@ fn main() {
             ("locations-datasets-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -9734,7 +11226,7 @@ fn main() {
     
     let mut app = App::new("healthcare1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200327")
+           .version("1.0.14+20200612")
            .about("Manage, store, and access healthcare data in Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli")
            .arg(Arg::with_name("url")

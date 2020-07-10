@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Games* API can be found at the
-[official documentation site](https://developers.google.com/games/services/).
+[official documentation site](https://developers.google.com/games/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games* API at revision *20200402*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Games* API at revision *20200701*. The CLI is at version *1.0.14*.
 
 ```bash
 games1 [options]
@@ -55,20 +55,8 @@ games1 [options]
         players
                 get <player-id> [-p <v>]... [-o <out>]
                 list <collection> [-p <v>]... [-o <out>]
-        pushtokens
-                remove (-r <kv>)... [-p <v>]...
-                update (-r <kv>)... [-p <v>]...
         revisions
                 check <client-revision> [-p <v>]... [-o <out>]
-        rooms
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                decline <room-id> [-p <v>]... [-o <out>]
-                dismiss <room-id> [-p <v>]...
-                get <room-id> [-p <v>]... [-o <out>]
-                join <room-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                leave <room-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
-                report-status <room-id> (-r <kv>)... [-p <v>]... [-o <out>]
         scores
                 get <player-id> <leaderboard-id> <time-span> [-p <v>]... [-o <out>]
                 list <leaderboard-id> <collection> <time-span> [-p <v>]... [-o <out>]
@@ -78,20 +66,8 @@ games1 [options]
         snapshots
                 get <snapshot-id> [-p <v>]... [-o <out>]
                 list <player-id> [-p <v>]... [-o <out>]
-        turn-based-matches
-                cancel <match-id> [-p <v>]...
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                decline <match-id> [-p <v>]... [-o <out>]
-                dismiss <match-id> [-p <v>]...
-                finish <match-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                get <match-id> [-p <v>]... [-o <out>]
-                join <match-id> [-p <v>]... [-o <out>]
-                leave <match-id> [-p <v>]... [-o <out>]
-                leave-turn <match-id> <match-version> [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
-                rematch <match-id> [-p <v>]... [-o <out>]
-                sync [-p <v>]... [-o <out>]
-                take-turn <match-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        stats
+                get [-p <v>]... [-o <out>]
   games1 --help
 
 Configuration:

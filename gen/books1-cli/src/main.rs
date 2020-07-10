@@ -290,10 +290,13 @@ impl<'n> Engine<'n> {
 
     fn _cloudloading_delete_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.cloudloading().delete_book(opt.value_of("volume-id").unwrap_or(""));
+        let mut call = self.hub.cloudloading().delete_book();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -307,6 +310,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["volume-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -320,12 +324,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -422,10 +434,13 @@ impl<'n> Engine<'n> {
 
     fn _dictionary_list_offline_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.dictionary().list_offline_metadata(opt.value_of("cpksver").unwrap_or(""));
+        let mut call = self.hub.dictionary().list_offline_metadata();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "cpksver" => {
+                    call = call.cpksver(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -439,6 +454,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["cpksver"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -570,12 +586,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -624,12 +648,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -638,7 +670,7 @@ impl<'n> Engine<'n> {
 
     fn _layers_annotation_data_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.layers().annotation_data_get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("annotation-data-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
+        let mut call = self.hub.layers().annotation_data_get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("annotation-data-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -657,6 +689,9 @@ impl<'n> Engine<'n> {
                 "h" => {
                     call = call.h(arg_from_str(value.unwrap_or("-0"), err, "h", "integer"));
                 },
+                "content-version" => {
+                    call = call.content_version(value.unwrap_or(""));
+                },
                 "allow-web-definitions" => {
                     call = call.allow_web_definitions(arg_from_str(value.unwrap_or("false"), err, "allow-web-definitions", "boolean"));
                 },
@@ -673,7 +708,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["scale", "locale", "h", "source", "allow-web-definitions", "w"].iter().map(|v|*v));
+                                                                           v.extend(["scale", "locale", "h", "source", "content-version", "w", "allow-web-definitions"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -709,7 +744,7 @@ impl<'n> Engine<'n> {
 
     fn _layers_annotation_data_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.layers().annotation_data_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
+        let mut call = self.hub.layers().annotation_data_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -740,6 +775,9 @@ impl<'n> Engine<'n> {
                 "h" => {
                     call = call.h(arg_from_str(value.unwrap_or("-0"), err, "h", "integer"));
                 },
+                "content-version" => {
+                    call = call.content_version(value.unwrap_or(""));
+                },
                 "annotation-data-id" => {
                     call = call.add_annotation_data_id(value.unwrap_or(""));
                 },
@@ -756,7 +794,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["scale", "source", "locale", "updated-min", "updated-max", "max-results", "annotation-data-id", "page-token", "w", "h"].iter().map(|v|*v));
+                                                                           v.extend(["scale", "source", "locale", "updated-min", "updated-max", "max-results", "annotation-data-id", "page-token", "content-version", "w", "h"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -975,7 +1013,7 @@ impl<'n> Engine<'n> {
 
     fn _layers_volume_annotations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.layers().volume_annotations_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
+        let mut call = self.hub.layers().volume_annotations_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1015,6 +1053,9 @@ impl<'n> Engine<'n> {
                 "end-offset" => {
                     call = call.end_offset(value.unwrap_or(""));
                 },
+                "content-version" => {
+                    call = call.content_version(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1028,7 +1069,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["show-deleted", "volume-annotations-version", "end-position", "updated-max", "start-position", "updated-min", "end-offset", "max-results", "source", "start-offset", "page-token", "locale"].iter().map(|v|*v));
+                                                                           v.extend(["show-deleted", "volume-annotations-version", "end-position", "updated-max", "start-position", "updated-min", "end-offset", "max-results", "source", "content-version", "start-offset", "page-token", "locale"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1068,6 +1109,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "country" => {
+                    call = call.country(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1081,6 +1125,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["country"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1116,15 +1161,21 @@ impl<'n> Engine<'n> {
 
     fn _myconfig_release_download_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.myconfig().release_download_access(&opt.values_of("volume-ids").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>(), opt.value_of("cpksver").unwrap_or(""));
+        let mut call = self.hub.myconfig().release_download_access();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-ids" => {
+                    call = call.add_volume_ids(value.unwrap_or(""));
+                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
+                },
+                "cpksver" => {
+                    call = call.cpksver(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1139,7 +1190,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "source", "volume-ids", "cpksver"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1175,15 +1226,27 @@ impl<'n> Engine<'n> {
 
     fn _myconfig_request_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.myconfig().request_access(opt.value_of("source").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""), opt.value_of("nonce").unwrap_or(""), opt.value_of("cpksver").unwrap_or(""));
+        let mut call = self.hub.myconfig().request_access();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                "nonce" => {
+                    call = call.nonce(value.unwrap_or(""));
+                },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
                 "license-types" => {
                     call = call.license_types(value.unwrap_or(""));
+                },
+                "cpksver" => {
+                    call = call.cpksver(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1198,7 +1261,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "license-types"].iter().map(|v|*v));
+                                                                           v.extend(["nonce", "license-types", "locale", "volume-id", "cpksver", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1234,15 +1297,21 @@ impl<'n> Engine<'n> {
 
     fn _myconfig_sync_volume_licenses(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.myconfig().sync_volume_licenses(opt.value_of("source").unwrap_or(""), opt.value_of("nonce").unwrap_or(""), opt.value_of("cpksver").unwrap_or(""));
+        let mut call = self.hub.myconfig().sync_volume_licenses();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-ids" => {
                     call = call.add_volume_ids(value.unwrap_or(""));
                 },
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
                 "show-preorders" => {
                     call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
+                },
+                "nonce" => {
+                    call = call.nonce(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -1252,6 +1321,9 @@ impl<'n> Engine<'n> {
                 },
                 "features" => {
                     call = call.add_features(value.unwrap_or(""));
+                },
+                "cpksver" => {
+                    call = call.cpksver(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1266,7 +1338,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "show-preorders", "volume-ids", "include-non-comics-series", "features"].iter().map(|v|*v));
+                                                                           v.extend(["nonce", "features", "locale", "show-preorders", "cpksver", "source", "volume-ids", "include-non-comics-series"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1428,12 +1500,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1673,10 +1753,16 @@ impl<'n> Engine<'n> {
 
     fn _mylibrary_annotations_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().annotations_summary(&opt.values_of("layer-ids").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>(), opt.value_of("volume-id").unwrap_or(""));
+        let mut call = self.hub.mylibrary().annotations_summary();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
+                "layer-ids" => {
+                    call = call.add_layer_ids(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1690,6 +1776,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["layer-ids", "volume-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1864,10 +1951,13 @@ impl<'n> Engine<'n> {
 
     fn _mylibrary_bookshelves_add_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().bookshelves_add_volume(opt.value_of("shelf").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
+        let mut call = self.hub.mylibrary().bookshelves_add_volume(opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
@@ -1887,7 +1977,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "reason"].iter().map(|v|*v));
+                                                                           v.extend(["source", "reason", "volume-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1901,12 +1991,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1949,12 +2047,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2075,11 +2181,16 @@ impl<'n> Engine<'n> {
 
     fn _mylibrary_bookshelves_move_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let volume_position: i32 = arg_from_str(&opt.value_of("volume-position").unwrap_or(""), err, "<volume-position>", "integer");
-        let mut call = self.hub.mylibrary().bookshelves_move_volume(opt.value_of("shelf").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""), volume_position);
+        let mut call = self.hub.mylibrary().bookshelves_move_volume(opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-position" => {
+                    call = call.volume_position(arg_from_str(value.unwrap_or("-0"), err, "volume-position", "integer"));
+                },
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
@@ -2096,7 +2207,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source"].iter().map(|v|*v));
+                                                                           v.extend(["volume-position", "volume-id", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2110,12 +2221,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2124,10 +2243,13 @@ impl<'n> Engine<'n> {
 
     fn _mylibrary_bookshelves_remove_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().bookshelves_remove_volume(opt.value_of("shelf").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
+        let mut call = self.hub.mylibrary().bookshelves_remove_volume(opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
@@ -2147,7 +2269,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "reason"].iter().map(|v|*v));
+                                                                           v.extend(["source", "reason", "volume-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2161,12 +2283,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2308,12 +2438,18 @@ impl<'n> Engine<'n> {
 
     fn _mylibrary_readingpositions_set_position(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().readingpositions_set_position(opt.value_of("volume-id").unwrap_or(""), opt.value_of("timestamp").unwrap_or(""), opt.value_of("position").unwrap_or(""));
+        let mut call = self.hub.mylibrary().readingpositions_set_position(opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "timestamp" => {
+                    call = call.timestamp(value.unwrap_or(""));
+                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
+                },
+                "position" => {
+                    call = call.position(value.unwrap_or(""));
                 },
                 "device-cookie" => {
                     call = call.device_cookie(value.unwrap_or(""));
@@ -2337,7 +2473,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["action", "source", "content-version", "device-cookie"].iter().map(|v|*v));
+                                                                           v.extend(["device-cookie", "timestamp", "source", "content-version", "action", "position"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2351,12 +2487,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2365,12 +2509,15 @@ impl<'n> Engine<'n> {
 
     fn _notification_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.notification().get(opt.value_of("notification-id").unwrap_or(""));
+        let mut call = self.hub.notification().get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
+                },
+                "notification-id" => {
+                    call = call.notification_id(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -2388,7 +2535,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
+                                                                           v.extend(["notification-id", "source", "locale"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2665,12 +2812,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2731,12 +2886,20 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
                 CallType::Standard => call.doit(),
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2816,10 +2979,13 @@ impl<'n> Engine<'n> {
 
     fn _series_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.series().get(&opt.values_of("series-id").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
+        let mut call = self.hub.series().get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "series-id" => {
+                    call = call.add_series_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2833,6 +2999,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["series-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2868,10 +3035,13 @@ impl<'n> Engine<'n> {
 
     fn _series_membership_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.series().membership_get(opt.value_of("series-id").unwrap_or(""));
+        let mut call = self.hub.series().membership_get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "series-id" => {
+                    call = call.series_id(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -2891,7 +3061,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["series-id", "page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3063,7 +3233,7 @@ impl<'n> Engine<'n> {
 
     fn _volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.volumes().list(opt.value_of("q").unwrap_or(""));
+        let mut call = self.hub.volumes().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3075,6 +3245,9 @@ impl<'n> Engine<'n> {
                 },
                 "show-preorders" => {
                     call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
+                },
+                "q" => {
+                    call = call.q(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -3119,7 +3292,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "projection", "library-restrict", "lang-restrict", "print-type", "show-preorders", "max-results", "filter", "source", "start-index", "max-allowed-maturity-rating", "download", "partner"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "filter", "projection", "library-restrict", "lang-restrict", "print-type", "show-preorders", "max-results", "q", "source", "start-index", "max-allowed-maturity-rating", "download", "partner"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3291,12 +3464,18 @@ impl<'n> Engine<'n> {
 
     fn _volumes_recommended_rate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.volumes().recommended_rate(opt.value_of("rating").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
+        let mut call = self.hub.volumes().recommended_rate();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
+                },
+                "rating" => {
+                    call = call.rating(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -3314,7 +3493,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "source", "volume-id", "rating"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3736,12 +3915,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Books::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -3846,7 +4028,7 @@ fn main() {
         
         ("cloudloading", "methods: 'add-book', 'delete-book' and 'update-book'", vec![
             ("add-book",
-                    Some(r##""##),
+                    Some(r##"Add a user-upload volume and triggers processing."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/cloudloading_add-book",
                   vec![
                     (Some(r##"v"##),
@@ -3865,20 +4047,20 @@ fn main() {
                     Some(r##"Remove the book and its contents"##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/cloudloading_delete-book",
                   vec![
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"The id of the book to be removed."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("update-book",
-                    Some(r##""##),
+                    Some(r##"Updates a user-upload volume."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/cloudloading_update-book",
                   vec![
                     (Some(r##"kv"##),
@@ -3906,12 +4088,6 @@ fn main() {
                     Some(r##"Returns a list of offline dictionary metadata available"##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/dictionary_list-offline-metadata",
                   vec![
-                    (Some(r##"cpksver"##),
-                     None,
-                     Some(r##"The device/version ID from which to request the data."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -3944,7 +4120,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("share",
-                    Some(r##"Initiates sharing of the content with the user's family. Empty response indicates success."##),
+                    Some(r##"Initiates sharing of the content with the user's family. Empty response
+        indicates success."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_share",
                   vec![
                     (Some(r##"v"##),
@@ -3952,9 +4129,16 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("unshare",
-                    Some(r##"Initiates revoking content that has already been shared with the user's family. Empty response indicates success."##),
+                    Some(r##"Initiates revoking content that has already been shared with the user's
+        family. Empty response indicates success."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_unshare",
                   vec![
                     (Some(r##"v"##),
@@ -3962,6 +4146,12 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ]),
         
@@ -3985,12 +4175,6 @@ fn main() {
                     (Some(r##"annotation-data-id"##),
                      None,
                      Some(r##"The ID of the annotation data to retrieve."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"content-version"##),
-                     None,
-                     Some(r##"The content version for the volume you are trying to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -4019,12 +4203,6 @@ fn main() {
                     (Some(r##"layer-id"##),
                      None,
                      Some(r##"The ID for the layer to get the annotation data."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"content-version"##),
-                     None,
-                     Some(r##"The content version for the requested volume."##),
                      Some(true),
                      Some(false)),
         
@@ -4140,12 +4318,6 @@ fn main() {
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"content-version"##),
-                     None,
-                     Some(r##"The content version for the requested volume."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4181,18 +4353,6 @@ fn main() {
                     Some(r##"Release downloaded content access restriction."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_release-download-access",
                   vec![
-                    (Some(r##"volume-ids"##),
-                     None,
-                     Some(r##"The volume(s) to release restrictions for."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"cpksver"##),
-                     None,
-                     Some(r##"The device/version ID from which to release the restriction."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4209,30 +4369,6 @@ fn main() {
                     Some(r##"Request concurrent and download access restrictions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_request-access",
                   vec![
-                    (Some(r##"source"##),
-                     None,
-                     Some(r##"String to identify the originator of this request."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"The volume to request concurrent/download restrictions for."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"nonce"##),
-                     None,
-                     Some(r##"The client nonce value."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"cpksver"##),
-                     None,
-                     Some(r##"The device/version ID from which to request the restrictions."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4246,27 +4382,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("sync-volume-licenses",
-                    Some(r##"Request downloaded content access for specified volumes on the My eBooks shelf."##),
+                    Some(r##"Request downloaded content access for specified volumes on the My eBooks
+        shelf."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_sync-volume-licenses",
                   vec![
-                    (Some(r##"source"##),
-                     None,
-                     Some(r##"String to identify the originator of this request."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"nonce"##),
-                     None,
-                     Some(r##"The client nonce value."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"cpksver"##),
-                     None,
-                     Some(r##"The device/version ID from which to release the restriction."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4280,7 +4399,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("update-user-settings",
-                    Some(r##"Sets the settings for the user. If a sub-object is specified, it will overwrite the existing sub-object stored in the server. Unspecified sub-objects will retain the existing value."##),
+                    Some(r##"Sets the settings for the user. If a sub-object is specified, it will
+        overwrite the existing sub-object stored in the server. Unspecified
+        sub-objects will retain the existing value."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_update-user-settings",
                   vec![
                     (Some(r##"kv"##),
@@ -4319,6 +4440,12 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("annotations-insert",
                     Some(r##"Inserts a new annotation."##),
@@ -4362,18 +4489,6 @@ fn main() {
                     Some(r##"Gets the summary of specified layers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/mylibrary_annotations-summary",
                   vec![
-                    (Some(r##"layer-ids"##),
-                     None,
-                     Some(r##"Array of layer IDs to get the summary for."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"Volume id to get the summary for."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4424,17 +4539,17 @@ fn main() {
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"ID of volume to add."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("bookshelves-clear-volumes",
                     Some(r##"Clears all volumes from a bookshelf."##),
@@ -4451,9 +4566,16 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("bookshelves-get",
-                    Some(r##"Retrieves metadata for a specific bookshelf belonging to the authenticated user."##),
+                    Some(r##"Retrieves metadata for a specific bookshelf belonging to the authenticated
+        user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/mylibrary_bookshelves-get",
                   vec![
                     (Some(r##"shelf"##),
@@ -4500,23 +4622,17 @@ fn main() {
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"ID of volume to move."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"volume-position"##),
-                     None,
-                     Some(r##"Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)"##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("bookshelves-remove-volume",
                     Some(r##"Removes a volume from a bookshelf."##),
@@ -4528,17 +4644,17 @@ fn main() {
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"ID of volume to remove."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("bookshelves-volumes-list",
                     Some(r##"Gets volume information for volumes on a bookshelf."##),
@@ -4594,23 +4710,17 @@ fn main() {
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"timestamp"##),
-                     None,
-                     Some(r##"RFC 3339 UTC format timestamp associated with this reading position."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"position"##),
-                     None,
-                     Some(r##"Position string for the new volume reading position."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ]),
         
@@ -4619,12 +4729,6 @@ fn main() {
                     Some(r##"Returns notification details for a given notification id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/notification_get",
                   vec![
-                    (Some(r##"notification-id"##),
-                     None,
-                     Some(r##"String to identify the notification."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4695,7 +4799,7 @@ fn main() {
         
         ("promooffer", "methods: 'accept', 'dismiss' and 'get'", vec![
             ("accept",
-                    Some(r##""##),
+                    Some(r##"Accepts the promo offer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/promooffer_accept",
                   vec![
                     (Some(r##"v"##),
@@ -4703,9 +4807,15 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("dismiss",
-                    Some(r##""##),
+                    Some(r##"Marks the promo offer as dismissed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/promooffer_dismiss",
                   vec![
                     (Some(r##"v"##),
@@ -4713,6 +4823,12 @@ fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("get",
                     Some(r##"Returns a list of promo offers available to the user"##),
@@ -4737,12 +4853,6 @@ fn main() {
                     Some(r##"Returns Series metadata for the given series ids."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/series_get",
                   vec![
-                    (Some(r##"series-id"##),
-                     None,
-                     Some(r##"String that identifies the series"##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4759,12 +4869,6 @@ fn main() {
                     Some(r##"Returns Series membership data given the series id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/series_membership-get",
                   vec![
-                    (Some(r##"series-id"##),
-                     None,
-                     Some(r##"String that identifies the series"##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4828,12 +4932,6 @@ fn main() {
                     Some(r##"Performs a book search."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/volumes_list",
                   vec![
-                    (Some(r##"q"##),
-                     None,
-                     Some(r##"Full-text search query string."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4882,18 +4980,6 @@ fn main() {
                     Some(r##"Rate a recommended book for the current user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/volumes_recommended-rate",
                   vec![
-                    (Some(r##"rating"##),
-                     None,
-                     Some(r##"Rating to be given to the volume."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"volume-id"##),
-                     None,
-                     Some(r##"ID of the source volume."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4928,8 +5014,8 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200310")
-           .about("Searches for books and manages your Google Books library.")
+           .version("1.0.14+20200707")
+           .about("The Google Books API allows clients to access the Google Books repository.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

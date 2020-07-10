@@ -3411,28 +3411,30 @@ impl<'n> Engine<'n> {
                     "source-image-encryption-key.sha256" => Some(("sourceImageEncryptionKey.sha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-image-encryption-key.kms-key-name" => Some(("sourceImageEncryptionKey.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "license-codes" => Some(("licenseCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "licenses" => Some(("licenses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "license-codes" => Some(("licenseCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "users" => Some(("users", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "disk-encryption-key.raw-key" => Some(("diskEncryptionKey.rawKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption-key.kms-key-service-account" => Some(("diskEncryptionKey.kmsKeyServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption-key.sha256" => Some(("diskEncryptionKey.sha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption-key.kms-key-name" => Some(("diskEncryptionKey.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-disk" => Some(("sourceDisk", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "physical-block-size-bytes" => Some(("physicalBlockSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-attach-timestamp" => Some(("lastAttachTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-snapshot" => Some(("sourceSnapshot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-detach-timestamp" => Some(("lastDetachTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "label-fingerprint" => Some(("labelFingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-disk-id" => Some(("sourceDiskId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-image-id" => Some(("sourceImageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-policies" => Some(("resourcePolicies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "replica-zones" => Some(("replicaZones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "source-snapshot-id" => Some(("sourceSnapshotId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "users" => Some(("users", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size-gb" => Some(("sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3445,7 +3447,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-image" => Some(("sourceImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "disk-encryption-key", "id", "kind", "kms-key-name", "kms-key-service-account", "label-fingerprint", "labels", "last-attach-timestamp", "last-detach-timestamp", "license-codes", "licenses", "name", "options", "physical-block-size-bytes", "raw-key", "region", "replica-zones", "resource-policies", "self-link", "sha256", "size-gb", "source-image", "source-image-encryption-key", "source-image-id", "source-snapshot", "source-snapshot-encryption-key", "source-snapshot-id", "status", "type", "users", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "disk-encryption-key", "id", "kind", "kms-key-name", "kms-key-service-account", "label-fingerprint", "labels", "last-attach-timestamp", "last-detach-timestamp", "license-codes", "licenses", "name", "options", "physical-block-size-bytes", "raw-key", "region", "replica-zones", "resource-policies", "self-link", "sha256", "size-gb", "source-disk", "source-disk-id", "source-image", "source-image-encryption-key", "source-image-id", "source-snapshot", "source-snapshot-encryption-key", "source-snapshot-id", "status", "type", "users", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6575,6 +6577,7 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "default-port" => Some(("defaultPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "network-endpoint-type" => Some(("networkEndpointType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6585,7 +6588,7 @@ impl<'n> Engine<'n> {
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "default-port", "description", "id", "kind", "name", "network", "network-endpoint-type", "self-link", "size", "subnetwork", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "creation-timestamp", "default-port", "description", "id", "kind", "name", "network", "network-endpoint-type", "self-link", "size", "subnetwork", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7272,7 +7275,14 @@ impl<'n> Engine<'n> {
                     "http-health-check.host" => Some(("httpHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port-name" => Some(("httpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port" => Some(("httpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "log-config.enable" => Some(("logConfig.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ssl-health-check.proxy-header" => Some(("sslHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ssl-health-check.request" => Some(("sslHealthCheck.request", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7293,19 +7303,13 @@ impl<'n> Engine<'n> {
                     "tcp-health-check.port" => Some(("tcpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-health-check.port-name" => Some(("tcpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-health-check.response" => Some(("tcpHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "enable", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "log-config", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7470,7 +7474,14 @@ impl<'n> Engine<'n> {
                     "http-health-check.host" => Some(("httpHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port-name" => Some(("httpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port" => Some(("httpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "log-config.enable" => Some(("logConfig.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ssl-health-check.proxy-header" => Some(("sslHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ssl-health-check.request" => Some(("sslHealthCheck.request", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7491,19 +7502,13 @@ impl<'n> Engine<'n> {
                     "tcp-health-check.port" => Some(("tcpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-health-check.port-name" => Some(("tcpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-health-check.response" => Some(("tcpHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "enable", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "log-config", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7603,7 +7608,14 @@ impl<'n> Engine<'n> {
                     "http-health-check.host" => Some(("httpHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port-name" => Some(("httpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port" => Some(("httpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "log-config.enable" => Some(("logConfig.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ssl-health-check.proxy-header" => Some(("sslHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ssl-health-check.request" => Some(("sslHealthCheck.request", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7624,19 +7636,13 @@ impl<'n> Engine<'n> {
                     "tcp-health-check.port" => Some(("tcpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-health-check.port-name" => Some(("tcpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-health-check.response" => Some(("tcpHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "enable", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "log-config", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11610,13 +11616,13 @@ impl<'n> Engine<'n> {
                     "properties.reservation-affinity.key" => Some(("properties.reservationAffinity.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties.reservation-affinity.consume-reservation-type" => Some(("properties.reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties.machine-type" => Some(("properties.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.description" => Some(("properties.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.tags.items" => Some(("properties.tags.items", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "properties.tags.fingerprint" => Some(("properties.tags.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.labels" => Some(("properties.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "properties.shielded-instance-config.enable-vtpm" => Some(("properties.shieldedInstanceConfig.enableVtpm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "properties.shielded-instance-config.enable-integrity-monitoring" => Some(("properties.shieldedInstanceConfig.enableIntegrityMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "properties.shielded-instance-config.enable-secure-boot" => Some(("properties.shieldedInstanceConfig.enableSecureBoot", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "properties.tags.items" => Some(("properties.tags.items", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "properties.tags.fingerprint" => Some(("properties.tags.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "properties.labels" => Some(("properties.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "properties.private-ipv6-google-access" => Some(("properties.privateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties.resource-policies" => Some(("properties.resourcePolicies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "properties.min-cpu-platform" => Some(("properties.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties.scheduling.automatic-restart" => Some(("properties.scheduling.automaticRestart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -11625,13 +11631,14 @@ impl<'n> Engine<'n> {
                     "properties.can-ip-forward" => Some(("properties.canIpForward", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "properties.metadata.kind" => Some(("properties.metadata.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties.metadata.fingerprint" => Some(("properties.metadata.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "properties.description" => Some(("properties.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-instance" => Some(("sourceInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-restart", "can-ip-forward", "consume-reservation-type", "creation-timestamp", "description", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "fingerprint", "id", "items", "key", "kind", "labels", "machine-type", "metadata", "min-cpu-platform", "name", "on-host-maintenance", "preemptible", "properties", "reservation-affinity", "resource-policies", "scheduling", "self-link", "shielded-instance-config", "source-instance", "tags", "values"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-restart", "can-ip-forward", "consume-reservation-type", "creation-timestamp", "description", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "fingerprint", "id", "items", "key", "kind", "labels", "machine-type", "metadata", "min-cpu-platform", "name", "on-host-maintenance", "preemptible", "private-ipv6-google-access", "properties", "reservation-affinity", "resource-policies", "scheduling", "self-link", "shielded-instance-config", "source-instance", "tags", "values"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12781,6 +12788,7 @@ impl<'n> Engine<'n> {
                     "reservation-affinity.consume-reservation-type" => Some(("reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "display-device.enable-display" => Some(("displayDevice.enableDisplay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "private-ipv6-google-access" => Some(("privateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scheduling.automatic-restart" => Some(("scheduling.automaticRestart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduling.preemptible" => Some(("scheduling.preemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduling.on-host-maintenance" => Some(("scheduling.onHostMaintenance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12811,7 +12819,7 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-restart", "can-ip-forward", "consume-reservation-type", "cpu-platform", "creation-timestamp", "deletion-protection", "description", "display-device", "enable-display", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "fingerprint", "hostname", "id", "items", "key", "kind", "label-fingerprint", "labels", "machine-type", "metadata", "min-cpu-platform", "name", "on-host-maintenance", "preemptible", "reservation-affinity", "resource-policies", "scheduling", "self-link", "shielded-instance-config", "shielded-instance-integrity-policy", "start-restricted", "status", "status-message", "tags", "update-auto-learn-policy", "values", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-restart", "can-ip-forward", "consume-reservation-type", "cpu-platform", "creation-timestamp", "deletion-protection", "description", "display-device", "enable-display", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "fingerprint", "hostname", "id", "items", "key", "kind", "label-fingerprint", "labels", "machine-type", "metadata", "min-cpu-platform", "name", "on-host-maintenance", "preemptible", "private-ipv6-google-access", "reservation-affinity", "resource-policies", "scheduling", "self-link", "shielded-instance-config", "shielded-instance-integrity-policy", "start-restricted", "status", "status-message", "tags", "update-auto-learn-policy", "values", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14529,6 +14537,7 @@ impl<'n> Engine<'n> {
                     "reservation-affinity.consume-reservation-type" => Some(("reservationAffinity.consumeReservationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "display-device.enable-display" => Some(("displayDevice.enableDisplay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "private-ipv6-google-access" => Some(("privateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scheduling.automatic-restart" => Some(("scheduling.automaticRestart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduling.preemptible" => Some(("scheduling.preemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduling.on-host-maintenance" => Some(("scheduling.onHostMaintenance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14559,7 +14568,7 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-restart", "can-ip-forward", "consume-reservation-type", "cpu-platform", "creation-timestamp", "deletion-protection", "description", "display-device", "enable-display", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "fingerprint", "hostname", "id", "items", "key", "kind", "label-fingerprint", "labels", "machine-type", "metadata", "min-cpu-platform", "name", "on-host-maintenance", "preemptible", "reservation-affinity", "resource-policies", "scheduling", "self-link", "shielded-instance-config", "shielded-instance-integrity-policy", "start-restricted", "status", "status-message", "tags", "update-auto-learn-policy", "values", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-restart", "can-ip-forward", "consume-reservation-type", "cpu-platform", "creation-timestamp", "deletion-protection", "description", "display-device", "enable-display", "enable-integrity-monitoring", "enable-secure-boot", "enable-vtpm", "fingerprint", "hostname", "id", "items", "key", "kind", "label-fingerprint", "labels", "machine-type", "metadata", "min-cpu-platform", "name", "on-host-maintenance", "preemptible", "private-ipv6-google-access", "reservation-affinity", "resource-policies", "scheduling", "self-link", "shielded-instance-config", "shielded-instance-integrity-policy", "start-restricted", "status", "status-message", "tags", "update-auto-learn-policy", "values", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14838,12 +14847,13 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-ip" => Some(("networkIP", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subnetwork" => Some(("subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["fingerprint", "kind", "name", "network", "network-ip", "subnetwork"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["fingerprint", "ipv6-address", "kind", "name", "network", "network-ip", "subnetwork"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -17225,6 +17235,7 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "default-port" => Some(("defaultPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "network-endpoint-type" => Some(("networkEndpointType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -17235,7 +17246,7 @@ impl<'n> Engine<'n> {
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "default-port", "description", "id", "kind", "name", "network", "network-endpoint-type", "self-link", "size", "subnetwork", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "creation-timestamp", "default-port", "description", "id", "kind", "name", "network", "network-endpoint-type", "self-link", "size", "subnetwork", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -17570,19 +17581,21 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "network-peering.network" => Some(("networkPeering.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-peering.name" => Some(("networkPeering.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-peering.auto-create-routes" => Some(("networkPeering.autoCreateRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.state-details" => Some(("networkPeering.stateDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-peering.import-subnet-routes-with-public-ip" => Some(("networkPeering.importSubnetRoutesWithPublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.state" => Some(("networkPeering.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-peering.export-custom-routes" => Some(("networkPeering.exportCustomRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "network-peering.export-subnet-routes-with-public-ip" => Some(("networkPeering.exportSubnetRoutesWithPublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.exchange-subnet-routes" => Some(("networkPeering.exchangeSubnetRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.import-custom-routes" => Some(("networkPeering.importCustomRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "network-peering.name" => Some(("networkPeering.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-peering.network" => Some(("networkPeering.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "peer-network" => Some(("peerNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auto-create-routes" => Some(("autoCreateRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-create-routes", "exchange-subnet-routes", "export-custom-routes", "import-custom-routes", "name", "network", "network-peering", "peer-network", "state", "state-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-create-routes", "exchange-subnet-routes", "export-custom-routes", "export-subnet-routes-with-public-ip", "import-custom-routes", "import-subnet-routes-with-public-ip", "name", "network", "network-peering", "peer-network", "state", "state-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -18259,16 +18272,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "network-peering.network" => Some(("networkPeering.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-peering.name" => Some(("networkPeering.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-peering.auto-create-routes" => Some(("networkPeering.autoCreateRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.state-details" => Some(("networkPeering.stateDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-peering.import-subnet-routes-with-public-ip" => Some(("networkPeering.importSubnetRoutesWithPublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.state" => Some(("networkPeering.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-peering.export-custom-routes" => Some(("networkPeering.exportCustomRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "network-peering.export-subnet-routes-with-public-ip" => Some(("networkPeering.exportSubnetRoutesWithPublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.exchange-subnet-routes" => Some(("networkPeering.exchangeSubnetRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-peering.import-custom-routes" => Some(("networkPeering.importCustomRoutes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "network-peering.name" => Some(("networkPeering.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-peering.network" => Some(("networkPeering.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-create-routes", "exchange-subnet-routes", "export-custom-routes", "import-custom-routes", "name", "network", "network-peering", "state", "state-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-create-routes", "exchange-subnet-routes", "export-custom-routes", "export-subnet-routes-with-public-ip", "import-custom-routes", "import-subnet-routes-with-public-ip", "name", "network", "network-peering", "state", "state-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -23549,6 +23564,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _region_disks_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_disks().get_iam_policy(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _region_disks_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -23577,28 +23644,30 @@ impl<'n> Engine<'n> {
                     "source-image-encryption-key.sha256" => Some(("sourceImageEncryptionKey.sha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-image-encryption-key.kms-key-name" => Some(("sourceImageEncryptionKey.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "license-codes" => Some(("licenseCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "licenses" => Some(("licenses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "license-codes" => Some(("licenseCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "users" => Some(("users", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "disk-encryption-key.raw-key" => Some(("diskEncryptionKey.rawKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption-key.kms-key-service-account" => Some(("diskEncryptionKey.kmsKeyServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption-key.sha256" => Some(("diskEncryptionKey.sha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-encryption-key.kms-key-name" => Some(("diskEncryptionKey.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-disk" => Some(("sourceDisk", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "physical-block-size-bytes" => Some(("physicalBlockSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-attach-timestamp" => Some(("lastAttachTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-snapshot" => Some(("sourceSnapshot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-detach-timestamp" => Some(("lastDetachTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "label-fingerprint" => Some(("labelFingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-disk-id" => Some(("sourceDiskId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-image-id" => Some(("sourceImageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-policies" => Some(("resourcePolicies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "replica-zones" => Some(("replicaZones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "source-snapshot-id" => Some(("sourceSnapshotId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "users" => Some(("users", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size-gb" => Some(("sizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -23611,7 +23680,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-image" => Some(("sourceImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "disk-encryption-key", "id", "kind", "kms-key-name", "kms-key-service-account", "label-fingerprint", "labels", "last-attach-timestamp", "last-detach-timestamp", "license-codes", "licenses", "name", "options", "physical-block-size-bytes", "raw-key", "region", "replica-zones", "resource-policies", "self-link", "sha256", "size-gb", "source-image", "source-image-encryption-key", "source-image-id", "source-snapshot", "source-snapshot-encryption-key", "source-snapshot-id", "status", "type", "users", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "disk-encryption-key", "id", "kind", "kms-key-name", "kms-key-service-account", "label-fingerprint", "labels", "last-attach-timestamp", "last-detach-timestamp", "license-codes", "licenses", "name", "options", "physical-block-size-bytes", "raw-key", "region", "replica-zones", "resource-policies", "self-link", "sha256", "size-gb", "source-disk", "source-disk-id", "source-image", "source-image-encryption-key", "source-image-id", "source-snapshot", "source-snapshot-encryption-key", "source-snapshot-id", "status", "type", "users", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -23921,6 +23990,94 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _region_disks_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.iam-owned" => Some(("policy.iamOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "iam-owned", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RegionSetPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.region_disks().set_iam_policy(request, opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _region_disks_set_labels(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -24063,6 +24220,379 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_health_check_services_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_health_check_services().delete(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("health-check-service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_health_check_services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_health_check_services().get(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("health-check-service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_health_check_services_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-endpoint-groups" => Some(("networkEndpointGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-endpoints" => Some(("notificationEndpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "health-checks" => Some(("healthChecks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "health-status-aggregation-policy" => Some(("healthStatusAggregationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "fingerprint", "health-checks", "health-status-aggregation-policy", "id", "kind", "name", "network-endpoint-groups", "notification-endpoints", "region", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HealthCheckService = json::value::from_value(object).unwrap();
+        let mut call = self.hub.region_health_check_services().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_health_check_services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_health_check_services().list(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_health_check_services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-endpoint-groups" => Some(("networkEndpointGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-endpoints" => Some(("notificationEndpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "health-checks" => Some(("healthChecks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "health-status-aggregation-policy" => Some(("healthStatusAggregationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "fingerprint", "health-checks", "health-status-aggregation-policy", "id", "kind", "name", "network-endpoint-groups", "notification-endpoints", "region", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HealthCheckService = json::value::from_value(object).unwrap();
+        let mut call = self.hub.region_health_check_services().patch(request, opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("health-check-service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -24240,7 +24770,14 @@ impl<'n> Engine<'n> {
                     "http-health-check.host" => Some(("httpHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port-name" => Some(("httpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port" => Some(("httpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "log-config.enable" => Some(("logConfig.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ssl-health-check.proxy-header" => Some(("sslHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ssl-health-check.request" => Some(("sslHealthCheck.request", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -24261,19 +24798,13 @@ impl<'n> Engine<'n> {
                     "tcp-health-check.port" => Some(("tcpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-health-check.port-name" => Some(("tcpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-health-check.response" => Some(("tcpHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "enable", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "log-config", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -24438,7 +24969,14 @@ impl<'n> Engine<'n> {
                     "http-health-check.host" => Some(("httpHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port-name" => Some(("httpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port" => Some(("httpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "log-config.enable" => Some(("logConfig.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ssl-health-check.proxy-header" => Some(("sslHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ssl-health-check.request" => Some(("sslHealthCheck.request", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -24459,19 +24997,13 @@ impl<'n> Engine<'n> {
                     "tcp-health-check.port" => Some(("tcpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-health-check.port-name" => Some(("tcpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-health-check.response" => Some(("tcpHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "enable", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "log-config", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -24571,7 +25103,14 @@ impl<'n> Engine<'n> {
                     "http-health-check.host" => Some(("httpHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port-name" => Some(("httpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-health-check.port" => Some(("httpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "log-config.enable" => Some(("logConfig.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "ssl-health-check.proxy-header" => Some(("sslHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ssl-health-check.request" => Some(("sslHealthCheck.request", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -24592,19 +25131,13 @@ impl<'n> Engine<'n> {
                     "tcp-health-check.port" => Some(("tcpHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-health-check.port-name" => Some(("tcpHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-health-check.response" => Some(("tcpHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.request-path" => Some(("httpsHealthCheck.requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.proxy-header" => Some(("httpsHealthCheck.proxyHeader", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-specification" => Some(("httpsHealthCheck.portSpecification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.response" => Some(("httpsHealthCheck.response", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.host" => Some(("httpsHealthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port-name" => Some(("httpsHealthCheck.portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "https-health-check.port" => Some(("httpsHealthCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "enable", "healthy-threshold", "host", "http2-health-check", "http-health-check", "https-health-check", "id", "kind", "log-config", "name", "port", "port-name", "port-specification", "proxy-header", "region", "request", "request-path", "response", "self-link", "ssl-health-check", "tcp-health-check", "timeout-sec", "type", "unhealthy-threshold"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -26202,6 +26735,280 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _region_notification_endpoints_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_notification_endpoints().delete(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("notification-endpoint").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_notification_endpoints_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_notification_endpoints().get(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("notification-endpoint").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_notification_endpoints_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grpc-settings.resend-interval.nanos" => Some(("grpcSettings.resendInterval.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "grpc-settings.resend-interval.seconds" => Some(("grpcSettings.resendInterval.seconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grpc-settings.endpoint" => Some(("grpcSettings.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grpc-settings.payload-name" => Some(("grpcSettings.payloadName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grpc-settings.retry-duration-sec" => Some(("grpcSettings.retryDurationSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "grpc-settings.authority" => Some(("grpcSettings.authority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authority", "creation-timestamp", "description", "endpoint", "grpc-settings", "id", "kind", "name", "nanos", "payload-name", "region", "resend-interval", "retry-duration-sec", "seconds", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationEndpoint = json::value::from_value(object).unwrap();
+        let mut call = self.hub.region_notification_endpoints().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _region_notification_endpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.region_notification_endpoints().list(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "filter", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _region_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.region_operations().delete(opt.value_of("project").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("operation").unwrap_or(""));
@@ -26547,16 +27354,24 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed.domains" => Some(("managed.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "managed.status" => Some(("managed.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed.domain-status" => Some(("managed.domainStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "certificate" => Some(("certificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-managed.private-key" => Some(("selfManaged.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-managed.certificate" => Some(("selfManaged.certificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-key" => Some(("privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subject-alternative-names" => Some(("subjectAlternativeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate", "creation-timestamp", "description", "id", "kind", "name", "private-key", "region", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate", "creation-timestamp", "description", "domain-status", "domains", "expire-time", "id", "kind", "managed", "name", "private-key", "region", "self-link", "self-managed", "status", "subject-alternative-names", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -28544,8 +29359,9 @@ impl<'n> Engine<'n> {
                     "specific-reservation-required" => Some(("specificReservationRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "commitment" => Some(("commitment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "specific-reservation.count" => Some(("specificReservation.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "specific-reservation.instance-properties.min-cpu-platform" => Some(("specificReservation.instanceProperties.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "specific-reservation.instance-properties.maintenance-interval" => Some(("specificReservation.instanceProperties.maintenanceInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "specific-reservation.instance-properties.machine-type" => Some(("specificReservation.instanceProperties.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "specific-reservation.instance-properties.min-cpu-platform" => Some(("specificReservation.instanceProperties.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "specific-reservation.in-use-count" => Some(("specificReservation.inUseCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -28553,7 +29369,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["commitment", "count", "creation-timestamp", "description", "id", "in-use-count", "instance-properties", "kind", "machine-type", "min-cpu-platform", "name", "self-link", "specific-reservation", "specific-reservation-required", "status", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["commitment", "count", "creation-timestamp", "description", "id", "in-use-count", "instance-properties", "kind", "machine-type", "maintenance-interval", "min-cpu-platform", "name", "self-link", "specific-reservation", "specific-reservation-required", "status", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -31966,16 +32782,24 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed.domains" => Some(("managed.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "managed.status" => Some(("managed.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed.domain-status" => Some(("managed.domainStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "certificate" => Some(("certificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-managed.private-key" => Some(("selfManaged.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-managed.certificate" => Some(("selfManaged.certificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-key" => Some(("privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subject-alternative-names" => Some(("subjectAlternativeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate", "creation-timestamp", "description", "id", "kind", "name", "private-key", "region", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate", "creation-timestamp", "description", "domain-status", "domains", "expire-time", "id", "kind", "managed", "name", "private-key", "region", "self-link", "self-managed", "status", "subject-alternative-names", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -32890,6 +33714,8 @@ impl<'n> Engine<'n> {
                     "log-config.filter-expr" => Some(("logConfig.filterExpr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-config.aggregation-interval" => Some(("logConfig.aggregationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-config.metadata" => Some(("logConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-ipv6-google-access" => Some(("privateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -32901,9 +33727,9 @@ impl<'n> Engine<'n> {
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ipv6-cidr-range" => Some(("ipv6CidrRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-interval", "creation-timestamp", "description", "enable", "enable-flow-logs", "filter-expr", "fingerprint", "flow-sampling", "gateway-address", "id", "ip-cidr-range", "kind", "log-config", "metadata", "metadata-fields", "name", "network", "private-ip-google-access", "purpose", "region", "role", "self-link", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-interval", "creation-timestamp", "description", "enable", "enable-flow-logs", "filter-expr", "fingerprint", "flow-sampling", "gateway-address", "id", "ip-cidr-range", "ipv6-cidr-range", "kind", "log-config", "metadata", "metadata-fields", "name", "network", "private-ip-google-access", "private-ipv6-google-access", "purpose", "region", "role", "self-link", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -33130,6 +33956,8 @@ impl<'n> Engine<'n> {
                     "log-config.filter-expr" => Some(("logConfig.filterExpr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-config.aggregation-interval" => Some(("logConfig.aggregationInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-config.metadata" => Some(("logConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-ipv6-google-access" => Some(("privateIpv6GoogleAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -33141,9 +33969,9 @@ impl<'n> Engine<'n> {
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ipv6-cidr-range" => Some(("ipv6CidrRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-interval", "creation-timestamp", "description", "enable", "enable-flow-logs", "filter-expr", "fingerprint", "flow-sampling", "gateway-address", "id", "ip-cidr-range", "kind", "log-config", "metadata", "metadata-fields", "name", "network", "private-ip-google-access", "purpose", "region", "role", "self-link", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-interval", "creation-timestamp", "description", "enable", "enable-flow-logs", "filter-expr", "fingerprint", "flow-sampling", "gateway-address", "id", "ip-cidr-range", "ipv6-cidr-range", "kind", "log-config", "metadata", "metadata-fields", "name", "network", "private-ip-google-access", "private-ipv6-google-access", "purpose", "region", "role", "self-link", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -40526,6 +41354,9 @@ impl<'n> Engine<'n> {
                     ("get", Some(opt)) => {
                         call_result = self._region_disks_get(opt, dry_run, &mut err);
                     },
+                    ("get-iam-policy", Some(opt)) => {
+                        call_result = self._region_disks_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("insert", Some(opt)) => {
                         call_result = self._region_disks_insert(opt, dry_run, &mut err);
                     },
@@ -40538,6 +41369,9 @@ impl<'n> Engine<'n> {
                     ("resize", Some(opt)) => {
                         call_result = self._region_disks_resize(opt, dry_run, &mut err);
                     },
+                    ("set-iam-policy", Some(opt)) => {
+                        call_result = self._region_disks_set_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("set-labels", Some(opt)) => {
                         call_result = self._region_disks_set_labels(opt, dry_run, &mut err);
                     },
@@ -40546,6 +41380,29 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("region-disks".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("region-health-check-services", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._region_health_check_services_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._region_health_check_services_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._region_health_check_services_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._region_health_check_services_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._region_health_check_services_patch(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("region-health-check-services".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -40645,6 +41502,26 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("region-instance-groups".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("region-notification-endpoints", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._region_notification_endpoints_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._region_notification_endpoints_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._region_notification_endpoints_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._region_notification_endpoints_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("region-notification-endpoints".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -41536,7 +42413,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of accelerator types available to the specified project."##),
+                    Some(r##"Retrieves a list of accelerator types that are available to the specified project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/accelerator-types_list",
                   vec![
                     (Some(r##"project"##),
@@ -42336,7 +43213,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-health",
-                    Some(r##"Gets the most recent health check results for this BackendService."##),
+                    Some(r##"Gets the most recent health check results for this BackendService.
+        
+        Example request body:
+        
+        { "group": "/zones/us-east1-b/instanceGroups/lb-backend-example" }"##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/backend-services_get-health",
                   vec![
                     (Some(r##"project"##),
@@ -42370,7 +43251,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a BackendService resource in the specified project using the data included in the request. There are several restrictions and guidelines to keep in mind when creating a backend service. Read  Understanding backend services for more information."##),
+                    Some(r##"Creates a BackendService resource in the specified project using the data included in the request. For more information, see  Backend services overview."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/backend-services_insert",
                   vec![
                     (Some(r##"project"##),
@@ -42420,7 +43301,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Patches the specified BackendService resource with the data included in the request. There are several Understanding backend services to keep in mind when updating a backend service. Read  Understanding backend services for more information. This method supports PATCH semantics and uses the JSON merge patch format and processing rules."##),
+                    Some(r##"Patches the specified BackendService resource with the data included in the request. For more information, see  Backend services overview. This method supports PATCH semantics and uses the JSON merge patch format and processing rules."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/backend-services_patch",
                   vec![
                     (Some(r##"project"##),
@@ -42488,7 +43369,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the specified BackendService resource with the data included in the request. There are several Understanding backend services to keep in mind when updating a backend service. Read  Understanding backend services for more information."##),
+                    Some(r##"Updates the specified BackendService resource with the data included in the request. For more information, see Backend services overview."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/backend-services_update",
                   vec![
                     (Some(r##"project"##),
@@ -45468,7 +46349,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-errors",
-                    Some(r##"Lists all errors thrown by actions on instances for a given managed instance group."##),
+                    Some(r##"Lists all errors thrown by actions on instances for a given managed instance group. The filter and orderBy query parameters are not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_list-errors",
                   vec![
                     (Some(r##"project"##),
@@ -45502,7 +46383,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-managed-instances",
-                    Some(r##"Lists all of the instances in the managed instance group. Each instance in the list has a currentAction, which indicates the action that the managed instance group is performing on the instance. For example, if the group is still creating an instance, the currentAction is CREATING. If a previous action failed, the list displays the errors for that failed action."##),
+                    Some(r##"Lists all of the instances in the managed instance group. Each instance in the list has a currentAction, which indicates the action that the managed instance group is performing on the instance. For example, if the group is still creating an instance, the currentAction is CREATING. If a previous action failed, the list displays the errors for that failed action. The orderBy query parameter is not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_list-managed-instances",
                   vec![
                     (Some(r##"project"##),
@@ -45943,7 +46824,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-instances",
-                    Some(r##"Lists the instances in the specified instance group."##),
+                    Some(r##"Lists the instances in the specified instance group. The orderBy query parameter is not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_list-instances",
                   vec![
                     (Some(r##"project"##),
@@ -46773,7 +47654,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-referrers",
-                    Some(r##"Retrieves the list of referrers to instances contained within the specified zone. For more information, read Viewing Referrers to VM Instances."##),
+                    Some(r##"Retrieves a list of resources that refer to the VM instance specified in the request. For example, if the VM instance is part of a managed instance group, the referrers list includes the managed instance group. For more information, read Viewing Referrers to VM Instances."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instances_list-referrers",
                   vec![
                     (Some(r##"project"##),
@@ -47201,7 +48082,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-scheduling",
-                    Some(r##"Sets an instance's scheduling options."##),
+                    Some(r##"Sets an instance's scheduling options. You can only call this method on a stopped instance, that is, a VM instance that is in a `TERMINATED` state. See Instance Life Cycle for more information on the possible instance states."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instances_set-scheduling",
                   vec![
                     (Some(r##"project"##),
@@ -49456,7 +50337,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Patch the node group."##),
+                    Some(r##"Updates the specified node group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/node-groups_patch",
                   vec![
                     (Some(r##"project"##),
@@ -50856,7 +51737,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a regional BackendService resource in the specified project using the data included in the request. There are several restrictions and guidelines to keep in mind when creating a regional backend service. Read  Understanding backend services for more information."##),
+                    Some(r##"Creates a regional BackendService resource in the specified project using the data included in the request. For more information, see  Backend services overview."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-backend-services_insert",
                   vec![
                     (Some(r##"project"##),
@@ -50918,7 +51799,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the specified regional BackendService resource with the data included in the request. There are several Understanding backend services to keep in mind when updating a backend service. Read  Understanding backend services for more information. This method supports PATCH semantics and uses the JSON merge patch format and processing rules."##),
+                    Some(r##"Updates the specified regional BackendService resource with the data included in the request. For more information, see  Understanding backend services This method supports PATCH semantics and uses the JSON merge patch format and processing rules."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-backend-services_patch",
                   vec![
                     (Some(r##"project"##),
@@ -50958,7 +51839,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the specified regional BackendService resource with the data included in the request. There are several Understanding backend services to keep in mind when updating a backend service. Read  Understanding backend services for more information."##),
+                    Some(r##"Updates the specified regional BackendService resource with the data included in the request. For more information, see  Backend services overview."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-backend-services_update",
                   vec![
                     (Some(r##"project"##),
@@ -51185,7 +52066,7 @@ fn main() {
                   ]),
             ]),
         
-        ("region-disks", "methods: 'add-resource-policies', 'create-snapshot', 'delete', 'get', 'insert', 'list', 'remove-resource-policies', 'resize', 'set-labels' and 'test-iam-permissions'", vec![
+        ("region-disks", "methods: 'add-resource-policies', 'create-snapshot', 'delete', 'get', 'get-iam-policy', 'insert', 'list', 'remove-resource-policies', 'resize', 'set-iam-policy', 'set-labels' and 'test-iam-permissions'", vec![
             ("add-resource-policies",
                     Some(r##"Adds existing resource policies to a regional disk. You can only add one policy which will be applied to this disk for scheduling snapshot creation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-disks_add-resource-policies",
@@ -51319,6 +52200,40 @@ fn main() {
                     (Some(r##"disk"##),
                      None,
                      Some(r##"Name of the regional persistent disk to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. May be empty if no such policy or resource exists."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-disks_get-iam-policy",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"The name of the region for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"Name or id of the resource for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -51476,6 +52391,46 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-disks_set-iam-policy",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"The name of the region for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"Name or id of the resource for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("set-labels",
                     Some(r##"Sets the labels on the target regional disk."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-disks_set-labels",
@@ -51535,6 +52490,179 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"Name or id of the resource for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("region-health-check-services", "methods: 'delete', 'get', 'insert', 'list' and 'patch'", vec![
+            ("delete",
+                    Some(r##"Deletes the specified regional HealthCheckService."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-health-check-services_delete",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"health-check-service"##),
+                     None,
+                     Some(r##"Name of the HealthCheckService to delete. The name must be 1-63 characters long, and comply with RFC1035."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Returns the specified regional HealthCheckService resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-health-check-services_get",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"health-check-service"##),
+                     None,
+                     Some(r##"Name of the HealthCheckService to update. The name must be 1-63 characters long, and comply with RFC1035."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",
+                    Some(r##"Creates a regional HealthCheckService resource in the specified project and region using the data included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-health-check-services_insert",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Lists all the HealthCheckService resources that have been configured for the specified project in the given region."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-health-check-services_list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",
+                    Some(r##"Updates the specified regional HealthCheckService resource with the data included in the request. This method supports PATCH semantics and uses the JSON merge patch format and processing rules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-health-check-services_patch",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"health-check-service"##),
+                     None,
+                     Some(r##"Name of the HealthCheckService to update. The name must be 1-63 characters long, and comply with RFC1035."##),
                      Some(true),
                      Some(false)),
         
@@ -52073,7 +53201,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-errors",
-                    Some(r##"Lists all errors thrown by actions on instances for a given regional managed instance group."##),
+                    Some(r##"Lists all errors thrown by actions on instances for a given regional managed instance group. The filter and orderBy query parameters are not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-instance-group-managers_list-errors",
                   vec![
                     (Some(r##"project"##),
@@ -52107,7 +53235,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-managed-instances",
-                    Some(r##"Lists the instances in the managed instance group and instances that are scheduled to be created. The list includes any current actions that the group has scheduled for its instances."##),
+                    Some(r##"Lists the instances in the managed instance group and instances that are scheduled to be created. The list includes any current actions that the group has scheduled for its instances. The orderBy query parameter is not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-instance-group-managers_list-managed-instances",
                   vec![
                     (Some(r##"project"##),
@@ -52414,7 +53542,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-instances",
-                    Some(r##"Lists the instances in the specified instance group and displays information about the named ports. Depending on the specified options, this method can list all instances or only the instances that are running."##),
+                    Some(r##"Lists the instances in the specified instance group and displays information about the named ports. Depending on the specified options, this method can list all instances or only the instances that are running. The orderBy query parameter is not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-instance-groups_list-instances",
                   vec![
                     (Some(r##"project"##),
@@ -52480,6 +53608,139 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("region-notification-endpoints", "methods: 'delete', 'get', 'insert' and 'list'", vec![
+            ("delete",
+                    Some(r##"Deletes the specified NotificationEndpoint in the given region"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-notification-endpoints_delete",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"notification-endpoint"##),
+                     None,
+                     Some(r##"Name of the NotificationEndpoint resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Returns the specified NotificationEndpoint resource in the given region."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-notification-endpoints_get",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"notification-endpoint"##),
+                     None,
+                     Some(r##"Name of the NotificationEndpoint resource to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",
+                    Some(r##"Create a NotificationEndpoint in the specified project in the given region using the parameters that are included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-notification-endpoints_insert",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Lists the NotificationEndpoints for a project in the given region."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/region-notification-endpoints_list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Project ID for this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"region"##),
+                     None,
+                     Some(r##"Name of the region scoping this request."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -55507,7 +56768,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-usable",
-                    Some(r##"Retrieves an aggregated list of all usable subnetworks in the project. The list contains all of the subnetworks in the project and the subnetworks that were shared by a Shared VPC host project."##),
+                    Some(r##"Retrieves an aggregated list of all usable subnetworks in the project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/subnetworks_list-usable",
                   vec![
                     (Some(r##"project"##),
@@ -58128,7 +59389,7 @@ fn main() {
     
     let mut app = App::new("compute1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200311")
+           .version("1.0.14+20200612")
            .about("Creates and runs virtual machines on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_compute1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Cloud OS Login v1.0.13+20200329
+site_name: Cloud OS Login v1.0.14+20200704
 site_url: http://byron.github.io/google-apis-rs/google-oslogin1-cli
 site_description: A complete library to interact with Cloud OS Login (protocol v1)
 

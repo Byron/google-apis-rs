@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dataproc* crate version *1.0.13+20200323*, where *20200323* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Dataproc* crate version *1.0.14+20200703*, where *20200703* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -342,7 +342,7 @@ impl<'a, C, A> Dataproc<C, A>
         Dataproc {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://dataproc.googleapis.com/".to_string(),
             _root_url: "https://dataproc.googleapis.com/".to_string(),
         }
@@ -353,7 +353,7 @@ impl<'a, C, A> Dataproc<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -531,7 +531,7 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobReference {
-    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// Optional. The ID of the Google Cloud Platform project that the job belongs to. If specified, must match the request project ID.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// Optional. The job ID, which must be unique within the project.The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or hyphens (-). The maximum length is 100 characters.If not specified by the caller, the job ID will be provided by the server.
@@ -554,15 +554,15 @@ pub struct GceClusterConfig {
     /// Optional. Reservation Affinity for consuming Zonal reservation.
     #[serde(rename="reservationAffinity")]
     pub reservation_affinity: Option<ReservationAffinity>,
-    /// Optional. The Compute Engine network to be used for machine communications. Cannot be specified with subnetwork_uri. If neither network_uri nor subnetwork_uri is specified, the "default" network of the project is used, if it exists. Cannot be a "Custom Subnet Network" (see Using Subnetworks for more information).A full URL, partial URI, or short name are valid. Examples:
+    /// Optional. The Compute Engine network to be used for machine communications. Cannot be specified with subnetwork_uri. If neither network_uri nor subnetwork_uri is specified, the "default" network of the project is used, if it exists. Cannot be a "Custom Subnet Network" (see Using Subnetworks (https://cloud.google.com/compute/docs/subnetworks) for more information).A full URL, partial URI, or short name are valid. Examples:
     /// https://www.googleapis.com/compute/v1/projects/[project_id]/regions/global/default
     /// projects/[project_id]/regions/global/default
     /// default
     #[serde(rename="networkUri")]
     pub network_uri: Option<String>,
-    /// The Compute Engine tags to add to all instances (see Tagging instances).
+    /// The Compute Engine tags to add to all instances (see Tagging instances (https://cloud.google.com/compute/docs/label-or-tag-resources#tags)).
     pub tags: Option<Vec<String>>,
-    /// Optional. The Dataproc service account (also see VM Data Plane identity) used by Dataproc cluster VM instances to access Google Cloud Platform services.If not specified, the Compute Engine default service account is used.
+    /// Optional. The Dataproc service account (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/service-accounts#service_accounts_in_cloud_dataproc) (also see VM Data Plane identity (https://cloud.google.com/dataproc/docs/concepts/iam/dataproc-principals#vm_service_account_data_plane_identity)) used by Dataproc cluster VM instances to access Google Cloud Platform services.If not specified, the Compute Engine default service account (https://cloud.google.com/compute/docs/access/service-accounts#default_service_account) is used.
     #[serde(rename="serviceAccount")]
     pub service_account: Option<String>,
     /// Optional. The zone where the Compute Engine cluster will be located. On a create request, it is required in the "global" region. If omitted in a non-global Dataproc region, the service will pick a zone in the corresponding Compute Engine region. On a get request, zone will always be present.A full URL, partial URI, or short name are valid. Examples:
@@ -606,15 +606,21 @@ pub struct ClusterConfig {
     /// Optional. The config settings for software inside the cluster.
     #[serde(rename="softwareConfig")]
     pub software_config: Option<SoftwareConfig>,
-    /// Optional. A Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Dataproc staging bucket).
+    /// Optional. A Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Dataproc staging bucket (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
     #[serde(rename="configBucket")]
     pub config_bucket: Option<String>,
     /// Optional. The shared Compute Engine config settings for all instances in a cluster.
     #[serde(rename="gceClusterConfig")]
     pub gce_cluster_config: Option<GceClusterConfig>,
+    /// Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs data, such as Spark and MapReduce history files. If you do not specify a temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's temp bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket. The default bucket has a TTL of 90 days, but you can use any TTL (or none) if you specify a bucket.
+    #[serde(rename="tempBucket")]
+    pub temp_bucket: Option<String>,
     /// Optional. Autoscaling config for the policy associated with the cluster. Cluster does not autoscale if this field is unset.
     #[serde(rename="autoscalingConfig")]
     pub autoscaling_config: Option<AutoscalingConfig>,
+    /// Optional. Port/endpoint configuration for this cluster
+    #[serde(rename="endpointConfig")]
+    pub endpoint_config: Option<EndpointConfig>,
     /// Optional. The Compute Engine config settings for worker instances in a cluster.
     #[serde(rename="workerConfig")]
     pub worker_config: Option<InstanceGroupConfig>,
@@ -660,13 +666,18 @@ pub struct InstanceGroupConfig {
     /// Optional. The Compute Engine machine type used for cluster instances.A full URL, partial URI, or short name are valid. Examples:
     /// https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2
     /// projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2
-    /// n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto Zone Placement feature, you must use the short name of the machine type resource, for example, n1-standard-2.
+    /// n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto Zone Placement (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement) feature, you must use the short name of the machine type resource, for example, n1-standard-2.
     #[serde(rename="machineTypeUri")]
     pub machine_type_uri: Option<String>,
     /// Output only. The list of instance names. Dataproc derives the names from cluster_name, num_instances, and the instance group.
     #[serde(rename="instanceNames")]
     pub instance_names: Option<Vec<String>>,
-    /// Optional. The Compute Engine image resource used for cluster instances. It can be specified or may be inferred from SoftwareConfig.image_version.
+    /// Optional. The Compute Engine image resource used for cluster instances.The URI can represent an image or image family.Image examples:
+    /// https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/[image-id]
+    /// projects/[project_id]/global/images/[image-id]
+    /// image-idImage family examples. Dataproc will use the most recent image from the family:
+    /// https://www.googleapis.com/compute/beta/projects/[project_id]/global/images/family/[custom-image-family-name]
+    /// projects/[project_id]/global/images/family/[custom-image-family-name]If the URI is unspecified, it will be inferred from SoftwareConfig.image_version or the system default.
     #[serde(rename="imageUri")]
     pub image_uri: Option<String>,
     /// Optional. The Compute Engine accelerator configuration for these instances.
@@ -674,7 +685,7 @@ pub struct InstanceGroupConfig {
     /// Output only. The config for Compute Engine Instance Group Manager that manages this group. This is only used for preemptible instance groups.
     #[serde(rename="managedGroupConfig")]
     pub managed_group_config: Option<ManagedGroupConfig>,
-    /// Optional. Specifies the minimum cpu platform for the Instance Group. See Dataproc&rarr;Minimum CPU Platform.
+    /// Optional. Specifies the minimum cpu platform for the Instance Group. See Dataproc -&gt; Minimum CPU Platform (https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-cpu).
     #[serde(rename="minCpuPlatform")]
     pub min_cpu_platform: Option<String>,
     /// Optional. Disk option config settings.
@@ -730,7 +741,7 @@ pub struct DiskConfig {
 impl Part for DiskConfig {}
 
 
-/// A Dataproc job for running Presto (https://prestosql.io/) queries
+/// A Dataproc job for running Presto (https://prestosql.io/) queries. IMPORTANT: The Dataproc Presto Optional Component (https://cloud.google.com/dataproc/docs/concepts/components/presto) must be enabled when the cluster is created to submit a Presto job to the cluster.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -812,7 +823,7 @@ impl Part for NodeInitializationAction {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
-    /// OPTIONAL: A GetPolicyOptions object for specifying options to GetIamPolicy. This field is only used by Cloud IAM.
+    /// OPTIONAL: A GetPolicyOptions object for specifying options to GetIamPolicy.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -825,13 +836,13 @@ impl RequestValue for GetIamPolicyRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SparkRJob {
-    /// Optional. HCFS URIs of files to be copied to the working directory of R drivers and distributed tasks. Useful for naively parallel tasks.
+    /// Optional. HCFS URIs of files to be placed in the working directory of each executor. Useful for naively parallel tasks.
     #[serde(rename="fileUris")]
     pub file_uris: Option<Vec<String>>,
     /// Optional. The runtime log config for job execution.
     #[serde(rename="loggingConfig")]
     pub logging_config: Option<LoggingConfig>,
-    /// Optional. HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
+    /// Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
     #[serde(rename="archiveUris")]
     pub archive_uris: Option<Vec<String>>,
     /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
@@ -1020,7 +1031,7 @@ impl Part for ClusterSelector {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SoftwareConfig {
-    /// Optional. The version of software inside the cluster. It must be one of the supported Dataproc Versions, such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version. If unspecified, it defaults to the latest Debian version.
+    /// Optional. The version of software inside the cluster. It must be one of the supported Dataproc Versions (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_cloud_dataproc_versions), such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions). If unspecified, it defaults to the latest Debian version.
     #[serde(rename="imageVersion")]
     pub image_version: Option<String>,
     /// Optional. The set of components to activate on the cluster.
@@ -1035,7 +1046,7 @@ pub struct SoftwareConfig {
     /// mapred: mapred-site.xml
     /// pig: pig.properties
     /// spark: spark-defaults.conf
-    /// yarn: yarn-site.xmlFor more information, see Cluster properties.
+    /// yarn: yarn-site.xmlFor more information, see Cluster properties (https://cloud.google.com/dataproc/docs/concepts/cluster-properties).
     pub properties: Option<HashMap<String, String>>,
 }
 
@@ -1069,7 +1080,7 @@ impl Part for InstanceGroupAutoscalingPolicyConfig {}
 pub struct Binding {
     /// Role that is assigned to members. For example, roles/viewer, roles/editor, or roles/owner.
     pub role: Option<String>,
-    /// The condition that is associated with this binding. NOTE: An unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently.
+    /// The condition that is associated with this binding.If the condition evaluates to true, then this binding applies to the current request.If the condition evaluates to false, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the members in this binding.To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource. members can have the following values:
     /// allUsers: A special identifier that represents anyone who is  on the internet; with or without a Google account.
@@ -1131,7 +1142,7 @@ pub struct Cluster {
     pub project_id: Option<String>,
     /// Optional. The labels to associate with this cluster. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a cluster.
     pub labels: Option<HashMap<String, String>>,
-    /// Contains cluster daemon metrics such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
+    /// Output only. Contains cluster daemon metrics such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
     pub metrics: Option<ClusterMetrics>,
     /// Output only. The previous cluster status.
     #[serde(rename="statusHistory")]
@@ -1173,13 +1184,13 @@ pub struct SparkJob {
     pub logging_config: Option<LoggingConfig>,
     /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
     pub args: Option<Vec<String>>,
-    /// Optional. HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.
+    /// Optional. HCFS URIs of files to be placed in the working directory of each executor. Useful for naively parallel tasks.
     #[serde(rename="fileUris")]
     pub file_uris: Option<Vec<String>>,
     /// The name of the driver's main class. The jar file that contains the class must be in the default CLASSPATH or specified in jar_file_uris.
     #[serde(rename="mainClass")]
     pub main_class: Option<String>,
-    /// Optional. HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
+    /// Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
     #[serde(rename="archiveUris")]
     pub archive_uris: Option<Vec<String>>,
     /// The HCFS URI of the jar file that contains the main class.
@@ -1277,7 +1288,7 @@ impl Part for AutoscalingConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BasicYarnAutoscalingConfig {
-    /// Required. Fraction of average pending memory in the last cooldown period for which to remove workers. A scale-down factor of 1 will result in scaling down so that there is no available memory remaining after the update (more aggressive scaling). A scale-down factor of 0 disables removing workers, which can be beneficial for autoscaling a single job.Bounds: 0.0, 1.0.
+    /// Required. Fraction of average YARN pending memory in the last cooldown period for which to remove workers. A scale-down factor of 1 will result in scaling down so that there is no available memory remaining after the update (more aggressive scaling). A scale-down factor of 0 disables removing workers, which can be beneficial for autoscaling a single job. See How autoscaling works for more information.Bounds: 0.0, 1.0.
     #[serde(rename="scaleDownFactor")]
     pub scale_down_factor: Option<f64>,
     /// Required. Timeout for YARN graceful decommissioning of Node Managers. Specifies the duration to wait for jobs to complete before forcefully removing workers (and potentially interrupting jobs). Only applicable to downscaling operations.Bounds: 0s, 1d.
@@ -1286,7 +1297,7 @@ pub struct BasicYarnAutoscalingConfig {
     /// Optional. Minimum scale-down threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2 worker scale-down for the cluster to scale. A threshold of 0 means the autoscaler will scale down on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.
     #[serde(rename="scaleDownMinWorkerFraction")]
     pub scale_down_min_worker_fraction: Option<f64>,
-    /// Required. Fraction of average pending memory in the last cooldown period for which to add workers. A scale-up factor of 1.0 will result in scaling up so that there is no pending memory remaining after the update (more aggressive scaling). A scale-up factor closer to 0 will result in a smaller magnitude of scaling up (less aggressive scaling).Bounds: 0.0, 1.0.
+    /// Required. Fraction of average YARN pending memory in the last cooldown period for which to add workers. A scale-up factor of 1.0 will result in scaling up so that there is no pending memory remaining after the update (more aggressive scaling). A scale-up factor closer to 0 will result in a smaller magnitude of scaling up (less aggressive scaling). See How autoscaling works for more information.Bounds: 0.0, 1.0.
     #[serde(rename="scaleUpFactor")]
     pub scale_up_factor: Option<f64>,
     /// Optional. Minimum scale-up threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2-worker scale-up for the cluster to scale. A threshold of 0 means the autoscaler will scale up on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.
@@ -1384,7 +1395,7 @@ pub struct YarnApplication {
 impl Part for YarnApplication {}
 
 
-/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources.A Policy is a collection of bindings. A binding binds one or more members to a single role. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A role is a named list of permissions; each role can be an IAM predefined role or a user-created custom role.Optionally, a binding can specify a condition, which is a logical expression that allows access to a resource only if the expression evaluates to true. A condition can add constraints based on attributes of the request, the resource, or both.JSON example:
+/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources.A Policy is a collection of bindings. A binding binds one or more members to a single role. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A role is a named list of permissions; each role can be an IAM predefined role or a user-created custom role.For some types of Google Cloud resources, a binding can also specify a condition, which is a logical expression that allows access to a resource only if the expression evaluates to true. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).JSON example:
 /// {
 /// "bindings": [
 /// {
@@ -1398,7 +1409,9 @@ impl Part for YarnApplication {}
 /// },
 /// {
 /// "role": "roles/resourcemanager.organizationViewer",
-/// "members": ["user:eve@example.com"],
+/// "members": [
+/// "user:eve@example.com"
+/// ],
 /// "condition": {
 /// "title": "expirable access",
 /// "description": "Does not grant access after Sep 2020",
@@ -1458,7 +1471,7 @@ pub struct Policy {
     /// Getting a policy that includes a conditional role binding
     /// Adding a conditional role binding to a policy
     /// Changing a conditional role binding in a policy
-    /// Removing any role binding, with or without a condition, from a policy  that includes conditionsImportant: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset.
+    /// Removing any role binding, with or without a condition, from a policy  that includes conditionsImportant: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset.To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -1493,7 +1506,7 @@ pub struct LoggingConfig {
 impl Part for LoggingConfig {}
 
 
-/// Specifies the type and number of accelerator cards attached to the instances of an instance. See GPUs on Compute Engine.
+/// Specifies the type and number of accelerator cards attached to the instances of an instance. See GPUs on Compute Engine (https://cloud.google.com/compute/docs/gpus/).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1502,10 +1515,10 @@ pub struct AcceleratorConfig {
     /// The number of the accelerator cards of this type exposed to this instance.
     #[serde(rename="acceleratorCount")]
     pub accelerator_count: Option<i32>,
-    /// Full URL, partial URI, or short name of the accelerator type resource to expose to this instance. See Compute Engine AcceleratorTypes.Examples:
+    /// Full URL, partial URI, or short name of the accelerator type resource to expose to this instance. See Compute Engine AcceleratorTypes (https://cloud.google.com/compute/docs/reference/beta/acceleratorTypes).Examples:
     /// https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
     /// projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
-    /// nvidia-tesla-k80Auto Zone Exception: If you are using the Dataproc Auto Zone Placement feature, you must use the short name of the accelerator type resource, for example, nvidia-tesla-k80.
+    /// nvidia-tesla-k80Auto Zone Exception: If you are using the Dataproc Auto Zone Placement (https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement) feature, you must use the short name of the accelerator type resource, for example, nvidia-tesla-k80.
     #[serde(rename="acceleratorTypeUri")]
     pub accelerator_type_uri: Option<String>,
 }
@@ -1535,6 +1548,23 @@ pub struct SubmitJobRequest {
 impl RequestValue for SubmitJobRequest {}
 
 
+/// Endpoint config for this cluster
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EndpointConfig {
+    /// Output only. The map of port descriptions to URLs. Will only be populated if enable_http_port_access is true.
+    #[serde(rename="httpPorts")]
+    pub http_ports: Option<HashMap<String, String>>,
+    /// Optional. If true, enable http access to specific ports on the cluster from external sources. Defaults to false.
+    #[serde(rename="enableHttpPortAccess")]
+    pub enable_http_port_access: Option<bool>,
+}
+
+impl Part for EndpointConfig {}
+
+
 /// A Dataproc workflow template resource.
 /// 
 /// # Activities
@@ -1562,7 +1592,7 @@ pub struct WorkflowTemplate {
     /// For projects.regions.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
     /// For projects.locations.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub name: Option<String>,
-    /// Optional. emplate parameters whose values are substituted into the template. Values for parameters must be provided when the template is instantiated.
+    /// Optional. Template parameters whose values are substituted into the template. Values for parameters must be provided when the template is instantiated.
     pub parameters: Option<Vec<TemplateParameter>>,
     /// Optional. The labels to associate with this template. These labels will be propagated to all jobs and clusters created by the workflow instance.Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).No more than 32 labels can be associated with a template.
     pub labels: Option<HashMap<String, String>>,
@@ -1658,38 +1688,38 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderedJob {
-    /// no description provided
+    /// Optional. Job is a Hadoop job.
     #[serde(rename="hadoopJob")]
     pub hadoop_job: Option<HadoopJob>,
     /// Optional. The labels to associate with this job.Label keys must be between 1 and 63 characters long, and must conform to the following regular expression: \p{Ll}\p{Lo}{0,62}Label values must be between 1 and 63 characters long, and must conform to the following regular expression: \p{Ll}\p{Lo}\p{N}_-{0,63}No more than 32 labels can be associated with a given job.
     pub labels: Option<HashMap<String, String>>,
-    /// Spark R job
+    /// Optional. Job is a SparkR job.
     #[serde(rename="sparkRJob")]
     pub spark_r_job: Option<SparkRJob>,
-    /// no description provided
+    /// Optional. Job is a SparkSql job.
     #[serde(rename="sparkSqlJob")]
     pub spark_sql_job: Option<SparkSqlJob>,
     /// Optional. The optional list of prerequisite job step_ids. If not specified, the job will start at the beginning of workflow.
     #[serde(rename="prerequisiteStepIds")]
     pub prerequisite_step_ids: Option<Vec<String>>,
-    /// no description provided
+    /// Optional. Job is a Pig job.
     #[serde(rename="pigJob")]
     pub pig_job: Option<PigJob>,
     /// Required. The step id. The id must be unique among all jobs within the template.The step id is used as prefix for job id, as job goog-dataproc-workflow-step-id label, and in prerequisiteStepIds field from other steps.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
     #[serde(rename="stepId")]
     pub step_id: Option<String>,
-    /// no description provided
+    /// Optional. Job is a Spark job.
     #[serde(rename="sparkJob")]
     pub spark_job: Option<SparkJob>,
-    /// Presto job
+    /// Optional. Job is a Presto job.
     #[serde(rename="prestoJob")]
     pub presto_job: Option<PrestoJob>,
     /// Optional. Job scheduling configuration.
     pub scheduling: Option<JobScheduling>,
-    /// no description provided
+    /// Optional. Job is a PySpark job.
     #[serde(rename="pysparkJob")]
     pub pyspark_job: Option<PySparkJob>,
-    /// no description provided
+    /// Optional. Job is a Hive job.
     #[serde(rename="hiveJob")]
     pub hive_job: Option<HiveJob>,
 }
@@ -1714,10 +1744,10 @@ pub struct PySparkJob {
     pub logging_config: Option<LoggingConfig>,
     /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
     pub args: Option<Vec<String>>,
-    /// Optional. HCFS URIs of files to be copied to the working directory of Python drivers and distributed tasks. Useful for naively parallel tasks.
+    /// Optional. HCFS URIs of files to be placed in the working directory of each executor. Useful for naively parallel tasks.
     #[serde(rename="fileUris")]
     pub file_uris: Option<Vec<String>>,
-    /// Optional. HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.
+    /// Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
     #[serde(rename="archiveUris")]
     pub archive_uris: Option<Vec<String>>,
     /// Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip.
@@ -1796,7 +1826,7 @@ pub struct KerberosConfig {
     /// Optional. The Cloud Storage URI of a KMS encrypted file containing the password to the user provided key. For the self-signed certificate, this password is generated by Dataproc.
     #[serde(rename="keyPasswordUri")]
     pub key_password_uri: Option<String>,
-    /// Optional. Flag to indicate whether to Kerberize the cluster.
+    /// Optional. Flag to indicate whether to Kerberize the cluster (default: false). Set this field to true to enable Kerberos on a cluster.
     #[serde(rename="enableKerberos")]
     pub enable_kerberos: Option<bool>,
     /// Optional. The admin server (IP or hostname) for the remote trusted realm in a cross realm trust relationship.
@@ -2017,7 +2047,7 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetPolicyOptions {
-    /// Optional. The policy format version to be returned.Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected.Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset.
+    /// Optional. The policy format version to be returned.Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected.Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset.To learn which resources support conditions in their IAM policies, see the IAM documentation (https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -2327,7 +2357,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -2469,7 +2499,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -2635,7 +2665,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -2697,7 +2727,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -2941,7 +2971,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -3042,7 +3072,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -3381,7 +3411,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
     /// 
     /// # Arguments
     ///
@@ -5655,7 +5685,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *regions.operations.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7650,7 +7680,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *regions.clusters.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10003,7 +10033,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *locations.workflowTemplates.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10874,7 +10904,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *regions.autoscalingPolicies.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -14316,7 +14346,7 @@ impl<'a, C, A> ProjectRegionJobSubmitAsOperationCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *locations.autoscalingPolicies.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -15733,7 +15763,7 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> where C: Bor
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *regions.workflowTemplates.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -20476,7 +20506,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 ///
 /// A builder for the *regions.jobs.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

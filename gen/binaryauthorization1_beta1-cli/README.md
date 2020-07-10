@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Binary Authorization* API at revision *20200327*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Binary Authorization* API at revision *20200619*. The CLI is at version *1.0.14*.
 
 ```bash
 binaryauthorization1-beta1 [options]

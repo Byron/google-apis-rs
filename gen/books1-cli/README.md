@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *books* API can be found at the
-[official documentation site](https://developers.google.com/books/docs/v1/getting_started).
+[official documentation site](https://code.google.com/apis/books/docs/v1/getting_started.html).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *books* API at revision *20200310*. The CLI is at version *1.0.13*.
+This documentation was generated from the *books* API at revision *20200707*. The CLI is at version *1.0.14*.
 
 ```bash
 books1 [options]
@@ -35,63 +35,63 @@ books1 [options]
                 volumes-list <user-id> <shelf> [-p <v>]... [-o <out>]
         cloudloading
                 add-book [-p <v>]... [-o <out>]
-                delete-book <volume-id> [-p <v>]...
+                delete-book [-p <v>]... [-o <out>]
                 update-book (-r <kv>)... [-p <v>]... [-o <out>]
         dictionary
-                list-offline-metadata <cpksver> [-p <v>]... [-o <out>]
+                list-offline-metadata [-p <v>]... [-o <out>]
         familysharing
                 get-family-info [-p <v>]... [-o <out>]
-                share [-p <v>]...
-                unshare [-p <v>]...
+                share [-p <v>]... [-o <out>]
+                unshare [-p <v>]... [-o <out>]
         layers
-                annotation-data-get <volume-id> <layer-id> <annotation-data-id> <content-version> [-p <v>]... [-o <out>]
-                annotation-data-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
+                annotation-data-get <volume-id> <layer-id> <annotation-data-id> [-p <v>]... [-o <out>]
+                annotation-data-list <volume-id> <layer-id> [-p <v>]... [-o <out>]
                 get <volume-id> <summary-id> [-p <v>]... [-o <out>]
                 list <volume-id> [-p <v>]... [-o <out>]
                 volume-annotations-get <volume-id> <layer-id> <annotation-id> [-p <v>]... [-o <out>]
-                volume-annotations-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
+                volume-annotations-list <volume-id> <layer-id> [-p <v>]... [-o <out>]
         myconfig
                 get-user-settings [-p <v>]... [-o <out>]
-                release-download-access <volume-ids>... <cpksver> [-p <v>]... [-o <out>]
-                request-access <source> <volume-id> <nonce> <cpksver> [-p <v>]... [-o <out>]
-                sync-volume-licenses <source> <nonce> <cpksver> [-p <v>]... [-o <out>]
+                release-download-access [-p <v>]... [-o <out>]
+                request-access [-p <v>]... [-o <out>]
+                sync-volume-licenses [-p <v>]... [-o <out>]
                 update-user-settings (-r <kv>)... [-p <v>]... [-o <out>]
         mylibrary
-                annotations-delete <annotation-id> [-p <v>]...
+                annotations-delete <annotation-id> [-p <v>]... [-o <out>]
                 annotations-insert (-r <kv>)... [-p <v>]... [-o <out>]
                 annotations-list [-p <v>]... [-o <out>]
-                annotations-summary <layer-ids>... <volume-id> [-p <v>]... [-o <out>]
+                annotations-summary [-p <v>]... [-o <out>]
                 annotations-update <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                bookshelves-add-volume <shelf> <volume-id> [-p <v>]...
-                bookshelves-clear-volumes <shelf> [-p <v>]...
+                bookshelves-add-volume <shelf> [-p <v>]... [-o <out>]
+                bookshelves-clear-volumes <shelf> [-p <v>]... [-o <out>]
                 bookshelves-get <shelf> [-p <v>]... [-o <out>]
                 bookshelves-list [-p <v>]... [-o <out>]
-                bookshelves-move-volume <shelf> <volume-id> <volume-position> [-p <v>]...
-                bookshelves-remove-volume <shelf> <volume-id> [-p <v>]...
+                bookshelves-move-volume <shelf> [-p <v>]... [-o <out>]
+                bookshelves-remove-volume <shelf> [-p <v>]... [-o <out>]
                 bookshelves-volumes-list <shelf> [-p <v>]... [-o <out>]
                 readingpositions-get <volume-id> [-p <v>]... [-o <out>]
-                readingpositions-set-position <volume-id> <timestamp> <position> [-p <v>]...
+                readingpositions-set-position <volume-id> [-p <v>]... [-o <out>]
         notification
-                get <notification-id> [-p <v>]... [-o <out>]
+                get [-p <v>]... [-o <out>]
         onboarding
                 list-categories [-p <v>]... [-o <out>]
                 list-category-volumes [-p <v>]... [-o <out>]
         personalizedstream
                 get [-p <v>]... [-o <out>]
         promooffer
-                accept [-p <v>]...
-                dismiss [-p <v>]...
+                accept [-p <v>]... [-o <out>]
+                dismiss [-p <v>]... [-o <out>]
                 get [-p <v>]... [-o <out>]
         series
-                get <series-id>... [-p <v>]... [-o <out>]
-                membership-get <series-id> [-p <v>]... [-o <out>]
+                get [-p <v>]... [-o <out>]
+                membership-get [-p <v>]... [-o <out>]
         volumes
                 associated-list <volume-id> [-p <v>]... [-o <out>]
                 get <volume-id> [-p <v>]... [-o <out>]
-                list <q> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
                 mybooks-list [-p <v>]... [-o <out>]
                 recommended-list [-p <v>]... [-o <out>]
-                recommended-rate <rating> <volume-id> [-p <v>]... [-o <out>]
+                recommended-rate [-p <v>]... [-o <out>]
                 useruploaded-list [-p <v>]... [-o <out>]
   books1 --help
 

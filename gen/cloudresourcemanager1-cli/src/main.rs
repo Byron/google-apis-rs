@@ -4195,8 +4195,8 @@ fn main() {
         Authorization requires the Google IAM permission
         `resourcemanager.projects.getIamPolicy` on the project.
         
-        For additional information about resource structure and identification,
-        see [Resource Names](/apis/design/resource_names)."##),
+        For additional information about `resource` (e.g. my-project-id) structure
+        and identification, see [Resource Names](/apis/design/resource_names)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4345,8 +4345,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project. Overwrites
-        any existing policy.
+                    Some(r##"Sets the IAM access control policy for the specified Project.
+        
+        CAUTION: This method will replace the existing policy, and cannot be used
+        to append additional IAM settings.
+        
+        NOTE: Removing service accounts from policies or changing their roles can
+        render services completely inoperable. It is important to understand how
+        the service account is being used before removing or updating its roles.
+        
+        For additional information about `resource` (e.g. my-project-id) structure
+        and identification, see [Resource Names](/apis/design/resource_names).
         
         The following constraints apply when using `setIamPolicy()`:
         
@@ -4383,14 +4392,6 @@ fn main() {
         projects that no longer have owners who have accepted the ToS. Edits to
         IAM policies will be rejected until the lack of a ToS-accepting owner is
         rectified.
-        
-        + This method will replace the existing policy, and cannot be used to
-        append additional IAM settings.
-        
-        Note: Removing service accounts from policies or changing their roles
-        can render services completely inoperable. It is important to understand
-        how the service account is being used before removing or updating its
-        roles.
         
         Authorization requires the Google IAM permission
         `resourcemanager.projects.setIamPolicy` on the project"##),
@@ -4455,6 +4456,9 @@ fn main() {
                   ]),
             ("test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified Project.
+        
+        For additional information about `resource` (e.g. my-project-id) structure
+        and identification, see [Resource Names](/apis/design/resource_names).
         
         There are no permissions required for making this API call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_test-iam-permissions",
@@ -4559,7 +4563,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200408")
+           .version("1.0.14+20200629")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *classroom* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -449,7 +449,7 @@ impl<'a, C, A> Classroom<C, A>
         Classroom {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://classroom.googleapis.com/".to_string(),
             _root_url: "https://classroom.googleapis.com/".to_string(),
         }
@@ -469,7 +469,7 @@ impl<'a, C, A> Classroom<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5536,7 +5536,7 @@ impl<'a, C, A> CourseTeacherListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of items to return. Zero means no maximum.
+    /// Maximum number of items to return. The default is 30 if unspecified or `0`.
     /// 
     /// The server may return fewer than the specified number of results.
     ///
@@ -13321,7 +13321,7 @@ impl<'a, C, A> CourseStudentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of items to return. Zero means no maximum.
+    /// Maximum number of items to return. The default is 30 if unspecified or `0`.
     /// 
     /// The server may return fewer than the specified number of results.
     ///
@@ -20210,7 +20210,8 @@ impl<'a, C, A> InvitationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of items to return. Zero means no maximum.
+    /// Maximum number of items to return. The default is 500 if unspecified or
+    /// `0`.
     /// 
     /// The server may return fewer than the specified number of results.
     ///

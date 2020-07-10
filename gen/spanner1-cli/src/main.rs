@@ -5116,7 +5116,9 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"Required. The database whose schema we wish to get."##),
+                     Some(r##"Required. The database whose schema we wish to get.
+        Values are of the form
+        `projects/<project>/instances/<instance>/databases/<database>`"##),
                      Some(true),
                      Some(false)),
         
@@ -5419,7 +5421,13 @@ fn main() {
         commonly, the cause is conflicts with concurrent
         transactions. However, it can also happen for a variety of other
         reasons. If `Commit` returns `ABORTED`, the caller should re-attempt
-        the transaction from the beginning, re-using the same session."##),
+        the transaction from the beginning, re-using the same session.
+        
+        On very rare occasions, `Commit` might return `UNKNOWN`. This can happen,
+        for example, if the client job experiences a 1+ hour networking failure.
+        At that point, Cloud Spanner has lost track of the transaction outcome and
+        we recommend that you perform another read from the database to see the
+        state of things as they are now."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-commit",
                   vec![
                     (Some(r##"session"##),
@@ -6323,7 +6331,7 @@ fn main() {
     
     let mut app = App::new("spanner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200403")
+           .version("1.0.14+20200623")
            .about("Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spanner1_cli")
            .arg(Arg::with_name("url")

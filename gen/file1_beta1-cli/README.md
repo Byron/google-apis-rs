@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Filestore* API at revision *20200406*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Cloud Filestore* API at revision *20200613*. The CLI is at version *1.0.14*.
 
 ```bash
 file1-beta1 [options]

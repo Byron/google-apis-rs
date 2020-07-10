@@ -1,4 +1,4 @@
-site_name: YouTube v1.0.13+20200402
+site_name: YouTube v1.0.14+20200709
 site_url: http://byron.github.io/google-apis-rs/google-youtube3-cli
 site_description: A complete library to interact with YouTube (protocol v3)
 
@@ -9,7 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['activities_insert.md', 'Activities', 'Insert']
+- ['abuse-reports_insert.md', 'Abuse Reports', 'Insert']
 - ['activities_list.md', 'Activities', 'List']
 - ['captions_delete.md', 'Captions', 'Delete']
 - ['captions_download.md', 'Captions', 'Download']
@@ -70,6 +70,10 @@ pages:
 - ['subscriptions_insert.md', 'Subscriptions', 'Insert']
 - ['subscriptions_list.md', 'Subscriptions', 'List']
 - ['super-chat-events_list.md', 'Super Chat Events', 'List']
+- ['third-party-links_delete.md', 'Third Party Links', 'Delete']
+- ['third-party-links_insert.md', 'Third Party Links', 'Insert']
+- ['third-party-links_list.md', 'Third Party Links', 'List']
+- ['third-party-links_update.md', 'Third Party Links', 'Update']
 - ['thumbnails_set.md', 'Thumbnails', 'Set']
 - ['video-abuse-report-reasons_list.md', 'Video Abuse Report Reasons', 'List']
 - ['video-categories_list.md', 'Video Categories', 'List']
@@ -82,6 +86,9 @@ pages:
 - ['videos_update.md', 'Videos', 'Update']
 - ['watermarks_set.md', 'Watermarks', 'Set']
 - ['watermarks_unset.md', 'Watermarks', 'Unset']
+- ['youtube_v3-infocards.md', 'Youtube', 'V3 Infocards']
+- ['youtube_v3-infocards-list.md', 'Youtube', 'V3 Infocards List']
+- ['youtube_v3-tests-create.md', 'Youtube', 'V3 Tests Create']
 
 theme: readthedocs
 

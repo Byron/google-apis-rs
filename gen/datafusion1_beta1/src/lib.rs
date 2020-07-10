@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Data Fusion* crate version *1.0.13+20200318*, where *20200318* is the exact revision of the *datafusion:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Data Fusion* crate version *1.0.14+20200609*, where *20200609* is the exact revision of the *datafusion:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Data Fusion* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/data-fusion/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.DataFusion.html) ... 
 //! 
 //! * projects
-//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations instances create*](struct.ProjectLocationInstanceCreateCall.html), [*locations instances delete*](struct.ProjectLocationInstanceDeleteCall.html), [*locations instances get*](struct.ProjectLocationInstanceGetCall.html), [*locations instances get iam policy*](struct.ProjectLocationInstanceGetIamPolicyCall.html), [*locations instances list*](struct.ProjectLocationInstanceListCall.html), [*locations instances patch*](struct.ProjectLocationInstancePatchCall.html), [*locations instances restart*](struct.ProjectLocationInstanceRestartCall.html), [*locations instances set iam policy*](struct.ProjectLocationInstanceSetIamPolicyCall.html), [*locations instances test iam permissions*](struct.ProjectLocationInstanceTestIamPermissionCall.html), [*locations instances upgrade*](struct.ProjectLocationInstanceUpgradeCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
+//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations instances create*](struct.ProjectLocationInstanceCreateCall.html), [*locations instances delete*](struct.ProjectLocationInstanceDeleteCall.html), [*locations instances get*](struct.ProjectLocationInstanceGetCall.html), [*locations instances get iam policy*](struct.ProjectLocationInstanceGetIamPolicyCall.html), [*locations instances list*](struct.ProjectLocationInstanceListCall.html), [*locations instances patch*](struct.ProjectLocationInstancePatchCall.html), [*locations instances restart*](struct.ProjectLocationInstanceRestartCall.html), [*locations instances set iam policy*](struct.ProjectLocationInstanceSetIamPolicyCall.html), [*locations instances test iam permissions*](struct.ProjectLocationInstanceTestIamPermissionCall.html), [*locations instances upgrade*](struct.ProjectLocationInstanceUpgradeCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html) and [*locations versions list*](struct.ProjectLocationVersionListCall.html)
 //! 
 //! 
 //! 
@@ -336,7 +336,7 @@ impl<'a, C, A> DataFusion<C, A>
         DataFusion {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://datafusion.googleapis.com/".to_string(),
             _root_url: "https://datafusion.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> DataFusion<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -412,7 +412,7 @@ impl ResponseResult for ListInstancesResponse {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -471,8 +471,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -584,7 +584,7 @@ pub struct Instance {
     /// Output only. The time the instance was last updated.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// Optional. An optional description of this instance.
+    /// A description of this instance.
     pub description: Option<String>,
     /// Specifies whether the Data Fusion instance should be private. If set to
     /// true, all Data Fusion nodes will have private IP addresses and will not be
@@ -664,6 +664,9 @@ pub struct Version {
     /// The version number of the Data Fusion instance, such as '6.0.1.0'.
     #[serde(rename="versionNumber")]
     pub version_number: Option<String>,
+    /// Whether this is currently the default version for Cloud Data Fusion
+    #[serde(rename="defaultVersion")]
+    pub default_version: Option<bool>,
 }
 
 impl Part for Version {}
@@ -733,10 +736,12 @@ impl ResponseResult for Location {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -754,7 +759,9 @@ impl ResponseResult for Location {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -841,6 +848,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -983,9 +993,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1053,6 +1071,29 @@ pub struct UpgradeInstanceRequest { _never_set: Option<bool> }
 impl RequestValue for UpgradeInstanceRequest {}
 
 
+/// Response message for the list available versions request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations versions list projects](struct.ProjectLocationVersionListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListAvailableVersionsResponse {
+    /// Token to retrieve the next page of results or empty if there are no more
+    /// results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Represents a list of versions that are supported.
+    #[serde(rename="availableVersions")]
+    pub available_versions: Option<Vec<Version>>,
+}
+
+impl ResponseResult for ListAvailableVersionsResponse {}
+
+
 /// Specifies the audit configuration for a service.
 /// The configuration determines which permission types are logged, and what
 /// identities, if any, are exempted from logging.
@@ -1069,7 +1110,7 @@ impl RequestValue for UpgradeInstanceRequest {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1078,18 +1119,18 @@ impl RequestValue for UpgradeInstanceRequest {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -1212,7 +1253,7 @@ impl ResponseResult for Operation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = DataFusion::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_get(...)`, `locations_instances_get_iam_policy(...)`, `locations_instances_list(...)`, `locations_instances_patch(...)`, `locations_instances_restart(...)`, `locations_instances_set_iam_policy(...)`, `locations_instances_test_iam_permissions(...)`, `locations_instances_upgrade(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
+/// // like `locations_get(...)`, `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_get(...)`, `locations_instances_get_iam_policy(...)`, `locations_instances_list(...)`, `locations_instances_patch(...)`, `locations_instances_restart(...)`, `locations_instances_set_iam_policy(...)`, `locations_instances_test_iam_permissions(...)`, `locations_instances_upgrade(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)` and `locations_versions_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1269,7 +1310,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -1380,7 +1421,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -1509,6 +1550,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationInstanceGetCall {
             hub: self.hub,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists possible versions for Data Fusion instances in the specified project
+    /// and location.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project and location for which to retrieve instance information
+    ///              in the format projects/{project}/locations/{location}.
+    pub fn locations_versions_list(&self, parent: &str) -> ProjectLocationVersionListCall<'a, C, A> {
+        ProjectLocationVersionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _latest_patch_only: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1799,11 +1862,9 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2056,11 +2117,9 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2100,7 +2159,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *locations.instances.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2345,11 +2404,9 @@ impl<'a, C, A> ProjectLocationInstanceSetIamPolicyCall<'a, C, A> where C: Borrow
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2601,11 +2658,9 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2895,11 +2950,9 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3198,11 +3251,9 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3501,11 +3552,9 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3544,7 +3593,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -3793,11 +3842,9 @@ impl<'a, C, A> ProjectLocationInstanceTestIamPermissionCall<'a, C, A> where C: B
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -4041,6 +4088,10 @@ impl<'a, C, A> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> where C: Borrow
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> {
@@ -4069,11 +4120,9 @@ impl<'a, C, A> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> where C: Borrow
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -4367,11 +4416,9 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -4666,11 +4713,9 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -4972,11 +5017,9 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -5227,11 +5270,9 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -5257,6 +5298,299 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists possible versions for Data Fusion instances in the specified project
+/// and location.
+///
+/// A builder for the *locations.versions.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_datafusion1_beta1 as datafusion1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use datafusion1_beta1::DataFusion;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DataFusion::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_versions_list("parent")
+///              .page_token("erat")
+///              .page_size(-95)
+///              .latest_patch_only(true)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationVersionListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DataFusion<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _latest_patch_only: Option<bool>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationVersionListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAvailableVersionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "datafusion.projects.locations.versions.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._latest_patch_only {
+            params.push(("latestPatchOnly", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "latestPatchOnly"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}/versions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The project and location for which to retrieve instance information
+    /// in the format projects/{project}/locations/{location}.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationVersionListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token value to use if there are additional
+    /// results to retrieve for this list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationVersionListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of items to return.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationVersionListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Whether or not to return the latest patch of every available minor version.
+    /// If true, only the latest patch will be returned. Ex. if allowed versions is
+    /// [6.1.1, 6.1.2, 6.2.0] then response will be [6.1.2, 6.2.0]
+    ///
+    /// Sets the *latest patch only* query property to the given value.
+    pub fn latest_patch_only(mut self, new_value: bool) -> ProjectLocationVersionListCall<'a, C, A> {
+        self._latest_patch_only = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationVersionListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationVersionListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationVersionListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5514,11 +5848,9 @@ impl<'a, C, A> ProjectLocationInstanceRestartCall<'a, C, A> where C: BorrowMut<h
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -5769,11 +6101,9 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -6058,11 +6388,9 @@ impl<'a, C, A> ProjectLocationInstanceUpgradeCall<'a, C, A> where C: BorrowMut<h
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.

@@ -1196,6 +1196,68 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_versions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "latest-patch-only" => {
+                    call = call.latest_patch_only(arg_from_str(value.unwrap_or("false"), err, "latest-patch-only", "boolean"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "latest-patch-only", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -1250,6 +1312,9 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-operations-list", Some(opt)) => {
                         call_result = self._projects_locations_operations_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-versions-list", Some(opt)) => {
+                        call_result = self._projects_locations_versions_list(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1312,11 +1377,9 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::DataFusion::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "alt", "callback", "fields", "key", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
-                    ("access-token", "access_token"),
-                    ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
                     ("upload-type", "uploadType"),
@@ -1342,7 +1405,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-get-iam-policy', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-restart', 'locations-instances-set-iam-policy', 'locations-instances-test-iam-permissions', 'locations-instances-upgrade', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-get-iam-policy', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-restart', 'locations-instances-set-iam-policy', 'locations-instances-test-iam-permissions', 'locations-instances-upgrade', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list' and 'locations-versions-list'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli/projects_locations-get",
@@ -1553,7 +1616,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli/projects_locations-instances-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1584,7 +1647,7 @@ fn main() {
             ("locations-instances-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -1787,13 +1850,37 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-versions-list",
+                    Some(r##"Lists possible versions for Data Fusion instances in the specified project
+        and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli/projects_locations-versions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project and location for which to retrieve instance information
+        in the format projects/{project}/locations/{location}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("datafusion1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200318")
+           .version("1.0.14+20200609")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for
                quickly building and managing data pipelines. It provides a graphical interface to increase
                time efficiency and reduce complexity, and allows business users, developers, and data

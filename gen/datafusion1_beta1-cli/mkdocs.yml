@@ -1,4 +1,4 @@
-site_name: Data Fusion v1.0.13+20200318
+site_name: Data Fusion v1.0.14+20200609
 site_url: http://byron.github.io/google-apis-rs/google-datafusion1_beta1-cli
 site_description: A complete library to interact with Data Fusion (protocol v1beta1)
 
@@ -25,6 +25,7 @@ pages:
 - ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
 - ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
 - ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-versions-list.md', 'Projects', 'Locations Versions List']
 
 theme: readthedocs
 

@@ -58,6 +58,9 @@ impl<'n> Engine<'n> {
                 "success-on-timeout" => {
                     call = call.success_on_timeout(arg_from_str(value.unwrap_or("false"), err, "success-on-timeout", "boolean"));
                 },
+                "agent-id" => {
+                    call = call.agent_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -71,7 +74,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["wait-token", "success-on-timeout"].iter().map(|v|*v));
+                                                                           v.extend(["agent-id", "wait-token", "success-on-timeout"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -134,10 +137,12 @@ impl<'n> Engine<'n> {
                     "breakpoint.status.is-error" => Some(("breakpoint.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "breakpoint.final-time" => Some(("breakpoint.finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.log-message-format" => Some(("breakpoint.logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.state" => Some(("breakpoint.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.log-level" => Some(("breakpoint.logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.labels" => Some(("breakpoint.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "breakpoint.user-email" => Some(("breakpoint.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.id" => Some(("breakpoint.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.canary-expire-time" => Some(("breakpoint.canaryExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.location.column" => Some(("breakpoint.location.column", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "breakpoint.location.path" => Some(("breakpoint.location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.location.line" => Some(("breakpoint.location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -147,7 +152,7 @@ impl<'n> Engine<'n> {
                     "breakpoint.create-time" => Some(("breakpoint.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.condition" => Some(("breakpoint.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "breakpoint", "column", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "breakpoint", "canary-expire-time", "column", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "state", "status", "user-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -239,11 +244,12 @@ impl<'n> Engine<'n> {
                     "debuggee.labels" => Some(("debuggee.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "debuggee.uniquifier" => Some(("debuggee.uniquifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.project" => Some(("debuggee.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "debuggee.canary-mode" => Some(("debuggee.canaryMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.agent-version" => Some(("debuggee.agentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.is-inactive" => Some(("debuggee.isInactive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "debuggee.id" => Some(("debuggee.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-version", "debuggee", "description", "format", "id", "is-disabled", "is-error", "is-inactive", "labels", "parameters", "project", "refers-to", "status", "uniquifier"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-version", "canary-mode", "debuggee", "description", "format", "id", "is-disabled", "is-error", "is-inactive", "labels", "parameters", "project", "refers-to", "status", "uniquifier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -515,10 +521,12 @@ impl<'n> Engine<'n> {
                     "status.is-error" => Some(("status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "final-time" => Some(("finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-message-format" => Some(("logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "user-email" => Some(("userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "canary-expire-time" => Some(("canaryExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.column" => Some(("location.column", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location.path" => Some(("location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.line" => Some(("location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -528,7 +536,7 @@ impl<'n> Engine<'n> {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition" => Some(("condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "column", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "canary-expire-time", "column", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "state", "status", "user-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -545,6 +553,9 @@ impl<'n> Engine<'n> {
                 "client-version" => {
                     call = call.client_version(value.unwrap_or(""));
                 },
+                "canary-option" => {
+                    call = call.canary_option(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -558,7 +569,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["client-version"].iter().map(|v|*v));
+                                                                           v.extend(["client-version", "canary-option"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1022,7 +1033,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200405")
+           .version("1.0.14+20200703")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")

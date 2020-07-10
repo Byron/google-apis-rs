@@ -522,6 +522,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "reverse-lookup-config.kind" => Some(("reverseLookupConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -542,7 +543,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "deactivate-time", "description", "dns-name", "dnssec-config", "forwarding-config", "id", "kind", "labels", "name", "name-server-set", "name-servers", "network-url", "non-existence", "peering-config", "private-visibility-config", "state", "target-network", "visibility"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "deactivate-time", "description", "dns-name", "dnssec-config", "forwarding-config", "id", "kind", "labels", "name", "name-server-set", "name-servers", "network-url", "non-existence", "peering-config", "private-visibility-config", "reverse-lookup-config", "state", "target-network", "visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -795,6 +796,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "reverse-lookup-config.kind" => Some(("reverseLookupConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -815,7 +817,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "deactivate-time", "description", "dns-name", "dnssec-config", "forwarding-config", "id", "kind", "labels", "name", "name-server-set", "name-servers", "network-url", "non-existence", "peering-config", "private-visibility-config", "state", "target-network", "visibility"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "deactivate-time", "description", "dns-name", "dnssec-config", "forwarding-config", "id", "kind", "labels", "name", "name-server-set", "name-servers", "network-url", "non-existence", "peering-config", "private-visibility-config", "reverse-lookup-config", "state", "target-network", "visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -902,6 +904,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "reverse-lookup-config.kind" => Some(("reverseLookupConfig.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -922,7 +925,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "deactivate-time", "description", "dns-name", "dnssec-config", "forwarding-config", "id", "kind", "labels", "name", "name-server-set", "name-servers", "network-url", "non-existence", "peering-config", "private-visibility-config", "state", "target-network", "visibility"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "deactivate-time", "description", "dns-name", "dnssec-config", "forwarding-config", "id", "kind", "labels", "name", "name-server-set", "name-servers", "network-url", "non-existence", "peering-config", "private-visibility-config", "reverse-lookup-config", "state", "target-network", "visibility"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1763,18 +1766,18 @@ fn main() {
     let arg_data = [
         ("changes", "methods: 'create', 'get' and 'list'", vec![
             ("create",
-                    Some(r##"Atomically update the ResourceRecordSet collection."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/changes_create",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1797,24 +1800,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Fetch the representation of an existing Change."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/changes_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"change-id"##),
                      None,
-                     Some(r##"The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1831,18 +1834,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Enumerate Changes to a ResourceRecordSet collection."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/changes_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1862,24 +1865,24 @@ fn main() {
         
         ("dns-keys", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Fetch the representation of an existing DnsKey."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/dns-keys_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"dns-key-id"##),
                      None,
-                     Some(r##"The identifier of the requested DnsKey."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1896,18 +1899,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Enumerate DnsKeys to a ResourceRecordSet collection."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/dns-keys_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1927,24 +1930,24 @@ fn main() {
         
         ("managed-zone-operations", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Fetch the representation of an existing Operation."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zone-operations_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"operation"##),
                      None,
-                     Some(r##"Identifies the operation addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1961,18 +1964,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Enumerate Operations for the given ManagedZone."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zone-operations_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -1992,12 +1995,12 @@ fn main() {
         
         ("managed-zones", "methods: 'create', 'delete', 'get', 'list', 'patch' and 'update'", vec![
             ("create",
-                    Some(r##"Create a new ManagedZone."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_create",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2020,18 +2023,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Delete a previously created ManagedZone."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_delete",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2042,18 +2045,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Fetch the representation of an existing ManagedZone."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2070,12 +2073,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Enumerate ManagedZones that have been created but not yet deleted."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2092,18 +2095,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Apply a partial update to an existing ManagedZone."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_patch",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2126,18 +2129,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update an existing ManagedZone."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/managed-zones_update",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2163,12 +2166,12 @@ fn main() {
         
         ("policies", "methods: 'create', 'delete', 'get', 'list', 'patch' and 'update'", vec![
             ("create",
-                    Some(r##"Create a new Policy"##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/policies_create",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2191,18 +2194,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Delete a previously created Policy. Will fail if the policy is still being referenced by a network."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/policies_delete",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"policy"##),
                      None,
-                     Some(r##"User given friendly name of the policy addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2213,18 +2216,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Fetch the representation of an existing Policy."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/policies_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"policy"##),
                      None,
-                     Some(r##"User given friendly name of the policy addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2241,12 +2244,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Enumerate all Policies associated with a project."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/policies_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2263,18 +2266,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Apply a partial update to an existing Policy."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/policies_patch",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"policy"##),
                      None,
-                     Some(r##"User given friendly name of the policy addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2297,18 +2300,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update an existing Policy."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/policies_update",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"policy"##),
                      None,
-                     Some(r##"User given friendly name of the policy addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2334,12 +2337,12 @@ fn main() {
         
         ("projects", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Fetch the representation of an existing Project."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/projects_get",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2359,18 +2362,18 @@ fn main() {
         
         ("resource-record-sets", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Enumerate ResourceRecordSets that have been created but not yet deleted."##),
+                    Some(r##""##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns1_cli/resource-record-sets_list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Identifies the project addressed by this request."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"managed-zone"##),
                      None,
-                     Some(r##"Identifies the managed zone addressed by this request. Can be the managed zone name or id."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -2392,7 +2395,7 @@ fn main() {
     
     let mut app = App::new("dns1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20191205")
+           .version("1.0.14+20200515")
            .about("Configures and serves authoritative DNS records.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dns1_cli")
            .arg(Arg::with_name("url")

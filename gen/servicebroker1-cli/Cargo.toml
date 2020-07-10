@@ -4,7 +4,7 @@
 [package]
 
 name = "google-servicebroker1-cli"
-version = "1.0.13+20190624"
+version = "1.0.14+20190624"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Broker (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/servicebroker1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-servicebroker1]
 path = "../servicebroker1"
-version = "1.0.13+20190624"
+version = "1.0.14+20190624"

@@ -170,12 +170,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Webfonts::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -199,7 +202,8 @@ fn main() {
     let arg_data = [
         ("webfonts", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Retrieves the list of fonts currently served by the Google Fonts Developer API"##),
+                    Some(r##"Retrieves the list of fonts currently served by the Google Fonts Developer
+        API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_webfonts1_cli/webfonts_list",
                   vec![
                     (Some(r##"v"##),
@@ -220,8 +224,9 @@ fn main() {
     
     let mut app = App::new("webfonts1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200302")
-           .about("Accesses the metadata for all families served by Google Fonts, providing a list of families currently available (including available styles and a list of supported script subsets).")
+           .version("1.0.14+20200706")
+           .about("The Google Web Fonts Developer API lets you retrieve information about web fonts served
+               by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webfonts1_cli")
            .arg(Arg::with_name("folder")
                    .long("config-dir")

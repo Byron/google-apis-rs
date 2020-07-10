@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Composer* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Composer* crate version *1.0.14+20200625*, where *20200625* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Composer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/composer/).
@@ -334,7 +334,7 @@ impl<'a, C, A> CloudComposer<C, A>
         CloudComposer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://composer.googleapis.com/".to_string(),
             _root_url: "https://composer.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudComposer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

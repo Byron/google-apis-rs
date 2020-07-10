@@ -284,6 +284,8 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thread.name" => Some(("thread.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "space.type" => Some(("space.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "space.single-user-bot-dm" => Some(("space.singleUserBotDm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "space.threaded" => Some(("space.threaded", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "space.display-name" => Some(("space.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "space.name" => Some(("space.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -296,7 +298,7 @@ impl<'n> Engine<'n> {
                     "sender.display-name" => Some(("sender.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sender.name" => Some(("sender.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-response", "argument-text", "create-time", "display-name", "domain-id", "fallback-text", "name", "preview-text", "sender", "space", "text", "thread", "type", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-response", "argument-text", "create-time", "display-name", "domain-id", "fallback-text", "name", "preview-text", "sender", "single-user-bot-dm", "space", "text", "thread", "threaded", "type", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -483,6 +485,8 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "thread.name" => Some(("thread.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "space.type" => Some(("space.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "space.single-user-bot-dm" => Some(("space.singleUserBotDm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "space.threaded" => Some(("space.threaded", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "space.display-name" => Some(("space.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "space.name" => Some(("space.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -495,7 +499,7 @@ impl<'n> Engine<'n> {
                     "sender.display-name" => Some(("sender.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sender.name" => Some(("sender.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-response", "argument-text", "create-time", "display-name", "domain-id", "fallback-text", "name", "preview-text", "sender", "space", "text", "thread", "type", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-response", "argument-text", "create-time", "display-name", "domain-id", "fallback-text", "name", "preview-text", "sender", "single-user-bot-dm", "space", "text", "thread", "threaded", "type", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -884,7 +888,7 @@ fn main() {
     
     let mut app = App::new("chat1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200405")
+           .version("1.0.14+20200701")
            .about("Enables bots to fetch information and perform actions in Hangouts Chat.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_chat1_cli")
            .arg(Arg::with_name("folder")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *appengine* crate version *1.0.14+20200701*, where *20200701* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *appengine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -350,7 +350,7 @@ impl<'a, C, A> Appengine<C, A>
         Appengine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://appengine.googleapis.com/".to_string(),
             _root_url: "https://appengine.googleapis.com/".to_string(),
         }
@@ -361,7 +361,7 @@ impl<'a, C, A> Appengine<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1126,22 +1126,25 @@ pub struct Application {
     /// Cookie expiration policy for this application.
     #[serde(rename="defaultCookieExpiration")]
     pub default_cookie_expiration: Option<String>,
-    /// no description provided
-    pub iap: Option<IdentityAwareProxy>,
+    /// Serving status of this application.
+    #[serde(rename="servingStatus")]
+    pub serving_status: Option<String>,
     /// Location from which this application runs. Application instances run out of the data centers in the specified location, which is also where all of the application's end user content is stored.Defaults to us-central.View the list of supported locations (https://cloud.google.com/appengine/docs/locations).
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// The feature specific settings to be used in the application.
     #[serde(rename="featureSettings")]
     pub feature_settings: Option<FeatureSettings>,
-    /// Serving status of this application.
-    #[serde(rename="servingStatus")]
-    pub serving_status: Option<String>,
+    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
+    pub id: Option<String>,
+    /// The type of the Cloud Firestore or Cloud Datastore database associated with this application.
+    #[serde(rename="databaseType")]
+    pub database_type: Option<String>,
     /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
     #[serde(rename="authDomain")]
     pub auth_domain: Option<String>,
-    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
-    pub id: Option<String>,
+    /// no description provided
+    pub iap: Option<IdentityAwareProxy>,
 }
 
 impl RequestValue for Application {}

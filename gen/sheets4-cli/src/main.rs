@@ -2259,7 +2259,7 @@ fn main() {
     
     let mut app = App::new("sheets4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200402")
+           .version("1.0.14+20200630")
            .about("Reads and writes Google Sheets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sheets4_cli")
            .arg(Arg::with_name("url")

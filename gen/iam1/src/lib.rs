@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *iam* crate version *1.0.13+20200319*, where *20200319* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *iam* crate version *1.0.14+20200617*, where *20200617* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -347,7 +347,7 @@ impl<'a, C, A> Iam<C, A>
         Iam {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://iam.googleapis.com/".to_string(),
             _root_url: "https://iam.googleapis.com/".to_string(),
         }
@@ -370,7 +370,7 @@ impl<'a, C, A> Iam<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -417,8 +417,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -488,7 +488,16 @@ impl Part for AuditableService {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignJwtRequest {
-    /// Required. The JWT payload to sign, a JSON JWT Claim set.
+    /// Required. The JWT payload to sign. Must be a serialized JSON object that contains a
+    /// JWT Claims Set. For example: `{"sub": "user@example.com", "iat": 313435}`
+    /// 
+    /// If the JWT Claims Set contains an expiration time (`exp`) claim, it must be
+    /// an integer timestamp that is not in the past and no more than 1 hour in the
+    /// future.
+    /// 
+    /// If the JWT Claims Set does not contain an expiration time (`exp`) claim,
+    /// this claim is added automatically, with a timestamp that is 1 hour in the
+    /// future.
     pub payload: Option<String>,
 }
 
@@ -643,10 +652,12 @@ impl RequestValue for UploadServiceAccountKeyRequest {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -664,7 +675,9 @@ impl RequestValue for UploadServiceAccountKeyRequest {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -751,6 +764,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -780,6 +796,8 @@ pub struct QueryGrantableRolesRequest {
     #[serde(rename="fullResourceName")]
     pub full_resource_name: Option<String>,
     /// Optional limit on the number of roles to include in the response.
+    /// 
+    /// The default is 300, and the maximum is 1,000.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// no description provided
@@ -922,7 +940,14 @@ pub struct Permission {
 impl Resource for Permission {}
 
 
-/// The patch service account request.
+/// The request for
+/// PatchServiceAccount.
+/// 
+/// You can patch only the `display_name` and `description` fields. You must use
+/// the `update_mask` field to specify which of these fields you want to patch.
+/// 
+/// Only the fields specified in the request are guaranteed to be returned in
+/// the response. Other fields may be empty in the response.
 /// 
 /// # Activities
 /// 
@@ -1028,6 +1053,10 @@ impl RequestValue for CreateServiceAccountKeyRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateRoleRequest {
     /// The role ID to use for this role.
+    /// 
+    /// A role ID may contain alphanumeric characters, underscores (`_`), and
+    /// periods (`.`). It must contain a minimum of 3 characters and a maximum of
+    /// 64 characters.
     #[serde(rename="roleId")]
     pub role_id: Option<String>,
     /// The Role resource to create.
@@ -1086,7 +1115,7 @@ impl Part for LintResult {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1193,22 +1222,17 @@ pub struct Expr {
 impl Part for Expr {}
 
 
-/// A service account in the Identity and Access Management API.
+/// An IAM service account.
 /// 
-/// To create a service account, specify the `project_id` and the `account_id`
-/// for the account.  The `account_id` is unique within the project, and is used
-/// to generate the service account email address and a stable
-/// `unique_id`.
+/// A service account is an account for an application or a virtual machine (VM)
+/// instance, not a person. You can use a service account to call Google APIs. To
+/// learn more, read the [overview of service
+/// accounts](https://cloud.google.com/iam/help/service-accounts/overview).
 /// 
-/// If the account already exists, the account's resource name is returned
-/// in the format of projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}. The caller
-/// can use the name in other methods to access the account.
-/// 
-/// All other methods can identify the service account using the format
-/// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
-/// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-/// the account. The `ACCOUNT` value can be the `email` address or the
-/// `unique_id` of the service account.
+/// When you create a service account, you specify the project ID that owns the
+/// service account, as well as a name that must be unique within the project.
+/// IAM uses these values to create an email address that identifies the service
+/// account.
 /// 
 /// # Activities
 /// 
@@ -1222,41 +1246,52 @@ impl Part for Expr {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
-    /// @OutputOnly The OAuth2 client id for the service account.
-    /// This is used in conjunction with the OAuth2 clientconfig API to make
-    /// three legged OAuth2 (3LO) flows to access the data of Google users.
+    /// Output only. The OAuth 2.0 client ID for the service account.
     #[serde(rename="oauth2ClientId")]
     pub oauth2_client_id: Option<String>,
-    /// Optional. A user-specified name for the service account.
-    /// Must be less than or equal to 100 UTF-8 bytes.
+    /// Optional. A user-specified, human-readable name for the service account. The maximum
+    /// length is 100 UTF-8 bytes.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Optional. A user-specified opaque description of the service account.
-    /// Must be less than or equal to 256 UTF-8 bytes.
+    /// Optional. A user-specified, human-readable description of the service account. The
+    /// maximum length is 256 UTF-8 bytes.
     pub description: Option<String>,
-    /// @OutputOnly The id of the project that owns the service account.
+    /// Output only. The ID of the project that owns the service account.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// @OutputOnly A bool indicate if the service account is disabled.
-    /// The field is currently in alpha phase.
+    /// Output only. Whether the service account is disabled.
     pub disabled: Option<bool>,
-    /// Optional. Note: `etag` is an inoperable legacy field that is only returned
-    /// for backwards compatibility.
+    /// Deprecated. Do not use.
     pub etag: Option<String>,
-    /// @OutputOnly The unique and stable id of the service account.
+    /// Output only. The unique, stable numeric ID for the service account.
+    /// 
+    /// Each service account retains its unique ID even if you delete the service
+    /// account. For example, if you delete a service account, then create a new
+    /// service account with the same name, the new service account has a different
+    /// unique ID than the deleted service account.
     #[serde(rename="uniqueId")]
     pub unique_id: Option<String>,
-    /// @OutputOnly The email address of the service account.
+    /// Output only. The email address of the service account.
     pub email: Option<String>,
-    /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// The resource name of the service account.
     /// 
-    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
-    /// project from the `account` and the `ACCOUNT` value can be the `email`
-    /// address or the `unique_id` of the service account.
+    /// Use one of the following formats:
     /// 
-    /// In responses the resource name will always be in the format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}`
+    /// * `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}`
+    /// 
+    /// As an alternative, you can use the `-` wildcard character instead of the
+    /// project ID:
+    /// 
+    /// * `projects/-/serviceAccounts/{EMAIL_ADDRESS}`
+    /// * `projects/-/serviceAccounts/{UNIQUE_ID}`
+    /// 
+    /// When possible, avoid using the `-` wildcard character, because it can cause
+    /// response messages to contain misleading error codes. For example, if you
+    /// try to get the service account
+    /// `projects/-/serviceAccounts/fake@example.com`, which does not exist, the
+    /// response contains an HTTP `403 Forbidden` error instead of a `404 Not
+    /// Found` error.
     pub name: Option<String>,
 }
 
@@ -1288,6 +1323,8 @@ pub struct QueryTestablePermissionsRequest {
     #[serde(rename="fullResourceName")]
     pub full_resource_name: Option<String>,
     /// Optional limit on the number of permissions to include in the response.
+    /// 
+    /// The default is 100, and the maximum is 1,000.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -1440,9 +1477,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1586,7 +1631,7 @@ impl ResponseResult for ServiceAccountKey {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1595,18 +1640,18 @@ impl ResponseResult for ServiceAccountKey {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -1729,7 +1774,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Role definition.
+    /// Gets the definition of a Role.
     /// 
     /// # Arguments
     ///
@@ -1768,7 +1813,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Undelete a Role, bringing it back in its previous state.
+    /// Undeletes a custom Role.
     /// 
     /// # Arguments
     ///
@@ -1803,13 +1848,23 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Soft deletes a role. The role is suspended and cannot be used to create new
-    /// IAM Policy Bindings.
-    /// The Role will not be included in `ListRoles()` unless `show_deleted` is set
-    /// in the `ListRolesRequest`. The Role contains the deleted boolean set.
-    /// Existing Bindings remains, but are inactive. The Role can be undeleted
-    /// within 7 days. After 7 days the Role is deleted and all Bindings associated
-    /// with the role are removed.
+    /// Deletes a custom Role.
+    /// 
+    /// When you delete a custom role, the following changes occur immediately:
+    /// 
+    /// * You cannot bind a member to the custom role in an IAM
+    /// Policy.
+    /// * Existing bindings to the custom role are not changed, but they have no
+    /// effect.
+    /// * By default, the response from ListRoles does not include the custom
+    /// role.
+    /// 
+    /// You have 7 days to undelete the custom role. After 7 days, the following
+    /// changes occur:
+    /// 
+    /// * The custom role is permanently deleted and cannot be recovered.
+    /// * If an IAM policy contains a binding to the custom role, the binding is
+    /// permanently removed.
     /// 
     /// # Arguments
     ///
@@ -1843,7 +1898,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new Role.
+    /// Creates a new custom Role.
     /// 
     /// # Arguments
     ///
@@ -1878,7 +1933,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Role definition.
+    /// Updates the definition of a custom Role.
     /// 
     /// # Arguments
     ///
@@ -1914,7 +1969,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the Roles defined on a resource.
+    /// Lists every predefined Role that IAM supports, or every custom role
+    /// that is defined for an organization or project.
     /// 
     /// # Arguments
     ///
@@ -1999,8 +2055,11 @@ impl<'a, C, A> IamPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of services that support service level audit logging
-    /// configuration for the given resource.
+    /// Returns a list of services that allow you to opt into audit logs that are
+    /// not generated by default.
+    /// 
+    /// To learn more about audit logs, see the [Logging
+    /// documentation](https://cloud.google.com/logging/docs/audit).
     /// 
     /// # Arguments
     ///
@@ -2017,19 +2076,12 @@ impl<'a, C, A> IamPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lints a Cloud IAM policy object or its sub fields. Currently supports
-    /// google.iam.v1.Binding.condition.
+    /// Lints, or validates, an IAM policy. Currently checks the
+    /// google.iam.v1.Binding.condition field, which contains a condition
+    /// expression for a role binding.
     /// 
-    /// Each lint operation consists of multiple lint validation units.
-    /// Each unit inspects the input object in regard to a particular linting
-    /// aspect and issues a google.iam.admin.v1.LintResult disclosing the
-    /// result.
-    /// 
-    /// The set of applicable validation units is determined by the Cloud IAM
-    /// server and is not configurable.
-    /// 
-    /// Regardless of any lint issues or their severities, successful calls to
-    /// `lintPolicy` return an HTTP 200 OK status code.
+    /// Successful calls to this method always return an HTTP `200 OK` status code,
+    /// even if the linter detects an issue in the IAM policy.
     /// 
     /// # Arguments
     ///
@@ -2088,7 +2140,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Role definition.
+    /// Gets the definition of a Role.
     /// 
     /// # Arguments
     ///
@@ -2127,7 +2179,8 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the Roles defined on a resource.
+    /// Lists every predefined Role that IAM supports, or every custom role
+    /// that is defined for an organization or project.
     pub fn list(&self) -> RoleListCall<'a, C, A> {
         RoleListCall {
             hub: self.hub,
@@ -2144,9 +2197,9 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Queries roles that can be granted on a particular resource.
-    /// A role is grantable if it can be used as the role in a binding for a policy
-    /// for that resource.
+    /// Lists roles that can be granted on a Google Cloud resource. A role is
+    /// grantable if the IAM policy for the resource can contain bindings to the
+    /// role.
     /// 
     /// # Arguments
     ///
@@ -2226,7 +2279,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Role definition.
+    /// Gets the definition of a Role.
     /// 
     /// # Arguments
     ///
@@ -2265,16 +2318,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// EnableServiceAccount is currently in the alpha launch stage.
+    /// Enables a ServiceAccount that was disabled by
+    /// DisableServiceAccount.
     /// 
-    ///  Restores a disabled ServiceAccount
-    ///  that has been manually disabled by using DisableServiceAccount. Service
-    ///  accounts that have been disabled by other means or for other reasons,
-    ///  such as abuse, cannot be restored using this method.
+    /// If the service account is already enabled, then this method has no effect.
     /// 
-    ///  EnableServiceAccount will have no effect on a service account that is
-    ///  not disabled.  Enabling an already enabled service account will have no
-    ///  effect.
+    /// If the service account was disabled by other means—for example, if Google
+    /// disabled the service account because it was compromised—you cannot use this
+    /// method to enable the service account.
     /// 
     /// # Arguments
     ///
@@ -2297,20 +2348,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the Cloud IAM access control policy for a
-    /// ServiceAccount.
+    /// Gets the IAM policy that is attached to a ServiceAccount. This IAM
+    /// policy specifies which members have access to the service account.
     /// 
-    /// Note: Service accounts are both
-    /// [resources and
-    /// identities](/iam/docs/service-accounts#service_account_permissions). This
-    /// method treats the service account as a resource. It returns the Cloud IAM
-    /// policy that reflects what members have access to the service account.
-    /// 
-    /// This method does not return what resources the service account has access
-    /// to. To see if a service account has access to a resource, call the
-    /// `getIamPolicy` method on the target resource. For example, to view grants
-    /// for a project, call the
-    /// [projects.getIamPolicy](/resource-manager/reference/rest/v1/projects/getIamPolicy)
+    /// This method does not tell you whether the service account has been granted
+    /// any roles on other resources. To check whether a service account has role
+    /// grants on a resource, use the `getIamPolicy` method for that resource. For
+    /// example, to view the role grants for a project, call the Resource Manager
+    /// API's
+    /// [`projects.getIamPolicy`](https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy)
     /// method.
     /// 
     /// # Arguments
@@ -2330,7 +2376,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Undelete a Role, bringing it back in its previous state.
+    /// Undeletes a custom Role.
     /// 
     /// # Arguments
     ///
@@ -2365,13 +2411,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Soft deletes a role. The role is suspended and cannot be used to create new
-    /// IAM Policy Bindings.
-    /// The Role will not be included in `ListRoles()` unless `show_deleted` is set
-    /// in the `ListRolesRequest`. The Role contains the deleted boolean set.
-    /// Existing Bindings remains, but are inactive. The Role can be undeleted
-    /// within 7 days. After 7 days the Role is deleted and all Bindings associated
-    /// with the role are removed.
+    /// Deletes a custom Role.
+    /// 
+    /// When you delete a custom role, the following changes occur immediately:
+    /// 
+    /// * You cannot bind a member to the custom role in an IAM
+    /// Policy.
+    /// * Existing bindings to the custom role are not changed, but they have no
+    /// effect.
+    /// * By default, the response from ListRoles does not include the custom
+    /// role.
+    /// 
+    /// You have 7 days to undelete the custom role. After 7 days, the following
+    /// changes occur:
+    /// 
+    /// * The custom role is permanently deleted and cannot be recovered.
+    /// * If an IAM policy contains a binding to the custom role, the binding is
+    /// permanently removed.
     /// 
     /// # Arguments
     ///
@@ -2405,8 +2461,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Tests the specified permissions against the IAM access control policy
-    /// for a ServiceAccount.
+    /// Tests whether the caller has the specified permissions on a
+    /// ServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -2426,11 +2482,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// **Note**: This method is in the process of being deprecated. Call the
-    /// [`signBlob()`](/iam/credentials/reference/rest/v1/projects.serviceAccounts/signBlob)
-    /// method of the Cloud IAM Service Account Credentials API instead.
+    /// **Note:** We are in the process of deprecating this method. Use the
+    /// [`signBlob`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signBlob)
+    /// method in the IAM Service Account Credentials API instead.
     /// 
-    /// Signs a blob using a service account's system-managed private key.
+    /// Signs a blob using the system-managed private key for a ServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -2453,22 +2509,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the Cloud IAM access control policy for a
-    /// ServiceAccount.
+    /// Sets the IAM policy that is attached to a ServiceAccount.
     /// 
-    /// Note: Service accounts are both
-    /// [resources and
-    /// identities](/iam/docs/service-accounts#service_account_permissions). This
-    /// method treats the service account as a resource. Use it to grant members
-    /// access to the service account, such as when they need to impersonate it.
+    /// Use this method to grant or revoke access to the service account. For
+    /// example, you could grant a member the ability to impersonate the service
+    /// account.
     /// 
-    /// This method does not grant the service account access to other resources,
-    /// such as projects. To grant a service account access to resources, include
-    /// the service account in the Cloud IAM policy for the desired resource, then
-    /// call the appropriate `setIamPolicy` method on the target resource. For
-    /// example, to grant a service account access to a project, call the
-    /// [projects.setIamPolicy](/resource-manager/reference/rest/v1/projects/setIamPolicy)
-    /// method.
+    /// This method does not enable the service account to access other resources.
+    /// To grant roles to a service account on a resource, follow these steps:
+    /// 
+    /// 1. Call the resource's `getIamPolicy` method to get its current IAM policy.
+    /// 2. Edit the policy so that it binds the service account to an IAM role for
+    /// the resource.
+    /// 3. Call the resource's `setIamPolicy` method to update its IAM policy.
+    /// 
+    /// For detailed instructions, see
+    /// [Granting roles to a service account for specific
+    /// resources](https://cloud.google.com/iam/help/service-accounts/granting-access-to-service-accounts).
     /// 
     /// # Arguments
     ///
@@ -2490,6 +2547,20 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Deletes a ServiceAccount.
     /// 
+    /// **Warning:** After you delete a service account, you might not be able to
+    /// undelete it. If you know that you need to re-enable the service account in
+    /// the future, use DisableServiceAccount instead.
+    /// 
+    /// If you delete a service account, IAM permanently removes the service
+    /// account 30 days later. Google Cloud cannot recover the service account
+    /// after it is permanently removed, even if you file a support request.
+    /// 
+    /// To help avoid unplanned outages, we recommend that you disable the service
+    /// account before you delete it. Use DisableServiceAccount to disable the
+    /// service account, then wait at least 24 hours and watch for unintended
+    /// consequences. If there are no unintended consequences, you can delete the
+    /// service account.
+    /// 
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the service account in the following format:
@@ -2509,8 +2580,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a ServiceAccount
-    /// and returns it.
+    /// Creates a ServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -2532,24 +2602,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Patches a ServiceAccount.
     /// 
-    /// Currently, only the following fields are updatable:
-    /// `display_name` and `description`.
-    /// 
-    /// Only fields specified in the request are guaranteed to be returned in
-    /// the response. Other fields in the response may be empty.
-    /// 
-    /// Note: The field mask is required.
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
-    ///            Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
-    ///            project from the `account` and the `ACCOUNT` value can be the `email`
-    ///            address or the `unique_id` of the service account.
-    ///            In responses the resource name will always be in the format
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// * `name` - The resource name of the service account.
+    ///            Use one of the following formats:
+    ///            * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}`
+    ///            * `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}`
+    ///            As an alternative, you can use the `-` wildcard character instead of the
+    ///            project ID:
+    ///            * `projects/-/serviceAccounts/{EMAIL_ADDRESS}`
+    ///            * `projects/-/serviceAccounts/{UNIQUE_ID}`
+    ///            When possible, avoid using the `-` wildcard character, because it can cause
+    ///            response messages to contain misleading error codes. For example, if you
+    ///            try to get the service account
+    ///            `projects/-/serviceAccounts/fake@example.com`, which does not exist, the
+    ///            response contains an HTTP `403 Forbidden` error instead of a `404 Not
+    ///            Found` error.
     pub fn service_accounts_patch(&self, request: PatchServiceAccountRequest, name: &str) -> ProjectServiceAccountPatchCall<'a, C, A> {
         ProjectServiceAccountPatchCall {
             hub: self.hub,
@@ -2563,10 +2632,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Upload public key for a given service account.
-    /// This rpc will create a
-    /// ServiceAccountKey that has the
-    /// provided public key and returns it.
+    /// Creates a ServiceAccountKey, using a public key that you provide.
     /// 
     /// # Arguments
     ///
@@ -2589,7 +2655,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Role definition.
+    /// Updates the definition of a custom Role.
     /// 
     /// # Arguments
     ///
@@ -2625,7 +2691,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new Role.
+    /// Creates a new custom Role.
     /// 
     /// # Arguments
     ///
@@ -2660,24 +2726,22 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// DisableServiceAccount is currently in the alpha launch stage.
+    /// Disables a ServiceAccount immediately.
     /// 
-    /// Disables a ServiceAccount,
-    /// which immediately prevents the service account from authenticating and
-    /// gaining access to APIs.
+    /// If an application uses the service account to authenticate, that
+    /// application can no longer call Google APIs or access Google Cloud
+    /// resources. Existing access tokens for the service account are rejected, and
+    /// requests for new access tokens will fail.
     /// 
-    /// Disabled service accounts can be safely restored by using
-    /// EnableServiceAccount at any point. Deleted service accounts cannot be
-    /// restored using this method.
+    /// To re-enable the service account, use EnableServiceAccount. After you
+    /// re-enable the service account, its existing access tokens will be accepted,
+    /// and you can request new access tokens.
     /// 
-    /// Disabling a service account that is bound to VMs, Apps, Functions, or
-    /// other jobs will cause those jobs to lose access to resources if they are
-    /// using the disabled service account.
-    /// 
-    /// To improve reliability of your services and avoid unexpected outages, it
-    /// is recommended to first disable a service account rather than delete it.
-    /// After disabling the service account, wait at least 24 hours to verify there
-    /// are no unintended consequences, and then delete the service account.
+    /// To help avoid unplanned outages, we recommend that you disable the service
+    /// account before you delete it. Use this method to disable the service
+    /// account, then wait at least 24 hours and watch for unintended consequences.
+    /// If there are no unintended consequences, you can delete the service account
+    /// with DeleteServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -2700,7 +2764,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the Roles defined on a resource.
+    /// Lists every predefined Role that IAM supports, or every custom role
+    /// that is defined for an organization or project.
     /// 
     /// # Arguments
     ///
@@ -2744,8 +2809,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Restores a deleted ServiceAccount.
-    /// This is to be used as an action of last resort.  A service account may
-    /// not always be restorable.
+    /// 
+    /// **Important:** It is not always possible to restore a deleted service
+    /// account. Use this method only as a last resort.
+    /// 
+    /// After you delete a service account, IAM permanently removes the service
+    /// account 30 days later. There is no way to restore a deleted service account
+    /// that has been permanently removed.
     /// 
     /// # Arguments
     ///
@@ -2767,24 +2837,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Note: This method is in the process of being deprecated. Use
+    /// **Note:** We are in the process of deprecating this method. Use
     /// PatchServiceAccount instead.
     /// 
     /// Updates a ServiceAccount.
     /// 
-    /// Currently, only the following fields are updatable:
-    /// `display_name` and `description`.
+    /// You can update only the `display_name` and `description` fields.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
-    ///            Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
-    ///            project from the `account` and the `ACCOUNT` value can be the `email`
-    ///            address or the `unique_id` of the service account.
-    ///            In responses the resource name will always be in the format
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// * `name` - The resource name of the service account.
+    ///            Use one of the following formats:
+    ///            * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}`
+    ///            * `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}`
+    ///            As an alternative, you can use the `-` wildcard character instead of the
+    ///            project ID:
+    ///            * `projects/-/serviceAccounts/{EMAIL_ADDRESS}`
+    ///            * `projects/-/serviceAccounts/{UNIQUE_ID}`
+    ///            When possible, avoid using the `-` wildcard character, because it can cause
+    ///            response messages to contain misleading error codes. For example, if you
+    ///            try to get the service account
+    ///            `projects/-/serviceAccounts/fake@example.com`, which does not exist, the
+    ///            response contains an HTTP `403 Forbidden` error instead of a `404 Not
+    ///            Found` error.
     pub fn service_accounts_update(&self, request: ServiceAccount, name: &str) -> ProjectServiceAccountUpdateCall<'a, C, A> {
         ProjectServiceAccountUpdateCall {
             hub: self.hub,
@@ -2798,15 +2874,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// **Note**: This method is in the process of being deprecated. Call the
-    /// [`signJwt()`](/iam/credentials/reference/rest/v1/projects.serviceAccounts/signJwt)
-    /// method of the Cloud IAM Service Account Credentials API instead.
+    /// **Note:** We are in the process of deprecating this method. Use the
+    /// [`signJwt`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signJwt)
+    /// method in the IAM Service Account Credentials API instead.
     /// 
-    /// Signs a JWT using a service account's system-managed private key.
-    /// 
-    /// If no expiry time (`exp`) is provided in the `SignJwtRequest`, IAM sets an
-    /// an expiry time of one hour by default. If you request an expiry time of
-    /// more than one hour, the request will fail.
+    /// Signs a JSON Web Token (JWT) using the system-managed private key for a
+    /// ServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -2829,7 +2902,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists ServiceAccountKeys.
+    /// Lists every ServiceAccountKey for a service account.
     /// 
     /// # Arguments
     ///
@@ -2851,8 +2924,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a ServiceAccountKey
-    /// and returns it.
+    /// Creates a ServiceAccountKey.
     /// 
     /// # Arguments
     ///
@@ -2875,7 +2947,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists ServiceAccounts for a project.
+    /// Lists every ServiceAccount that belongs to a specific project.
     /// 
     /// # Arguments
     ///
@@ -2895,8 +2967,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the ServiceAccountKey
-    /// by key id.
+    /// Gets a ServiceAccountKey.
     /// 
     /// # Arguments
     ///
@@ -2981,8 +3052,9 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the permissions testable on a resource.
-    /// A permission is testable if it can be tested for an identity on a resource.
+    /// Lists every permission that you can test on a resource. A permission is
+    /// testable if you can check whether a member has that permission on the
+    /// resource.
     /// 
     /// # Arguments
     ///
@@ -3006,7 +3078,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Gets a Role definition.
+/// Gets the definition of a Role.
 ///
 /// A builder for the *roles.get* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -3286,7 +3358,7 @@ impl<'a, C, A> OrganizationRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Undelete a Role, bringing it back in its previous state.
+/// Undeletes a custom Role.
 ///
 /// A builder for the *roles.undelete* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -3590,13 +3662,23 @@ impl<'a, C, A> OrganizationRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Soft deletes a role. The role is suspended and cannot be used to create new
-/// IAM Policy Bindings.
-/// The Role will not be included in `ListRoles()` unless `show_deleted` is set
-/// in the `ListRolesRequest`. The Role contains the deleted boolean set.
-/// Existing Bindings remains, but are inactive. The Role can be undeleted
-/// within 7 days. After 7 days the Role is deleted and all Bindings associated
-/// with the role are removed.
+/// Deletes a custom Role.
+/// 
+/// When you delete a custom role, the following changes occur immediately:
+/// 
+/// * You cannot bind a member to the custom role in an IAM
+/// Policy.
+/// * Existing bindings to the custom role are not changed, but they have no
+/// effect.
+/// * By default, the response from ListRoles does not include the custom
+/// role.
+/// 
+/// You have 7 days to undelete the custom role. After 7 days, the following
+/// changes occur:
+/// 
+/// * The custom role is permanently deleted and cannot be recovered.
+/// * If an IAM policy contains a binding to the custom role, the binding is
+/// permanently removed.
 ///
 /// A builder for the *roles.delete* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -3881,7 +3963,7 @@ impl<'a, C, A> OrganizationRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Creates a new Role.
+/// Creates a new custom Role.
 ///
 /// A builder for the *roles.create* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -4185,7 +4267,7 @@ impl<'a, C, A> OrganizationRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Updates a Role definition.
+/// Updates the definition of a custom Role.
 ///
 /// A builder for the *roles.patch* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -4501,7 +4583,8 @@ impl<'a, C, A> OrganizationRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Lists the Roles defined on a resource.
+/// Lists every predefined Role that IAM supports, or every custom role
+/// that is defined for an organization or project.
 ///
 /// A builder for the *roles.list* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -4763,6 +4846,8 @@ impl<'a, C, A> OrganizationRoleListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
     /// Optional limit on the number of roles to include in the response.
+    /// 
+    /// The default is 300, and the maximum is 1,000.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> OrganizationRoleListCall<'a, C, A> {
@@ -4832,8 +4917,11 @@ impl<'a, C, A> OrganizationRoleListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns a list of services that support service level audit logging
-/// configuration for the given resource.
+/// Returns a list of services that allow you to opt into audit logs that are
+/// not generated by default.
+/// 
+/// To learn more about audit logs, see the [Logging
+/// documentation](https://cloud.google.com/logging/docs/audit).
 ///
 /// A builder for the *queryAuditableServices* method supported by a *iamPolicy* resource.
 /// It is not used directly, but through a `IamPolicyMethods` instance.
@@ -5081,19 +5169,12 @@ impl<'a, C, A> IamPolicyQueryAuditableServiceCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Lints a Cloud IAM policy object or its sub fields. Currently supports
-/// google.iam.v1.Binding.condition.
+/// Lints, or validates, an IAM policy. Currently checks the
+/// google.iam.v1.Binding.condition field, which contains a condition
+/// expression for a role binding.
 /// 
-/// Each lint operation consists of multiple lint validation units.
-/// Each unit inspects the input object in regard to a particular linting
-/// aspect and issues a google.iam.admin.v1.LintResult disclosing the
-/// result.
-/// 
-/// The set of applicable validation units is determined by the Cloud IAM
-/// server and is not configurable.
-/// 
-/// Regardless of any lint issues or their severities, successful calls to
-/// `lintPolicy` return an HTTP 200 OK status code.
+/// Successful calls to this method always return an HTTP `200 OK` status code,
+/// even if the linter detects an issue in the IAM policy.
 ///
 /// A builder for the *lintPolicy* method supported by a *iamPolicy* resource.
 /// It is not used directly, but through a `IamPolicyMethods` instance.
@@ -5341,7 +5422,7 @@ impl<'a, C, A> IamPolicyLintPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Gets a Role definition.
+/// Gets the definition of a Role.
 ///
 /// A builder for the *get* method supported by a *role* resource.
 /// It is not used directly, but through a `RoleMethods` instance.
@@ -5621,7 +5702,8 @@ impl<'a, C, A> RoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Lists the Roles defined on a resource.
+/// Lists every predefined Role that IAM supports, or every custom role
+/// that is defined for an organization or project.
 ///
 /// A builder for the *list* method supported by a *role* resource.
 /// It is not used directly, but through a `RoleMethods` instance.
@@ -5858,6 +5940,8 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self
     }
     /// Optional limit on the number of roles to include in the response.
+    /// 
+    /// The default is 300, and the maximum is 1,000.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> RoleListCall<'a, C, A> {
@@ -5927,9 +6011,9 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Queries roles that can be granted on a particular resource.
-/// A role is grantable if it can be used as the role in a binding for a policy
-/// for that resource.
+/// Lists roles that can be granted on a Google Cloud resource. A role is
+/// grantable if the IAM policy for the resource can contain bindings to the
+/// role.
 ///
 /// A builder for the *queryGrantableRoles* method supported by a *role* resource.
 /// It is not used directly, but through a `RoleMethods` instance.
@@ -6435,7 +6519,7 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Gets a Role definition.
+/// Gets the definition of a Role.
 ///
 /// A builder for the *roles.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6715,16 +6799,14 @@ impl<'a, C, A> ProjectRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// EnableServiceAccount is currently in the alpha launch stage.
+/// Enables a ServiceAccount that was disabled by
+/// DisableServiceAccount.
 /// 
-///  Restores a disabled ServiceAccount
-///  that has been manually disabled by using DisableServiceAccount. Service
-///  accounts that have been disabled by other means or for other reasons,
-///  such as abuse, cannot be restored using this method.
+/// If the service account is already enabled, then this method has no effect.
 /// 
-///  EnableServiceAccount will have no effect on a service account that is
-///  not disabled.  Enabling an already enabled service account will have no
-///  effect.
+/// If the service account was disabled by other means—for example, if Google
+/// disabled the service account because it was compromised—you cannot use this
+/// method to enable the service account.
 ///
 /// A builder for the *serviceAccounts.enable* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7013,20 +7095,15 @@ impl<'a, C, A> ProjectServiceAccountEnableCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Returns the Cloud IAM access control policy for a
-/// ServiceAccount.
+/// Gets the IAM policy that is attached to a ServiceAccount. This IAM
+/// policy specifies which members have access to the service account.
 /// 
-/// Note: Service accounts are both
-/// [resources and
-/// identities](/iam/docs/service-accounts#service_account_permissions). This
-/// method treats the service account as a resource. It returns the Cloud IAM
-/// policy that reflects what members have access to the service account.
-/// 
-/// This method does not return what resources the service account has access
-/// to. To see if a service account has access to a resource, call the
-/// `getIamPolicy` method on the target resource. For example, to view grants
-/// for a project, call the
-/// [projects.getIamPolicy](/resource-manager/reference/rest/v1/projects/getIamPolicy)
+/// This method does not tell you whether the service account has been granted
+/// any roles on other resources. To check whether a service account has role
+/// grants on a resource, use the `getIamPolicy` method for that resource. For
+/// example, to view the role grants for a project, call the Resource Manager
+/// API's
+/// [`projects.getIamPolicy`](https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy)
 /// method.
 ///
 /// A builder for the *serviceAccounts.getIamPolicy* method supported by a *project* resource.
@@ -7232,6 +7309,10 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectServiceAccountGetIamPolicyCall<'a, C, A> {
@@ -7301,7 +7382,7 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Undelete a Role, bringing it back in its previous state.
+/// Undeletes a custom Role.
 ///
 /// A builder for the *roles.undelete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7605,13 +7686,23 @@ impl<'a, C, A> ProjectRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Soft deletes a role. The role is suspended and cannot be used to create new
-/// IAM Policy Bindings.
-/// The Role will not be included in `ListRoles()` unless `show_deleted` is set
-/// in the `ListRolesRequest`. The Role contains the deleted boolean set.
-/// Existing Bindings remains, but are inactive. The Role can be undeleted
-/// within 7 days. After 7 days the Role is deleted and all Bindings associated
-/// with the role are removed.
+/// Deletes a custom Role.
+/// 
+/// When you delete a custom role, the following changes occur immediately:
+/// 
+/// * You cannot bind a member to the custom role in an IAM
+/// Policy.
+/// * Existing bindings to the custom role are not changed, but they have no
+/// effect.
+/// * By default, the response from ListRoles does not include the custom
+/// role.
+/// 
+/// You have 7 days to undelete the custom role. After 7 days, the following
+/// changes occur:
+/// 
+/// * The custom role is permanently deleted and cannot be recovered.
+/// * If an IAM policy contains a binding to the custom role, the binding is
+/// permanently removed.
 ///
 /// A builder for the *roles.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7896,8 +7987,8 @@ impl<'a, C, A> ProjectRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Tests the specified permissions against the IAM access control policy
-/// for a ServiceAccount.
+/// Tests whether the caller has the specified permissions on a
+/// ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8183,11 +8274,11 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
 }
 
 
-/// **Note**: This method is in the process of being deprecated. Call the
-/// [`signBlob()`](/iam/credentials/reference/rest/v1/projects.serviceAccounts/signBlob)
-/// method of the Cloud IAM Service Account Credentials API instead.
+/// **Note:** We are in the process of deprecating this method. Use the
+/// [`signBlob`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signBlob)
+/// method in the IAM Service Account Credentials API instead.
 /// 
-/// Signs a blob using a service account's system-managed private key.
+/// Signs a blob using the system-managed private key for a ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.signBlob* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8476,22 +8567,23 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Sets the Cloud IAM access control policy for a
-/// ServiceAccount.
+/// Sets the IAM policy that is attached to a ServiceAccount.
 /// 
-/// Note: Service accounts are both
-/// [resources and
-/// identities](/iam/docs/service-accounts#service_account_permissions). This
-/// method treats the service account as a resource. Use it to grant members
-/// access to the service account, such as when they need to impersonate it.
+/// Use this method to grant or revoke access to the service account. For
+/// example, you could grant a member the ability to impersonate the service
+/// account.
 /// 
-/// This method does not grant the service account access to other resources,
-/// such as projects. To grant a service account access to resources, include
-/// the service account in the Cloud IAM policy for the desired resource, then
-/// call the appropriate `setIamPolicy` method on the target resource. For
-/// example, to grant a service account access to a project, call the
-/// [projects.setIamPolicy](/resource-manager/reference/rest/v1/projects/setIamPolicy)
-/// method.
+/// This method does not enable the service account to access other resources.
+/// To grant roles to a service account on a resource, follow these steps:
+/// 
+/// 1. Call the resource's `getIamPolicy` method to get its current IAM policy.
+/// 2. Edit the policy so that it binds the service account to an IAM role for
+/// the resource.
+/// 3. Call the resource's `setIamPolicy` method to update its IAM policy.
+/// 
+/// For detailed instructions, see
+/// [Granting roles to a service account for specific
+/// resources](https://cloud.google.com/iam/help/service-accounts/granting-access-to-service-accounts).
 ///
 /// A builder for the *serviceAccounts.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8778,6 +8870,20 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
 
 
 /// Deletes a ServiceAccount.
+/// 
+/// **Warning:** After you delete a service account, you might not be able to
+/// undelete it. If you know that you need to re-enable the service account in
+/// the future, use DisableServiceAccount instead.
+/// 
+/// If you delete a service account, IAM permanently removes the service
+/// account 30 days later. Google Cloud cannot recover the service account
+/// after it is permanently removed, even if you file a support request.
+/// 
+/// To help avoid unplanned outages, we recommend that you disable the service
+/// account before you delete it. Use DisableServiceAccount to disable the
+/// service account, then wait at least 24 hours and watch for unintended
+/// consequences. If there are no unintended consequences, you can delete the
+/// service account.
 ///
 /// A builder for the *serviceAccounts.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9035,8 +9141,7 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Creates a ServiceAccount
-/// and returns it.
+/// Creates a ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9323,14 +9428,6 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
 
 
 /// Patches a ServiceAccount.
-/// 
-/// Currently, only the following fields are updatable:
-/// `display_name` and `description`.
-/// 
-/// Only fields specified in the request are guaranteed to be returned in
-/// the response. Other fields in the response may be empty.
-/// 
-/// Note: The field mask is required.
 ///
 /// A builder for the *serviceAccounts.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9542,15 +9639,25 @@ impl<'a, C, A> ProjectServiceAccountPatchCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// The resource name of the service account.
     /// 
-    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
-    /// project from the `account` and the `ACCOUNT` value can be the `email`
-    /// address or the `unique_id` of the service account.
+    /// Use one of the following formats:
     /// 
-    /// In responses the resource name will always be in the format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}`
+    /// * `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}`
+    /// 
+    /// As an alternative, you can use the `-` wildcard character instead of the
+    /// project ID:
+    /// 
+    /// * `projects/-/serviceAccounts/{EMAIL_ADDRESS}`
+    /// * `projects/-/serviceAccounts/{UNIQUE_ID}`
+    /// 
+    /// When possible, avoid using the `-` wildcard character, because it can cause
+    /// response messages to contain misleading error codes. For example, if you
+    /// try to get the service account
+    /// `projects/-/serviceAccounts/fake@example.com`, which does not exist, the
+    /// response contains an HTTP `403 Forbidden` error instead of a `404 Not
+    /// Found` error.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9623,10 +9730,7 @@ impl<'a, C, A> ProjectServiceAccountPatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Upload public key for a given service account.
-/// This rpc will create a
-/// ServiceAccountKey that has the
-/// provided public key and returns it.
+/// Creates a ServiceAccountKey, using a public key that you provide.
 ///
 /// A builder for the *serviceAccounts.keys.upload* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9915,7 +10019,7 @@ impl<'a, C, A> ProjectServiceAccountKeyUploadCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Updates a Role definition.
+/// Updates the definition of a custom Role.
 ///
 /// A builder for the *roles.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10231,7 +10335,7 @@ impl<'a, C, A> ProjectRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Creates a new Role.
+/// Creates a new custom Role.
 ///
 /// A builder for the *roles.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10535,24 +10639,22 @@ impl<'a, C, A> ProjectRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// DisableServiceAccount is currently in the alpha launch stage.
+/// Disables a ServiceAccount immediately.
 /// 
-/// Disables a ServiceAccount,
-/// which immediately prevents the service account from authenticating and
-/// gaining access to APIs.
+/// If an application uses the service account to authenticate, that
+/// application can no longer call Google APIs or access Google Cloud
+/// resources. Existing access tokens for the service account are rejected, and
+/// requests for new access tokens will fail.
 /// 
-/// Disabled service accounts can be safely restored by using
-/// EnableServiceAccount at any point. Deleted service accounts cannot be
-/// restored using this method.
+/// To re-enable the service account, use EnableServiceAccount. After you
+/// re-enable the service account, its existing access tokens will be accepted,
+/// and you can request new access tokens.
 /// 
-/// Disabling a service account that is bound to VMs, Apps, Functions, or
-/// other jobs will cause those jobs to lose access to resources if they are
-/// using the disabled service account.
-/// 
-/// To improve reliability of your services and avoid unexpected outages, it
-/// is recommended to first disable a service account rather than delete it.
-/// After disabling the service account, wait at least 24 hours to verify there
-/// are no unintended consequences, and then delete the service account.
+/// To help avoid unplanned outages, we recommend that you disable the service
+/// account before you delete it. Use this method to disable the service
+/// account, then wait at least 24 hours and watch for unintended consequences.
+/// If there are no unintended consequences, you can delete the service account
+/// with DeleteServiceAccount.
 ///
 /// A builder for the *serviceAccounts.disable* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10841,7 +10943,8 @@ impl<'a, C, A> ProjectServiceAccountDisableCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Lists the Roles defined on a resource.
+/// Lists every predefined Role that IAM supports, or every custom role
+/// that is defined for an organization or project.
 ///
 /// A builder for the *roles.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11103,6 +11206,8 @@ impl<'a, C, A> ProjectRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self
     }
     /// Optional limit on the number of roles to include in the response.
+    /// 
+    /// The default is 300, and the maximum is 1,000.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectRoleListCall<'a, C, A> {
@@ -11173,8 +11278,13 @@ impl<'a, C, A> ProjectRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Restores a deleted ServiceAccount.
-/// This is to be used as an action of last resort.  A service account may
-/// not always be restorable.
+/// 
+/// **Important:** It is not always possible to restore a deleted service
+/// account. Use this method only as a last resort.
+/// 
+/// After you delete a service account, IAM permanently removes the service
+/// account 30 days later. There is no way to restore a deleted service account
+/// that has been permanently removed.
 ///
 /// A builder for the *serviceAccounts.undelete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11462,13 +11572,12 @@ impl<'a, C, A> ProjectServiceAccountUndeleteCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Note: This method is in the process of being deprecated. Use
+/// **Note:** We are in the process of deprecating this method. Use
 /// PatchServiceAccount instead.
 /// 
 /// Updates a ServiceAccount.
 /// 
-/// Currently, only the following fields are updatable:
-/// `display_name` and `description`.
+/// You can update only the `display_name` and `description` fields.
 ///
 /// A builder for the *serviceAccounts.update* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11680,15 +11789,25 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// The resource name of the service account.
     /// 
-    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
-    /// project from the `account` and the `ACCOUNT` value can be the `email`
-    /// address or the `unique_id` of the service account.
+    /// Use one of the following formats:
     /// 
-    /// In responses the resource name will always be in the format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// * `projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}`
+    /// * `projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}`
+    /// 
+    /// As an alternative, you can use the `-` wildcard character instead of the
+    /// project ID:
+    /// 
+    /// * `projects/-/serviceAccounts/{EMAIL_ADDRESS}`
+    /// * `projects/-/serviceAccounts/{UNIQUE_ID}`
+    /// 
+    /// When possible, avoid using the `-` wildcard character, because it can cause
+    /// response messages to contain misleading error codes. For example, if you
+    /// try to get the service account
+    /// `projects/-/serviceAccounts/fake@example.com`, which does not exist, the
+    /// response contains an HTTP `403 Forbidden` error instead of a `404 Not
+    /// Found` error.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11761,15 +11880,12 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// **Note**: This method is in the process of being deprecated. Call the
-/// [`signJwt()`](/iam/credentials/reference/rest/v1/projects.serviceAccounts/signJwt)
-/// method of the Cloud IAM Service Account Credentials API instead.
+/// **Note:** We are in the process of deprecating this method. Use the
+/// [`signJwt`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signJwt)
+/// method in the IAM Service Account Credentials API instead.
 /// 
-/// Signs a JWT using a service account's system-managed private key.
-/// 
-/// If no expiry time (`exp`) is provided in the `SignJwtRequest`, IAM sets an
-/// an expiry time of one hour by default. If you request an expiry time of
-/// more than one hour, the request will fail.
+/// Signs a JSON Web Token (JWT) using the system-managed private key for a
+/// ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.signJwt* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12058,7 +12174,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Lists ServiceAccountKeys.
+/// Lists every ServiceAccountKey for a service account.
 ///
 /// A builder for the *serviceAccounts.keys.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12334,8 +12450,7 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Creates a ServiceAccountKey
-/// and returns it.
+/// Creates a ServiceAccountKey.
 ///
 /// A builder for the *serviceAccounts.keys.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12624,7 +12739,7 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Lists ServiceAccounts for a project.
+/// Lists every ServiceAccount that belongs to a specific project.
 ///
 /// A builder for the *serviceAccounts.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12838,6 +12953,8 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
     /// response. Further accounts can subsequently be obtained by including the
     /// ListServiceAccountsResponse.next_page_token
     /// in a subsequent request.
+    /// 
+    /// The default is 20, and the maximum is 100.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectServiceAccountListCall<'a, C, A> {
@@ -12907,8 +13024,7 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Gets the ServiceAccountKey
-/// by key id.
+/// Gets a ServiceAccountKey.
 ///
 /// A builder for the *serviceAccounts.keys.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -13438,8 +13554,9 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Lists the permissions testable on a resource.
-/// A permission is testable if it can be tested for an identity on a resource.
+/// Lists every permission that you can test on a resource. A permission is
+/// testable if you can check whether a member has that permission on the
+/// resource.
 ///
 /// A builder for the *queryTestablePermissions* method supported by a *permission* resource.
 /// It is not used directly, but through a `PermissionMethods` instance.

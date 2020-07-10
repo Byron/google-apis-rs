@@ -1,0 +1,31 @@
+site_name: Network Management v1.0.14+20200520
+site_url: http://byron.github.io/google-apis-rs/google-networkmanagement1-cli
+site_description: A complete library to interact with Network Management (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/networkmanagement1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-global-connectivity-tests-create.md', 'Projects', 'Locations Global Connectivity Tests Create']
+- ['projects_locations-global-connectivity-tests-delete.md', 'Projects', 'Locations Global Connectivity Tests Delete']
+- ['projects_locations-global-connectivity-tests-get.md', 'Projects', 'Locations Global Connectivity Tests Get']
+- ['projects_locations-global-connectivity-tests-get-iam-policy.md', 'Projects', 'Locations Global Connectivity Tests Get Iam Policy']
+- ['projects_locations-global-connectivity-tests-list.md', 'Projects', 'Locations Global Connectivity Tests List']
+- ['projects_locations-global-connectivity-tests-patch.md', 'Projects', 'Locations Global Connectivity Tests Patch']
+- ['projects_locations-global-connectivity-tests-rerun.md', 'Projects', 'Locations Global Connectivity Tests Rerun']
+- ['projects_locations-global-connectivity-tests-set-iam-policy.md', 'Projects', 'Locations Global Connectivity Tests Set Iam Policy']
+- ['projects_locations-global-connectivity-tests-test-iam-permissions.md', 'Projects', 'Locations Global Connectivity Tests Test Iam Permissions']
+- ['projects_locations-global-operations-cancel.md', 'Projects', 'Locations Global Operations Cancel']
+- ['projects_locations-global-operations-delete.md', 'Projects', 'Locations Global Operations Delete']
+- ['projects_locations-global-operations-get.md', 'Projects', 'Locations Global Operations Get']
+- ['projects_locations-global-operations-list.md', 'Projects', 'Locations Global Operations List']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

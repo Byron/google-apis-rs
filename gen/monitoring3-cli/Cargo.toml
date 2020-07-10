@@ -4,7 +4,7 @@
 [package]
 
 name = "google-monitoring3-cli"
-version = "1.0.13+20200329"
+version = "1.0.14+20200708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Monitoring (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-monitoring3]
 path = "../monitoring3"
-version = "1.0.13+20200329"
+version = "1.0.14+20200708"

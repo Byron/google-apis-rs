@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Monitoring* crate version *1.0.13+20200329*, where *20200329* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Monitoring* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Monitoring* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/api/).
@@ -350,7 +350,7 @@ impl<'a, C, A> Monitoring<C, A>
         Monitoring {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://monitoring.googleapis.com/".to_string(),
             _root_url: "https://monitoring.googleapis.com/".to_string(),
         }
@@ -367,7 +367,7 @@ impl<'a, C, A> Monitoring<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -477,19 +477,29 @@ impl RequestValue for Group {}
 impl ResponseResult for Group {}
 
 
-/// A condition type that allows alert policies to be defined using Monitoring Query Language.
+/// The protocol for the ListUptimeCheckConfigs response.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [uptime check configs list projects](struct.ProjectUptimeCheckConfigListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimeSeriesQueryLanguageCondition {
-    /// Monitoring Query Language query that generates time series data and describes a condition for alerting on that data.
-    pub query: Option<String>,
-    /// A short explanation of what the query represents. For example:"Error ratio exceeds 15% for >5% of servers in >2 regions"
-    pub summary: Option<String>,
+pub struct ListUptimeCheckConfigsResponse {
+    /// This field represents the pagination token to retrieve the next page of results. If the value is empty, it means no further results for the request. To retrieve the next page of results, the value of the next_page_token is passed to the subsequent List method call (in the request message's page_token field).
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The total number of Uptime check configurations for the project, irrespective of any pagination.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
+    /// The returned Uptime check configurations.
+    #[serde(rename="uptimeCheckConfigs")]
+    pub uptime_check_configs: Option<Vec<UptimeCheckConfig>>,
 }
 
-impl Part for TimeSeriesQueryLanguageCondition {}
+impl ResponseResult for ListUptimeCheckConfigsResponse {}
 
 
 /// A Service is a discrete, autonomous, and network-accessible unit, designed to solve an individual concern (Wikipedia (https://en.wikipedia.org/wiki/Service-orientation)). In Cloud Monitoring, a Service acts as the root resource under which operational aspects of the service are accessible.
@@ -1015,9 +1025,6 @@ pub struct Condition {
     /// A condition that compares a time series against a threshold.
     #[serde(rename="conditionThreshold")]
     pub condition_threshold: Option<MetricThreshold>,
-    /// A condition that uses the Monitoring Query Language to define alerts. If set, no other conditions can be present.
-    #[serde(rename="conditionTimeSeriesQueryLanguage")]
-    pub condition_time_series_query_language: Option<TimeSeriesQueryLanguageCondition>,
     /// A short name or phrase used to identify the condition in dashboards, notifications, and incidents. To avoid confusion, don't use the same display name for multiple conditions in the same policy.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
@@ -1036,7 +1043,7 @@ impl Part for Condition {}
 /// A closed time interval. It extends from the start time to the end time, and includes both: [startTime, endTime]. Valid time intervals depend on the MetricKind of the metric value. In no case can the end time be earlier than the start time.
 /// For a GAUGE metric, the startTime value is technically optional; if  no value is specified, the start time defaults to the value of the  end time, and the interval represents a single point in time. If both  start and end times are specified, they must be identical. Such an  interval is valid only for GAUGE metrics, which are point-in-time  measurements.
 /// For DELTA and CUMULATIVE metrics, the start time must be earlier  than the end time.
-/// In all cases, the start time of the next interval must be  at least a microsecond after the end time of the previous interval.  Because the interval is closed, if the start time of a new interval  is the same as the end time of the previous interval, data written  at the new start time could overwrite data written at the previous  end time.
+/// In all cases, the start time of the next interval must be  at least a millisecond after the end time of the previous interval.  Because the interval is closed, if the start time of a new interval  is the same as the end time of the previous interval, data written  at the new start time could overwrite data written at the previous  end time.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1375,19 +1382,11 @@ pub struct ListTimeSeriesResponse {
     /// One or more time series that match the filter included in the request.
     #[serde(rename="timeSeries")]
     pub time_series: Option<Vec<TimeSeries>>,
+    /// The unit in which all time_series point values are reported. unit follows the UCUM format for units as seen in https://unitsofmeasure.org/ucum.html. If different time_series have different units (for example, because they come from different metric types, or a unit is absent), then unit will be "{not_a_unit}".
+    pub unit: Option<String>,
 }
 
 impl ResponseResult for ListTimeSeriesResponse {}
-
-
-/// Future parameters for the availability SLI.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AvailabilityCriteria { _never_set: Option<bool> }
-
-impl Part for AvailabilityCriteria {}
 
 
 /// Describes a change made to a configuration.
@@ -1542,6 +1541,9 @@ pub struct ListNotificationChannelsResponse {
     /// The notification channels defined for the specified project.
     #[serde(rename="notificationChannels")]
     pub notification_channels: Option<Vec<NotificationChannel>>,
+    /// The total number of notification channels in all pages. This number is only an estimate, and may change in subsequent pages. https://aip.dev/158
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
 }
 
 impl ResponseResult for ListNotificationChannelsResponse {}
@@ -1738,7 +1740,10 @@ pub struct GetNotificationChannelVerificationCodeRequest {
 impl RequestValue for GetNotificationChannelVerificationCodeRequest {}
 
 
-/// Defines a metric type and its schema. Once a metric descriptor is created, deleting or altering it stops data collection and makes the metric type's existing data unusable.
+/// Defines a metric type and its schema. Once a metric descriptor is created, deleting or altering it stops data collection and makes the metric type's existing data unusable.The following are specific rules for service defined Monitoring metric descriptors:
+/// type, metric_kind, value_type, description, display_name,  launch_stage fields are all required. The unit field must be specified  if the value_type is any of DOUBLE, INT64, DISTRIBUTION.
+/// Maximum of default 500 metric descriptors per service is allowed.
+/// Maximum of default 10 labels per metric descriptor is allowed.The default maximum limit can be overridden. Please follow https://cloud.google.com/monitoring/quotas
 /// 
 /// # Activities
 /// 
@@ -1761,7 +1766,10 @@ pub struct MetricDescriptor {
     /// Whether the measurement is an integer, a floating-point number, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="valueType")]
     pub value_type: Option<String>,
-    /// The set of labels that can be used to describe a specific instance of this metric type. For example, the appengine.googleapis.com/http/server/response_latencies metric type has a label for the HTTP response code, response_code, so you can look at latencies for successful responses or just for responses that failed.
+    /// The set of labels that can be used to describe a specific instance of this metric type.The label key name must follow:
+    /// Only upper and lower-case letters, digits and underscores (_) are  allowed.
+    /// Label name must start with a letter or digit.
+    /// The maximum length of a label name is 100 characters.For example, the appengine.googleapis.com/http/server/response_latencies metric type has a label for the HTTP response code, response_code, so you can look at latencies for successful responses or just for responses that failed.
     pub labels: Option<Vec<LabelDescriptor>>,
     /// Optional. The launch stage of the metric definition.
     #[serde(rename="launchStage")]
@@ -1771,7 +1779,9 @@ pub struct MetricDescriptor {
     pub monitored_resource_types: Option<Vec<String>>,
     /// Optional. Metadata which can be used to guide usage of the metric.
     pub metadata: Option<MetricDescriptorMetadata>,
-    /// The metric type, including its DNS name prefix. The type is not URL-encoded. All user-defined metric types have the DNS name custom.googleapis.com or external.googleapis.com. Metric types should use a natural hierarchical grouping. For example:
+    /// The metric type, including its DNS name prefix. The type is not URL-encoded.All service defined metrics must be prefixed with the service name, in the format of {service name}/{relative metric name}, such as cloudsql.googleapis.com/database/cpu/utilization. The relative metric name must follow:
+    /// Only upper and lower-case letters, digits, '/' and underscores '_' are  allowed.
+    /// The maximum number of characters allowed for the relative_metric_name is  100.All user-defined metric types have the DNS name custom.googleapis.com, external.googleapis.com, or logging.googleapis.com/user/.Metric types should use a natural hierarchical grouping. For example:
     /// "custom.googleapis.com/invoice/paid/amount"
     /// "external.googleapis.com/prometheus/up"
     /// "appengine.googleapis.com/http/server/response_latencies"
@@ -1784,7 +1794,8 @@ pub struct MetricDescriptor {
     /// s second
     /// min minute
     /// h hour
-    /// d dayPrefixes (PREFIX)
+    /// d day
+    /// 1 dimensionlessPrefixes (PREFIX)
     /// k kilo (10^3)
     /// M mega (10^6)
     /// G giga (10^9)
@@ -1849,7 +1860,7 @@ pub struct NotificationChannelDescriptor {
     pub description: Option<String>,
     /// The set of labels that must be defined to identify a particular channel of the corresponding type. Each label includes a description for how that field should be populated.
     pub labels: Option<Vec<LabelDescriptor>>,
-    /// The type of notification channel, such as "email", "sms", etc. Notification channel types are globally unique.
+    /// The type of notification channel, such as "email" and "sms". To view the full list of channels, see Channel descriptors (https://cloud.google.com/monitoring/alerts/using-channels-api#ncd). Notification channel types are globally unique.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The product launch stage for channels of this type.
@@ -1948,7 +1959,12 @@ pub struct VerifyNotificationChannelRequest {
 impl RequestValue for VerifyNotificationChannelRequest {}
 
 
-/// An object that describes the schema of a MonitoredResource object using a type name and a set of labels. For example, the monitored resource descriptor for Google Compute Engine VM instances has a type of "gce_instance" and specifies the use of the labels "instance_id" and "zone" to identify particular VM instances.Different APIs can support different monitored resource types. APIs generally provide a list method that returns the monitored resource descriptors used by the API.
+/// An object that describes the schema of a MonitoredResource object using a type name and a set of labels. For example, the monitored resource descriptor for Google Compute Engine VM instances has a type of "gce_instance" and specifies the use of the labels "instance_id" and "zone" to identify particular VM instances.Different services can support different monitored resource types.The following are specific rules to service defined monitored resources for Monitoring and Logging:
+/// The type, display_name, description, labels and launch_stage  fields are all required.
+/// The first label of the monitored resource descriptor must be  resource_container. There are legacy monitored resource descritptors  start with project_id.
+/// It must include a location label.
+/// Maximum of default 5 service defined monitored resource descriptors  is allowed per service.
+/// Maximum of default 10 labels per monitored resource is allowed.The default maximum limit can be overridden. Please follow https://cloud.google.com/monitoring/quotas
 /// 
 /// # Activities
 /// 
@@ -1964,9 +1980,15 @@ pub struct MonitoredResourceDescriptor {
     pub display_name: Option<String>,
     /// Optional. A detailed description of the monitored resource type that might be used in documentation.
     pub description: Option<String>,
-    /// Required. A set of labels used to describe instances of this monitored resource type. For example, an individual Google Cloud SQL database is identified by values for the labels "database_id" and "zone".
+    /// Required. A set of labels used to describe instances of this monitored resource type. The label key name must follow:
+    /// Only upper and lower-case letters, digits and underscores (_) are  allowed.
+    /// Label name must start with a letter or digit.
+    /// The maximum length of a label name is 100 characters.For example, an individual Google Cloud SQL database is identified by values for the labels database_id and location.
     pub labels: Option<Vec<LabelDescriptor>>,
-    /// Required. The monitored resource type. For example, the type "cloudsql_database" represents databases in Google Cloud SQL. The maximum length of this value is 256 characters.
+    /// Required. The monitored resource type. For example, the type cloudsql_database represents databases in Google Cloud SQL.All service defined monitored resource types must be prefixed with the service name, in the format of {service name}/{relative resource name}. The relative resource name must follow:
+    /// Only upper and lower-case letters and digits are allowed.
+    /// It must start with upper case character and is recommended to use Upper  Camel Case style.
+    /// The maximum number of characters allowed for the relative_resource_name  is 100.Note there are legacy service monitored resources not following this rule.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Optional. The launch stage of the monitored resource definition.
@@ -1996,6 +2018,9 @@ pub struct ListAlertPoliciesResponse {
     /// The returned alert policies.
     #[serde(rename="alertPolicies")]
     pub alert_policies: Option<Vec<AlertPolicy>>,
+    /// The total number of alert policies in all pages. This number is only an estimate, and may change in subsequent pages. https://aip.dev/158
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
 }
 
 impl ResponseResult for ListAlertPoliciesResponse {}
@@ -2093,20 +2118,28 @@ impl Part for ClusterIstio {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HttpCheck {
-    /// The list of headers to send as part of the Uptime check request. If two headers have the same key and different values, they should be entered as a single header, with the value being a comma-separated list of all the desired values as described at https://www.w3.org/Protocols/rfc2616/rfc2616.txt (page 31). Entering two separate headers with the same key in a Create call will cause the first to be overwritten by the second. The maximum number of headers allowed is 100.
-    pub headers: Option<HashMap<String, String>>,
-    /// The authentication information. Optional when creating an HTTP check; defaults to empty.
-    #[serde(rename="authInfo")]
-    pub auth_info: Option<BasicAuthentication>,
+    /// The request body associated with the HTTP POST request. If content_type is URL_ENCODED, the body passed in must be URL-encoded. Users can provide a Content-Length header via the headers field or the API will do so. If the request_method is GET and body is not empty, the API will return an error. The maximum byte size is 1 megabyte. Note: As with all bytes fields JSON representations are base64 encoded. e.g.: "foo=bar" in URL-encoded form is "foo%3Dbar" and in base64 encoding is "Zm9vJTI1M0RiYXI=".
+    pub body: Option<String>,
     /// If true, use HTTPS instead of HTTP to run the check.
     #[serde(rename="useSsl")]
     pub use_ssl: Option<bool>,
-    /// Boolean specifiying whether to encrypt the header information. Encryption should be specified for any headers related to authentication that you do not wish to be seen when retrieving the configuration. The server will be responsible for encrypting the headers. On Get/List calls, if mask_headers is set to true then the headers will be obscured with ******.
-    #[serde(rename="maskHeaders")]
-    pub mask_headers: Option<bool>,
+    /// The content type to use for the check.
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// The list of headers to send as part of the Uptime check request. If two headers have the same key and different values, they should be entered as a single header, with the value being a comma-separated list of all the desired values as described at https://www.w3.org/Protocols/rfc2616/rfc2616.txt (page 31). Entering two separate headers with the same key in a Create call will cause the first to be overwritten by the second. The maximum number of headers allowed is 100.
+    pub headers: Option<HashMap<String, String>>,
+    /// The HTTP request method to use for the check. If set to METHOD_UNSPECIFIED then request_method defaults to GET.
+    #[serde(rename="requestMethod")]
+    pub request_method: Option<String>,
+    /// The authentication information. Optional when creating an HTTP check; defaults to empty.
+    #[serde(rename="authInfo")]
+    pub auth_info: Option<BasicAuthentication>,
     /// Boolean specifying whether to include SSL certificate validation as a part of the Uptime check. Only applies to checks where monitored_resource is set to uptime_url. If use_ssl is false, setting validate_ssl to true has no effect.
     #[serde(rename="validateSsl")]
     pub validate_ssl: Option<bool>,
+    /// Boolean specifying whether to encrypt the header information. Encryption should be specified for any headers related to authentication that you do not wish to be seen when retrieving the configuration. The server will be responsible for encrypting the headers. On Get/List calls, if mask_headers is set to true then the headers will be obscured with ******.
+    #[serde(rename="maskHeaders")]
+    pub mask_headers: Option<bool>,
     /// Optional (defaults to "/"). The path to the page against which to run the check. Will be combined with the host (specified within the monitored_resource) and port to construct the full URL. If the provided path does not begin with "/", a "/" will be prepended automatically.
     pub path: Option<String>,
     /// Optional (defaults to 80 when use_ssl is false, and 443 when use_ssl is true). The TCP port on the HTTP server against which to run the check. Will be combined with host (specified within the monitored_resource) and path to construct the full URL.
@@ -2161,29 +2194,14 @@ pub struct Exemplar {
 impl Part for Exemplar {}
 
 
-/// The protocol for the ListUptimeCheckConfigs response.
+/// Future parameters for the availability SLI.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [uptime check configs list projects](struct.ProjectUptimeCheckConfigListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListUptimeCheckConfigsResponse {
-    /// This field represents the pagination token to retrieve the next page of results. If the value is empty, it means no further results for the request. To retrieve the next page of results, the value of the next_page_token is passed to the subsequent List method call (in the request message's page_token field).
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The total number of Uptime check configurations for the project, irrespective of any pagination.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
-    /// The returned Uptime check configurations.
-    #[serde(rename="uptimeCheckConfigs")]
-    pub uptime_check_configs: Option<Vec<UptimeCheckConfig>>,
-}
+pub struct AvailabilityCriteria { _never_set: Option<bool> }
 
-impl ResponseResult for ListUptimeCheckConfigsResponse {}
+impl Part for AvailabilityCriteria {}
 
 
 /// Distribution contains summary statistics for a population of values. It optionally contains a histogram representing the distribution of those values across a set of buckets.The summary statistics are the count, mean, sum of the squared deviation from the mean, the minimum, and the maximum of the set of population of values. The histogram is based on a sequence of buckets and gives a count of values that fall into each bucket. The boundaries of the buckets are given either explicitly or by formulas for buckets of fixed or exponentially increasing widths.Although it is not forbidden, it is generally a bad idea to include non-finite values (infinities or NaNs) in the population of values, as this will render the mean and sum_of_squared_deviation fields meaningless.
@@ -2332,7 +2350,7 @@ pub struct Range {
 impl Part for Range {}
 
 
-/// A descriptor for the labels and points in a timeseries.
+/// A descriptor for the labels and points in a time series.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2367,7 +2385,7 @@ pub struct TimeSeries {
     /// The value type of the time series. When listing time series, this value type might be different from the value type of the associated metric if this time series is an alignment or reduction of other time series.When creating a time series, this field is optional. If present, it must be the same as the type of the data in the points field.
     #[serde(rename="valueType")]
     pub value_type: Option<String>,
-    /// Output only. The associated monitored resource metadata. When reading a a timeseries, this field will include metadata labels that are explicitly named in the reduction. When creating a timeseries, this field is ignored.
+    /// Output only. The associated monitored resource metadata. When reading a time series, this field will include metadata labels that are explicitly named in the reduction. When creating a time series, this field is ignored.
     pub metadata: Option<MonitoredResourceMetadata>,
 }
 
@@ -3049,7 +3067,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Queries time series using the time series query language. This method does not require a Workspace.
+    /// Queries time series using Monitoring Query Language. This method does not require a Workspace.
     /// 
     /// # Arguments
     ///
@@ -3139,7 +3157,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the existing alerting policies for the project.
+    /// Lists the existing alerting policies for the workspace.
     /// 
     /// # Arguments
     ///
@@ -3416,7 +3434,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - Required. The project in which to create the alerting policy. The format is:
     ///            projects/[PROJECT_ID_OR_NUMBER]
-    ///            Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container.
+    ///            Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. |name| must be a host project of a workspace, otherwise INVALID_ARGUMENT error will return. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container.
     pub fn alert_policies_create(&self, request: AlertPolicy, name: &str) -> ProjectAlertPolicyCreateCall<'a, C, A> {
         ProjectAlertPolicyCreateCall {
             hub: self.hub,
@@ -6322,11 +6340,14 @@ impl<'a, C, A> ServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// - `identifier_case`
     /// - `app_engine.module_id`
     /// - `cloud_endpoints.service`
-    /// - `cluster_istio.location`
-    /// - `cluster_istio.cluster_name`
-    /// - `cluster_istio.service_namespace`
-    /// - `cluster_istio.service_name`
-    /// identifier_case refers to which option in the identifier oneof is populated. For example, the filter identifier_case = "CUSTOM" would match all services with a value for the custom field. Valid options are "CUSTOM", "APP_ENGINE", "CLOUD_ENDPOINTS", and "CLUSTER_ISTIO".
+    /// - `mesh_istio.mesh_uid`
+    /// - `mesh_istio.service_namespace`
+    /// - `mesh_istio.service_name`
+    /// - `cluster_istio.location` (deprecated)
+    /// - `cluster_istio.cluster_name` (deprecated)
+    /// - `cluster_istio.service_namespace` (deprecated)
+    /// - `cluster_istio.service_name` (deprecated)
+    /// identifier_case refers to which option in the identifier oneof is populated. For example, the filter identifier_case = "CUSTOM" would match all services with a value for the custom field. Valid options are "CUSTOM", "APP_ENGINE", "CLOUD_ENDPOINTS", "MESH_ISTIO", and "CLUSTER_ISTIO" (deprecated),
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ServiceListCall<'a, C, A> {
@@ -10066,7 +10087,7 @@ impl<'a, C, A> ProjectMonitoredResourceDescriptorListCall<'a, C, A> where C: Bor
 }
 
 
-/// Queries time series using the time series query language. This method does not require a Workspace.
+/// Queries time series using Monitoring Query Language. This method does not require a Workspace.
 ///
 /// A builder for the *timeSeries.query* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11270,7 +11291,7 @@ impl<'a, C, A> ProjectTimeSeryListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Lists the existing alerting policies for the project.
+/// Lists the existing alerting policies for the workspace.
 ///
 /// A builder for the *alertPolicies.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -15152,7 +15173,7 @@ impl<'a, C, A> ProjectAlertPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::
     }
     /// Required. The project in which to create the alerting policy. The format is:
     /// projects/[PROJECT_ID_OR_NUMBER]
-    /// Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container.
+    /// Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. |name| must be a host project of a workspace, otherwise INVALID_ARGUMENT error will return. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container.
     ///
     /// Sets the *name* path property to the given value.
     ///

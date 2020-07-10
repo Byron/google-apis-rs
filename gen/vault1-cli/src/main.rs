@@ -2970,7 +2970,7 @@ fn main() {
                   vec![
                     (Some(r##"matter-id"##),
                      None,
-                     Some(r##"The matter id of the parent matter for which the saved query is to be
+                     Some(r##"The matter ID of the parent matter for which the saved query is to be
         created."##),
                      Some(true),
                      Some(false)),
@@ -2999,14 +2999,14 @@ fn main() {
                   vec![
                     (Some(r##"matter-id"##),
                      None,
-                     Some(r##"The matter id of the parent matter for which the saved query is to be
+                     Some(r##"The matter ID of the parent matter for which the saved query is to be
         deleted."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"saved-query-id"##),
                      None,
-                     Some(r##"Id of the saved query to be deleted."##),
+                     Some(r##"ID of the saved query to be deleted."##),
                      Some(true),
                      Some(false)),
         
@@ -3028,14 +3028,14 @@ fn main() {
                   vec![
                     (Some(r##"matter-id"##),
                      None,
-                     Some(r##"The matter id of the parent matter for which the saved query is to be
+                     Some(r##"The matter ID of the parent matter for which the saved query is to be
         retrieved."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"saved-query-id"##),
                      None,
-                     Some(r##"Id of the saved query to be retrieved."##),
+                     Some(r##"ID of the saved query to be retrieved."##),
                      Some(true),
                      Some(false)),
         
@@ -3058,7 +3058,7 @@ fn main() {
                   vec![
                     (Some(r##"matter-id"##),
                      None,
-                     Some(r##"The matter id of the parent matter for which the saved queries are to be
+                     Some(r##"The matter ID of the parent matter for which the saved queries are to be
         retrieved."##),
                      Some(true),
                      Some(false)),
@@ -3106,7 +3106,7 @@ fn main() {
             ("update",
                     Some(r##"Updates the specified matter.
         This updates only the name and description of the matter, identified by
-        matter id. Changes to any other fields are ignored.
+        matter ID. Changes to any other fields are ignored.
         Returns the default view of the matter."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_update",
                   vec![
@@ -3168,7 +3168,7 @@ fn main() {
     
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200330")
+           .version("1.0.14+20200623")
            .about("Archiving and eDiscovery for G Suite.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")

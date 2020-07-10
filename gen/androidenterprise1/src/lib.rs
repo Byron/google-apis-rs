@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *1.0.13+20200325*, where *20200325* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Android Enterprise* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -40,7 +40,7 @@
 //! * storelayoutpages
 //!  * [*delete*](struct.StorelayoutpageDeleteCall.html), [*get*](struct.StorelayoutpageGetCall.html), [*insert*](struct.StorelayoutpageInsertCall.html), [*list*](struct.StorelayoutpageListCall.html) and [*update*](struct.StorelayoutpageUpdateCall.html)
 //! * [users](struct.User.html)
-//!  * [*delete*](struct.UserDeleteCall.html), [*generate authentication token*](struct.UserGenerateAuthenticationTokenCall.html), [*generate token*](struct.UserGenerateTokenCall.html), [*get*](struct.UserGetCall.html), [*get available product set*](struct.UserGetAvailableProductSetCall.html), [*insert*](struct.UserInsertCall.html), [*list*](struct.UserListCall.html), [*revoke device access*](struct.UserRevokeDeviceAccesCall.html), [*revoke token*](struct.UserRevokeTokenCall.html), [*set available product set*](struct.UserSetAvailableProductSetCall.html) and [*update*](struct.UserUpdateCall.html)
+//!  * [*delete*](struct.UserDeleteCall.html), [*generate authentication token*](struct.UserGenerateAuthenticationTokenCall.html), [*get*](struct.UserGetCall.html), [*get available product set*](struct.UserGetAvailableProductSetCall.html), [*insert*](struct.UserInsertCall.html), [*list*](struct.UserListCall.html), [*revoke device access*](struct.UserRevokeDeviceAccesCall.html), [*set available product set*](struct.UserSetAvailableProductSetCall.html) and [*update*](struct.UserUpdateCall.html)
 //! * webapps
 //!  * [*delete*](struct.WebappDeleteCall.html), [*get*](struct.WebappGetCall.html), [*insert*](struct.WebappInsertCall.html), [*list*](struct.WebappListCall.html) and [*update*](struct.WebappUpdateCall.html)
 //! 
@@ -362,8 +362,8 @@ impl<'a, C, A> AndroidEnterprise<C, A>
         AndroidEnterprise {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/androidenterprise/v1/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -418,7 +418,7 @@ impl<'a, C, A> AndroidEnterprise<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -426,7 +426,7 @@ impl<'a, C, A> AndroidEnterprise<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/androidenterprise/v1/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -461,10 +461,12 @@ pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
     /// The type of the value being provided.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The list of string values - this will only be present if type is multiselect.
+    /// The list of string values - this will only be present if type is
+    /// multiselect.
     #[serde(rename="valueMultiselect")]
     pub value_multiselect: Option<Vec<String>>,
-    /// The string value - this will be present for types string, choice and hidden.
+    /// The string value - this will be present for types string, choice and
+    /// hidden.
     #[serde(rename="valueString")]
     pub value_string: Option<String>,
 }
@@ -472,17 +474,35 @@ pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
 impl Part for AppRestrictionsSchemaRestrictionRestrictionValue {}
 
 
-/// The existence of an Installs resource indicates that an app is installed on a particular device (or that an install is pending).
+/// The existence of an Installs resource indicates that an app is
+/// installed on a particular device (or that an install is pending).
 /// 
-/// The API can be used to create an install resource using the update method. This triggers the actual install of the app on the device. If the user does not already have an entitlement for the app, then an attempt is made to create one. If this fails (for example, because the app is not free and there is no available license), then the creation of the install fails.
+/// The API can be used to create an install resource using the
+/// <a class="method-link" method="androidenterprise.installs.update">update</a>
+/// method. This triggers the actual install of the app on the device. If the
+/// user does not already have an entitlement for the app, then an attempt is
+/// made to create one. If this fails (for example, because the app is not free
+/// and there is no available license), then the creation of the install fails.
 /// 
-/// The API can also be used to update an installed app. If the update method is used on an existing install, then the app will be updated to the latest available version.
+/// The API can also be used to update an installed app. If
+/// the&nbsp;<a class="method-link" method="androidenterprise.installs.update"
+/// style="font-style: normal; font-size: 14px; font-family: Roboto, sans-serif;
+/// line-height: 22.3999996185303px;">update</a>&nbsp;method is
+/// used on an existing install, then the app will be updated to the latest
+/// available version.
 /// 
-/// Note that it is not possible to force the installation of a specific version of an app: the version code is read-only.
+/// Note that it is not possible to force the installation of a specific version
+/// of an app: the version code is read-only.
 /// 
-/// If a user installs an app themselves (as permitted by the enterprise), then again an install resource and possibly an entitlement resource are automatically created.
+/// If a user installs an app themselves (as permitted by the enterprise), then
+/// again an install resource and possibly an entitlement resource are
+/// automatically created.
 /// 
-/// The API can also be used to delete an install resource, which triggers the removal of the app from the device. Note that deleting an install does not automatically remove the corresponding entitlement, even if there are no remaining installs. The install resource will also be deleted if the user uninstalls the app themselves.
+/// The API can also be used to delete an install resource, which triggers the
+/// removal of the app from the device. Note that deleting an install does not
+/// automatically remove the corresponding entitlement, even if there are no
+/// remaining installs. The install resource will also be deleted if the user
+/// uninstalls the app themselves.
 /// 
 /// # Activities
 /// 
@@ -496,15 +516,18 @@ impl Part for AppRestrictionsSchemaRestrictionRestrictionValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Install {
-    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
+    /// Install state. The state <code>&quot;installPending&quot;</code>
+    /// means that an install request has recently been made and download to the
+    /// device is in progress. The state <code>&quot;installed&quot;</code>
+    /// means that the app has been installed. This field is read-only.
     #[serde(rename="installState")]
     pub install_state: Option<String>,
-    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
+    /// The version of the installed product. Guaranteed to be set only if the
+    /// install state is <code>&quot;installed&quot;</code>.
     #[serde(rename="versionCode")]
     pub version_code: Option<i32>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The ID of the product that the install is for. For example, "app:com.google.android.gm".
+    /// The ID of the product that the install is for. For example,
+    /// <code>&quot;app:com.google.android.gm&quot;</code>.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -514,15 +537,31 @@ impl Resource for Install {}
 impl ResponseResult for Install {}
 
 
-/// The presence of an Entitlements resource indicates that a user has the right to use a particular app. Entitlements are user specific, not device specific. This allows a user with an entitlement to an app to install the app on all their devices. It's also possible for a user to hold an entitlement to an app without installing the app on any device.
+/// The presence of an Entitlements resource indicates that a user has the right
+/// to use a particular app. Entitlements are user specific, not device specific.
+/// This allows a user with an entitlement to an app to install the app on all
+/// their devices. It's also possible for a user to hold an entitlement to an app
+/// without installing the app on any device.
 /// 
-/// The API can be used to create an entitlement. As an option, you can also use the API to trigger the installation of an app on all a user's managed devices at the same time the entitlement is created.
+/// The API can be used to create an entitlement. As an option, you can also use
+/// the API to trigger the installation of an app on all a user's managed devices
+/// at the same time the entitlement is created.
 /// 
-/// If the app is free, creating the entitlement also creates a group license for that app. For paid apps, creating the entitlement consumes one license, and that license remains consumed until the entitlement is removed. If the enterprise hasn't purchased enough licenses, then no entitlement is created and the installation fails. An entitlement is also not created for an app if the app requires permissions that the enterprise hasn't accepted.
+/// If the app is free, creating the entitlement also creates a group license
+/// for that app. For paid apps, creating the entitlement consumes one license,
+/// and that license remains consumed until the entitlement is removed. If the
+/// enterprise hasn't purchased enough licenses, then no entitlement is created
+/// and the installation fails. An entitlement is also not created for an app if
+/// the app requires permissions that the enterprise hasn't accepted.
 /// 
-/// If an entitlement is deleted, the app may be uninstalled from a user's device. As a best practice, uninstall the app by calling  Installs.delete() before deleting the entitlement.
+/// If an entitlement is deleted, the app may be uninstalled from a user's
+/// device. As a best practice, uninstall the app by calling
+/// <a class="method-link" method="androidenterprise.installs.delete">
+/// Installs.delete()</a> before deleting the entitlement.
 /// 
-/// Entitlements for apps that a user pays for on an unmanaged profile have "userPurchase" as the entitlement reason. These entitlements cannot be removed via the API.
+/// Entitlements for apps that a user pays for on an unmanaged profile have
+/// <code class="">"userPurchase"</code> as the entitlement reason. These
+/// entitlements cannot be removed via the API.
 /// 
 /// # Activities
 /// 
@@ -536,11 +575,12 @@ impl ResponseResult for Install {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Entitlement {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The reason for the entitlement. For example, "free" for free apps. This property is temporary: it will be replaced by the acquisition kind field of group licenses.
+    /// The reason for the entitlement. For example, <code class="">"free"</code>
+    /// for free apps. This property is temporary: it will be replaced by the <code
+    /// class="">acquisition kind</code> field of group licenses.
     pub reason: Option<String>,
-    /// The ID of the product that the entitlement is for. For example, "app:com.google.android.gm".
+    /// The ID of the product that the entitlement is for. For example,
+    /// <code>&quot;app:com.google.android.gm&quot;</code>.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -550,7 +590,7 @@ impl Resource for Entitlement {}
 impl ResponseResult for Entitlement {}
 
 
-/// The managed configuration resources for the user.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -561,8 +601,6 @@ impl ResponseResult for Entitlement {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedConfigurationsForUserListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#managedConfigurationsForUserListResponse".
-    pub kind: Option<String>,
     /// A managed configuration for an app for a specific user.
     #[serde(rename="managedConfigurationForUser")]
     pub managed_configuration_for_user: Option<Vec<ManagedConfiguration>>,
@@ -571,7 +609,7 @@ pub struct ManagedConfigurationsForUserListResponse {
 impl ResponseResult for ManagedConfigurationsForUserListResponse {}
 
 
-/// The install resources for the device.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -582,9 +620,9 @@ impl ResponseResult for ManagedConfigurationsForUserListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstallsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#installsListResponse".
-    pub kind: Option<String>,
-    /// An installation of an app for a user on a specific device. The existence of an install implies that the user must have an entitlement to the app.
+    /// An installation of an app for a user on a specific device.
+    /// The existence of an install implies that the user must have an
+    /// entitlement to the app.
     pub install: Option<Vec<Install>>,
 }
 
@@ -603,15 +641,29 @@ impl ResponseResult for InstallsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductSet {
-    /// Additional list of product IDs making up the product set. Unlike the productID array, in this list It's possible to specify which tracks (alpha, beta, production) of a product are visible to the user. See ProductVisibility and its fields for more information. Specifying the same product ID both here and in the productId array is not allowed and it will result in an error.
+    /// Additional list of product IDs making up the product set.
+    /// Unlike the productID array, in this list It's possible to specify
+    /// which tracks (alpha, beta, production) of a product are visible to the
+    /// user. See ProductVisibility and its fields for more information. Specifying
+    /// the same product ID both here and in the productId array is not allowed and
+    /// it will result in an error.
     #[serde(rename="productVisibility")]
     pub product_visibility: Option<Vec<ProductVisibility>>,
-    /// no description provided
-    pub kind: Option<String>,
     /// The list of product IDs making up the set of products.
     #[serde(rename="productId")]
     pub product_id: Option<Vec<String>>,
-    /// The interpretation of this product set. "unknown" should never be sent and is ignored if received. "whitelist" means that the user is entitled to access the product set. "includeAll" means that all products are accessible, including products that are approved, products with revoked approval, and products that have never been approved. "allApproved" means that the user is entitled to access all products that are approved for the enterprise. If the value is "allApproved" or "includeAll", the productId field is ignored. If no value is provided, it is interpreted as "whitelist" for backwards compatibility. Further "allApproved" or "includeAll" does not enable automatic visibility of "alpha" or "beta" tracks for Android app. Use ProductVisibility to enable "alpha" or "beta" tracks per user.
+    /// The interpretation of this product set. "unknown" should never be sent and
+    /// is ignored if received. "whitelist" means that the user is entitled to
+    /// access the product set. "includeAll" means that all products are
+    /// accessible, including products that are approved, products with revoked
+    /// approval, and products that have never been approved. "allApproved" means
+    /// that the user is entitled to access all products that are approved for the
+    /// enterprise. If the value is "allApproved" or "includeAll", the productId
+    /// field is ignored. If no value is provided, it is interpreted as
+    /// "whitelist" for backwards compatibility.
+    /// Further "allApproved" or "includeAll" does not enable automatic
+    /// visibility of "alpha" or "beta" tracks for Android app. Use
+    /// ProductVisibility to enable "alpha" or "beta" tracks per user.
     #[serde(rename="productSetBehavior")]
     pub product_set_behavior: Option<String>,
 }
@@ -626,20 +678,24 @@ impl ResponseResult for ProductSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewDeviceEvent {
-    /// The ID of the user. This field will always be present.
+    /// The ID of the user.
+    /// This field will always be present.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
-    /// The Android ID of the device. This field will always be present.
+    /// The Android ID of the device.
+    /// This field will always be present.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
     /// Policy app on the device.
     #[serde(rename="dpcPackageName")]
     pub dpc_package_name: Option<String>,
-    /// Identifies the extent to which the device is controlled by an Android EMM in various deployment configurations.
-    /// 
-    /// Possible values include: 
-    /// - "managedDevice", a device where the DPC is set as device owner, 
-    /// - "managedProfile", a device where the DPC is set as profile owner.
+    /// Identifies the extent to which the device is controlled by an Android
+    /// EMM in various deployment configurations. <br><br>
+    /// Possible values include:
+    /// <ul><li>"<code>managedDevice</code>", a device where the DPC is set as
+    /// device owner,</li>
+    /// <li>"<code>managedProfile</code>", a device where the DPC is set as profile
+    /// owner.</li></ul>
     #[serde(rename="managementType")]
     pub management_type: Option<String>,
 }
@@ -647,7 +703,9 @@ pub struct NewDeviceEvent {
 impl Part for NewDeviceEvent {}
 
 
-/// A WebApps resource represents a web app created for an enterprise. Web apps are published to managed Google Play and can be distributed like other Android apps. On a user's device, a web app opens its specified URL.
+/// A WebApps resource represents a web app created for an enterprise. Web apps
+/// are published to managed Google Play and can be distributed like other
+/// Android apps. On a user's device, a web app opens its specified URL.
 /// 
 /// # Activities
 /// 
@@ -660,31 +718,45 @@ impl Part for NewDeviceEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebApp {
-    /// The ID of the application. A string of the form "app:<package name>" where the package name always starts with the prefix "com.google.enterprise.webapp." followed by a random id.
+    /// The ID of the application.  A string of the form
+    /// <code>&quot;app:&lt;package name&gt;&quot;</code> where the package name
+    /// always starts with the prefix
+    /// <code>&quot;com.google.enterprise.webapp.&quot;</code> followed by a
+    /// random id.
     #[serde(rename="webAppId")]
     pub web_app_id: Option<String>,
-    /// A list of icons representing this website. If absent, a default icon (for create) or the current icon (for update) will be used.
+    /// A list of icons representing this website. If absent, a default icon (for
+    /// create) or the current icon (for update) will be used.
     pub icons: Option<Vec<WebAppIcon>>,
     /// The current version of the app.
     /// 
-    /// 
-    /// Note that the version can automatically increase during the lifetime of the web app, while Google does internal housekeeping to keep the web app up-to-date.
+    /// <p>Note that the version can automatically increase during the lifetime of
+    /// the web app, while Google does internal housekeeping to keep the web app
+    /// up-to-date.
     #[serde(rename="versionCode")]
     pub version_code: Option<String>,
-    /// The title of the web app as displayed to the user (e.g., amongst a list of other applications, or as a label for an icon).
+    /// The title of the web app as displayed to the user (e.g., amongst a list of
+    /// other applications, or as a label for an icon).
     pub title: Option<String>,
-    /// The display mode of the web app.
-    /// 
-    /// Possible values include: 
-    /// - "minimalUi", the device's status bar, navigation bar, the app's URL, and a refresh button are visible when the app is open. For HTTP URLs, you can only select this option.
-    /// - "standalone", the device's status bar and navigation bar are visible when the app is open.
-    /// - "fullScreen", the app opens in full screen mode, hiding the device's status and navigation bars. All browser UI elements, page URL, system status bar and back button are not visible, and the web app takes up the entirety of the available display area.
+    /// The display mode of the web app. <br><br>
+    /// Possible values include:
+    /// <ul><li>"<code>minimalUi</code>", the device's status bar, navigation bar,
+    /// the app's URL, and a refresh button are visible when the app is open. For
+    /// HTTP URLs, you can only select this option.
+    /// <li>"<code>standalone</code>", the device's status bar and navigation
+    /// bar are visible when the app is open.
+    /// <li>"<code>fullScreen</code>", the app opens in full screen mode, hiding
+    /// the device's status and navigation bars.  All browser UI elements, page
+    /// URL, system status bar and back button are not visible, and the web app
+    /// takes up the entirety of the available display area.
+    /// </ul>
     #[serde(rename="displayMode")]
     pub display_mode: Option<String>,
     /// A flag whether the app has been published to the Play store yet.
     #[serde(rename="isPublished")]
     pub is_published: Option<bool>,
-    /// The start URL, i.e. the URL that should load when the user opens the application.
+    /// The start URL, i.e. the URL that should load when the user opens the
+    /// application.
     #[serde(rename="startUrl")]
     pub start_url: Option<String>,
 }
@@ -707,7 +779,9 @@ pub struct AdministratorWebTokenSpecPrivateApps {
 impl Part for AdministratorWebTokenSpecPrivateApps {}
 
 
-/// Specification for a token used to generate iframes. The token specifies what data the admin is allowed to modify and the URI the iframe is allowed to communiate with.
+/// Specification for a token used to generate iframes. The token specifies
+/// what data the admin is allowed to modify and the URI the iframe is
+/// allowed to communiate with.
 /// 
 /// # Activities
 /// 
@@ -721,30 +795,31 @@ pub struct AdministratorWebTokenSpec {
     /// Options for displaying the Organize apps page.
     #[serde(rename="storeBuilder")]
     pub store_builder: Option<AdministratorWebTokenSpecStoreBuilder>,
-    /// no description provided
-    pub kind: Option<String>,
+    /// Options for displaying the Managed Configuration page.
+    #[serde(rename="managedConfigurations")]
+    pub managed_configurations: Option<AdministratorWebTokenSpecManagedConfigurations>,
     /// Options for displaying the managed Play Search apps page.
     #[serde(rename="playSearch")]
     pub play_search: Option<AdministratorWebTokenSpecPlaySearch>,
-    /// The URI of the parent frame hosting the iframe. To prevent XSS, the iframe may not be hosted at other URIs. This URI must be https. Use whitespaces to separate multiple parent URIs.
+    /// The URI of the parent frame hosting the iframe. To prevent XSS, the iframe
+    /// may not be hosted at other URIs. This URI must be https.
+    /// Use whitespaces to separate multiple parent URIs.
     pub parent: Option<String>,
     /// Options for displaying the Private Apps page.
     #[serde(rename="privateApps")]
     pub private_apps: Option<AdministratorWebTokenSpecPrivateApps>,
-    /// Deprecated. Use PlaySearch.approveApps.
+    /// Deprecated. Use <code>PlaySearch.approveApps</code>.
     pub permission: Option<Vec<String>>,
     /// Options for displaying the Web Apps page.
     #[serde(rename="webApps")]
     pub web_apps: Option<AdministratorWebTokenSpecWebApps>,
-    /// Options for displaying the Managed Configuration page.
-    #[serde(rename="managedConfigurations")]
-    pub managed_configurations: Option<AdministratorWebTokenSpecManagedConfigurations>,
 }
 
 impl RequestValue for AdministratorWebTokenSpec {}
 
 
-/// The state of a user's device, as accessed by the getState and setState methods on device resources.
+/// The state of a user's device, as accessed by the getState and setState
+/// methods on device resources.
 /// 
 /// # Activities
 /// 
@@ -756,9 +831,10 @@ impl RequestValue for AdministratorWebTokenSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceState {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.
+    /// The state of the Google account on the device. "enabled" indicates that
+    /// the Google account on the device can be used to access Google services
+    /// (including Google Play), while "disabled" means that it cannot.
+    /// A new device is initially in the "disabled" state.
     #[serde(rename="accountState")]
     pub account_state: Option<String>,
 }
@@ -767,15 +843,17 @@ impl RequestValue for DeviceState {}
 impl ResponseResult for DeviceState {}
 
 
-/// A managed configurations settings resource contains the set of managed properties that have been configured for an Android app to be applied to a set of users. The app's developer would have defined configurable properties in the managed configurations schema.
+/// A managed configurations settings resource contains the set of
+/// managed properties that have been configured for an Android app to be applied
+/// to a set of users. The app's developer would have
+/// defined configurable properties in the managed configurations schema.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedConfigurationsSettings {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The last updated time of the managed configuration settings in milliseconds since 1970-01-01T00:00:00Z.
+    /// The last updated time of the managed configuration settings in
+    /// milliseconds since 1970-01-01T00:00:00Z.
     #[serde(rename="lastUpdatedTimestampMillis")]
     pub last_updated_timestamp_millis: Option<String>,
     /// The name of the managed configurations settings.
@@ -788,9 +866,12 @@ pub struct ManagedConfigurationsSettings {
 impl Part for ManagedConfigurationsSettings {}
 
 
-/// A product permissions resource represents the set of permissions required by a specific app and whether or not they have been accepted by an enterprise admin.
+/// A product permissions resource represents the set of permissions
+/// required by a specific app and whether or not they have been accepted
+/// by an enterprise admin.
 /// 
-/// The API can be used to read the set of permissions, and also to update the set to indicate that permissions have been accepted.
+/// The API can be used to read the set of permissions, and also to update
+/// the set to indicate that permissions have been accepted.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -806,16 +887,20 @@ pub struct ProductPermission {
 impl Part for ProductPermission {}
 
 
-/// Maintenance window for managed Google Play Accounts. This allows Play store to update the apps on the foreground in the designated window.
+/// Maintenance window for managed Google Play Accounts.
+/// This allows Play store to update the apps on the foreground in the designated
+/// window.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MaintenanceWindow {
-    /// Start time of the maintenance window, in milliseconds after midnight on the device. Windows can span midnight.
+    /// Start time of the maintenance window, in milliseconds after midnight on the
+    /// device. Windows can span midnight.
     #[serde(rename="startTimeAfterMidnightMs")]
     pub start_time_after_midnight_ms: Option<String>,
-    /// Duration of the maintenance window, in milliseconds. The duration must be between 30 minutes and 24 hours (inclusive).
+    /// Duration of the maintenance window, in milliseconds. The duration must be
+    /// between 30 minutes and 24 hours (inclusive).
     #[serde(rename="durationMs")]
     pub duration_ms: Option<String>,
 }
@@ -844,7 +929,8 @@ pub struct Notification {
     /// Notifications about an app installation failure.
     #[serde(rename="installFailureEvent")]
     pub install_failure_event: Option<InstallFailureEvent>,
-    /// The ID of the enterprise for which the notification is sent. This will always be present.
+    /// The ID of the enterprise for which the notification is sent.
+    /// This will always be present.
     #[serde(rename="enterpriseId")]
     pub enterprise_id: Option<String>,
     /// Notifications about product availability changes.
@@ -859,7 +945,9 @@ pub struct Notification {
     /// Notifications about app updates.
     #[serde(rename="appUpdateEvent")]
     pub app_update_event: Option<AppUpdateEvent>,
-    /// The time when the notification was published in milliseconds since 1970-01-01T00:00:00Z. This will always be present.
+    /// The time when the notification was published in
+    /// milliseconds since 1970-01-01T00:00:00Z.
+    /// This will always be present.
     #[serde(rename="timestampMillis")]
     pub timestamp_millis: Option<String>,
 }
@@ -873,10 +961,13 @@ impl Part for Notification {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebAppIcon {
-    /// The actual bytes of the image in a base64url encoded string (c.f. RFC4648, section 5 "Base 64 Encoding with URL and Filename Safe Alphabet").  
-    /// - The image type can be png or jpg.
-    /// - The image should ideally be square.
-    /// - The image should ideally have a size of 512x512.
+    /// The actual bytes of the image in a base64url encoded string (c.f. RFC4648,
+    /// section 5 "Base 64 Encoding with URL and Filename Safe Alphabet").
+    /// <ul>
+    /// <li>The image type can be png or jpg.
+    /// <li>The image should ideally be square.
+    /// <li>The image should ideally have a size of 512x512.
+    /// </ul>
     #[serde(rename="imageData")]
     pub image_data: Option<String>,
 }
@@ -890,10 +981,12 @@ impl Part for WebAppIcon {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductAvailabilityChangeEvent {
-    /// The new state of the product. This field will always be present.
+    /// The new state of the product.
+    /// This field will always be present.
     #[serde(rename="availabilityStatus")]
     pub availability_status: Option<String>,
-    /// The id of the product (e.g. "app:com.google.android.gm") for which the product availability changed. This field will always be present.
+    /// The id of the product (e.g. "app:com.google.android.gm") for which the
+    /// product availability changed. This field will always be present.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -907,7 +1000,9 @@ impl Part for ProductAvailabilityChangeEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductSigningCertificate {
-    /// The base64 urlsafe encoded SHA1 hash of the certificate. (This field is deprecated in favor of SHA2-256. It should not be used and may be removed at any time.)
+    /// The base64 urlsafe encoded SHA1 hash of the certificate. (This field is
+    /// deprecated in favor of SHA2-256. It should not be used and may be
+    /// removed at any time.)
     #[serde(rename="certificateHashSha1")]
     pub certificate_hash_sha1: Option<String>,
     /// The base64 urlsafe encoded SHA2-256 hash of the certificate.
@@ -929,7 +1024,16 @@ impl Part for ProductSigningCertificate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductsGenerateApprovalUrlResponse {
-    /// A URL that can be rendered in an iframe to display the permissions (if any) of a product. This URL can be used to approve the product only once and only within 24 hours of being generated, using the Products.approve call. If the product is currently unapproved and has no permissions, this URL will point to an empty page. If the product is currently approved, a URL will only be generated if that product has added permissions since it was last approved, and the URL will only display those new permissions that have not yet been accepted.
+    /// A URL that can be rendered in an iframe to display the permissions (if
+    /// any) of a product.
+    /// This URL can be used to approve the product only once and only within 24
+    /// hours of being generated, using the <code>Products.approve</code> call.
+    /// If the product is currently unapproved and has no permissions, this
+    /// URL will point to an empty page.
+    /// If the product is currently approved, a URL will only be generated if
+    /// that product has added permissions since it was last approved, and the
+    /// URL will only display those new permissions that have not yet been
+    /// accepted.
     pub url: Option<String>,
 }
 
@@ -951,7 +1055,8 @@ pub struct LocalizedText {
 impl Part for LocalizedText {}
 
 
-/// A Devices resource represents a mobile device managed by the EMM and belonging to a specific enterprise user.
+/// A Devices resource represents a mobile device managed by the EMM and
+/// belonging to a specific enterprise user.
 /// 
 /// # Activities
 /// 
@@ -971,18 +1076,24 @@ pub struct Device {
     pub policy: Option<Policy>,
     /// The device report updated with the latest app states.
     pub report: Option<DeviceReport>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The Google Play Services Android ID for the device encoded as a lowercase hex string. For example, "123456789abcdef0".
+    /// The Google Play Services Android ID for the device encoded as
+    /// a lowercase hex string. For example,
+    /// <code>&quot;123456789abcdef0&quot;</code>.
     #[serde(rename="androidId")]
     pub android_id: Option<String>,
-    /// Identifies the extent to which the device is controlled by a managed Google Play EMM in various deployment configurations.
-    /// 
-    /// Possible values include: 
-    /// - "managedDevice", a device that has the EMM's device policy controller (DPC) as the device owner. 
-    /// - "managedProfile", a device that has a profile managed by the DPC (DPC is profile owner) in addition to a separate, personal profile that is unavailable to the DPC. 
-    /// - "containerApp", no longer used (deprecated). 
-    /// - "unmanagedProfile", a device that has been allowed (by the domain's admin, using the Admin Console to enable the privilege) to use managed Google Play, but the profile is itself not owned by a DPC.
+    /// Identifies the extent to which the device is controlled by a managed
+    /// Google Play EMM in various deployment configurations. <br><br>
+    /// Possible values include:
+    /// <ul><li>"<code>managedDevice</code>", a device that has the EMM's device
+    /// policy controller (DPC) as the device owner.</li>
+    /// <li>"<code>managedProfile</code>", a device that has a profile managed
+    /// by the DPC (DPC is profile owner) in addition to a separate, personal
+    /// profile that is unavailable to the DPC.</li>
+    /// <li>"<code>containerApp</code>", no longer used (deprecated).</li>
+    /// <li>"<code>unmanagedProfile</code>", a device that has been allowed (by the
+    /// domain's admin, using the Admin Console to enable the privilege) to use
+    /// managed Google Play, but the profile is itself
+    /// not owned by a DPC.</li></ul>
     #[serde(rename="managementType")]
     pub management_type: Option<String>,
 }
@@ -992,7 +1103,10 @@ impl Resource for Device {}
 impl ResponseResult for Device {}
 
 
-/// A variable set is a key-value pair of EMM-provided placeholders and its corresponding value, which is attributed to a user. For example, $FIRSTNAME could be a placeholder, and its value could be Alice. Placeholders should start with a '$' sign and should be alphanumeric only.
+/// A variable set is a key-value pair of EMM-provided placeholders and
+/// its corresponding value, which is attributed to a user. For example,
+/// $FIRSTNAME could be a placeholder, and its value could be Alice. Placeholders
+/// should start with a '$' sign and should be alphanumeric only.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1001,8 +1115,6 @@ pub struct VariableSet {
     /// The value of the placeholder, specific to the user.
     #[serde(rename="userValue")]
     pub user_value: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
     /// The placeholder string; defined by EMM.
     pub placeholder: Option<String>,
 }
@@ -1021,7 +1133,8 @@ impl Part for VariableSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnterprisesSendTestPushNotificationResponse {
-    /// The name of the Cloud Pub/Sub topic to which notifications for this enterprise's enrolled account will be sent.
+    /// The name of the Cloud Pub/Sub topic to which notifications for this
+    /// enterprise's enrolled account will be sent.
     #[serde(rename="topicName")]
     pub topic_name: Option<String>,
     /// The message ID of the test push notification that was sent.
@@ -1032,28 +1145,40 @@ pub struct EnterprisesSendTestPushNotificationResponse {
 impl ResponseResult for EnterprisesSendTestPushNotificationResponse {}
 
 
-/// A restriction in the App Restriction Schema represents a piece of configuration that may be pre-applied.
+/// A restriction in the App Restriction Schema represents a piece of
+/// configuration that may be pre-applied.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppRestrictionsSchemaRestriction {
-    /// A longer description of the restriction, giving more detail of what it affects.
+    /// A longer description of the restriction, giving more detail of what it
+    /// affects.
     pub description: Option<String>,
     /// The name of the restriction.
     pub title: Option<String>,
-    /// The default value of the restriction. bundle and bundleArray restrictions never have a default value.
+    /// The default value of the restriction. <code>bundle</code> and
+    /// <code>bundleArray</code> restrictions never have a default value.
     #[serde(rename="defaultValue")]
     pub default_value: Option<AppRestrictionsSchemaRestrictionRestrictionValue>,
-    /// For bundle or bundleArray restrictions, the list of nested restrictions. A bundle restriction is always nested within a bundleArray restriction, and a bundleArray restriction is at most two levels deep.
+    /// For <code>bundle</code> or <code>bundleArray</code> restrictions, the list
+    /// of nested restrictions. A <code>bundle</code> restriction is always nested
+    /// within a <code>bundleArray</code> restriction, and a
+    /// <code>bundleArray</code> restriction is at most two levels deep.
     #[serde(rename="nestedRestriction")]
     pub nested_restriction: Option<Vec<AppRestrictionsSchemaRestriction>>,
-    /// For choice or multiselect restrictions, the list of possible entries' machine-readable values. These values should be used in the configuration, either as a single string value for a choice restriction or in a stringArray for a multiselect restriction.
+    /// For <code>choice</code> or <code>multiselect</code> restrictions, the list
+    /// of possible entries' machine-readable values. These values should be used
+    /// in the configuration, either as a single <code>string</code> value for a
+    /// <code>choice</code> restriction or in a <code>stringArray</code> for a
+    /// <code>multiselect</code> restriction.
     #[serde(rename="entryValue")]
     pub entry_value: Option<Vec<String>>,
-    /// The unique key that the product uses to identify the restriction, e.g. "com.google.android.gm.fieldname".
+    /// The unique key that the product uses to identify the restriction,
+    /// e.g. "com.google.android.gm.fieldname".
     pub key: Option<String>,
-    /// For choice or multiselect restrictions, the list of possible entries' human-readable names.
+    /// For <code>choice</code> or <code>multiselect</code> restrictions, the list
+    /// of possible entries' human-readable names.
     pub entry: Option<Vec<String>>,
     /// The type of the restriction.
     #[serde(rename="restrictionType")]
@@ -1063,7 +1188,7 @@ pub struct AppRestrictionsSchemaRestriction {
 impl Part for AppRestrictionsSchemaRestriction {}
 
 
-/// The store page resources for the enterprise.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1076,8 +1201,6 @@ impl Part for AppRestrictionsSchemaRestriction {}
 pub struct StoreLayoutClustersListResponse {
     /// A store cluster of an enterprise.
     pub cluster: Option<Vec<StoreCluster>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#storeLayoutClustersListResponse".
-    pub kind: Option<String>,
 }
 
 impl ResponseResult for StoreLayoutClustersListResponse {}
@@ -1089,13 +1212,19 @@ impl ResponseResult for StoreLayoutClustersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewPermissionsEvent {
-    /// The set of permissions that the enterprise admin has already approved for this application. Use Permissions.Get on the EMM API to retrieve details about these permissions.
+    /// The set of permissions that the enterprise admin has already approved for
+    /// this application.
+    /// Use Permissions.Get on the EMM API to retrieve details about these
+    /// permissions.
     #[serde(rename="approvedPermissions")]
     pub approved_permissions: Option<Vec<String>>,
-    /// The set of permissions that the app is currently requesting. Use Permissions.Get on the EMM API to retrieve details about these permissions.
+    /// The set of permissions that the app is currently requesting.
+    /// Use Permissions.Get on the EMM API to retrieve details about these
+    /// permissions.
     #[serde(rename="requestedPermissions")]
     pub requested_permissions: Option<Vec<String>>,
-    /// The id of the product (e.g. "app:com.google.android.gm") for which new permissions were added. This field will always be present.
+    /// The id of the product (e.g. "app:com.google.android.gm") for which new
+    /// permissions were added. This field will always be present.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1103,7 +1232,7 @@ pub struct NewPermissionsEvent {
 impl Part for NewPermissionsEvent {}
 
 
-/// The managed configuration resources for the device.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1114,8 +1243,6 @@ impl Part for NewPermissionsEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedConfigurationsForDeviceListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#managedConfigurationsForDeviceListResponse".
-    pub kind: Option<String>,
     /// A managed configuration for an app on a specific device.
     #[serde(rename="managedConfigurationForDevice")]
     pub managed_configuration_for_device: Option<Vec<ManagedConfiguration>>,
@@ -1124,7 +1251,8 @@ pub struct ManagedConfigurationsForDeviceListResponse {
 impl ResponseResult for ManagedConfigurationsForDeviceListResponse {}
 
 
-/// A service account that can be used to authenticate as the enterprise to API calls that require such authentication.
+/// A service account that can be used to authenticate as the enterprise to
+/// API calls that require such authentication.
 /// 
 /// # Activities
 /// 
@@ -1135,8 +1263,6 @@ impl ResponseResult for ManagedConfigurationsForDeviceListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnterpriseAccount {
-    /// no description provided
-    pub kind: Option<String>,
     /// The email address of the service account.
     #[serde(rename="accountEmail")]
     pub account_email: Option<String>,
@@ -1146,7 +1272,8 @@ impl RequestValue for EnterpriseAccount {}
 impl ResponseResult for EnterpriseAccount {}
 
 
-/// A service account identity, including the name and credentials that can be used to authenticate as the service account.
+/// A service account identity, including the name and credentials that can be
+/// used to authenticate as the service account.
 /// 
 /// # Activities
 /// 
@@ -1157,9 +1284,8 @@ impl ResponseResult for EnterpriseAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The account name of the service account, in the form of an email address. Assigned by the server.
+    /// The account name of the service account, in the form of an email address.
+    /// Assigned by the server.
     pub name: Option<String>,
     /// Credentials that can be used to authenticate as this ServiceAccount.
     pub key: Option<ServiceAccountKey>,
@@ -1168,7 +1294,7 @@ pub struct ServiceAccount {
 impl ResponseResult for ServiceAccount {}
 
 
-/// The matching products.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1179,13 +1305,12 @@ impl ResponseResult for ServiceAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductsListResponse {
-    /// Information about a product (e.g. an app) in the Google Play store, for display to an enterprise admin.
+    /// Information about a product (e.g. an app) in the Google Play store, for
+    /// display to an enterprise admin.
     pub product: Option<Vec<Product>>,
     /// Pagination information for token pagination.
     #[serde(rename="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#productsListResponse".
-    pub kind: Option<String>,
     /// General pagination information.
     #[serde(rename="pageInfo")]
     pub page_info: Option<PageInfo>,
@@ -1219,12 +1344,14 @@ impl ResponseResult for ServiceAccountKeysListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductVisibility {
-    /// Grants the user visibility to the specified product track(s), identified by trackIds.
+    /// Grants the user visibility to the specified product track(s), identified by
+    /// <code>trackIds</code>.
     #[serde(rename="trackIds")]
     pub track_ids: Option<Vec<String>>,
-    /// Deprecated. Use trackIds instead.
+    /// Deprecated. Use <code>trackIds</code> instead.
     pub tracks: Option<Vec<String>>,
-    /// The product ID to make visible to the user. Required for each item in the productVisibility list.
+    /// The product ID to make visible to the user.
+    /// Required for each item in the productVisibility list.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1232,7 +1359,9 @@ pub struct ProductVisibility {
 impl Part for ProductVisibility {}
 
 
-/// General setting for the managed Google Play store layout, currently only specifying the page to display the first time the store is opened.
+/// General setting for the managed Google Play store layout,
+/// currently only specifying the page to display the first time
+/// the store is opened.
 /// 
 /// # Activities
 /// 
@@ -1244,14 +1373,17 @@ impl Part for ProductVisibility {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StoreLayout {
-    /// The ID of the store page to be used as the homepage. The homepage is the first page shown in the managed Google Play Store.
+    /// The ID of the store page to be used as the homepage. The homepage is the
+    /// first page shown in the managed Google Play Store.
     /// 
-    /// Not specifying a homepage is equivalent to setting the store layout type to "basic".
+    /// Not specifying a homepage is equivalent to setting the store layout
+    /// type to "basic".
     #[serde(rename="homepageId")]
     pub homepage_id: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The store layout type. By default, this value is set to "basic" if the homepageId field is not set, and to "custom" otherwise. If set to "basic", the layout will consist of all approved apps that have been whitelisted for the user.
+    /// The store layout type. By default, this value is set to "basic"
+    /// if the homepageId field is not set, and to "custom" otherwise.
+    /// If set to "basic", the layout will consist of all approved apps that
+    /// have been whitelisted for the user.
     #[serde(rename="storeLayoutType")]
     pub store_layout_type: Option<String>,
 }
@@ -1260,7 +1392,7 @@ impl RequestValue for StoreLayout {}
 impl ResponseResult for StoreLayout {}
 
 
-/// The device resources for the user.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1273,14 +1405,12 @@ impl ResponseResult for StoreLayout {}
 pub struct DevicesListResponse {
     /// A managed device.
     pub device: Option<Vec<Device>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#devicesListResponse".
-    pub kind: Option<String>,
 }
 
 impl ResponseResult for DevicesListResponse {}
 
 
-/// The matching enterprise resources.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1291,8 +1421,6 @@ impl ResponseResult for DevicesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnterprisesListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
-    pub kind: Option<String>,
     /// An enterprise.
     pub enterprise: Option<Vec<Enterprise>>,
 }
@@ -1300,9 +1428,22 @@ pub struct EnterprisesListResponse {
 impl ResponseResult for EnterprisesListResponse {}
 
 
-/// An Enterprises resource represents the binding between an EMM and a specific organization. That binding can be instantiated in one of two different ways using this API as follows: 
-/// - For Google managed domain customers, the process involves using Enterprises.enroll and Enterprises.setAccount (in conjunction with artifacts obtained from the Admin console and the Google API Console) and submitted to the EMM through a more-or-less manual process. 
-/// - For managed Google Play Accounts customers, the process involves using Enterprises.generateSignupUrl and Enterprises.completeSignup in conjunction with the managed Google Play sign-up UI (Google-provided mechanism) to create the binding without manual steps. As an EMM, you can support either or both approaches in your EMM console. See Create an Enterprise for details.
+/// An Enterprises resource represents the binding between an EMM and a
+/// specific organization. That binding can be instantiated in one of two
+/// different ways using this API as follows:
+/// <ul><li>For Google managed domain customers, the process involves using
+/// <code>Enterprises.enroll</code> and <code>Enterprises.setAccount</code> (in
+/// conjunction with artifacts obtained from the Admin console and the Google
+/// API Console) and submitted to the EMM through a more-or-less manual
+/// process.</li>
+/// <li>For managed Google Play Accounts customers, the process involves using
+/// <code>Enterprises.generateSignupUrl</code> and
+/// <code>Enterprises.completeSignup</code> in conjunction with the managed
+/// Google Play sign-up UI (Google-provided mechanism) to create the binding
+/// without manual steps.</li></ul> As an EMM, you can support either or both
+/// approaches in your EMM console. See <a
+/// href="/android/work/play/emm-api/create-enterprise">Create an Enterprise</a>
+/// for details.
 /// 
 /// # Activities
 /// 
@@ -1326,15 +1467,14 @@ impl ResponseResult for EnterprisesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Enterprise {
-    /// Admins of the enterprise. This is only supported for enterprises created via the EMM-initiated flow.
+    /// Admins of the enterprise. This is only supported for enterprises
+    /// created via the EMM-initiated flow.
     pub administrator: Option<Vec<Administrator>>,
     /// The enterprise's primary domain, such as "example.com".
     #[serde(rename="primaryDomain")]
     pub primary_domain: Option<String>,
     /// The unique ID for the enterprise.
     pub id: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
     /// The name of the enterprise, for example, "Example, Inc".
     pub name: Option<String>,
 }
@@ -1350,19 +1490,23 @@ impl ResponseResult for Enterprise {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstallFailureEvent {
-    /// The reason for the installation failure. This field will always be present.
+    /// The reason for the installation failure.
+    /// This field will always be present.
     #[serde(rename="failureReason")]
     pub failure_reason: Option<String>,
-    /// The ID of the user. This field will always be present.
+    /// The ID of the user.
+    /// This field will always be present.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
-    /// The Android ID of the device. This field will always be present.
+    /// The Android ID of the device.
+    /// This field will always be present.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
     /// Additional details on the failure if applicable.
     #[serde(rename="failureDetails")]
     pub failure_details: Option<String>,
-    /// The id of the product (e.g. "app:com.google.android.gm") for which the install failure event occured. This field will always be present.
+    /// The id of the product (e.g. "app:com.google.android.gm") for which the
+    /// install failure event occured. This field will always be present.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1383,13 +1527,17 @@ pub struct AdministratorWebTokenSpecStoreBuilder {
 impl Part for AdministratorWebTokenSpecStoreBuilder {}
 
 
-/// An event generated when a new version of an app is uploaded to Google Play. Notifications are sent for new public versions only: alpha, beta, or canary versions do not generate this event. To fetch up-to-date version history for an app, use Products.Get on the EMM API.
+/// An event generated when a new version of an app is uploaded to Google Play.
+/// Notifications are sent for new public versions only: alpha, beta, or canary
+/// versions do not generate this event. To fetch up-to-date version history for
+/// an app, use Products.Get on the EMM API.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppUpdateEvent {
-    /// The id of the product (e.g. "app:com.google.android.gm") that was updated. This field will always be present.
+    /// The id of the product (e.g. "app:com.google.android.gm") that was updated.
+    /// This field will always be present.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1408,8 +1556,6 @@ impl Part for AppUpdateEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdministratorWebToken {
-    /// no description provided
-    pub kind: Option<String>,
     /// An opaque token to be passed to the Play front-end to generate an iframe.
     pub token: Option<String>,
 }
@@ -1423,7 +1569,9 @@ impl ResponseResult for AdministratorWebToken {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdministratorWebTokenSpecPlaySearch {
-    /// Allow access to the iframe in approve mode. Default is false.
+    /// Allow access to the iframe in <a
+    /// href="https://developers.google.com/android/work/play/emm-api/managed-play-iframe#render">approve
+    /// mode</a>. Default is false.
     #[serde(rename="approveApps")]
     pub approve_apps: Option<bool>,
     /// Whether the managed Play Search apps page is displayed. Default is true.
@@ -1442,15 +1590,18 @@ pub struct ProductPolicy {
     /// The auto-install policy for the product.
     #[serde(rename="autoInstallPolicy")]
     pub auto_install_policy: Option<AutoInstallPolicy>,
-    /// Deprecated. Use trackIds instead.
+    /// Deprecated. Use <code>trackIds</code> instead.
     pub tracks: Option<Vec<String>>,
     /// The managed configuration for the product.
     #[serde(rename="managedConfiguration")]
     pub managed_configuration: Option<ManagedConfiguration>,
-    /// The ID of the product. For example, "app:com.google.android.gm".
+    /// The ID of the product. For example,
+    /// <code>&quot;app:com.google.android.gm&quot;</code>.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
-    /// Grants the device visibility to the specified product release track(s), identified by trackIds. The list of release tracks of a product can be obtained by calling Products.Get.
+    /// Grants the device visibility to the specified product release track(s),
+    /// identified by <code>trackIds</code>. The list of release tracks of a
+    /// product can be obtained by calling Products.Get.
     #[serde(rename="trackIds")]
     pub track_ids: Option<Vec<String>>,
 }
@@ -1472,7 +1623,8 @@ pub struct ManagedPropertyBundle {
 impl Part for ManagedPropertyBundle {}
 
 
-/// The auto-install constraint. Defines a set of restrictions for installation. At least one of the fields must be set.
+/// The auto-install constraint. Defines a set of restrictions for installation.
+/// At least one of the fields must be set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1492,13 +1644,17 @@ pub struct AutoInstallConstraint {
 impl Part for AutoInstallConstraint {}
 
 
-/// An event generated when a new app version is uploaded to Google Play and its app restrictions schema changed. To fetch the app restrictions schema for an app, use Products.getAppRestrictionsSchema on the EMM API.
+/// An event generated when a new app version is uploaded to Google Play and its
+/// app restrictions schema changed.
+/// To fetch the app restrictions schema for an app, use
+/// Products.getAppRestrictionsSchema on the EMM API.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppRestrictionsSchemaChangeEvent {
-    /// The id of the product (e.g. "app:com.google.android.gm") for which the app restriction schema changed. This field will always be present.
+    /// The id of the product (e.g. "app:com.google.android.gm") for which the
+    /// app restriction schema changed. This field will always be present.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1532,16 +1688,20 @@ pub struct AdministratorWebTokenSpecWebApps {
 impl Part for AdministratorWebTokenSpecWebApps {}
 
 
-/// Device report updated with the latest app states for managed apps on the device.
+/// Device report updated with the latest app states for managed apps on the
+/// device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceReport {
-    /// List of app states set by managed apps on the device. App states are defined by the app's developers. This field will always be present.
+    /// List of app states set by managed apps on the device. App states are
+    /// defined by the app's developers.
+    /// This field will always be present.
     #[serde(rename="appState")]
     pub app_state: Option<Vec<AppState>>,
-    /// The timestamp of the last report update in milliseconds since epoch. This field will always be present.
+    /// The timestamp of the last report update in milliseconds since epoch.
+    /// This field will always be present.
     #[serde(rename="lastUpdatedTimestampMillis")]
     pub last_updated_timestamp_millis: Option<String>,
 }
@@ -1555,12 +1715,15 @@ impl Part for DeviceReport {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceReportUpdateEvent {
-    /// The device report updated with the latest app states. This field will always be present.
+    /// The device report updated with the latest app states.
+    /// This field will always be present.
     pub report: Option<DeviceReport>,
-    /// The ID of the user. This field will always be present.
+    /// The ID of the user.
+    /// This field will always be present.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
-    /// The Android ID of the device. This field will always be present.
+    /// The Android ID of the device.
+    /// This field will always be present.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
 }
@@ -1574,19 +1737,33 @@ impl Part for DeviceReportUpdateEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// The auto-update policy for apps installed on the device. "choiceToTheUser" allows the device's user to configure the app update policy. "always" enables auto updates. "never" disables auto updates. "wifiOnly" enables auto updates only when the device is connected to wifi.
+    /// The auto-update policy for apps installed on the device. "choiceToTheUser"
+    /// allows the device's user to configure the app update policy. "always"
+    /// enables auto updates. "never" disables auto updates. "wifiOnly" enables
+    /// auto updates only when the device is connected to wifi.
     #[serde(rename="autoUpdatePolicy")]
     pub auto_update_policy: Option<String>,
-    /// Whether the device reports app states to the EMM. The default value is "deviceReportDisabled".
+    /// Whether the device reports app states to the EMM. The default value is
+    /// "deviceReportDisabled".
     #[serde(rename="deviceReportPolicy")]
     pub device_report_policy: Option<String>,
-    /// The maintenance window defining when apps running in the foreground should be updated.
+    /// The maintenance window defining when apps running in the foreground should
+    /// be updated.
     #[serde(rename="maintenanceWindow")]
     pub maintenance_window: Option<MaintenanceWindow>,
-    /// The list of product policies.
+    /// The list of product policies. The <code>productAvailabilityPolicy</code>
+    /// needs to be set to <code>WHITELIST</code> or <code>ALL</code> for the
+    /// product policies to be applied.
     #[serde(rename="productPolicy")]
     pub product_policy: Option<Vec<ProductPolicy>>,
-    /// The availability granted to the device for the specified products. "all" gives the device access to all products, regardless of approval status. "all" does not enable automatic visibility of "alpha" or "beta" tracks. "whitelist" grants the device access the products specified in productPolicy[]. Only products that are approved or products that were previously approved (products with revoked approval) by the enterprise can be whitelisted. If no value is provided, the availability set at the user level is applied by default.
+    /// The availability granted to the device for the specified products. "all"
+    /// gives the device access to all products, regardless of approval status.
+    /// "all" does not enable automatic visibility of "alpha" or "beta" tracks.
+    /// "whitelist" grants the device access the products specified in
+    /// productPolicy[]. Only products that are approved or products that were
+    /// previously approved (products with revoked approval) by the enterprise can
+    /// be whitelisted. If no value is provided, the availability set at the user
+    /// level is applied by default.
     #[serde(rename="productAvailabilityPolicy")]
     pub product_availability_policy: Option<String>,
 }
@@ -1594,14 +1771,15 @@ pub struct Policy {
 impl Part for Policy {}
 
 
-/// A configuration variables resource contains the managed configuration settings ID to be applied to a single user, as well as the variable set that is attributed to the user. The variable set will be used to replace placeholders in the managed configuration settings.
+/// A configuration variables resource contains the managed configuration
+/// settings ID to be applied to a single user, as well as the variable set that
+/// is attributed to the user. The variable set will be used to replace
+/// placeholders in the managed configuration settings.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConfigurationVariables {
-    /// no description provided
-    pub kind: Option<String>,
     /// The variable set that is attributed to the user.
     #[serde(rename="variableSet")]
     pub variable_set: Option<Vec<VariableSet>>,
@@ -1619,10 +1797,13 @@ impl Part for ConfigurationVariables {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrackInfo {
-    /// A modifiable name for a track. This is the visible name in the play developer console.
+    /// A modifiable name for a track. This is the visible name in the play
+    /// developer console.
     #[serde(rename="trackAlias")]
     pub track_alias: Option<String>,
-    /// Unmodifiable, unique track identifier. This identifier is the releaseTrackId in the url of the play developer console page that displays the track information.
+    /// Unmodifiable, unique track identifier. This identifier is the
+    /// releaseTrackId in the url of the play developer console page that displays
+    /// the track information.
     #[serde(rename="trackId")]
     pub track_id: Option<String>,
 }
@@ -1630,7 +1811,8 @@ pub struct TrackInfo {
 impl Part for TrackInfo {}
 
 
-/// An AuthenticationToken is used by the EMM's device policy client on a device to provision the given EMM-managed user on that device.
+/// An AuthenticationToken is used by the EMM's device policy client on a device
+/// to provision the given EMM-managed user on that device.
 /// 
 /// # Activities
 /// 
@@ -1641,9 +1823,9 @@ impl Part for TrackInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuthenticationToken {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The authentication token to be passed to the device policy client on the device where it can be used to provision the account for which this token was generated.
+    /// The authentication token to be passed to the device policy client on the
+    /// device where it can be used to provision the account for which this token
+    /// was generated.
     pub token: Option<String>,
 }
 
@@ -1659,13 +1841,18 @@ pub struct AutoInstallPolicy {
     /// The auto-install mode. If unset defaults to "doNotAutoInstall".
     #[serde(rename="autoInstallMode")]
     pub auto_install_mode: Option<String>,
-    /// The constraints for auto-installing the app. You can specify a maximum of one constraint.
+    /// The constraints for auto-installing the app. You can specify a maximum of
+    /// one constraint.
     #[serde(rename="autoInstallConstraint")]
     pub auto_install_constraint: Option<Vec<AutoInstallConstraint>>,
-    /// The priority of the install, as an unsigned integer. A lower number means higher priority.
+    /// The priority of the install, as an unsigned integer. A lower number means
+    /// higher priority.
     #[serde(rename="autoInstallPriority")]
     pub auto_install_priority: Option<i32>,
-    /// The minimum version of the app. If a lower version of the app is installed, then the app will be auto-updated according to the auto-install constraints, instead of waiting for the regular auto-update. You can set a minimum version code for at most 20 apps per device.
+    /// The minimum version of the app. If a lower version of the app is installed,
+    /// then the app will be auto-updated according to the auto-install
+    /// constraints, instead of waiting for the regular auto-update. You can set a
+    /// minimum version code for at most 20 apps per device.
     #[serde(rename="minimumVersionCode")]
     pub minimum_version_code: Option<i32>,
 }
@@ -1673,9 +1860,14 @@ pub struct AutoInstallPolicy {
 impl Part for AutoInstallPolicy {}
 
 
-/// A Products resource represents an app in the Google Play store that is available to at least some users in the enterprise. (Some apps are restricted to a single enterprise, and no information about them is made available outside that enterprise.)
+/// A Products resource represents an app in the Google Play store that is
+/// available to at least some users in the enterprise. (Some apps are restricted
+/// to a single enterprise, and no information about them is made available
+/// outside that enterprise.)
 /// 
-/// The information provided for each product (localized name, icon, link to the full Google Play details page) is intended to allow a basic representation of the product within an EMM user interface.
+/// The information provided for each product (localized name, icon, link
+/// to the full Google Play details page) is intended to allow a basic
+/// representation of the product within an EMM user interface.
 /// 
 /// # Activities
 /// 
@@ -1692,7 +1884,8 @@ impl Part for AutoInstallPolicy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Product {
-    /// A link to a smaller image that can be used as an icon for the product. This image is suitable for use at up to 128px x 128px.
+    /// A link to a smaller image that can be used as an icon for the product.
+    /// This image is suitable for use at up to 128px x 128px.
     #[serde(rename="smallIconUrl")]
     pub small_icon_url: Option<String>,
     /// The countries which this app is available in.
@@ -1703,7 +1896,8 @@ pub struct Product {
     /// A description of the recent changes made to the app.
     #[serde(rename="recentChanges")]
     pub recent_changes: Option<String>,
-    /// A link to the managed Google Play details page for the product, for use by an Enterprise admin.
+    /// A link to the managed Google Play details page for the product,
+    /// for use by an Enterprise admin.
     #[serde(rename="workDetailsUrl")]
     pub work_details_url: Option<String>,
     /// App versions currently available for this product.
@@ -1712,25 +1906,34 @@ pub struct Product {
     /// A list of screenshot links representing the app.
     #[serde(rename="screenshotUrls")]
     pub screenshot_urls: Option<Vec<String>>,
-    /// A link to an image that can be used as an icon for the product. This image is suitable for use at up to 512px x 512px.
+    /// A link to an image that can be used as an icon for the product.
+    /// This image is suitable for use at up to 512px x 512px.
     #[serde(rename="iconUrl")]
     pub icon_url: Option<String>,
     /// A link to the (consumer) Google Play details page for the product.
     #[serde(rename="detailsUrl")]
     pub details_url: Option<String>,
-    /// The approximate time (within 7 days) the app was last published, expressed in milliseconds since epoch.
+    /// The approximate time (within 7 days) the app was last published, expressed
+    /// in milliseconds since epoch.
     #[serde(rename="lastUpdatedTimestampMillis")]
     pub last_updated_timestamp_millis: Option<String>,
-    /// Whether this product is free, free with in-app purchases, or paid. If the pricing is unknown, this means the product is not generally available anymore (even though it might still be available to people who own it).
+    /// Whether this product is free, free with in-app purchases, or paid.
+    /// If the pricing is unknown, this means the product is not generally
+    /// available anymore (even though it might still be available to
+    /// people who own it).
     #[serde(rename="productPricing")]
     pub product_pricing: Option<String>,
     /// The localized promotional description, if available.
     pub description: Option<String>,
     /// The app category (e.g. RACING, SOCIAL, etc.)
     pub category: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// How and to whom the package is made available. The value publicGoogleHosted means that the package is available through the Play store and not restricted to a specific enterprise. The value privateGoogleHosted means that the package is a private app (restricted to an enterprise) but hosted by Google. The value privateSelfHosted means that the package is a private app (restricted to an enterprise) and is privately hosted.
+    /// How and to whom the package is made available.
+    /// The value <code>publicGoogleHosted</code> means that the package is
+    /// available through the Play store and not restricted to a specific
+    /// enterprise. The value <code>privateGoogleHosted</code> means that the
+    /// package is a private app (restricted to an enterprise) but hosted by
+    /// Google. The value <code>privateSelfHosted</code> means that the package is
+    /// a private app (restricted to an enterprise) and is privately hosted.
     #[serde(rename="distributionChannel")]
     pub distribution_channel: Option<String>,
     /// The name of the product.
@@ -1744,7 +1947,7 @@ pub struct Product {
     /// The tracks visible to the enterprise.
     #[serde(rename="appTracks")]
     pub app_tracks: Option<Vec<TrackInfo>>,
-    /// Deprecated, use appTracks instead.
+    /// Deprecated, use <code>appTracks</code> instead.
     #[serde(rename="availableTracks")]
     pub available_tracks: Option<Vec<String>>,
     /// The name of the author of the product (for example, the app developer).
@@ -1758,7 +1961,8 @@ pub struct Product {
     pub signing_certificate: Option<ProductSigningCertificate>,
     /// A list of permissions required by the app.
     pub permissions: Option<Vec<ProductPermission>>,
-    /// A string of the form app:<package name>. For example, app:com.google.android.gm represents the Gmail app.
+    /// A string of the form <code><em>app:&lt;package name&gt;</em></code>. For
+    /// example, <code>app:com.google.android.gm</code> represents the Gmail app.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1767,9 +1971,15 @@ impl Resource for Product {}
 impl ResponseResult for Product {}
 
 
-/// A Permissions resource represents some extra capability, to be granted to an Android app, which requires explicit consent. An enterprise admin must consent to these permissions on behalf of their users before an entitlement for the app can be created.
+/// A Permissions resource represents some extra capability, to be granted to an
+/// Android app, which requires explicit consent. An enterprise admin must
+/// consent to these permissions on behalf of their users before an
+/// entitlement for the app can be created.
 /// 
-/// The permissions collection is read-only. The information provided for each permission (localized name and description) is intended to be used in the MDM user interface when obtaining consent from the enterprise.
+/// The permissions collection is read-only. The information provided for
+/// each permission (localized name and description) is intended to be
+/// used in the MDM user interface when obtaining consent from the
+/// enterprise.
 /// 
 /// # Activities
 /// 
@@ -1783,10 +1993,9 @@ pub struct Permission {
     /// An opaque string uniquely identifying the permission.
     #[serde(rename="permissionId")]
     pub permission_id: Option<String>,
-    /// A longer description of the Permissions resource, giving more details of what it affects.
+    /// A longer description of the Permissions resource, giving more details of
+    /// what it affects.
     pub description: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
     /// The name of the permission.
     pub name: Option<String>,
 }
@@ -1795,7 +2004,9 @@ impl Resource for Permission {}
 impl ResponseResult for Permission {}
 
 
-/// A resource returned by the PullNotificationSet API, which contains a collection of notifications for enterprises associated with the service account authenticated for the request.
+/// A resource returned by the PullNotificationSet API, which contains
+/// a collection of notifications for enterprises associated with the service
+/// account authenticated for the request.
 /// 
 /// # Activities
 /// 
@@ -1808,9 +2019,9 @@ impl ResponseResult for Permission {}
 pub struct NotificationSet {
     /// The notifications received, or empty if no notifications are present.
     pub notification: Option<Vec<Notification>>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The notification set ID, required to mark the notification as received with the Enterprises.AcknowledgeNotification API. This will be omitted if no notifications are present.
+    /// The notification set ID, required to mark the notification as
+    /// received with the Enterprises.AcknowledgeNotification API.
+    /// This will be omitted if no notifications are present.
     #[serde(rename="notificationSetId")]
     pub notification_set_id: Option<String>,
 }
@@ -1818,7 +2029,7 @@ pub struct NotificationSet {
 impl ResponseResult for NotificationSet {}
 
 
-/// The entitlement resources for the user.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1829,16 +2040,18 @@ impl ResponseResult for NotificationSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntitlementsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#entitlementsListResponse".
-    pub kind: Option<String>,
-    /// An entitlement of a user to a product (e.g. an app). For example, a free app that they have installed, or a paid app that they have been allocated a license to.
+    /// An entitlement of a user to a product (e.g. an app).
+    /// For example, a free app that they have installed, or a paid app that they
+    /// have been allocated a license to.
     pub entitlement: Option<Vec<Entitlement>>,
 }
 
 impl ResponseResult for EntitlementsListResponse {}
 
 
-/// A managed configuration resource contains the set of managed properties defined by the app developer in the app's managed configurations schema, as well as any configuration variables defined for the user.
+/// A managed configuration resource contains the set of managed properties
+/// defined by the app developer in the app's managed configurations schema,
+/// as well as any configuration variables defined for the user.
 /// 
 /// # Activities
 /// 
@@ -1854,13 +2067,15 @@ impl ResponseResult for EntitlementsListResponse {}
 pub struct ManagedConfiguration {
     /// Deprecated.
     pub kind: Option<String>,
-    /// Contains the ID of the managed configuration profile and the set of configuration variables (if any) defined for the user.
+    /// Contains the ID of the managed configuration profile and the set of
+    /// configuration variables (if any) defined for the user.
     #[serde(rename="configurationVariables")]
     pub configuration_variables: Option<ConfigurationVariables>,
     /// The set of managed properties for this configuration.
     #[serde(rename="managedProperty")]
     pub managed_property: Option<Vec<ManagedProperty>>,
-    /// The ID of the product that the managed configuration is for, e.g. "app:com.google.android.gm".
+    /// The ID of the product that the managed configuration is for, e.g.
+    /// "app:com.google.android.gm".
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -1869,7 +2084,7 @@ impl RequestValue for ManagedConfiguration {}
 impl ResponseResult for ManagedConfiguration {}
 
 
-/// The user resources for the group license.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1880,8 +2095,6 @@ impl ResponseResult for ManagedConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupLicenseUsersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicenseUsersListResponse".
-    pub kind: Option<String>,
     /// A user of an enterprise.
     pub user: Option<Vec<User>>,
 }
@@ -1895,9 +2108,8 @@ impl ResponseResult for GroupLicenseUsersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApprovalUrlInfo {
-    /// no description provided
-    pub kind: Option<String>,
-    /// A URL that displays a product's permissions and that can also be used to approve the product with the Products.approve call.
+    /// A URL that displays a product's permissions and that can also be used to
+    /// approve the product with the <code>Products.approve</code> call.
     #[serde(rename="approvalUrl")]
     pub approval_url: Option<String>,
 }
@@ -1905,21 +2117,31 @@ pub struct ApprovalUrlInfo {
 impl Part for ApprovalUrlInfo {}
 
 
-/// Represents a keyed app state containing a key, timestamp, severity level, optional description, and optional data.
+/// Represents a keyed app state containing a key, timestamp, severity level,
+/// optional description, and optional data.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct KeyedAppState {
-    /// Free-form, human-readable message describing the app state. For example, an error message. To prevent XSS, we recommend removing any HTML from the message before displaying it.
+    /// Free-form, human-readable message describing the app state. For example,
+    /// an error message. To prevent XSS, we recommend removing any HTML from the
+    /// message before displaying it.
     pub message: Option<String>,
-    /// Additional field intended for machine-readable data. For example, a number or JSON object. To prevent XSS, we recommend removing any HTML from the data before displaying it.
+    /// Additional field intended for machine-readable data. For example, a number
+    /// or JSON object. To prevent XSS, we recommend removing any HTML from the
+    /// data before displaying it.
     pub data: Option<String>,
-    /// Severity of the app state. This field will always be present.
+    /// Severity of the app state.
+    /// This field will always be present.
     pub severity: Option<String>,
-    /// Key indicating what the app is providing a state for. The content of the key is set by the app's developer. To prevent XSS, we recommend removing any HTML from the key before displaying it. This field will always be present.
+    /// Key indicating what the app is providing a state for. The content of the
+    /// key is set by the app's developer. To prevent XSS, we recommend removing
+    /// any HTML from the key before displaying it.
+    /// This field will always be present.
     pub key: Option<String>,
-    /// Timestamp of when the app set the state in milliseconds since epoch. This field will always be present.
+    /// Timestamp of when the app set the state in milliseconds since epoch.
+    /// This field will always be present.
     #[serde(rename="stateTimestampMillis")]
     pub state_timestamp_millis: Option<String>,
 }
@@ -1927,7 +2149,8 @@ pub struct KeyedAppState {
 impl Part for KeyedAppState {}
 
 
-/// Represents the list of app restrictions available to be pre-configured for the product.
+/// Represents the list of app restrictions available to be pre-configured for
+/// the product.
 /// 
 /// # Activities
 /// 
@@ -1947,7 +2170,7 @@ pub struct AppRestrictionsSchema {
 impl ResponseResult for AppRestrictionsSchema {}
 
 
-/// The web app details for an enterprise.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1961,14 +2184,12 @@ pub struct WebAppsListResponse {
     /// The manifest describing a web app.
     #[serde(rename="webApp")]
     pub web_app: Option<Vec<WebApp>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#webAppsListResponse".
-    pub kind: Option<String>,
 }
 
 impl ResponseResult for WebAppsListResponse {}
 
 
-/// The store page resources for the enterprise.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1979,8 +2200,6 @@ impl ResponseResult for WebAppsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StoreLayoutPagesListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#storeLayoutPagesListResponse".
-    pub kind: Option<String>,
     /// A store page of an enterprise.
     pub page: Option<Vec<StorePage>>,
 }
@@ -1988,13 +2207,24 @@ pub struct StoreLayoutPagesListResponse {
 impl ResponseResult for StoreLayoutPagesListResponse {}
 
 
-/// There is no detailed description.
+/// Pagination information returned by a List operation when token pagination
+/// is enabled.
+/// 
+/// List operations that supports paging return only one "page" of results. This
+/// protocol buffer message describes the page that has been returned.
+/// 
+/// When using token pagination, clients should use the next/previous token
+/// to get another page of the result. The presence or absence of next/previous
+/// token indicates whether a next/previous page is available and provides a
+/// mean of accessing this page. ListRequest.page_token should be set to either
+/// next_page_token or previous_page_token to access another page.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPagination {
-    /// no description provided
+    /// Tokens to pass to the standard list field 'page_token'. Whenever available,
+    /// tokens are preferred over manipulating start_index.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
@@ -2005,7 +2235,8 @@ pub struct TokenPagination {
 impl Part for TokenPagination {}
 
 
-/// This represents an enterprise admin who can manage the enterprise in the managed Google Play store.
+/// This represents an enterprise admin who can manage the enterprise
+/// in the managed Google Play store.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2024,12 +2255,17 @@ impl Part for Administrator {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppVersion {
-    /// Deprecated, use trackId instead.
+    /// Deprecated, use <code>trackId</code> instead.
     pub track: Option<String>,
-    /// Track ids that the app version is published in. Replaces the track field (deprecated), but doesn't include the production track (see isProduction instead).
+    /// Track ids that the app version is published in. Replaces the
+    /// <code>track</code> field (deprecated), but doesn't include the production
+    /// track (see <code>isProduction</code> instead).
     #[serde(rename="trackId")]
     pub track_id: Option<Vec<String>>,
-    /// The string used in the Play store by the app developer to identify the version. The string is not necessarily unique or localized (for example, the string could be "1.4").
+    /// The string used in the Play store by the app developer to identify
+    /// the version.
+    /// The string is not necessarily unique or localized (for example, the string
+    /// could be "1.4").
     #[serde(rename="versionString")]
     pub version_string: Option<String>,
     /// True if this version is a production APK.
@@ -2043,7 +2279,8 @@ pub struct AppVersion {
 impl Part for AppVersion {}
 
 
-/// A resource returned by the GenerateSignupUrl API, which contains the Signup URL and Completion Token.
+/// A resource returned by the GenerateSignupUrl API, which contains the
+/// Signup URL and Completion Token.
 /// 
 /// # Activities
 /// 
@@ -2054,39 +2291,18 @@ impl Part for AppVersion {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignupInfo {
-    /// A URL under which the Admin can sign up for an enterprise. The page pointed to cannot be rendered in an iframe.
+    /// A URL under which the Admin can sign up for an enterprise.
+    /// The page pointed to cannot be rendered in an iframe.
     pub url: Option<String>,
     /// Deprecated.
     pub kind: Option<String>,
-    /// An opaque token that will be required, along with the Enterprise Token, for obtaining the enterprise resource from CompleteSignup.
+    /// An opaque token that will be required, along with the Enterprise Token,
+    /// for obtaining the enterprise resource from CompleteSignup.
     #[serde(rename="completionToken")]
     pub completion_token: Option<String>,
 }
 
 impl ResponseResult for SignupInfo {}
-
-
-/// A UserToken is used by a user when setting up a managed device or profile with their managed Google Play account on a device. When the user enters their email address and token (activation code) the appropriate EMM app can be automatically downloaded.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [generate token users](struct.UserGenerateTokenCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UserToken {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The unique ID for the user.
-    #[serde(rename="userId")]
-    pub user_id: Option<String>,
-    /// The token (activation code) to be entered by the user. This consists of a sequence of decimal digits. Note that the leading digit may be 0.
-    pub token: Option<String>,
-}
-
-impl ResponseResult for UserToken {}
 
 
 /// List of states set by the app.
@@ -2095,10 +2311,12 @@ impl ResponseResult for UserToken {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppState {
-    /// The package name of the app. This field will always be present.
+    /// The package name of the app.
+    /// This field will always be present.
     #[serde(rename="packageName")]
     pub package_name: Option<String>,
-    /// List of keyed app states. This field will always be present.
+    /// List of keyed app states.
+    /// This field will always be present.
     #[serde(rename="keyedAppState")]
     pub keyed_app_state: Option<Vec<KeyedAppState>>,
 }
@@ -2106,7 +2324,7 @@ pub struct AppState {
 impl Part for AppState {}
 
 
-/// The managed configurations settings for a product.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -2117,17 +2335,16 @@ impl Part for AppState {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedConfigurationsSettingsListResponse {
-    /// A managed configurations settings for an app that may be assigned to a group of users in an enterprise.
+    /// A managed configurations settings for an app that may be assigned to a
+    /// group of users in an enterprise.
     #[serde(rename="managedConfigurationsSettings")]
     pub managed_configurations_settings: Option<Vec<ManagedConfigurationsSettings>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#managedConfigurationsSettingsListResponse".
-    pub kind: Option<String>,
 }
 
 impl ResponseResult for ManagedConfigurationsSettingsListResponse {}
 
 
-/// The grouplicense resources for the enterprise.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -2141,14 +2358,13 @@ pub struct GroupLicensesListResponse {
     /// A group license for a product approved for use in the enterprise.
     #[serde(rename="groupLicense")]
     pub group_license: Option<Vec<GroupLicense>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicensesListResponse".
-    pub kind: Option<String>,
 }
 
 impl ResponseResult for GroupLicensesListResponse {}
 
 
-/// Definition of a managed Google Play store cluster, a list of products displayed as part of a store page.
+/// Definition of a managed Google Play store cluster, a list of products
+/// displayed as part of a store page.
 /// 
 /// # Activities
 /// 
@@ -2161,27 +2377,35 @@ impl ResponseResult for GroupLicensesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StoreCluster {
-    /// no description provided
-    pub kind: Option<String>,
-    /// List of products in the order they are displayed in the cluster. There should not be duplicates within a cluster.
-    #[serde(rename="productId")]
-    pub product_id: Option<Vec<String>>,
-    /// Unique ID of this cluster. Assigned by the server. Immutable once assigned.
-    pub id: Option<String>,
-    /// Ordered list of localized strings giving the name of this page. The text displayed is the one that best matches the user locale, or the first entry if there is no good match. There needs to be at least one entry.
-    pub name: Option<Vec<LocalizedText>>,
-    /// String (US-ASCII only) used to determine order of this cluster within the parent page's elements. Page elements are sorted in lexicographic order of this field. Duplicated values are allowed, but ordering between elements with duplicate order is undefined.
+    /// String (US-ASCII only) used to determine order of this cluster within the
+    /// parent page's elements. Page elements are sorted in lexicographic order
+    /// of this field.
+    /// Duplicated values are allowed, but ordering between elements with
+    /// duplicate order is undefined.
     /// 
-    /// The value of this field is never visible to a user, it is used solely for the purpose of defining an ordering. Maximum length is 256 characters.
+    /// The value of this field is never visible to a user, it is used solely
+    /// for the purpose of defining an ordering. Maximum length is 256
+    /// characters.
     #[serde(rename="orderInPage")]
     pub order_in_page: Option<String>,
+    /// Unique ID of this cluster. Assigned by the server. Immutable once assigned.
+    pub id: Option<String>,
+    /// Ordered list of localized strings giving the name of this page.
+    /// The text displayed is the one that best matches the user locale,
+    /// or the first entry if there is no good match. There needs to be
+    /// at least one entry.
+    pub name: Option<Vec<LocalizedText>>,
+    /// List of products in the order they are displayed in the cluster. There
+    /// should not be duplicates within a cluster.
+    #[serde(rename="productId")]
+    pub product_id: Option<Vec<String>>,
 }
 
 impl RequestValue for StoreCluster {}
 impl ResponseResult for StoreCluster {}
 
 
-/// The matching user resources.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -2192,8 +2416,6 @@ impl ResponseResult for StoreCluster {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#usersListResponse".
-    pub kind: Option<String>,
     /// A user of an enterprise.
     pub user: Option<Vec<User>>,
 }
@@ -2212,14 +2434,18 @@ impl ResponseResult for UsersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccountKey {
-    /// Public key data for the credentials file. This is an X.509 cert. If you are using the googleCredentials key type, this is identical to the cert that can be retrieved by using the X.509 cert url inside of the credentials file.
+    /// Public key data for the credentials file. This is an X.509 cert. If you are
+    /// using the <code>googleCredentials</code> key type, this is identical to the
+    /// cert that can be retrieved by using the X.509 cert url inside of the
+    /// credentials file.
     #[serde(rename="publicData")]
     pub public_data: Option<String>,
-    /// no description provided
-    pub kind: Option<String>,
-    /// The body of the private key credentials file, in string format. This is only populated when the ServiceAccountKey is created, and is not stored by Google.
+    /// The body of the private key credentials file, in string format. This
+    /// is only populated when the ServiceAccountKey is created, and is not stored
+    /// by Google.
     pub data: Option<String>,
-    /// An opaque, unique identifier for this ServiceAccountKey. Assigned by the server.
+    /// An opaque, unique identifier for this ServiceAccountKey.
+    /// Assigned by the server.
     pub id: Option<String>,
     /// The file format of the generated key data.
     #[serde(rename="type")]
@@ -2231,7 +2457,9 @@ impl Resource for ServiceAccountKey {}
 impl ResponseResult for ServiceAccountKey {}
 
 
-/// Definition of a managed Google Play store page, made of a localized name and links to other pages. A page also contains clusters defined as a subcollection.
+/// Definition of a managed Google Play store page, made of a localized name
+/// and links to other pages. A page also contains clusters defined
+/// as a subcollection.
 /// 
 /// # Activities
 /// 
@@ -2244,15 +2472,19 @@ impl ResponseResult for ServiceAccountKey {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StorePage {
-    /// no description provided
-    pub kind: Option<String>,
-    /// Ordered list of pages a user should be able to reach from this page. The list can't include this page. It is recommended that the basic pages are created first, before adding the links between pages.
+    /// Ordered list of pages a user should be able to reach from this page.
+    /// The list can't include this page.
+    /// It is recommended that the basic pages are created first,
+    /// before adding the links between pages.
     /// 
     /// The API doesn't verify that the pages exist or the pages are reachable.
     pub link: Option<Vec<String>>,
     /// Unique ID of this page. Assigned by the server. Immutable once assigned.
     pub id: Option<String>,
-    /// Ordered list of localized strings giving the name of this page. The text displayed is the one that best matches the user locale, or the first entry if there is no good match. There needs to be at least one entry.
+    /// Ordered list of localized strings giving the name of this page.
+    /// The text displayed is the one that best matches the user locale,
+    /// or the first entry if there is no good match. There needs to be
+    /// at least one entry.
     pub name: Option<Vec<LocalizedText>>,
 }
 
@@ -2271,10 +2503,20 @@ impl ResponseResult for StorePage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductsApproveRequest {
-    /// Sets how new permission requests for the product are handled. "allPermissions" automatically approves all current and future permissions for the product. "currentPermissionsOnly" approves the current set of permissions for the product, but any future permissions added through updates will require manual reapproval. If not specified, only the current set of permissions will be approved.
+    /// Sets how new permission requests for the product are handled.
+    /// "allPermissions" automatically approves all current and future
+    /// permissions for the product. "currentPermissionsOnly" approves the
+    /// current set of permissions for the product, but any future permissions
+    /// added through updates will require manual reapproval. If not specified,
+    /// only the current set of permissions will be approved.
     #[serde(rename="approvedPermissions")]
     pub approved_permissions: Option<String>,
-    /// The approval URL that was shown to the user. Only the permissions shown to the user with that URL will be accepted, which may not be the product's entire set of permissions. For example, the URL may only display new permissions from an update after the product was approved, or not include new permissions if the product was updated since the URL was generated.
+    /// The approval URL that was shown to the user. Only the permissions shown
+    /// to the user with that URL will be accepted, which may not be
+    /// the product's entire set of permissions. For example, the URL may only
+    /// display new permissions from an update after the product was approved,
+    /// or not include new permissions if the product was updated since the URL
+    /// was generated.
     #[serde(rename="approvalUrlInfo")]
     pub approval_url_info: Option<ApprovalUrlInfo>,
 }
@@ -2282,7 +2524,8 @@ pub struct ProductsApproveRequest {
 impl RequestValue for ProductsApproveRequest {}
 
 
-/// Information about the permissions required by a specific app and whether they have been accepted by the enterprise.
+/// Information about the permissions required by a specific app and
+/// whether they have been accepted by the enterprise.
 /// 
 /// # Activities
 /// 
@@ -2293,11 +2536,10 @@ impl RequestValue for ProductsApproveRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPermissions {
-    /// no description provided
-    pub kind: Option<String>,
     /// The permissions required by the app.
     pub permission: Option<Vec<ProductPermission>>,
-    /// The ID of the app that the permissions relate to, e.g. "app:com.google.android.gm".
+    /// The ID of the app that the permissions relate to, e.g.
+    /// "app:com.google.android.gm".
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -2305,30 +2547,39 @@ pub struct ProductPermissions {
 impl ResponseResult for ProductPermissions {}
 
 
-/// A managed property of a managed configuration. The property must match one of the properties in the app restrictions schema of the product. Exactly one of the value fields must be populated, and it must match the property's type in the app restrictions schema.
+/// A managed property of a managed configuration. The property must match one of
+/// the properties in the app restrictions schema of the product. Exactly one of
+/// the value fields must be populated, and it must match the property's type in
+/// the app restrictions schema.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedProperty {
-    /// The boolean value - this will only be present if type of the property is bool.
+    /// The boolean value - this will only be present if type of the property is
+    /// bool.
     #[serde(rename="valueBool")]
     pub value_bool: Option<bool>,
     /// The unique key that identifies the property.
     pub key: Option<String>,
-    /// The list of bundles of properties - this will only be present if type of the property is bundle_array.
+    /// The list of bundles of properties - this will only be present if type of
+    /// the property is bundle_array.
     #[serde(rename="valueBundleArray")]
     pub value_bundle_array: Option<Vec<ManagedPropertyBundle>>,
-    /// The integer value - this will only be present if type of the property is integer.
+    /// The integer value - this will only be present if type of the property is
+    /// integer.
     #[serde(rename="valueInteger")]
     pub value_integer: Option<i32>,
-    /// The bundle of managed properties - this will only be present if type of the property is bundle.
+    /// The bundle of managed properties - this will only be present if type of the
+    /// property is bundle.
     #[serde(rename="valueBundle")]
     pub value_bundle: Option<ManagedPropertyBundle>,
-    /// The list of string values - this will only be present if type of the property is multiselect.
+    /// The list of string values - this will only be present if type of the
+    /// property is multiselect.
     #[serde(rename="valueStringArray")]
     pub value_string_array: Option<Vec<String>>,
-    /// The string value - this will only be present if type of the property is string, choice or hidden.
+    /// The string value - this will only be present if type of the property is
+    /// string, choice or hidden.
     #[serde(rename="valueString")]
     pub value_string: Option<String>,
 }
@@ -2336,22 +2587,28 @@ pub struct ManagedProperty {
 impl Part for ManagedProperty {}
 
 
-/// A Users resource represents an account associated with an enterprise. The account may be specific to a device or to an individual user (who can then use the account across multiple devices). The account may provide access to managed Google Play only, or to other Google services, depending on the identity model: 
-/// - The Google managed domain identity model requires synchronization to Google account sources (via primaryEmail). 
-/// - The managed Google Play Accounts identity model provides a dynamic means for enterprises to create user or device accounts as needed. These accounts provide access to managed Google Play.
+/// A Users resource represents an account associated with an enterprise. The
+/// account may be specific to a device or to an individual user (who can then
+/// use the account across multiple devices). The account may provide access to
+/// managed Google Play only, or to other Google services, depending on the
+/// identity model:
+/// <ul><li>The Google managed domain identity model requires synchronization to
+/// Google account sources (via <code>primaryEmail</code>).</li>
+/// <li>The managed Google Play Accounts identity model provides a dynamic means
+/// for enterprises to create user or device accounts as needed. These accounts
+/// provide access to managed Google Play.</li>
+/// </ul>
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [revoke token users](struct.UserRevokeTokenCall.html) (none)
 /// * [revoke device access users](struct.UserRevokeDeviceAccesCall.html) (none)
 /// * [delete users](struct.UserDeleteCall.html) (none)
 /// * [generate authentication token users](struct.UserGenerateAuthenticationTokenCall.html) (none)
 /// * [list users](struct.UserListCall.html) (none)
 /// * [update users](struct.UserUpdateCall.html) (request|response)
-/// * [generate token users](struct.UserGenerateTokenCall.html) (none)
 /// * [set available product set users](struct.UserSetAvailableProductSetCall.html) (none)
 /// * [insert users](struct.UserInsertCall.html) (request|response)
 /// * [get available product set users](struct.UserGetAvailableProductSetCall.html) (none)
@@ -2359,23 +2616,39 @@ impl Part for ManagedProperty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The name that will appear in user interfaces. Setting this property is optional when creating EMM-managed users. If you do set this property, use something generic about the organization (such as "Example, Inc.") or your name (as EMM). Not used for Google-managed user accounts.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The user's primary email address, for example, "jsmith@example.com". Will always be set for Google managed users and not set for EMM managed users.
+    /// The user's primary email address, for example, "jsmith@example.com".
+    /// Will always be set for Google managed users and not set for EMM managed
+    /// users.
     #[serde(rename="primaryEmail")]
     pub primary_email: Option<String>,
-    /// The type of account that this user represents. A userAccount can be installed on multiple devices, but a deviceAccount is specific to a single device. An EMM-managed user (emmManaged) can be either type (userAccount, deviceAccount), but a Google-managed user (googleManaged) is always a userAccount.
+    /// The name that will appear in user interfaces. Setting this property is
+    /// optional when creating EMM-managed users. If you do set this property,
+    /// use something generic about the organization (such as "Example, Inc.") or
+    /// your name (as EMM).
+    /// Not used for Google-managed user accounts.
+    /// @mutable androidenterprise.users.update
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The type of account that this user represents. A <code>userAccount</code>
+    /// can be installed on multiple devices, but a <code>deviceAccount</code> is
+    /// specific to a single device. An EMM-managed user (<code>emmManaged</code>)
+    /// can be either type (<code>userAccount</code>, <code>deviceAccount</code>),
+    /// but a Google-managed user (<code>googleManaged</code>) is always a
+    /// <code>userAccount</code>.
     #[serde(rename="accountType")]
     pub account_type: Option<String>,
     /// The unique ID for the user.
     pub id: Option<String>,
-    /// A unique identifier you create for this user, such as "user342" or "asset#44418". Do not use personally identifiable information (PII) for this property. Must always be set for EMM-managed users. Not set for Google-managed users.
+    /// A unique identifier you create for this user, such as "user342" or
+    /// "asset#44418". Do not use personally identifiable information (PII) for
+    /// this property. Must always be set for EMM-managed users.
+    /// Not set for Google-managed users.
     #[serde(rename="accountIdentifier")]
     pub account_identifier: Option<String>,
-    /// The entity that manages the user. With googleManaged users, the source of truth is Google so EMMs have to make sure a Google Account exists for the user. With emmManaged users, the EMM is in charge.
+    /// The entity that manages the user.  With <code>googleManaged</code> users,
+    /// the source of truth is Google so EMMs have to make sure a Google Account
+    /// exists for the user.  With <code>emmManaged</code> users, the
+    /// EMM is in charge.
     #[serde(rename="managementType")]
     pub management_type: Option<String>,
 }
@@ -2391,9 +2664,11 @@ impl ResponseResult for User {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductApprovalEvent {
-    /// Whether the product was approved or unapproved. This field will always be present.
+    /// Whether the product was approved or unapproved.
+    /// This field will always be present.
     pub approved: Option<String>,
-    /// The id of the product (e.g. "app:com.google.android.gm") for which the approval status has changed. This field will always be present.
+    /// The id of the product (e.g. "app:com.google.android.gm") for which the
+    /// approval status has changed. This field will always be present.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -2401,11 +2676,23 @@ pub struct ProductApprovalEvent {
 impl Part for ProductApprovalEvent {}
 
 
-/// Group license objects allow you to keep track of licenses (called entitlements) for both free and paid apps. For a free app, a group license is created when an enterprise admin first approves the product in Google Play or when the first entitlement for the product is created for a user via the API. For a paid app, a group license object is only created when an enterprise admin purchases the product in Google Play for the first time.
+/// Group license objects allow you to keep track of licenses (called
+/// <a href="/android/work/play/emm-api/v1/entitlements">entitlements</a>)
+/// for both free and paid apps. For a free app, a group license is created when
+/// an enterprise admin first approves the product in Google Play or when the
+/// first entitlement for the product is created for a user via the API. For a
+/// paid app, a group license object is only created when an enterprise admin
+/// purchases the product in Google Play for the first time.
 /// 
-/// Use the API to query group licenses. A Grouplicenses resource includes the total number of licenses purchased (paid apps only) and the total number of licenses currently in use. In other words, the total number of Entitlements that exist for the product.
+/// Use the API to query group licenses. A <code>Grouplicenses</code> resource
+/// includes the total number of licenses purchased (paid apps only) and the
+/// total number of licenses currently in use. In other words, the total number
+/// of <code>Entitlements</code> that exist for the product.
 /// 
-/// Only one group license object is created per product and group license objects are never deleted. If a product is unapproved, its group license remains. This allows enterprise admins to keep track of any remaining entitlements for the product.
+/// Only one group license object is created per product and group license
+/// objects are never deleted. If a product is unapproved, its group license
+/// remains. This allows enterprise admins to keep track of any remaining
+/// entitlements for the product.
 /// 
 /// # Activities
 /// 
@@ -2416,25 +2703,44 @@ impl Part for ProductApprovalEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupLicense {
-    /// no description provided
-    pub kind: Option<String>,
-    /// The number of purchased licenses (possibly in multiple purchases). If this field is omitted, then there is no limit on the number of licenses that can be provisioned (for example, if the acquisition kind is "free").
+    /// The number of purchased licenses (possibly in multiple purchases).
+    /// If this field is omitted, then there is no limit on the number of licenses
+    /// that can be provisioned (for example, if the acquisition kind is
+    /// <code>&quot;free&quot;</code>).
     #[serde(rename="numPurchased")]
     pub num_purchased: Option<i32>,
-    /// The total number of provisioned licenses for this product. Returned by read operations, but ignored in write operations.
+    /// The total number of provisioned licenses for this product.
+    /// Returned by read operations, but ignored in write operations.
     #[serde(rename="numProvisioned")]
     pub num_provisioned: Option<i32>,
-    /// How this group license was acquired. "bulkPurchase" means that this Grouplicenses resource was created because the enterprise purchased licenses for this product; otherwise, the value is "free" (for free products).
+    /// How this group license was acquired. <code>&quot;bulkPurchase&quot;</code>
+    /// means that this Grouplicenses resource was created because the enterprise
+    /// purchased licenses for this product; otherwise, the value is
+    /// <code>&quot;free&quot;</code> (for free products).
     #[serde(rename="acquisitionKind")]
     pub acquisition_kind: Option<String>,
-    /// Whether the product to which this group license relates is currently approved by the enterprise. Products are approved when a group license is first created, but this approval may be revoked by an enterprise admin via Google Play. Unapproved products will not be visible to end users in collections, and new entitlements to them should not normally be created.
+    /// Whether the product to which this group license relates is currently
+    /// approved by the enterprise. Products are approved when a group license is
+    /// first created, but this approval may be revoked by an enterprise admin via
+    /// Google Play. Unapproved products will not be visible to end users in
+    /// collections, and new entitlements to them should not normally be created.
     pub approval: Option<String>,
-    /// The permission approval status of the product. This field is only set if the product is approved. Possible states are: 
-    /// - "currentApproved", the current set of permissions is approved, but additional permissions will require the administrator to reapprove the product (If the product was approved without specifying the approved permissions setting, then this is the default behavior.), 
-    /// - "needsReapproval", the product has unapproved permissions. No additional product licenses can be assigned until the product is reapproved, 
-    /// - "allCurrentAndFutureApproved", the current permissions are approved and any future permission updates will be automatically approved without administrator review.
+    /// The permission approval status of the product. This field
+    /// is only set if the product is approved. Possible states are:<ul>
+    /// <li>"<code>currentApproved</code>", the current set
+    /// of permissions is approved, but additional permissions will require the
+    /// administrator to reapprove the product (If the product was approved
+    /// without specifying the approved permissions setting, then this is the
+    /// default behavior.),</li>
+    /// <li>"<code>needsReapproval</code>", the product has unapproved permissions.
+    /// No additional product licenses can be assigned until the product is
+    /// reapproved,</li>
+    /// <li>"<code>allCurrentAndFutureApproved</code>",
+    /// the current permissions are approved and any future permission updates
+    /// will be automatically approved without administrator review.</li></ul>
     pub permissions: Option<String>,
-    /// The ID of the product that the license is for. For example, "app:com.google.android.gm".
+    /// The ID of the product that the license is for. For example,
+    /// <code>&quot;app:com.google.android.gm&quot;</code>.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -2443,19 +2749,24 @@ impl Resource for GroupLicense {}
 impl ResponseResult for GroupLicense {}
 
 
-/// There is no detailed description.
+/// Information about the current page.
+/// 
+/// List operations that supports paging return only one "page" of results. This
+/// protocol buffer message describes the page that has been returned.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageInfo {
-    /// no description provided
+    /// Maximum number of results returned in one page.
+    /// ! The number of results included in the API response.
     #[serde(rename="resultPerPage")]
     pub result_per_page: Option<i32>,
-    /// no description provided
+    /// Index of the first result returned in the current page.
     #[serde(rename="startIndex")]
     pub start_index: Option<i32>,
-    /// no description provided
+    /// Total number of results available on the backend
+    /// ! The total number of results in the result set.
     #[serde(rename="totalResults")]
     pub total_results: Option<i32>,
 }
@@ -2514,7 +2825,8 @@ impl<'a, C, A> ManagedconfigurationssettingMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
-    /// * `productId` - The ID of the product for which the managed configurations settings applies to.
+    /// * `productId` - The ID of the product for which the managed configurations settings applies
+    ///                 to.
     pub fn list(&self, enterprise_id: &str, product_id: &str) -> ManagedconfigurationssettingListCall<'a, C, A> {
         ManagedconfigurationssettingListCall {
             hub: self.hub,
@@ -2690,7 +3002,7 @@ impl<'a, C, A> StorelayoutpageMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `generate_authentication_token(...)`, `generate_token(...)`, `get(...)`, `get_available_product_set(...)`, `insert(...)`, `list(...)`, `revoke_device_access(...)`, `revoke_token(...)`, `set_available_product_set(...)` and `update(...)`
+/// // like `delete(...)`, `generate_authentication_token(...)`, `get(...)`, `get_available_product_set(...)`, `insert(...)`, `list(...)`, `revoke_device_access(...)`, `set_available_product_set(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
@@ -2707,28 +3019,14 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revokes a previously generated token (activation code) for the user.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `userId` - The ID of the user.
-    pub fn revoke_token(&self, enterprise_id: &str, user_id: &str) -> UserRevokeTokenCall<'a, C, A> {
-        UserRevokeTokenCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates the details of an EMM-managed user.
     /// 
-    /// Can be used with EMM-managed users only (not Google managed users). Pass the new details in the Users resource in the request body. Only the displayName field can be changed. Other fields must either be unset or have the currently active value.
+    /// Can be used with EMM-managed users only (not Google managed users).
+    /// Pass the new details in the
+    /// <a href="/android/work/play/emm-api/v1/users.html">Users</a>
+    /// resource in the request body. Only the <code>displayName</code> field
+    /// can be changed. Other fields must either be unset or have the
+    /// currently active value.
     /// 
     /// # Arguments
     ///
@@ -2749,7 +3047,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revokes access to all devices currently provisioned to the user. The user will no longer be able to use the managed Play store on any of their managed devices.
+    /// Revokes access to all devices currently provisioned to the user. The user
+    /// will no longer be able to use the managed Play store on any of their
+    /// managed devices.
     /// 
     /// This call only works with EMM-managed accounts.
     /// 
@@ -2789,7 +3089,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates an authentication token which the device policy client can use to provision the given EMM-managed user account on a device. The generated token is single-use and expires after a few minutes.
+    /// Generates an authentication token which the device policy client can use to
+    /// provision the given EMM-managed user account on a device.
+    /// The generated token is single-use and expires after a few minutes.
     /// 
     /// You can provision a maximum of 10 devices per user.
     /// 
@@ -2812,12 +3114,15 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up a user by primary email address. This is only supported for Google-managed users. Lookup of the id is not needed for EMM-managed users because the id is already returned in the result of the Users.insert call.
+    /// Looks up a user by primary email address.
+    /// This is only supported for Google-managed users.  Lookup of the id is not
+    /// needed for EMM-managed users because the id is already returned in the
+    /// result of the Users.insert call.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
-    /// * `email` - The exact primary email address of the user to look up.
+    /// * `email` - Required. The exact primary email address of the user to look up.
     pub fn list(&self, enterprise_id: &str, email: &str) -> UserListCall<'a, C, A> {
         UserListCall {
             hub: self.hub,
@@ -2833,8 +3138,12 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     ///
     /// Creates a new EMM-managed user.
     /// 
-    /// The Users resource passed in the body of the request should include an accountIdentifier and an accountType.
-    /// If a corresponding user already exists with the same account identifier, the user will be updated with the resource. In this case only the displayName field can be changed.
+    /// The <a href="/android/work/play/emm-api/v1/users.html">Users</a> resource
+    /// passed in the body of the request should include an
+    /// <code>accountIdentifier</code> and an <code>accountType</code>.
+    /// <p>If a corresponding user already exists with the same account identifier,
+    /// the user will be updated with the resource. In this case only the
+    /// <code>displayName</code> field can be changed.
     /// 
     /// # Arguments
     ///
@@ -2872,28 +3181,11 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates a token (activation code) to allow this user to configure their managed account in the Android Setup Wizard. Revokes any previously generated token.
-    /// 
-    /// This call only works with Google managed accounts.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `userId` - The ID of the user.
-    pub fn generate_token(&self, enterprise_id: &str, user_id: &str) -> UserGenerateTokenCall<'a, C, A> {
-        UserGenerateTokenCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _user_id: user_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Modifies the set of products that a user is entitled to access (referred to as whitelisted products). Only products that are approved or products that were previously approved (products with revoked approval) can be whitelisted.
+    /// Modifies the set of products that a user is entitled to access (referred to
+    /// as <em>whitelisted</em> products). Only products that are
+    /// <a href="/android/work/play/emm-api/v1/products/approve">approved</a>
+    /// or products that were previously approved (products with revoked approval)
+    /// can be whitelisted.
     /// 
     /// # Arguments
     ///
@@ -2982,7 +3274,8 @@ impl<'a, C, A> InstallMethods<'a, C, A> {
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
     /// * `deviceId` - The Android ID of the device.
-    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    /// * `installId` - The ID of the product represented by the install, e.g.
+    ///                 "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallGetCall<'a, C, A> {
         InstallGetCall {
             hub: self.hub,
@@ -3019,14 +3312,17 @@ impl<'a, C, A> InstallMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.
+    /// Requests to remove an app from a device. A call to <code>get</code> or
+    /// <code>list</code> will still show the app as installed on the device until
+    /// it is actually removed.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
     /// * `deviceId` - The Android ID of the device.
-    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    /// * `installId` - The ID of the product represented by the install, e.g.
+    ///                 "app:com.google.android.gm".
     pub fn delete(&self, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallDeleteCall<'a, C, A> {
         InstallDeleteCall {
             hub: self.hub,
@@ -3042,7 +3338,9 @@ impl<'a, C, A> InstallMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests to install the latest version of an app to a device. If the app is already installed, then it is updated to the latest version if necessary.
+    /// Requests to install the latest version of an app to a device. If the app
+    /// is already installed, then it is updated to the latest version if
+    /// necessary.
     /// 
     /// # Arguments
     ///
@@ -3050,7 +3348,8 @@ impl<'a, C, A> InstallMethods<'a, C, A> {
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
     /// * `deviceId` - The Android ID of the device.
-    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    /// * `installId` - The ID of the product represented by the install, e.g.
+    ///                 "app:com.google.android.gm".
     pub fn update(&self, request: Install, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallUpdateCall<'a, C, A> {
         InstallUpdateCall {
             hub: self.hub,
@@ -3246,14 +3545,16 @@ impl<'a, C, A> ManagedconfigurationsfordeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a per-device managed configuration for an app for the specified device.
+    /// Removes a per-device managed configuration for an app for the specified
+    /// device.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
     /// * `deviceId` - The Android ID of the device.
-    /// * `managedConfigurationForDeviceId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// * `managedConfigurationForDeviceId` - The ID of the managed configuration (a product ID), e.g.
+    ///                                       "app:com.google.android.gm".
     pub fn delete(&self, enterprise_id: &str, user_id: &str, device_id: &str, managed_configuration_for_device_id: &str) -> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> {
         ManagedconfigurationsfordeviceDeleteCall {
             hub: self.hub,
@@ -3269,7 +3570,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds or updates a per-device managed configuration for an app for the specified device.
+    /// Adds or updates a per-device managed configuration for an app for the
+    /// specified device.
     /// 
     /// # Arguments
     ///
@@ -3277,7 +3579,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceMethods<'a, C, A> {
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
     /// * `deviceId` - The Android ID of the device.
-    /// * `managedConfigurationForDeviceId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// * `managedConfigurationForDeviceId` - The ID of the managed configuration (a product ID), e.g.
+    ///                                       "app:com.google.android.gm".
     pub fn update(&self, request: ManagedConfiguration, enterprise_id: &str, user_id: &str, device_id: &str, managed_configuration_for_device_id: &str) -> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> {
         ManagedconfigurationsfordeviceUpdateCall {
             hub: self.hub,
@@ -3294,7 +3597,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the per-device managed configurations for the specified device. Only the ID is set.
+    /// Lists all the per-device managed configurations for the specified device.
+    /// Only the ID is set.
     /// 
     /// # Arguments
     ///
@@ -3322,7 +3626,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceMethods<'a, C, A> {
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
     /// * `deviceId` - The Android ID of the device.
-    /// * `managedConfigurationForDeviceId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// * `managedConfigurationForDeviceId` - The ID of the managed configuration (a product ID), e.g.
+    ///                                       "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, user_id: &str, device_id: &str, managed_configuration_for_device_id: &str) -> ManagedconfigurationsfordeviceGetCall<'a, C, A> {
         ManagedconfigurationsfordeviceGetCall {
             hub: self.hub,
@@ -3385,7 +3690,8 @@ impl<'a, C, A> GrouplicenseMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
-    /// * `groupLicenseId` - The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    /// * `groupLicenseId` - The ID of the product the group license is for, e.g.
+    ///                      "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, group_license_id: &str) -> GrouplicenseGetCall<'a, C, A> {
         GrouplicenseGetCall {
             hub: self.hub,
@@ -3458,7 +3764,11 @@ impl<'a, C, A> DeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a report containing any changes in app states on the device since the last report was generated. You can call this method up to 3 times every 24 hours for a given device.
+    /// Uploads a report containing any changes in app states on the device since
+    /// the last report was generated. You can call this method up to 3 times every
+    /// 24 hours for a given device.
+    /// If you exceed the quota, then the Google Play EMM API returns <code>HTTP
+    /// 429 Too Many Requests</code>.
     /// 
     /// # Arguments
     ///
@@ -3479,7 +3789,12 @@ impl<'a, C, A> DeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users.
+    /// Sets whether a device's access to Google services is enabled or disabled.
+    /// The device state takes effect only if enforcing EMM policies on Android
+    /// devices is enabled in the Google Admin Console.
+    /// Otherwise, the device state is ignored and all devices are allowed access
+    /// to Google services.
+    /// This is only supported for Google-managed users.
     /// 
     /// # Arguments
     ///
@@ -3502,7 +3817,13 @@ impl<'a, C, A> DeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users.
+    /// Retrieves whether a device's access to Google services is enabled or
+    /// disabled.
+    /// The device state takes effect only if enforcing EMM policies on Android
+    /// devices is enabled in the Google Admin Console.
+    /// Otherwise, the device state is ignored and all devices are allowed access
+    /// to Google services.
+    /// This is only supported for Google-managed users.
     /// 
     /// # Arguments
     ///
@@ -3629,7 +3950,9 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications.
+    /// Acknowledges notifications that were received from
+    /// Enterprises.PullNotificationSet to prevent subsequent calls from returning
+    /// the same notifications.
     pub fn acknowledge_notification_set(&self) -> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> {
         EnterpriseAcknowledgeNotificationSetCall {
             hub: self.hub,
@@ -3659,26 +3982,8 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the managed Google Play javascript API. Each token may only be used to start one UI session. See the javascript API documentation for further information.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `enterpriseId` - The ID of the enterprise.
-    pub fn create_web_token(&self, request: AdministratorWebTokenSpec, enterprise_id: &str) -> EnterpriseCreateWebTokenCall<'a, C, A> {
-        EnterpriseCreateWebTokenCall {
-            hub: self.hub,
-            _request: request,
-            _enterprise_id: enterprise_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Sends a test notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise.
+    /// Sends a test notification to validate the EMM integration with
+    /// the Google Cloud Pub/Sub service for this enterprise.
     /// 
     /// # Arguments
     ///
@@ -3695,11 +4000,15 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up an enterprise by domain name. This is only supported for enterprises created via the Google-initiated creation flow. Lookup of the id is not needed for enterprises created via the EMM-initiated flow since the EMM learns the enterprise ID in the callback specified in the Enterprises.generateSignupUrl call.
+    /// Looks up an enterprise by domain name.
+    /// This is only supported for enterprises created via the Google-initiated
+    /// creation flow.  Lookup of the id is not needed for enterprises created via
+    /// the EMM-initiated flow since the EMM learns the enterprise ID in the
+    /// callback specified in the Enterprises.generateSignupUrl call.
     /// 
     /// # Arguments
     ///
-    /// * `domain` - The exact primary domain name of the enterprise to look up.
+    /// * `domain` - Required. The exact primary domain name of the enterprise to look up.
     pub fn list(&self, domain: &str) -> EnterpriseListCall<'a, C, A> {
         EnterpriseListCall {
             hub: self.hub,
@@ -3712,7 +4021,34 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the store layout for the enterprise. By default, storeLayoutType is set to "basic" and the basic store layout is enabled. The basic layout only contains apps approved by the admin, and that have been added to the available product set for a user (using the  setAvailableProductSet call). Apps on the page are sorted in order of their product ID value. If you create a custom store layout (by setting storeLayoutType = "custom" and setting a homepage), the basic store layout is disabled.
+    /// Returns the store layout for the enterprise. If the store layout
+    /// has not been set, returns "basic" as the store layout type and no
+    /// homepage.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    pub fn get_store_layout(&self, enterprise_id: &str) -> EnterpriseGetStoreLayoutCall<'a, C, A> {
+        EnterpriseGetStoreLayoutCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the store layout for the enterprise. By default, storeLayoutType
+    /// is set to "basic" and the basic store layout is enabled. The basic
+    /// layout only contains apps approved by the admin, and that have
+    /// been added to the available product set for a user (using the
+    /// <a href="/android/work/play/emm-api/v1/users/setAvailableProductSet">
+    /// setAvailableProductSet</a> call). Apps on the page are sorted in order of
+    /// their product ID value. If you create a custom store layout (by setting
+    /// storeLayoutType = "custom" and setting a homepage), the basic store
+    /// layout is disabled.
     /// 
     /// # Arguments
     ///
@@ -3731,7 +4067,10 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token.
+    /// Completes the signup flow, by specifying the Completion token and
+    /// Enterprise token.
+    /// This request must not be called multiple times for a given Enterprise
+    /// Token.
     pub fn complete_signup(&self) -> EnterpriseCompleteSignupCall<'a, C, A> {
         EnterpriseCompleteSignupCall {
             hub: self.hub,
@@ -3745,11 +4084,26 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Pulls and returns a notification set for the enterprises associated with the service account authenticated for the request. The notification set may be empty if no notification are pending.
-    /// A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises.AcknowledgeNotificationSet, unless the notification set is empty.
-    /// Notifications that are not acknowledged within the 20 seconds will eventually be included again in the response to another PullNotificationSet request, and those that are never acknowledged will ultimately be deleted according to the Google Cloud Platform Pub/Sub system policy.
-    /// Multiple requests might be performed concurrently to retrieve notifications, in which case the pending notifications (if any) will be split among each caller, if any are pending.
-    /// If no notifications are present, an empty notification list is returned. Subsequent requests may return more notifications once they become available.
+    /// Pulls and returns a notification set for the enterprises associated with
+    /// the service account authenticated for the request. The notification set may
+    /// be empty if no notification are pending.
+    /// <br>
+    /// A notification set returned needs to be acknowledged within 20 seconds
+    /// by calling Enterprises.AcknowledgeNotificationSet, unless the
+    /// notification set is empty.
+    /// <br>
+    /// Notifications that are not acknowledged within the 20 seconds will
+    /// eventually be included again in the response to another PullNotificationSet
+    /// request, and those that are never acknowledged will ultimately be deleted
+    /// according to the Google Cloud Platform Pub/Sub system policy.
+    /// <br>
+    /// Multiple requests might be performed concurrently to retrieve
+    /// notifications, in which case the pending notifications (if any) will be
+    /// split among each caller, if any are pending.
+    /// <br>
+    /// If no notifications are present, an empty notification list is returned.
+    /// Subsequent requests may return more notifications once they become
+    /// available.
     pub fn pull_notification_set(&self) -> EnterprisePullNotificationSetCall<'a, C, A> {
         EnterprisePullNotificationSetCall {
             hub: self.hub,
@@ -3767,7 +4121,7 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `token` - The token provided by the enterprise to register the EMM.
+    /// * `token` - Required. The token provided by the enterprise to register the EMM.
     pub fn enroll(&self, request: Enterprise, token: &str) -> EnterpriseEnrollCall<'a, C, A> {
         EnterpriseEnrollCall {
             hub: self.hub,
@@ -3798,13 +4152,21 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a service account and credentials. The service account can be bound to the enterprise by calling setAccount. The service account is unique to this enterprise and EMM, and will be deleted if the enterprise is unbound. The credentials contain private key data and are not stored server-side.
-    /// 
-    /// This method can only be called after calling Enterprises.Enroll or Enterprises.CompleteSignup, and before Enterprises.SetAccount; at other times it will return an error.
-    /// 
-    /// Subsequent calls after the first will generate a new, unique set of credentials, and invalidate the previously generated credentials.
-    /// 
-    /// Once the service account is bound to the enterprise, it can be managed using the serviceAccountKeys resource.
+    /// Returns a service account and credentials. The service account
+    /// can be bound to the enterprise by calling setAccount. The service account
+    /// is unique to this enterprise and EMM, and will be deleted if the enterprise
+    /// is unbound. The credentials contain private key data and are not stored
+    /// server-side.
+    /// <br> <br>
+    /// This method can only be called after calling
+    /// Enterprises.Enroll or Enterprises.CompleteSignup, and before
+    /// Enterprises.SetAccount; at other times it will return an error.
+    /// <br> <br>
+    /// Subsequent calls after the first will generate a new, unique set of
+    /// credentials, and invalidate the previously generated credentials.
+    /// <br> <br>
+    /// Once the service account is bound to the enterprise, it can be managed
+    /// using the serviceAccountKeys resource.
     /// 
     /// # Arguments
     ///
@@ -3822,24 +4184,8 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the store layout for the enterprise. If the store layout has not been set, returns "basic" as the store layout type and no homepage.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    pub fn get_store_layout(&self, enterprise_id: &str) -> EnterpriseGetStoreLayoutCall<'a, C, A> {
-        EnterpriseGetStoreLayoutCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Sets the account that will be used to authenticate to the API as the enterprise.
+    /// Sets the account that will be used to authenticate to the API as the
+    /// enterprise.
     /// 
     /// # Arguments
     ///
@@ -3863,6 +4209,28 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
         EnterpriseGenerateSignupUrlCall {
             hub: self.hub,
             _callback_url: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a unique token to access an embeddable UI. To generate a
+    /// web UI, pass the generated token into the managed Google Play javascript
+    /// API. Each token may only be used to start one UI session. See the
+    /// javascript API documentation for further information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    pub fn create_web_token(&self, request: AdministratorWebTokenSpec, enterprise_id: &str) -> EnterpriseCreateWebTokenCall<'a, C, A> {
+        EnterpriseCreateWebTokenCall {
+            hub: self.hub,
+            _request: request,
+            _enterprise_id: enterprise_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3932,27 +4300,6 @@ impl<'a, C, A> StorelayoutclusterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new cluster in a page.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `pageId` - The ID of the page.
-    pub fn insert(&self, request: StoreCluster, enterprise_id: &str, page_id: &str) -> StorelayoutclusterInsertCall<'a, C, A> {
-        StorelayoutclusterInsertCall {
-            hub: self.hub,
-            _request: request,
-            _enterprise_id: enterprise_id.to_string(),
-            _page_id: page_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates a cluster.
     /// 
     /// # Arguments
@@ -3968,6 +4315,27 @@ impl<'a, C, A> StorelayoutclusterMethods<'a, C, A> {
             _enterprise_id: enterprise_id.to_string(),
             _page_id: page_id.to_string(),
             _cluster_id: cluster_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Inserts a new cluster in a page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `pageId` - The ID of the page.
+    pub fn insert(&self, request: StoreCluster, enterprise_id: &str, page_id: &str) -> StorelayoutclusterInsertCall<'a, C, A> {
+        StorelayoutclusterInsertCall {
+            hub: self.hub,
+            _request: request,
+            _enterprise_id: enterprise_id.to_string(),
+            _page_id: page_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4060,26 +4428,6 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of a product for display to an enterprise admin.
-    /// 
-    /// # Arguments
-    ///
-    /// * `enterpriseId` - The ID of the enterprise.
-    /// * `productId` - The ID of the product, e.g. "app:com.google.android.gm".
-    pub fn get(&self, enterprise_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
-        ProductGetCall {
-            hub: self.hub,
-            _enterprise_id: enterprise_id.to_string(),
-            _product_id: product_id.to_string(),
-            _language: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Retrieves the Android app permissions required by this app.
     /// 
     /// # Arguments
@@ -4099,9 +4447,16 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
-    /// 
-    /// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
+    /// Generates a URL that can be rendered in an iframe to display the
+    /// permissions (if any) of a product. An enterprise admin must view these
+    /// permissions and accept them on behalf of their organization in order to
+    /// approve that product. <br><br>
+    /// Admins should accept the displayed permissions by
+    /// interacting with a separate UI element in the EMM console, which in turn
+    /// should trigger the use of this URL as the
+    /// <code>approvalUrlInfo.approvalUrl</code> property in a
+    /// <code>Products.approve</code> call to approve the product.
+    /// This URL can only be used to display permissions for up to 1 day.
     /// 
     /// # Arguments
     ///
@@ -4140,9 +4495,13 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Approves the specified product and the relevant app permissions, if any. The maximum number of products that you can approve per enterprise customer is 1,000.
-    /// 
-    /// To learn how to use managed Google Play to design and create a store layout to display approved products to your users, see Store Layout Design.
+    /// <p>Approves the specified product and the relevant app permissions, if any.
+    /// The maximum number of products that you can approve per enterprise customer
+    /// is 1,000.</p>
+    /// <p>To learn how to use managed Google Play to design and create a store
+    /// layout to display approved products to your users,
+    /// see <a href="/android/work/play/emm-api/store-layout">Store Layout
+    /// Design</a>.</p>
     /// 
     /// # Arguments
     ///
@@ -4163,7 +4522,14 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the schema that defines the configurable properties for this product. All products have a schema, but this schema may be empty if no managed configurations have been defined. This schema can be used to populate a UI that allows an admin to configure the product. To apply a managed configuration based on the schema obtained using this API, see Managed Configurations through Play.
+    /// Retrieves the schema that defines the configurable properties for this
+    /// product. All products have a schema, but this schema may be empty if no
+    /// managed configurations have been defined. This schema can be used to
+    /// populate a UI that allows an admin to configure the product.
+    /// To apply a managed configuration based on the schema obtained using this
+    /// API, see
+    /// <a href="/android/work/play/emm-api/managed-configurations">Managed
+    /// Configurations through Play</a>.
     /// 
     /// # Arguments
     ///
@@ -4183,7 +4549,8 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Finds approved products that match a query, or all approved products if there is no query.
+    /// Finds approved products that match a query, or all approved products
+    /// if there is no query.
     /// 
     /// # Arguments
     ///
@@ -4197,6 +4564,26 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
             _max_results: Default::default(),
             _language: Default::default(),
             _approved: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves details of a product for display to an enterprise admin.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product, e.g. "app:com.google.android.gm".
+    pub fn get(&self, enterprise_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
+        ProductGetCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _product_id: product_id.to_string(),
+            _language: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4247,14 +4634,25 @@ impl<'a, C, A> ManagedconfigurationsforuserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties.
+    /// Adds or updates the managed configuration settings for an app for the
+    /// specified user.
+    /// If you support the <a
+    /// href="https://developers.google.com/android/work/play/emm-api/managed-configurations-iframe">Managed
+    /// configurations iframe</a>,
+    /// you can apply managed configurations to a user by specifying an
+    /// <code>mcmId</code>
+    /// and its associated configuration variables (if any) in the request.
+    /// Alternatively,
+    /// all EMMs can apply managed configurations by passing a list of managed
+    /// properties.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
-    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g.
+    ///                                     "app:com.google.android.gm".
     pub fn update(&self, request: ManagedConfiguration, enterprise_id: &str, user_id: &str, managed_configuration_for_user_id: &str) -> ManagedconfigurationsforuserUpdateCall<'a, C, A> {
         ManagedconfigurationsforuserUpdateCall {
             hub: self.hub,
@@ -4276,7 +4674,8 @@ impl<'a, C, A> ManagedconfigurationsforuserMethods<'a, C, A> {
     ///
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
-    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g.
+    ///                                     "app:com.google.android.gm".
     pub fn delete(&self, enterprise_id: &str, user_id: &str, managed_configuration_for_user_id: &str) -> ManagedconfigurationsforuserDeleteCall<'a, C, A> {
         ManagedconfigurationsforuserDeleteCall {
             hub: self.hub,
@@ -4291,7 +4690,8 @@ impl<'a, C, A> ManagedconfigurationsforuserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the per-user managed configurations for the specified user. Only the ID is set.
+    /// Lists all the per-user managed configurations for the specified user. Only
+    /// the ID is set.
     /// 
     /// # Arguments
     ///
@@ -4310,13 +4710,15 @@ impl<'a, C, A> ManagedconfigurationsforuserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of a per-user managed configuration for an app for the specified user.
+    /// Retrieves details of a per-user managed configuration for an app for the
+    /// specified user.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `userId` - The ID of the user.
-    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// * `managedConfigurationForUserId` - The ID of the managed configuration (a product ID), e.g.
+    ///                                     "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, user_id: &str, managed_configuration_for_user_id: &str) -> ManagedconfigurationsforuserGetCall<'a, C, A> {
         ManagedconfigurationsforuserGetCall {
             hub: self.hub,
@@ -4373,12 +4775,14 @@ impl<'a, C, A> GrouplicenseuserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the IDs of the users who have been granted entitlements under the license.
+    /// Retrieves the IDs of the users who have been granted entitlements
+    /// under the license.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
-    /// * `groupLicenseId` - The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    /// * `groupLicenseId` - The ID of the product the group license is for, e.g.
+    ///                      "app:com.google.android.gm".
     pub fn list(&self, enterprise_id: &str, group_license_id: &str) -> GrouplicenseuserListCall<'a, C, A> {
         GrouplicenseuserListCall {
             hub: self.hub,
@@ -4561,9 +4965,12 @@ impl<'a, C, A> ServiceaccountkeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates new credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
-    /// 
-    /// Only the type of the key should be populated in the resource to be inserted.
+    /// Generates new credentials for the service account associated with this
+    /// enterprise. The calling service account must have been retrieved by calling
+    /// Enterprises.GetServiceAccount and must have been set as the enterprise
+    /// service account by calling Enterprises.SetAccount. <br><br>
+    /// Only the type of the key should be populated in the resource to be
+    /// inserted.
     /// 
     /// # Arguments
     ///
@@ -4582,7 +4989,11 @@ impl<'a, C, A> ServiceaccountkeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all active credentials for the service account associated with this enterprise. Only the ID and key type are returned. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
+    /// Lists all active credentials for the service account associated with this
+    /// enterprise. Only the ID and key type are returned. The calling service
+    /// account must have been retrieved by calling Enterprises.GetServiceAccount
+    /// and must have been set as the enterprise service account by calling
+    /// Enterprises.SetAccount.
     /// 
     /// # Arguments
     ///
@@ -4599,7 +5010,10 @@ impl<'a, C, A> ServiceaccountkeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes and invalidates the specified credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
+    /// Removes and invalidates the specified credentials for the service account
+    /// associated with this enterprise. The calling service account must have been
+    /// retrieved by calling Enterprises.GetServiceAccount and must have been set
+    /// as the enterprise service account by calling Enterprises.SetAccount.
     /// 
     /// # Arguments
     ///
@@ -4660,7 +5074,8 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of an Android app permission for display to an enterprise admin.
+    /// Retrieves details of an Android app permission for display to an enterprise
+    /// admin.
     /// 
     /// # Arguments
     ///
@@ -4758,7 +5173,7 @@ impl<'a, C, A> ManagedconfigurationssettingListCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/managedConfigurationsSettings";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}/managedConfigurationsSettings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4874,7 +5289,8 @@ impl<'a, C, A> ManagedconfigurationssettingListCall<'a, C, A> where C: BorrowMut
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// The ID of the product for which the managed configurations settings applies to.
+    /// The ID of the product for which the managed configurations settings applies
+    /// to.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -4904,13 +5320,17 @@ impl<'a, C, A> ManagedconfigurationssettingListCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationssettingListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5014,7 +5434,7 @@ impl<'a, C, A> StorelayoutpageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5150,13 +5570,17 @@ impl<'a, C, A> StorelayoutpageListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutpageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5262,7 +5686,7 @@ impl<'a, C, A> StorelayoutpageGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5408,13 +5832,17 @@ impl<'a, C, A> StorelayoutpageGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutpageGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5519,7 +5947,7 @@ impl<'a, C, A> StorelayoutpageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5655,13 +6083,17 @@ impl<'a, C, A> StorelayoutpageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutpageDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5772,7 +6204,7 @@ impl<'a, C, A> StorelayoutpageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5932,13 +6364,17 @@ impl<'a, C, A> StorelayoutpageInsertCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutpageInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6051,7 +6487,7 @@ impl<'a, C, A> StorelayoutpageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6221,13 +6657,17 @@ impl<'a, C, A> StorelayoutpageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutpageUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6260,256 +6700,14 @@ impl<'a, C, A> StorelayoutpageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Revokes a previously generated token (activation code) for the user.
-///
-/// A builder for the *revokeToken* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.users().revoke_token("enterpriseId", "userId")
-///              .doit();
-/// # }
-/// ```
-pub struct UserRevokeTokenCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _user_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserRevokeTokenCall<'a, C, A> {}
-
-impl<'a, C, A> UserRevokeTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.users.revokeToken",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("userId", self._user_id.to_string()));
-        for &field in ["enterpriseId", "userId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/token";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["userId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> UserRevokeTokenCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserRevokeTokenCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> UserRevokeTokenCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserRevokeTokenCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserRevokeTokenCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Updates the details of an EMM-managed user.
 /// 
-/// Can be used with EMM-managed users only (not Google managed users). Pass the new details in the Users resource in the request body. Only the displayName field can be changed. Other fields must either be unset or have the currently active value.
+/// Can be used with EMM-managed users only (not Google managed users).
+/// Pass the new details in the
+/// <a href="/android/work/play/emm-api/v1/users.html">Users</a>
+/// resource in the request body. Only the <code>displayName</code> field
+/// can be changed. Other fields must either be unset or have the
+/// currently active value.
 ///
 /// A builder for the *update* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -6589,7 +6787,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6759,13 +6957,17 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6798,7 +7000,9 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Revokes access to all devices currently provisioned to the user. The user will no longer be able to use the managed Play store on any of their managed devices.
+/// Revokes access to all devices currently provisioned to the user. The user
+/// will no longer be able to use the managed Play store on any of their
+/// managed devices.
 /// 
 /// This call only works with EMM-managed accounts.
 ///
@@ -6872,7 +7076,7 @@ impl<'a, C, A> UserRevokeDeviceAccesCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/deviceAccess";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/deviceAccess";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7008,13 +7212,17 @@ impl<'a, C, A> UserRevokeDeviceAccesCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserRevokeDeviceAccesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7119,7 +7327,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7255,13 +7463,17 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7294,7 +7506,9 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Generates an authentication token which the device policy client can use to provision the given EMM-managed user account on a device. The generated token is single-use and expires after a few minutes.
+/// Generates an authentication token which the device policy client can use to
+/// provision the given EMM-managed user account on a device.
+/// The generated token is single-use and expires after a few minutes.
 /// 
 /// You can provision a maximum of 10 devices per user.
 /// 
@@ -7371,7 +7585,7 @@ impl<'a, C, A> UserGenerateAuthenticationTokenCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/authenticationToken";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/authenticationToken";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7517,13 +7731,17 @@ impl<'a, C, A> UserGenerateAuthenticationTokenCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserGenerateAuthenticationTokenCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7556,7 +7774,10 @@ impl<'a, C, A> UserGenerateAuthenticationTokenCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Looks up a user by primary email address. This is only supported for Google-managed users. Lookup of the id is not needed for EMM-managed users because the id is already returned in the result of the Users.insert call.
+/// Looks up a user by primary email address.
+/// This is only supported for Google-managed users.  Lookup of the id is not
+/// needed for EMM-managed users because the id is already returned in the
+/// result of the Users.insert call.
 ///
 /// A builder for the *list* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -7629,7 +7850,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7745,7 +7966,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// The exact primary email address of the user to look up.
+    /// Required. The exact primary email address of the user to look up.
     ///
     /// Sets the *email* query property to the given value.
     ///
@@ -7775,13 +7996,17 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7816,8 +8041,12 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 /// Creates a new EMM-managed user.
 /// 
-/// The Users resource passed in the body of the request should include an accountIdentifier and an accountType.
-/// If a corresponding user already exists with the same account identifier, the user will be updated with the resource. In this case only the displayName field can be changed.
+/// The <a href="/android/work/play/emm-api/v1/users.html">Users</a> resource
+/// passed in the body of the request should include an
+/// <code>accountIdentifier</code> and an <code>accountType</code>.
+/// <p>If a corresponding user already exists with the same account identifier,
+/// the user will be updated with the resource. In this case only the
+/// <code>displayName</code> field can be changed.
 ///
 /// A builder for the *insert* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -7895,7 +8124,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8055,13 +8284,17 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8167,7 +8400,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8313,13 +8546,17 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8352,267 +8589,11 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Generates a token (activation code) to allow this user to configure their managed account in the Android Setup Wizard. Revokes any previously generated token.
-/// 
-/// This call only works with Google managed accounts.
-///
-/// A builder for the *generateToken* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.users().generate_token("enterpriseId", "userId")
-///              .doit();
-/// # }
-/// ```
-pub struct UserGenerateTokenCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _user_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserGenerateTokenCall<'a, C, A> {}
-
-impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, UserToken)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.users.generateToken",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("userId", self._user_id.to_string()));
-        for &field in ["alt", "enterpriseId", "userId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/token";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["userId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> UserGenerateTokenCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the user.
-    ///
-    /// Sets the *user id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserGenerateTokenCall<'a, C, A> {
-        self._user_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> UserGenerateTokenCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserGenerateTokenCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserGenerateTokenCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Modifies the set of products that a user is entitled to access (referred to as whitelisted products). Only products that are approved or products that were previously approved (products with revoked approval) can be whitelisted.
+/// Modifies the set of products that a user is entitled to access (referred to
+/// as <em>whitelisted</em> products). Only products that are
+/// <a href="/android/work/play/emm-api/v1/products/approve">approved</a>
+/// or products that were previously approved (products with revoked approval)
+/// can be whitelisted.
 ///
 /// A builder for the *setAvailableProductSet* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -8692,7 +8673,7 @@ impl<'a, C, A> UserSetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/availableProductSet";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/availableProductSet";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8862,13 +8843,17 @@ impl<'a, C, A> UserSetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserSetAvailableProductSetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8974,7 +8959,7 @@ impl<'a, C, A> UserGetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/availableProductSet";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/availableProductSet";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9120,13 +9105,17 @@ impl<'a, C, A> UserGetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserGetAvailableProductSetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9236,7 +9225,7 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9372,7 +9361,8 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._device_id = new_value.to_string();
         self
     }
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    /// The ID of the product represented by the install, e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *install id* path property to the given value.
     ///
@@ -9402,13 +9392,17 @@ impl<'a, C, A> InstallGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InstallGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9516,7 +9510,7 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9672,13 +9666,17 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InstallListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9711,7 +9709,9 @@ impl<'a, C, A> InstallListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.
+/// Requests to remove an app from a device. A call to <code>get</code> or
+/// <code>list</code> will still show the app as installed on the device until
+/// it is actually removed.
 ///
 /// A builder for the *delete* method supported by a *install* resource.
 /// It is not used directly, but through a `InstallMethods` instance.
@@ -9787,7 +9787,7 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9913,7 +9913,8 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._device_id = new_value.to_string();
         self
     }
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    /// The ID of the product represented by the install, e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *install id* path property to the given value.
     ///
@@ -9943,13 +9944,17 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InstallDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9982,7 +9987,9 @@ impl<'a, C, A> InstallDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Requests to install the latest version of an app to a device. If the app is already installed, then it is updated to the latest version if necessary.
+/// Requests to install the latest version of an app to a device. If the app
+/// is already installed, then it is updated to the latest version if
+/// necessary.
 ///
 /// A builder for the *update* method supported by a *install* resource.
 /// It is not used directly, but through a `InstallMethods` instance.
@@ -10066,7 +10073,7 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10226,7 +10233,8 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._device_id = new_value.to_string();
         self
     }
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
+    /// The ID of the product represented by the install, e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *install id* path property to the given value.
     ///
@@ -10256,13 +10264,17 @@ impl<'a, C, A> InstallUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InstallUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10373,7 +10385,7 @@ impl<'a, C, A> WebappInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/webApps";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10533,13 +10545,17 @@ impl<'a, C, A> WebappInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> WebappInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10643,7 +10659,7 @@ impl<'a, C, A> WebappListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/webApps";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10779,13 +10795,17 @@ impl<'a, C, A> WebappListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> WebappListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10891,7 +10911,7 @@ impl<'a, C, A> WebappGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/webApps/{webAppId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11037,13 +11057,17 @@ impl<'a, C, A> WebappGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> WebappGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11148,7 +11172,7 @@ impl<'a, C, A> WebappDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/webApps/{webAppId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11284,13 +11308,17 @@ impl<'a, C, A> WebappDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> WebappDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11403,7 +11431,7 @@ impl<'a, C, A> WebappUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/webApps/{webAppId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/webApps/{webAppId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11573,13 +11601,17 @@ impl<'a, C, A> WebappUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> WebappUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11612,7 +11644,8 @@ impl<'a, C, A> WebappUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Removes a per-device managed configuration for an app for the specified device.
+/// Removes a per-device managed configuration for an app for the specified
+/// device.
 ///
 /// A builder for the *delete* method supported by a *managedconfigurationsfordevice* resource.
 /// It is not used directly, but through a `ManagedconfigurationsfordeviceMethods` instance.
@@ -11688,7 +11721,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice/{managedConfigurationForDeviceId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice/{managedConfigurationForDeviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11814,7 +11847,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
         self._device_id = new_value.to_string();
         self
     }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// The ID of the managed configuration (a product ID), e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *managed configuration for device id* path property to the given value.
     ///
@@ -11844,13 +11878,17 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsfordeviceDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11883,7 +11921,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceDeleteCall<'a, C, A> where C: Borro
 }
 
 
-/// Adds or updates a per-device managed configuration for an app for the specified device.
+/// Adds or updates a per-device managed configuration for an app for the
+/// specified device.
 ///
 /// A builder for the *update* method supported by a *managedconfigurationsfordevice* resource.
 /// It is not used directly, but through a `ManagedconfigurationsfordeviceMethods` instance.
@@ -11967,7 +12006,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice/{managedConfigurationForDeviceId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice/{managedConfigurationForDeviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12127,7 +12166,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
         self._device_id = new_value.to_string();
         self
     }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// The ID of the managed configuration (a product ID), e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *managed configuration for device id* path property to the given value.
     ///
@@ -12157,13 +12197,17 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsfordeviceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12196,7 +12240,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceUpdateCall<'a, C, A> where C: Borro
 }
 
 
-/// Lists all the per-device managed configurations for the specified device. Only the ID is set.
+/// Lists all the per-device managed configurations for the specified device.
+/// Only the ID is set.
 ///
 /// A builder for the *list* method supported by a *managedconfigurationsfordevice* resource.
 /// It is not used directly, but through a `ManagedconfigurationsfordeviceMethods` instance.
@@ -12271,7 +12316,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceListCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12427,13 +12472,17 @@ impl<'a, C, A> ManagedconfigurationsfordeviceListCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsfordeviceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12543,7 +12592,7 @@ impl<'a, C, A> ManagedconfigurationsfordeviceGetCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice/{managedConfigurationForDeviceId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/managedConfigurationsForDevice/{managedConfigurationForDeviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12679,7 +12728,8 @@ impl<'a, C, A> ManagedconfigurationsfordeviceGetCall<'a, C, A> where C: BorrowMu
         self._device_id = new_value.to_string();
         self
     }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// The ID of the managed configuration (a product ID), e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *managed configuration for device id* path property to the given value.
     ///
@@ -12709,13 +12759,17 @@ impl<'a, C, A> ManagedconfigurationsfordeviceGetCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsfordeviceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12821,7 +12875,7 @@ impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses/{groupLicenseId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/groupLicenses/{groupLicenseId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12937,7 +12991,8 @@ impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    /// The ID of the product the group license is for, e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *group license id* path property to the given value.
     ///
@@ -12967,13 +13022,17 @@ impl<'a, C, A> GrouplicenseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13077,7 +13136,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/groupLicenses";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13213,13 +13272,17 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13252,7 +13315,11 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Uploads a report containing any changes in app states on the device since the last report was generated. You can call this method up to 3 times every 24 hours for a given device.
+/// Uploads a report containing any changes in app states on the device since
+/// the last report was generated. You can call this method up to 3 times every
+/// 24 hours for a given device.
+/// If you exceed the quota, then the Google Play EMM API returns <code>HTTP
+/// 429 Too Many Requests</code>.
 ///
 /// A builder for the *forceReportUpload* method supported by a *device* resource.
 /// It is not used directly, but through a `DeviceMethods` instance.
@@ -13326,7 +13393,7 @@ impl<'a, C, A> DeviceForceReportUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/forceReportUpload";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/forceReportUpload";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13472,13 +13539,17 @@ impl<'a, C, A> DeviceForceReportUploadCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DeviceForceReportUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13511,7 +13582,12 @@ impl<'a, C, A> DeviceForceReportUploadCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Sets whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users.
+/// Sets whether a device's access to Google services is enabled or disabled.
+/// The device state takes effect only if enforcing EMM policies on Android
+/// devices is enabled in the Google Admin Console.
+/// Otherwise, the device state is ignored and all devices are allowed access
+/// to Google services.
+/// This is only supported for Google-managed users.
 ///
 /// A builder for the *setState* method supported by a *device* resource.
 /// It is not used directly, but through a `DeviceMethods` instance.
@@ -13593,7 +13669,7 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/state";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/state";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13773,13 +13849,17 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DeviceSetStateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13812,7 +13892,13 @@ impl<'a, C, A> DeviceSetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieves whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users.
+/// Retrieves whether a device's access to Google services is enabled or
+/// disabled.
+/// The device state takes effect only if enforcing EMM policies on Android
+/// devices is enabled in the Google Admin Console.
+/// Otherwise, the device state is ignored and all devices are allowed access
+/// to Google services.
+/// This is only supported for Google-managed users.
 ///
 /// A builder for the *getState* method supported by a *device* resource.
 /// It is not used directly, but through a `DeviceMethods` instance.
@@ -13887,7 +13973,7 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/state";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/state";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14043,13 +14129,17 @@ impl<'a, C, A> DeviceGetStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DeviceGetStateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14155,7 +14245,7 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14301,13 +14391,17 @@ impl<'a, C, A> DeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DeviceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14415,7 +14509,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14571,13 +14665,17 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DeviceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14644,7 +14742,7 @@ impl<'a, C, A> DeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.devices().update(req, "enterpriseId", "userId", "deviceId")
-///              .update_mask("invidunt")
+///              .update_mask("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -14697,7 +14795,7 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14857,9 +14955,11 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._device_id = new_value.to_string();
         self
     }
-    /// Mask that identifies which fields to update. If not set, all modifiable fields will be modified.
+    /// Mask that identifies which fields to update. If not set, all modifiable
+    /// fields will be modified.
     /// 
-    /// When set in a query parameter, this field should be specified as updateMask=<field1>,<field2>,...
+    /// When set in a query parameter, this field should be specified as
+    /// <code>updateMask=&lt;field1&gt;,&lt;field2&gt;,...</code>
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> DeviceUpdateCall<'a, C, A> {
@@ -14886,13 +14986,17 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DeviceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14925,7 +15029,9 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications.
+/// Acknowledges notifications that were received from
+/// Enterprises.PullNotificationSet to prevent subsequent calls from returning
+/// the same notifications.
 ///
 /// A builder for the *acknowledgeNotificationSet* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -14953,7 +15059,7 @@ impl<'a, C, A> DeviceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().acknowledge_notification_set()
-///              .notification_set_id("ea")
+///              .notification_set_id("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -14998,7 +15104,7 @@ impl<'a, C, A> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> where C: Borro
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/acknowledgeNotificationSet";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/acknowledgeNotificationSet";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15073,7 +15179,8 @@ impl<'a, C, A> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> where C: Borro
     }
 
 
-    /// The notification set ID as returned by Enterprises.PullNotificationSet. This must be provided.
+    /// The notification set ID as returned by Enterprises.PullNotificationSet.
+    /// This must be provided.
     ///
     /// Sets the *notification set id* query property to the given value.
     pub fn notification_set_id(mut self, new_value: &str) -> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> {
@@ -15100,13 +15207,17 @@ impl<'a, C, A> EnterpriseAcknowledgeNotificationSetCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseAcknowledgeNotificationSetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15209,7 +15320,7 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/unenroll";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/unenroll";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15335,13 +15446,17 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseUnenrollCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15374,284 +15489,8 @@ impl<'a, C, A> EnterpriseUnenrollCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the managed Google Play javascript API. Each token may only be used to start one UI session. See the javascript API documentation for further information.
-///
-/// A builder for the *createWebToken* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// use androidenterprise1::AdministratorWebTokenSpec;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AdministratorWebTokenSpec::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().create_web_token(req, "enterpriseId")
-///              .doit();
-/// # }
-/// ```
-pub struct EnterpriseCreateWebTokenCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _request: AdministratorWebTokenSpec,
-    _enterprise_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EnterpriseCreateWebTokenCall<'a, C, A> {}
-
-impl<'a, C, A> EnterpriseCreateWebTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AdministratorWebToken)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.createWebToken",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        for &field in ["alt", "enterpriseId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/createWebToken";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AdministratorWebTokenSpec) -> EnterpriseCreateWebTokenCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseCreateWebTokenCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> EnterpriseCreateWebTokenCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseCreateWebTokenCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseCreateWebTokenCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Sends a test notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise.
+/// Sends a test notification to validate the EMM integration with
+/// the Google Cloud Pub/Sub service for this enterprise.
 ///
 /// A builder for the *sendTestPushNotification* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -15722,7 +15561,7 @@ impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/sendTestPushNotification";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/sendTestPushNotification";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15858,13 +15697,17 @@ impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseSendTestPushNotificationCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15897,7 +15740,11 @@ impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Looks up an enterprise by domain name. This is only supported for enterprises created via the Google-initiated creation flow. Lookup of the id is not needed for enterprises created via the EMM-initiated flow since the EMM learns the enterprise ID in the callback specified in the Enterprises.generateSignupUrl call.
+/// Looks up an enterprise by domain name.
+/// This is only supported for enterprises created via the Google-initiated
+/// creation flow.  Lookup of the id is not needed for enterprises created via
+/// the EMM-initiated flow since the EMM learns the enterprise ID in the
+/// callback specified in the Enterprises.generateSignupUrl call.
 ///
 /// A builder for the *list* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -15968,7 +15815,7 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16053,7 +15900,7 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The exact primary domain name of the enterprise to look up.
+    /// Required. The exact primary domain name of the enterprise to look up.
     ///
     /// Sets the *domain* query property to the given value.
     ///
@@ -16083,13 +15930,17 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16122,7 +15973,267 @@ impl<'a, C, A> EnterpriseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Sets the store layout for the enterprise. By default, storeLayoutType is set to "basic" and the basic store layout is enabled. The basic layout only contains apps approved by the admin, and that have been added to the available product set for a user (using the  setAvailableProductSet call). Apps on the page are sorted in order of their product ID value. If you create a custom store layout (by setting storeLayoutType = "custom" and setting a homepage), the basic store layout is disabled.
+/// Returns the store layout for the enterprise. If the store layout
+/// has not been set, returns "basic" as the store layout type and no
+/// homepage.
+///
+/// A builder for the *getStoreLayout* method supported by a *enterprise* resource.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().get_store_layout("enterpriseId")
+///              .doit();
+/// # }
+/// ```
+pub struct EnterpriseGetStoreLayoutCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EnterpriseGetStoreLayoutCall<'a, C, A> {}
+
+impl<'a, C, A> EnterpriseGetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, StoreLayout)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.getStoreLayout",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        for &field in ["alt", "enterpriseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseGetStoreLayoutCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> EnterpriseGetStoreLayoutCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseGetStoreLayoutCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseGetStoreLayoutCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the store layout for the enterprise. By default, storeLayoutType
+/// is set to "basic" and the basic store layout is enabled. The basic
+/// layout only contains apps approved by the admin, and that have
+/// been added to the available product set for a user (using the
+/// <a href="/android/work/play/emm-api/v1/users/setAvailableProductSet">
+/// setAvailableProductSet</a> call). Apps on the page are sorted in order of
+/// their product ID value. If you create a custom store layout (by setting
+/// storeLayoutType = "custom" and setting a homepage), the basic store
+/// layout is disabled.
 ///
 /// A builder for the *setStoreLayout* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -16200,7 +16311,7 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16360,13 +16471,17 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseSetStoreLayoutCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16399,7 +16514,10 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token.
+/// Completes the signup flow, by specifying the Completion token and
+/// Enterprise token.
+/// This request must not be called multiple times for a given Enterprise
+/// Token.
 ///
 /// A builder for the *completeSignup* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -16427,8 +16545,8 @@ impl<'a, C, A> EnterpriseSetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().complete_signup()
-///              .enterprise_token("aliquyam")
-///              .completion_token("sit")
+///              .enterprise_token("rebum.")
+///              .completion_token("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -16478,7 +16596,7 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/completeSignup";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/completeSignup";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16597,13 +16715,17 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseCompleteSignupCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16636,11 +16758,26 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Pulls and returns a notification set for the enterprises associated with the service account authenticated for the request. The notification set may be empty if no notification are pending.
-/// A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises.AcknowledgeNotificationSet, unless the notification set is empty.
-/// Notifications that are not acknowledged within the 20 seconds will eventually be included again in the response to another PullNotificationSet request, and those that are never acknowledged will ultimately be deleted according to the Google Cloud Platform Pub/Sub system policy.
-/// Multiple requests might be performed concurrently to retrieve notifications, in which case the pending notifications (if any) will be split among each caller, if any are pending.
-/// If no notifications are present, an empty notification list is returned. Subsequent requests may return more notifications once they become available.
+/// Pulls and returns a notification set for the enterprises associated with
+/// the service account authenticated for the request. The notification set may
+/// be empty if no notification are pending.
+/// <br>
+/// A notification set returned needs to be acknowledged within 20 seconds
+/// by calling Enterprises.AcknowledgeNotificationSet, unless the
+/// notification set is empty.
+/// <br>
+/// Notifications that are not acknowledged within the 20 seconds will
+/// eventually be included again in the response to another PullNotificationSet
+/// request, and those that are never acknowledged will ultimately be deleted
+/// according to the Google Cloud Platform Pub/Sub system policy.
+/// <br>
+/// Multiple requests might be performed concurrently to retrieve
+/// notifications, in which case the pending notifications (if any) will be
+/// split among each caller, if any are pending.
+/// <br>
+/// If no notifications are present, an empty notification list is returned.
+/// Subsequent requests may return more notifications once they become
+/// available.
 ///
 /// A builder for the *pullNotificationSet* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -16668,7 +16805,7 @@ impl<'a, C, A> EnterpriseCompleteSignupCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().pull_notification_set()
-///              .request_mode("eirmod")
+///              .request_mode("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -16714,7 +16851,7 @@ impl<'a, C, A> EnterprisePullNotificationSetCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/pullNotificationSet";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/pullNotificationSet";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16800,9 +16937,16 @@ impl<'a, C, A> EnterprisePullNotificationSetCall<'a, C, A> where C: BorrowMut<hy
 
 
     /// The request mode for pulling notifications.
-    /// Specifying waitForNotifications will cause the request to block and wait until one or more notifications are present, or return an empty notification list if no notifications are present after some time.
-    /// Speciying returnImmediately will cause the request to immediately return the pending notifications, or an empty list if no notifications are present.
-    /// If omitted, defaults to waitForNotifications.
+    /// <br>
+    /// Specifying <code>waitForNotifications</code> will cause the request to
+    /// block and wait until one or more notifications are present, or return an
+    /// empty notification list if no notifications are present after some time.
+    /// <br>
+    /// Speciying <code>returnImmediately</code> will cause the request to
+    /// immediately return the pending notifications, or an empty list if no
+    /// notifications are present.
+    /// <br>
+    /// If omitted, defaults to <code>waitForNotifications</code>.
     ///
     /// Sets the *request mode* query property to the given value.
     pub fn request_mode(mut self, new_value: &str) -> EnterprisePullNotificationSetCall<'a, C, A> {
@@ -16829,13 +16973,17 @@ impl<'a, C, A> EnterprisePullNotificationSetCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterprisePullNotificationSetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16946,7 +17094,7 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/enroll";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/enroll";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17055,7 +17203,7 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The token provided by the enterprise to register the EMM.
+    /// Required. The token provided by the enterprise to register the EMM.
     ///
     /// Sets the *token* query property to the given value.
     ///
@@ -17085,13 +17233,17 @@ impl<'a, C, A> EnterpriseEnrollCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseEnrollCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17195,7 +17347,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17331,13 +17483,17 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17370,13 +17526,21 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Returns a service account and credentials. The service account can be bound to the enterprise by calling setAccount. The service account is unique to this enterprise and EMM, and will be deleted if the enterprise is unbound. The credentials contain private key data and are not stored server-side.
-/// 
-/// This method can only be called after calling Enterprises.Enroll or Enterprises.CompleteSignup, and before Enterprises.SetAccount; at other times it will return an error.
-/// 
-/// Subsequent calls after the first will generate a new, unique set of credentials, and invalidate the previously generated credentials.
-/// 
-/// Once the service account is bound to the enterprise, it can be managed using the serviceAccountKeys resource.
+/// Returns a service account and credentials. The service account
+/// can be bound to the enterprise by calling setAccount. The service account
+/// is unique to this enterprise and EMM, and will be deleted if the enterprise
+/// is unbound. The credentials contain private key data and are not stored
+/// server-side.
+/// <br> <br>
+/// This method can only be called after calling
+/// Enterprises.Enroll or Enterprises.CompleteSignup, and before
+/// Enterprises.SetAccount; at other times it will return an error.
+/// <br> <br>
+/// Subsequent calls after the first will generate a new, unique set of
+/// credentials, and invalidate the previously generated credentials.
+/// <br> <br>
+/// Once the service account is bound to the enterprise, it can be managed
+/// using the serviceAccountKeys resource.
 ///
 /// A builder for the *getServiceAccount* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -17404,7 +17568,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().get_service_account("enterpriseId")
-///              .key_type("ea")
+///              .key_type("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -17452,7 +17616,7 @@ impl<'a, C, A> EnterpriseGetServiceAccountCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/serviceAccount";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/serviceAccount";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17595,13 +17759,17 @@ impl<'a, C, A> EnterpriseGetServiceAccountCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseGetServiceAccountCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17634,253 +17802,8 @@ impl<'a, C, A> EnterpriseGetServiceAccountCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Returns the store layout for the enterprise. If the store layout has not been set, returns "basic" as the store layout type and no homepage.
-///
-/// A builder for the *getStoreLayout* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().get_store_layout("enterpriseId")
-///              .doit();
-/// # }
-/// ```
-pub struct EnterpriseGetStoreLayoutCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EnterpriseGetStoreLayoutCall<'a, C, A> {}
-
-impl<'a, C, A> EnterpriseGetStoreLayoutCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, StoreLayout)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.getStoreLayout",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        for &field in ["alt", "enterpriseId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseGetStoreLayoutCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> EnterpriseGetStoreLayoutCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseGetStoreLayoutCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseGetStoreLayoutCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Sets the account that will be used to authenticate to the API as the enterprise.
+/// Sets the account that will be used to authenticate to the API as the
+/// enterprise.
 ///
 /// A builder for the *setAccount* method supported by a *enterprise* resource.
 /// It is not used directly, but through a `EnterpriseMethods` instance.
@@ -17958,7 +17881,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/account";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/account";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18118,13 +18041,17 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseSetAccountCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18185,7 +18112,7 @@ impl<'a, C, A> EnterpriseSetAccountCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().generate_signup_url()
-///              .callback_url("eos")
+///              .callback_url("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -18231,7 +18158,7 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/signupUrl";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/signupUrl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18316,8 +18243,14 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The callback URL to which the Admin will be redirected after successfully creating an enterprise. Before redirecting there the system will add a single query parameter to this URL named "enterpriseToken" which will contain an opaque token to be used for the CompleteSignup request.
-    /// Beware that this means that the URL will be parsed, the parameter added and then a new URL formatted, i.e. there may be some minor formatting changes and, more importantly, the URL must be well-formed so that it can be parsed.
+    /// The callback URL to which the Admin will be redirected after successfully
+    /// creating an enterprise. Before redirecting there the system will add a
+    /// single query parameter to this URL named "enterpriseToken" which will
+    /// contain an opaque token to be used for the CompleteSignup request.<br>
+    /// Beware that this means that the URL will be parsed, the parameter added
+    /// and then a new URL formatted, i.e. there may be some minor formatting
+    /// changes and, more importantly, the URL must be well-formed so that it can
+    /// be parsed.
     ///
     /// Sets the *callback url* query property to the given value.
     pub fn callback_url(mut self, new_value: &str) -> EnterpriseGenerateSignupUrlCall<'a, C, A> {
@@ -18344,13 +18277,17 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EnterpriseGenerateSignupUrlCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18372,6 +18309,290 @@ impl<'a, C, A> EnterpriseGenerateSignupUrlCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseGenerateSignupUrlCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns a unique token to access an embeddable UI. To generate a
+/// web UI, pass the generated token into the managed Google Play javascript
+/// API. Each token may only be used to start one UI session. See the
+/// javascript API documentation for further information.
+///
+/// A builder for the *createWebToken* method supported by a *enterprise* resource.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::AdministratorWebTokenSpec;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AdministratorWebTokenSpec::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().create_web_token(req, "enterpriseId")
+///              .doit();
+/// # }
+/// ```
+pub struct EnterpriseCreateWebTokenCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _request: AdministratorWebTokenSpec,
+    _enterprise_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EnterpriseCreateWebTokenCall<'a, C, A> {}
+
+impl<'a, C, A> EnterpriseCreateWebTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AdministratorWebToken)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.createWebToken",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        for &field in ["alt", "enterpriseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/createWebToken";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AdministratorWebTokenSpec) -> EnterpriseCreateWebTokenCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseCreateWebTokenCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> EnterpriseCreateWebTokenCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseCreateWebTokenCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseCreateWebTokenCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18456,7 +18677,7 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18602,13 +18823,17 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18630,295 +18855,6 @@ impl<'a, C, A> StorelayoutclusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Inserts a new cluster in a page.
-///
-/// A builder for the *insert* method supported by a *storelayoutcluster* resource.
-/// It is not used directly, but through a `StorelayoutclusterMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// use androidenterprise1::StoreCluster;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = StoreCluster::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.storelayoutclusters().insert(req, "enterpriseId", "pageId")
-///              .doit();
-/// # }
-/// ```
-pub struct StorelayoutclusterInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _request: StoreCluster,
-    _enterprise_id: String,
-    _page_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for StorelayoutclusterInsertCall<'a, C, A> {}
-
-impl<'a, C, A> StorelayoutclusterInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, StoreCluster)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.storelayoutclusters.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("pageId", self._page_id.to_string()));
-        for &field in ["alt", "enterpriseId", "pageId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{pageId}", "pageId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["pageId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StoreCluster) -> StorelayoutclusterInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> StorelayoutclusterInsertCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the page.
-    ///
-    /// Sets the *page id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> StorelayoutclusterInsertCall<'a, C, A> {
-        self._page_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> StorelayoutclusterInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterInsertCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19012,7 +18948,7 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19192,13 +19128,17 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19220,6 +19160,299 @@ impl<'a, C, A> StorelayoutclusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Inserts a new cluster in a page.
+///
+/// A builder for the *insert* method supported by a *storelayoutcluster* resource.
+/// It is not used directly, but through a `StorelayoutclusterMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::StoreCluster;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = StoreCluster::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.storelayoutclusters().insert(req, "enterpriseId", "pageId")
+///              .doit();
+/// # }
+/// ```
+pub struct StorelayoutclusterInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _request: StoreCluster,
+    _enterprise_id: String,
+    _page_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for StorelayoutclusterInsertCall<'a, C, A> {}
+
+impl<'a, C, A> StorelayoutclusterInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, StoreCluster)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.storelayoutclusters.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("pageId", self._page_id.to_string()));
+        for &field in ["alt", "enterpriseId", "pageId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{pageId}", "pageId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["pageId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: StoreCluster) -> StorelayoutclusterInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> StorelayoutclusterInsertCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the page.
+    ///
+    /// Sets the *page id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn page_id(mut self, new_value: &str) -> StorelayoutclusterInsertCall<'a, C, A> {
+        self._page_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> StorelayoutclusterInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterInsertCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19305,7 +19538,7 @@ impl<'a, C, A> StorelayoutclusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19451,13 +19684,17 @@ impl<'a, C, A> StorelayoutclusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19565,7 +19802,7 @@ impl<'a, C, A> StorelayoutclusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/storeLayout/pages/{pageId}/clusters/{clusterId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19721,13 +19958,17 @@ impl<'a, C, A> StorelayoutclusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> StorelayoutclusterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19749,276 +19990,6 @@ impl<'a, C, A> StorelayoutclusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> StorelayoutclusterGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieves details of a product for display to an enterprise admin.
-///
-/// A builder for the *get* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.products().get("enterpriseId", "productId")
-///              .language("justo")
-///              .doit();
-/// # }
-/// ```
-pub struct ProductGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _product_id: String,
-    _language: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProductGetCall<'a, C, A> {}
-
-impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Product)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.products.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("productId", self._product_id.to_string()));
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "enterpriseId", "productId", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{productId}", "productId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["productId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the product, e.g. "app:com.google.android.gm".
-    ///
-    /// Sets the *product id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._product_id = new_value.to_string();
-        self
-    }
-    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProductGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20103,7 +20074,7 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/permissions";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}/permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -20249,13 +20220,17 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProductGetPermissionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20288,9 +20263,16 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
-/// 
-/// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
+/// Generates a URL that can be rendered in an iframe to display the
+/// permissions (if any) of a product. An enterprise admin must view these
+/// permissions and accept them on behalf of their organization in order to
+/// approve that product. <br><br>
+/// Admins should accept the displayed permissions by
+/// interacting with a separate UI element in the EMM console, which in turn
+/// should trigger the use of this URL as the
+/// <code>approvalUrlInfo.approvalUrl</code> property in a
+/// <code>Products.approve</code> call to approve the product.
+/// This URL can only be used to display permissions for up to 1 day.
 ///
 /// A builder for the *generateApprovalUrl* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -20318,7 +20300,7 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().generate_approval_url("enterpriseId", "productId")
-///              .language_code("dolores")
+///              .language_code("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -20368,7 +20350,7 @@ impl<'a, C, A> ProductGenerateApprovalUrlCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/generateApprovalUrl";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}/generateApprovalUrl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -20494,7 +20476,8 @@ impl<'a, C, A> ProductGenerateApprovalUrlCall<'a, C, A> where C: BorrowMut<hyper
         self._product_id = new_value.to_string();
         self
     }
-    /// The BCP 47 language code used for permission names and descriptions in the returned iframe, for instance "en-US".
+    /// The BCP 47 language code used for permission names and descriptions in
+    /// the returned iframe, for instance "en-US".
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {
@@ -20521,13 +20504,17 @@ impl<'a, C, A> ProductGenerateApprovalUrlCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProductGenerateApprovalUrlCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20632,7 +20619,7 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/unapprove";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}/unapprove";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -20768,13 +20755,17 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProductUnapproveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20807,9 +20798,13 @@ impl<'a, C, A> ProductUnapproveCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Approves the specified product and the relevant app permissions, if any. The maximum number of products that you can approve per enterprise customer is 1,000.
-/// 
-/// To learn how to use managed Google Play to design and create a store layout to display approved products to your users, see Store Layout Design.
+/// <p>Approves the specified product and the relevant app permissions, if any.
+/// The maximum number of products that you can approve per enterprise customer
+/// is 1,000.</p>
+/// <p>To learn how to use managed Google Play to design and create a store
+/// layout to display approved products to your users,
+/// see <a href="/android/work/play/emm-api/store-layout">Store Layout
+/// Design</a>.</p>
 ///
 /// A builder for the *approve* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -20888,7 +20883,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/approve";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}/approve";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -21048,13 +21043,17 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProductApproveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21087,7 +21086,14 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieves the schema that defines the configurable properties for this product. All products have a schema, but this schema may be empty if no managed configurations have been defined. This schema can be used to populate a UI that allows an admin to configure the product. To apply a managed configuration based on the schema obtained using this API, see Managed Configurations through Play.
+/// Retrieves the schema that defines the configurable properties for this
+/// product. All products have a schema, but this schema may be empty if no
+/// managed configurations have been defined. This schema can be used to
+/// populate a UI that allows an admin to configure the product.
+/// To apply a managed configuration based on the schema obtained using this
+/// API, see
+/// <a href="/android/work/play/emm-api/managed-configurations">Managed
+/// Configurations through Play</a>.
 ///
 /// A builder for the *getAppRestrictionsSchema* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -21115,7 +21121,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().get_app_restrictions_schema("enterpriseId", "productId")
-///              .language("ea")
+///              .language("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -21165,7 +21171,7 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products/{productId}/appRestrictionsSchema";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}/appRestrictionsSchema";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -21318,13 +21324,17 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProductGetAppRestrictionsSchemaCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21357,7 +21367,8 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Finds approved products that match a query, or all approved products if there is no query.
+/// Finds approved products that match a query, or all approved products
+/// if there is no query.
 ///
 /// A builder for the *list* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -21385,11 +21396,11 @@ impl<'a, C, A> ProductGetAppRestrictionsSchemaCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list("enterpriseId")
-///              .token("dolor")
-///              .query("diam")
-///              .max_results(39)
-///              .language("invidunt")
-///              .approved(true)
+///              .token("voluptua.")
+///              .query("duo")
+///              .max_results(8)
+///              .language("aliquyam")
+///              .approved(false)
 ///              .doit();
 /// # }
 /// ```
@@ -21453,7 +21464,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/products";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -21569,35 +21580,45 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// A pagination token is contained in a request's response when there are more products. The token can be used in a subsequent request to obtain more products, and so forth. This parameter cannot be used in the initial request.
+    /// Defines the token of the page to return, usually taken from
+    /// TokenPagination.
+    /// This can only be used if token paging is enabled.
     ///
     /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> ProductListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
-    /// The search query as typed in the Google Play store search box. If omitted, all approved apps will be returned (using the pagination parameters), including apps that are not available in the store (e.g. unpublished apps).
+    /// The search query as typed in the Google Play store search box.
+    /// If omitted, all approved apps will be returned (using the pagination
+    /// parameters), including apps that are not available in the store
+    /// (e.g. unpublished apps).
     ///
     /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> ProductListCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
-    /// Specifies the maximum number of products that can be returned per request. If not specified, uses a default value of 100, which is also the maximum retrievable within a single response.
+    /// Defines how many results the list operation should return.
+    /// The default number depends on the resource collection.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ProductListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de"). Results are returned in the language best matching the preferred language.
+    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
+    /// Results are returned in the language best matching the preferred
+    /// language.
     ///
     /// Sets the *language* query property to the given value.
     pub fn language(mut self, new_value: &str) -> ProductListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
-    /// Specifies whether to search among all products (false) or among only products that have been approved (true). Only "true" is supported, and should be specified.
+    /// Specifies whether to search among all products (false) or among
+    /// only products that have been approved (true). Only "true" is
+    /// supported, and should be specified.
     ///
     /// Sets the *approved* query property to the given value.
     pub fn approved(mut self, new_value: bool) -> ProductListCall<'a, C, A> {
@@ -21624,13 +21645,17 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProductListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21663,7 +21688,291 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties.
+/// Retrieves details of a product for display to an enterprise admin.
+///
+/// A builder for the *get* method supported by a *product* resource.
+/// It is not used directly, but through a `ProductMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.products().get("enterpriseId", "productId")
+///              .language("dolor")
+///              .doit();
+/// # }
+/// ```
+pub struct ProductGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _product_id: String,
+    _language: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProductGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Product)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.products.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("productId", self._product_id.to_string()));
+        if let Some(value) = self._language {
+            params.push(("language", value.to_string()));
+        }
+        for &field in ["alt", "enterpriseId", "productId", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/products/{productId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{productId}", "productId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["productId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the product, e.g. "app:com.google.android.gm".
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
+    ///
+    /// Sets the *language* query property to the given value.
+    pub fn language(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._language = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProductGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Adds or updates the managed configuration settings for an app for the
+/// specified user.
+/// If you support the <a
+/// href="https://developers.google.com/android/work/play/emm-api/managed-configurations-iframe">Managed
+/// configurations iframe</a>,
+/// you can apply managed configurations to a user by specifying an
+/// <code>mcmId</code>
+/// and its associated configuration variables (if any) in the request.
+/// Alternatively,
+/// all EMMs can apply managed configurations by passing a list of managed
+/// properties.
 ///
 /// A builder for the *update* method supported by a *managedconfigurationsforuser* resource.
 /// It is not used directly, but through a `ManagedconfigurationsforuserMethods` instance.
@@ -21745,7 +22054,7 @@ impl<'a, C, A> ManagedconfigurationsforuserUpdateCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -21895,7 +22204,8 @@ impl<'a, C, A> ManagedconfigurationsforuserUpdateCall<'a, C, A> where C: BorrowM
         self._user_id = new_value.to_string();
         self
     }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// The ID of the managed configuration (a product ID), e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *managed configuration for user id* path property to the given value.
     ///
@@ -21925,13 +22235,17 @@ impl<'a, C, A> ManagedconfigurationsforuserUpdateCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsforuserUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22038,7 +22352,7 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22154,7 +22468,8 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
         self._user_id = new_value.to_string();
         self
     }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// The ID of the managed configuration (a product ID), e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *managed configuration for user id* path property to the given value.
     ///
@@ -22184,13 +22499,17 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsforuserDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22223,7 +22542,8 @@ impl<'a, C, A> ManagedconfigurationsforuserDeleteCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Lists all the per-user managed configurations for the specified user. Only the ID is set.
+/// Lists all the per-user managed configurations for the specified user. Only
+/// the ID is set.
 ///
 /// A builder for the *list* method supported by a *managedconfigurationsforuser* resource.
 /// It is not used directly, but through a `ManagedconfigurationsforuserMethods` instance.
@@ -22296,7 +22616,7 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22442,13 +22762,17 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsforuserListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22481,7 +22805,8 @@ impl<'a, C, A> ManagedconfigurationsforuserListCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Retrieves details of a per-user managed configuration for an app for the specified user.
+/// Retrieves details of a per-user managed configuration for an app for the
+/// specified user.
 ///
 /// A builder for the *get* method supported by a *managedconfigurationsforuser* resource.
 /// It is not used directly, but through a `ManagedconfigurationsforuserMethods` instance.
@@ -22556,7 +22881,7 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/managedConfigurationsForUser/{managedConfigurationForUserId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22682,7 +23007,8 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
         self._user_id = new_value.to_string();
         self
     }
-    /// The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm".
+    /// The ID of the managed configuration (a product ID), e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *managed configuration for user id* path property to the given value.
     ///
@@ -22712,13 +23038,17 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedconfigurationsforuserGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22751,7 +23081,8 @@ impl<'a, C, A> ManagedconfigurationsforuserGetCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Retrieves the IDs of the users who have been granted entitlements under the license.
+/// Retrieves the IDs of the users who have been granted entitlements
+/// under the license.
 ///
 /// A builder for the *list* method supported by a *grouplicenseuser* resource.
 /// It is not used directly, but through a `GrouplicenseuserMethods` instance.
@@ -22824,7 +23155,7 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/groupLicenses/{groupLicenseId}/users";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/groupLicenses/{groupLicenseId}/users";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -22940,7 +23271,8 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._enterprise_id = new_value.to_string();
         self
     }
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
+    /// The ID of the product the group license is for, e.g.
+    /// "app:com.google.android.gm".
     ///
     /// Sets the *group license id* path property to the given value.
     ///
@@ -22970,13 +23302,17 @@ impl<'a, C, A> GrouplicenseuserListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> GrouplicenseuserListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23096,7 +23432,7 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23256,7 +23592,10 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._entitlement_id = new_value.to_string();
         self
     }
-    /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.
+    /// Set to true to also install the product on all the user's devices where
+    /// possible. Failure to install on one or more devices will not prevent
+    /// this operation from returning successfully, as long as the entitlement
+    /// was successfully assigned to the user.
     ///
     /// Sets the *install* query property to the given value.
     pub fn install(mut self, new_value: bool) -> EntitlementUpdateCall<'a, C, A> {
@@ -23283,13 +23622,17 @@ impl<'a, C, A> EntitlementUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EntitlementUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23397,7 +23740,7 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23553,13 +23896,17 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EntitlementGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23665,7 +24012,7 @@ impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/entitlements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23811,13 +24158,17 @@ impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EntitlementListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23924,7 +24275,7 @@ impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/entitlements/{entitlementId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24070,13 +24421,17 @@ impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EntitlementDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -24109,9 +24464,12 @@ impl<'a, C, A> EntitlementDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Generates new credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
-/// 
-/// Only the type of the key should be populated in the resource to be inserted.
+/// Generates new credentials for the service account associated with this
+/// enterprise. The calling service account must have been retrieved by calling
+/// Enterprises.GetServiceAccount and must have been set as the enterprise
+/// service account by calling Enterprises.SetAccount. <br><br>
+/// Only the type of the key should be populated in the resource to be
+/// inserted.
 ///
 /// A builder for the *insert* method supported by a *serviceaccountkey* resource.
 /// It is not used directly, but through a `ServiceaccountkeyMethods` instance.
@@ -24189,7 +24547,7 @@ impl<'a, C, A> ServiceaccountkeyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/serviceAccountKeys";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/serviceAccountKeys";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24349,13 +24707,17 @@ impl<'a, C, A> ServiceaccountkeyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceaccountkeyInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -24388,7 +24750,11 @@ impl<'a, C, A> ServiceaccountkeyInsertCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Lists all active credentials for the service account associated with this enterprise. Only the ID and key type are returned. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
+/// Lists all active credentials for the service account associated with this
+/// enterprise. Only the ID and key type are returned. The calling service
+/// account must have been retrieved by calling Enterprises.GetServiceAccount
+/// and must have been set as the enterprise service account by calling
+/// Enterprises.SetAccount.
 ///
 /// A builder for the *list* method supported by a *serviceaccountkey* resource.
 /// It is not used directly, but through a `ServiceaccountkeyMethods` instance.
@@ -24459,7 +24825,7 @@ impl<'a, C, A> ServiceaccountkeyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/serviceAccountKeys";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/serviceAccountKeys";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24595,13 +24961,17 @@ impl<'a, C, A> ServiceaccountkeyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceaccountkeyListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -24634,7 +25004,10 @@ impl<'a, C, A> ServiceaccountkeyListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Removes and invalidates the specified credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
+/// Removes and invalidates the specified credentials for the service account
+/// associated with this enterprise. The calling service account must have been
+/// retrieved by calling Enterprises.GetServiceAccount and must have been set
+/// as the enterprise service account by calling Enterprises.SetAccount.
 ///
 /// A builder for the *delete* method supported by a *serviceaccountkey* resource.
 /// It is not used directly, but through a `ServiceaccountkeyMethods` instance.
@@ -24706,7 +25079,7 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = self.hub._base_url.clone() + "enterprises/{enterpriseId}/serviceAccountKeys/{keyId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/enterprises/{enterpriseId}/serviceAccountKeys/{keyId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -24842,13 +25215,17 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ServiceaccountkeyDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -24881,7 +25258,8 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Retrieves details of an Android app permission for display to an enterprise admin.
+/// Retrieves details of an Android app permission for display to an enterprise
+/// admin.
 ///
 /// A builder for the *get* method supported by a *permission* resource.
 /// It is not used directly, but through a `PermissionMethods` instance.
@@ -24909,7 +25287,7 @@ impl<'a, C, A> ServiceaccountkeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("permissionId")
-///              .language("vero")
+///              .language("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -24957,7 +25335,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "permissions/{permissionId}";
+        let mut url = self.hub._base_url.clone() + "androidenterprise/v1/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -25100,13 +25478,17 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

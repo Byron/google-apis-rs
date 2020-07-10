@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Broker* crate version *1.0.13+20190624*, where *20190624* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Service Broker* crate version *1.0.14+20190624*, where *20190624* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Service Broker* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kubernetes-engine/docs/concepts/add-on/service-broker).
@@ -331,7 +331,7 @@ impl<'a, C, A> ServiceBroker<C, A>
         ServiceBroker {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://servicebroker.googleapis.com/".to_string(),
             _root_url: "https://servicebroker.googleapis.com/".to_string(),
         }
@@ -342,7 +342,7 @@ impl<'a, C, A> ServiceBroker<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

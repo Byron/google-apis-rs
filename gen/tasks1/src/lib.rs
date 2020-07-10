@@ -2,10 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *tasks* crate version *1.0.13+20190628*, where *20190628* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
-//! 
-//! Everything else about the *tasks* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/google-apps/tasks/firstapp).
+//! This documentation was generated from *Tasks* crate version *1.0.14+20200704*, where *20200704* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/tasks1).
 //! # Features
 //! 
@@ -117,7 +114,7 @@
 //!              .show_deleted(false)
 //!              .show_completed(true)
 //!              .page_token("gubergren")
-//!              .max_results("sadipscing")
+//!              .max_results(-95)
 //!              .due_min("aliquyam")
 //!              .due_max("ea")
 //!              .completed_min("no")
@@ -308,7 +305,7 @@ impl Default for Scope {
 ///              .show_deleted(true)
 ///              .show_completed(false)
 ///              .page_token("Lorem")
-///              .max_results("et")
+///              .max_results(-21)
 ///              .due_min("duo")
 ///              .due_max("aliquyam")
 ///              .completed_min("sea")
@@ -350,8 +347,8 @@ impl<'a, C, A> TasksHub<C, A>
         TasksHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/tasks/v1/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -364,7 +361,7 @@ impl<'a, C, A> TasksHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -372,7 +369,7 @@ impl<'a, C, A> TasksHub<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/tasks/v1/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -414,27 +411,40 @@ pub struct Task {
     pub status: Option<String>,
     /// Type of the resource. This is always "tasks#task".
     pub kind: Option<String>,
-    /// Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the "move" method to move the task under a different parent or to the top level.
+    /// Parent task identifier. This field is omitted if it is a top-level task.
+    /// This field is read-only. Use the "move" method to move the task under a
+    /// different parent or to the top level.
     pub parent: Option<String>,
     /// Collection of links. This collection is read-only.
     pub links: Option<Vec<TaskLinks>>,
     /// Title of the task.
     pub title: Option<String>,
-    /// Flag indicating whether the task has been deleted. The default if False.
+    /// Flag indicating whether the task has been deleted. The default is False.
     pub deleted: Option<bool>,
-    /// Completion date of the task (as a RFC 3339 timestamp). This field is omitted if the task has not been completed.
+    /// Completion date of the task (as a RFC 3339 timestamp). This field is
+    /// omitted if the task has not been completed.
     pub completed: Option<String>,
     /// Last modification time of the task (as a RFC 3339 timestamp).
     pub updated: Option<String>,
-    /// Due date of the task (as a RFC 3339 timestamp). Optional. The due date only records date information; the time portion of the timestamp is discarded when setting the due date. It isn't possible to read or write the time that a task is due via the API.
+    /// Due date of the task (as a RFC 3339 timestamp). Optional. The due date only
+    /// records date information; the time portion of the timestamp is discarded
+    /// when setting the due date. It isn't possible to read or write the time that
+    /// a task is due via the API.
     pub due: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Task identifier.
     pub id: Option<String>,
-    /// String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task's corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task (or at the top level). This field is read-only. Use the "move" method to move the task to another position.
+    /// String indicating the position of the task among its sibling tasks under
+    /// the same parent task or at the top level. If this string is greater than
+    /// another task's corresponding position string according to lexicographical
+    /// ordering, the task is positioned after the other task under the same parent
+    /// task (or at the top level). This field is read-only. Use the "move" method
+    /// to move the task to another position.
     pub position: Option<String>,
-    /// Flag indicating whether the task is hidden. This is the case if the task had been marked completed when the task list was last cleared. The default is False. This field is read-only.
+    /// Flag indicating whether the task is hidden. This is the case if the task
+    /// had been marked completed when the task list was last cleared. The default
+    /// is False. This field is read-only.
     pub hidden: Option<bool>,
     /// Notes describing the task. Optional.
     pub notes: Option<String>,
@@ -470,7 +480,8 @@ pub struct TaskList {
     pub title: Option<String>,
     /// Last modification time of the task list (as a RFC 3339 timestamp).
     pub updated: Option<String>,
-    /// URL pointing to this task list. Used to retrieve, update, or delete this task list.
+    /// URL pointing to this task list. Used to retrieve, update, or delete this
+    /// task list.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Task list identifier.
@@ -518,7 +529,8 @@ pub struct TaskLinks {
     /// Type of the link, e.g. "email".
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The description. In HTML speak: Everything between <a> and </a>.
+    /// The description. In HTML speak: Everything between &lt;a&gt; and
+    /// &lt;/a&gt;.
     pub description: Option<String>,
 }
 
@@ -666,7 +678,9 @@ impl<'a, C, A> TaskMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears all completed tasks from the specified task list. The affected tasks will be marked as 'hidden' and no longer be returned by default when retrieving all tasks for a task list.
+    /// Clears all completed tasks from the specified task list. The affected tasks
+    /// will be marked as 'hidden' and no longer be returned by default when
+    /// retrieving all tasks for a task list.
     /// 
     /// # Arguments
     ///
@@ -683,7 +697,9 @@ impl<'a, C, A> TaskMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.
+    /// Moves the specified task to another position in the task list. This can
+    /// include putting it as a child task under a new parent and/or move it to a
+    /// different position among its sibling tasks.
     /// 
     /// # Arguments
     ///
@@ -855,7 +871,8 @@ impl<'a, C, A> TasklistMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the authenticated user's specified task list. This method supports patch semantics.
+    /// Updates the authenticated user's specified task list. This method supports
+    /// patch semantics.
     /// 
     /// # Arguments
     ///
@@ -948,7 +965,7 @@ impl<'a, C, A> TasklistMethods<'a, C, A> {
 ///              .show_deleted(true)
 ///              .show_completed(true)
 ///              .page_token("elitr")
-///              .max_results("amet")
+///              .max_results(-97)
 ///              .due_min("no")
 ///              .due_max("labore")
 ///              .completed_min("eirmod")
@@ -966,7 +983,7 @@ pub struct TaskListCall<'a, C, A>
     _show_deleted: Option<bool>,
     _show_completed: Option<bool>,
     _page_token: Option<String>,
-    _max_results: Option<String>,
+    _max_results: Option<i32>,
     _due_min: Option<String>,
     _due_max: Option<String>,
     _completed_min: Option<String>,
@@ -1036,7 +1053,7 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -1152,28 +1169,33 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._tasklist = new_value.to_string();
         self
     }
-    /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.
+    /// Lower bound for a task's last modification time (as a RFC 3339 timestamp)
+    /// to filter by. Optional. The default is not to filter by last modification
+    /// time.
     ///
     /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
-    /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.
+    /// Flag indicating whether hidden tasks are returned in the result. Optional.
+    /// The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
     pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
-    /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.
+    /// Flag indicating whether deleted tasks are returned in the result. Optional.
+    /// The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
-    /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True.
+    /// Flag indicating whether completed tasks are returned in the result.
+    /// Optional. The default is True.
     ///
     /// Sets the *show completed* query property to the given value.
     pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
@@ -1187,35 +1209,40 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
+    /// Maximum number of task lists returned on one page. Optional. The default is
+    /// 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
-        self._max_results = Some(new_value.to_string());
+    pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a, C, A> {
+        self._max_results = Some(new_value);
         self
     }
-    /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
+    /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by.
+    /// Optional. The default is not to filter by due date.
     ///
     /// Sets the *due min* query property to the given value.
     pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._due_min = Some(new_value.to_string());
         self
     }
-    /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
+    /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by.
+    /// Optional. The default is not to filter by due date.
     ///
     /// Sets the *due max* query property to the given value.
     pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._due_max = Some(new_value.to_string());
         self
     }
-    /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
+    /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to
+    /// filter by. Optional. The default is not to filter by completion date.
     ///
     /// Sets the *completed min* query property to the given value.
     pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._completed_min = Some(new_value.to_string());
         self
     }
-    /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
+    /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to
+    /// filter by. Optional. The default is not to filter by completion date.
     ///
     /// Sets the *completed max* query property to the given value.
     pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
@@ -1242,13 +1269,17 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1361,7 +1392,7 @@ impl<'a, C, A> TaskUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks/{task}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks/{task}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -1531,13 +1562,17 @@ impl<'a, C, A> TaskUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1650,7 +1685,7 @@ impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks/{task}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks/{task}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -1820,13 +1855,17 @@ impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1859,7 +1898,9 @@ impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Clears all completed tasks from the specified task list. The affected tasks will be marked as 'hidden' and no longer be returned by default when retrieving all tasks for a task list.
+/// Clears all completed tasks from the specified task list. The affected tasks
+/// will be marked as 'hidden' and no longer be returned by default when
+/// retrieving all tasks for a task list.
 ///
 /// A builder for the *clear* method supported by a *task* resource.
 /// It is not used directly, but through a `TaskMethods` instance.
@@ -1929,7 +1970,7 @@ impl<'a, C, A> TaskClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         }
 
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/clear";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/clear";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2055,13 +2096,17 @@ impl<'a, C, A> TaskClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2094,7 +2139,9 @@ impl<'a, C, A> TaskClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.
+/// Moves the specified task to another position in the task list. This can
+/// include putting it as a child task under a new parent and/or move it to a
+/// different position among its sibling tasks.
 ///
 /// A builder for the *move* method supported by a *task* resource.
 /// It is not used directly, but through a `TaskMethods` instance.
@@ -2177,7 +2224,7 @@ impl<'a, C, A> TaskMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks/{task}/move";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks/{task}/move";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2303,14 +2350,16 @@ impl<'a, C, A> TaskMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._task = new_value.to_string();
         self
     }
-    /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
+    /// New previous sibling task identifier. If the task is moved to the first
+    /// position among its siblings, this parameter is omitted. Optional.
     ///
     /// Sets the *previous* query property to the given value.
     pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._previous = Some(new_value.to_string());
         self
     }
-    /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
+    /// New parent task identifier. If the task is moved to the top level, this
+    /// parameter is omitted. Optional.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
@@ -2337,13 +2386,17 @@ impl<'a, C, A> TaskMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2448,7 +2501,7 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks/{task}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks/{task}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2584,13 +2637,17 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2696,7 +2753,7 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks/{task}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks/{task}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2842,13 +2899,17 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2969,7 +3030,7 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "lists/{tasklist}/tasks";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/lists/{tasklist}/tasks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3109,14 +3170,16 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._tasklist = new_value.to_string();
         self
     }
-    /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.
+    /// Previous sibling task identifier. If the task is created at the first
+    /// position among its siblings, this parameter is omitted. Optional.
     ///
     /// Sets the *previous* query property to the given value.
     pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._previous = Some(new_value.to_string());
         self
     }
-    /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
+    /// Parent task identifier. If the task is created at the top level, this
+    /// parameter is omitted. Optional.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
@@ -3143,13 +3206,17 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3211,7 +3278,7 @@ impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tasklists().list()
 ///              .page_token("sed")
-///              .max_results("dolor")
+///              .max_results(-3)
 ///              .doit();
 /// # }
 /// ```
@@ -3220,7 +3287,7 @@ pub struct TasklistListCall<'a, C, A>
 
     hub: &'a TasksHub<C, A>,
     _page_token: Option<String>,
-    _max_results: Option<String>,
+    _max_results: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3261,7 +3328,7 @@ impl<'a, C, A> TasklistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/@me/lists";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/users/@me/lists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3353,11 +3420,12 @@ impl<'a, C, A> TasklistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
+    /// Maximum number of task lists returned on one page. Optional. The default is
+    /// 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: &str) -> TasklistListCall<'a, C, A> {
-        self._max_results = Some(new_value.to_string());
+    pub fn max_results(mut self, new_value: i32) -> TasklistListCall<'a, C, A> {
+        self._max_results = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3380,13 +3448,17 @@ impl<'a, C, A> TasklistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3497,7 +3569,7 @@ impl<'a, C, A> TasklistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/@me/lists/{tasklist}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/users/@me/lists/{tasklist}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3657,13 +3729,17 @@ impl<'a, C, A> TasklistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3766,7 +3842,7 @@ impl<'a, C, A> TasklistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         }
 
 
-        let mut url = self.hub._base_url.clone() + "users/@me/lists/{tasklist}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/users/@me/lists/{tasklist}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3892,13 +3968,17 @@ impl<'a, C, A> TasklistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3931,7 +4011,8 @@ impl<'a, C, A> TasklistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Updates the authenticated user's specified task list. This method supports patch semantics.
+/// Updates the authenticated user's specified task list. This method supports
+/// patch semantics.
 ///
 /// A builder for the *patch* method supported by a *tasklist* resource.
 /// It is not used directly, but through a `TasklistMethods` instance.
@@ -4009,7 +4090,7 @@ impl<'a, C, A> TasklistPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/@me/lists/{tasklist}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/users/@me/lists/{tasklist}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4169,13 +4250,17 @@ impl<'a, C, A> TasklistPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4284,7 +4369,7 @@ impl<'a, C, A> TasklistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/@me/lists";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/users/@me/lists";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4413,13 +4498,17 @@ impl<'a, C, A> TasklistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4523,7 +4612,7 @@ impl<'a, C, A> TasklistGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/@me/lists/{tasklist}";
+        let mut url = self.hub._base_url.clone() + "tasks/v1/users/@me/lists/{tasklist}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4659,13 +4748,17 @@ impl<'a, C, A> TasklistGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

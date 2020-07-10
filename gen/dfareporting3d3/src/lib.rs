@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *dfareporting* crate version *1.0.14+20200514*, where *20200514* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *dfareporting* *v3d3* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -471,7 +471,7 @@ impl<'a, C, A> Dfareporting<C, A>
         Dfareporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://www.googleapis.com/dfareporting/v3.3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -659,7 +659,7 @@ impl<'a, C, A> Dfareporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -974,7 +974,7 @@ pub struct UserRolePermissionGroupsListResponse {
 impl ResponseResult for UserRolePermissionGroupsListResponse {}
 
 
-/// There is no detailed description.
+/// List of files for a report.
 /// 
 /// # Activities
 /// 
@@ -989,7 +989,7 @@ pub struct FileList {
     /// Continuation token used to page through files. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// no description provided
+    /// The files returned in this response.
     pub items: Option<Vec<File>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#fileList".
     pub kind: Option<String>,
@@ -2135,7 +2135,7 @@ pub struct File {
     pub kind: Option<String>,
     /// The output format of the report. Only available once the file is available.
     pub format: Option<String>,
-    /// no description provided
+    /// The date range for which the file has report data. The date range will always be the absolute date range for which the report is run.
     #[serde(rename="dateRange")]
     pub date_range: Option<DateRange>,
     /// The filename of the file.
@@ -9084,8 +9084,8 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `profileId` - The DFA user profile ID.
-    /// * `reportId` - The ID of the report.
+    /// * `profileId` - The DFA profile ID.
+    /// * `reportId` - The ID of the parent report.
     pub fn files_list(&self, profile_id: &str, report_id: &str) -> ReportFileListCall<'a, C, A> {
         ReportFileListCall {
             hub: self.hub,
@@ -25269,7 +25269,7 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The DFA user profile ID.
+    /// The DFA profile ID.
     ///
     /// Sets the *profile id* path property to the given value.
     ///
@@ -25279,7 +25279,7 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._profile_id = new_value.to_string();
         self
     }
-    /// The ID of the report.
+    /// The ID of the parent report.
     ///
     /// Sets the *report id* path property to the given value.
     ///

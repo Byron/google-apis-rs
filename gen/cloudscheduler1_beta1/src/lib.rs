@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Scheduler* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *cloudscheduler:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Scheduler* crate version *1.0.14+20200618*, where *20200618* is the exact revision of the *cloudscheduler:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Scheduler* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/scheduler/).
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudScheduler<C, A>
         CloudScheduler {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://cloudscheduler.googleapis.com/".to_string(),
             _root_url: "https://cloudscheduler.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> CloudScheduler<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1037,7 +1037,7 @@ pub struct RetryConfig {
     /// A job's retry interval starts at
     /// min_backoff_duration, then doubles
     /// `max_doublings` times, then increases linearly, and finally
-    /// retries retries at intervals of
+    /// retries at intervals of
     /// max_backoff_duration up to
     /// retry_count times.
     /// 

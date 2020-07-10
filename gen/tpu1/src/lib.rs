@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *TPU* crate version *1.0.13+20200318*, where *20200318* is the exact revision of the *tpu:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *TPU* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *tpu:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *TPU* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/tpu/).
@@ -336,7 +336,7 @@ impl<'a, C, A> TPU<C, A>
         TPU {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://tpu.googleapis.com/".to_string(),
             _root_url: "https://tpu.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> TPU<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -639,13 +639,13 @@ pub struct ReimageNodeRequest {
 impl RequestValue for ReimageNodeRequest {}
 
 
-/// There is no detailed description.
+/// Sets the scheduling options for this node.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SchedulingConfig {
-    /// no description provided
+    /// Defines whether the node is preemptible.
     pub preemptible: Option<bool>,
     /// Whether the node is created under a reservation.
     pub reserved: Option<bool>,

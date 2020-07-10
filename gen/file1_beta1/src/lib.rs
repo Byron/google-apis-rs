@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Filestore* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Filestore* crate version *1.0.14+20200613*, where *20200613* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Filestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/filestore/).
@@ -334,7 +334,7 @@ impl<'a, C, A> CloudFilestore<C, A>
         CloudFilestore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://file.googleapis.com/".to_string(),
             _root_url: "https://file.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudFilestore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -400,6 +400,49 @@ pub struct ListInstancesResponse {
 }
 
 impl ResponseResult for ListInstancesResponse {}
+
+
+/// NFS export options specifications.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NfsExportOptions {
+    /// Either NO_ROOT_SQUASH, for allowing root access on the exported directory,
+    /// or ROOT_SQUASH, for not allowing root access. The default is
+    /// NO_ROOT_SQUASH.
+    #[serde(rename="squashMode")]
+    pub squash_mode: Option<String>,
+    /// Either READ_ONLY, for allowing only read requests on the exported
+    /// directory, or READ_WRITE, for allowing both read and write requests.
+    /// The default is READ_WRITE.
+    #[serde(rename="accessMode")]
+    pub access_mode: Option<String>,
+    /// List of either an IPv4 addresses in the format
+    /// {octet 1}.{octet 2}.{octet 3}.{octet 4} or CIDR ranges in the format
+    /// {octet 1}.{octet 2}.{octet 3}.{octet 4}/{mask size} which may mount the
+    /// file share.
+    /// Overlapping IP ranges are not allowed, both within and across
+    /// NfsExportOptions. An error will be returned.
+    /// The limit is 64 IP ranges/addresses for each FileShareConfig among all
+    /// NfsExportOptions.
+    #[serde(rename="ipRanges")]
+    pub ip_ranges: Option<Vec<String>>,
+    /// An integer representing the anonymous group id with a default value of
+    /// 65534.
+    /// Anon_gid may only be set with squash_mode of ROOT_SQUASH.  An error will be
+    /// returned if this field is specified for other squash_mode settings.
+    #[serde(rename="anonGid")]
+    pub anon_gid: Option<String>,
+    /// An integer representing the anonymous user id with a default value of
+    /// 65534.
+    /// Anon_uid may only be set with squash_mode of ROOT_SQUASH.  An error will be
+    /// returned if this field is specified for other squash_mode settings.
+    #[serde(rename="anonUid")]
+    pub anon_uid: Option<String>,
+}
+
+impl Part for NfsExportOptions {}
 
 
 /// Network configuration for the instance.
@@ -473,7 +516,7 @@ pub struct Instance {
     /// Output only. Additional information about the instance state, if available.
     #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
-    /// Optional. The description of the instance (2048 characters or less).
+    /// The description of the instance (2048 characters or less).
     pub description: Option<String>,
 }
 
@@ -548,6 +591,10 @@ pub struct FileShareConfig {
     pub capacity_gb: Option<String>,
     /// The name of the file share (must be 16 characters or less).
     pub name: Option<String>,
+    /// Nfs Export Options.
+    /// There is a limit of 10 export options per file share.
+    #[serde(rename="nfsExportOptions")]
+    pub nfs_export_options: Option<Vec<NfsExportOptions>>,
 }
 
 impl Part for FileShareConfig {}
@@ -783,7 +830,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The instance resource name, in the format
+    /// * `name` - Required. The instance resource name, in the format
     ///            projects/{project_id}/locations/{location}/instances/{instance_id}
     pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a, C, A> {
         ProjectLocationInstanceDeleteCall {
@@ -850,7 +897,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The instance resource name, in the format
+    /// * `name` - Required. The instance resource name, in the format
     ///            projects/{project_id}/locations/{location}/instances/{instance_id}.
     pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a, C, A> {
         ProjectLocationInstanceGetCall {
@@ -926,7 +973,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The instance's project and location, in the format
+    /// * `parent` - Required. The instance's project and location, in the format
     ///              projects/{project_id}/locations/{location}. In Cloud Filestore,
     ///              locations map to GCP zones, for example **us-west1-b**.
     pub fn locations_instances_create(&self, request: Instance, parent: &str) -> ProjectLocationInstanceCreateCall<'a, C, A> {
@@ -948,7 +995,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The project and location for which to retrieve instance information,
+    /// * `parent` - Required. The project and location for which to retrieve instance information,
     ///              in the format projects/{project_id}/locations/{location}. In Cloud
     ///              Filestore, locations map to GCP zones, for example **us-west1-b**. To
     ///              retrieve instance information for all locations, use "-" for the {location}
@@ -1234,11 +1281,9 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -1491,11 +1536,9 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -1713,7 +1756,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The instance resource name, in the format
+    /// Required. The instance resource name, in the format
     /// projects/{project_id}/locations/{location}/instances/{instance_id}
     ///
     /// Sets the *name* path property to the given value.
@@ -1746,11 +1789,9 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2049,11 +2090,9 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2343,11 +2382,9 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2565,7 +2602,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The instance resource name, in the format
+    /// Required. The instance resource name, in the format
     /// projects/{project_id}/locations/{location}/instances/{instance_id}.
     ///
     /// Sets the *name* path property to the given value.
@@ -2598,11 +2635,9 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -2854,11 +2889,9 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3108,11 +3141,9 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3377,7 +3408,7 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
         self._name = new_value.to_string();
         self
     }
-    /// Mask of fields to update.  At least one path must be supplied in this
+    /// Required. Mask of fields to update.  At least one path must be supplied in this
     /// field.  The elements of the repeated paths field may only include these
     /// fields:
     /// 
@@ -3412,11 +3443,9 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3670,7 +3699,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The instance's project and location, in the format
+    /// Required. The instance's project and location, in the format
     /// projects/{project_id}/locations/{location}. In Cloud Filestore,
     /// locations map to GCP zones, for example **us-west1-b**.
     ///
@@ -3682,8 +3711,11 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
         self._parent = new_value.to_string();
         self
     }
-    /// The name of the instance to create.
-    /// The name must be unique for the specified project and location.
+    /// Required. The ID of the instance to create.
+    /// The ID must be unique within the specified project and location.
+    /// 
+    /// This value must start with a lowercase letter followed by up to 62
+    /// lowercase letters, numbers, or hyphens, and cannot end with a hyphen.
     ///
     /// Sets the *instance id* query property to the given value.
     pub fn instance_id(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a, C, A> {
@@ -3712,11 +3744,9 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
@@ -3955,7 +3985,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The project and location for which to retrieve instance information,
+    /// Required. The project and location for which to retrieve instance information,
     /// in the format projects/{project_id}/locations/{location}. In Cloud
     /// Filestore, locations map to GCP zones, for example **us-west1-b**. To
     /// retrieve instance information for all locations, use "-" for the {location}
@@ -4020,11 +4050,9 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.

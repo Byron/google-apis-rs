@@ -343,7 +343,6 @@ impl<'n> Engine<'n> {
                     "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.status" => Some(("state.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.vetted-status" => Some(("state.vettedStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-photo-url" => Some(("profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -360,7 +359,7 @@ impl<'n> Engine<'n> {
                     "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "profile-photo-url", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2189,20 +2188,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.nanos" => Some(("product.upperPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.upper-price.units" => Some(("product.upperPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.currency-code" => Some(("product.upperPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.nanos" => Some(("product.lowerPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.lower-price.units" => Some(("product.lowerPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.currency-code" => Some(("product.lowerPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.product-name" => Some(("product.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alert-type" => Some(("alertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2224,7 +2217,7 @@ impl<'n> Engine<'n> {
                     "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "call-to-action", "coupon-code", "create-time", "currency-code", "day", "end-date", "end-time", "event", "hours", "language-code", "lower-price", "minutes", "month", "name", "nanos", "offer", "product", "product-name", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "units", "update-time", "upper-price", "url", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "alert-type", "call-to-action", "coupon-code", "create-time", "day", "end-date", "end-time", "event", "hours", "language-code", "minutes", "month", "name", "nanos", "offer", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "update-time", "url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2459,20 +2452,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.nanos" => Some(("product.upperPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.upper-price.units" => Some(("product.upperPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.currency-code" => Some(("product.upperPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.nanos" => Some(("product.lowerPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.lower-price.units" => Some(("product.lowerPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.currency-code" => Some(("product.lowerPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.product-name" => Some(("product.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alert-type" => Some(("alertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2494,7 +2481,7 @@ impl<'n> Engine<'n> {
                     "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "call-to-action", "coupon-code", "create-time", "currency-code", "day", "end-date", "end-time", "event", "hours", "language-code", "lower-price", "minutes", "month", "name", "nanos", "offer", "product", "product-name", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "units", "update-time", "upper-price", "url", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "alert-type", "call-to-action", "coupon-code", "create-time", "day", "end-date", "end-time", "event", "hours", "language-code", "minutes", "month", "name", "nanos", "offer", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "update-time", "url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4492,7 +4479,6 @@ impl<'n> Engine<'n> {
                     "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.status" => Some(("state.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.vetted-status" => Some(("state.vettedStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-photo-url" => Some(("profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4509,7 +4495,7 @@ impl<'n> Engine<'n> {
                     "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "profile-photo-url", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7452,7 +7438,7 @@ fn main() {
     
     let mut app = App::new("mybusiness4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+0")
+           .version("1.0.14+0")
            .about("The Google My Business API provides an interface for managing business location information on Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusiness4_cli")
            .arg(Arg::with_name("folder")

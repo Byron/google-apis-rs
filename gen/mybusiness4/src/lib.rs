@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *My Business* crate version *1.0.13+0*, where *0* is the exact revision of the *mybusiness:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *My Business* crate version *1.0.14+0*, where *0* is the exact revision of the *mybusiness:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *My Business* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/my-business/).
@@ -377,7 +377,7 @@ impl<'a, C, A> MyBusiness<C, A>
         MyBusiness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://mybusiness.googleapis.com/".to_string(),
             _root_url: "https://mybusiness.googleapis.com/".to_string(),
         }
@@ -403,7 +403,7 @@ impl<'a, C, A> MyBusiness<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -867,10 +867,6 @@ pub struct Account {
     pub account_name: Option<String>,
     /// Output only. Indicates the AccountState of this account.
     pub state: Option<AccountState>,
-    /// Profile photo for the account. This is populated only for the personal
-    /// account.
-    #[serde(rename="profilePhotoUrl")]
-    pub profile_photo_url: Option<String>,
     /// Output only. Specifies the AccountRole
     /// the caller has for this account.
     pub role: Option<String>,
@@ -1495,7 +1491,7 @@ impl RequestValue for GenerateAccountNumberRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Places {
-    /// The areas represented by place IDs.
+    /// The areas represented by place IDs. Limited to a maximum of 20 places.
     #[serde(rename="placeInfos")]
     pub place_infos: Option<Vec<PlaceInfo>>,
 }
@@ -1880,7 +1876,8 @@ pub struct ListBusinessCategoriesResponse {
     /// The total number of categories for the request parameters.
     #[serde(rename="totalCategoryCount")]
     pub total_category_count: Option<i32>,
-    /// The categories.
+    /// The categories. Categories are BASIC view. They don't contain any
+    /// ServiceType information.
     pub categories: Option<Vec<Category>>,
 }
 
@@ -1946,63 +1943,35 @@ pub struct LocalPostOffer {
 impl Part for LocalPostOffer {}
 
 
-/// Specific fields for product posts.
+/// Response message for Reviews.ListReviews.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LocalPostProduct {
-    /// Upper price of the product. In case price is not a range, lower_price is
-    /// equal to upper_price.
-    #[serde(rename="upperPrice")]
-    pub upper_price: Option<Money>,
-    /// Lower price of the product if the product has a price range, or the price
-    /// for the product.
-    #[serde(rename="lowerPrice")]
-    pub lower_price: Option<Money>,
-    /// Name of the product.
-    #[serde(rename="productName")]
-    pub product_name: Option<String>,
-}
-
-impl Part for LocalPostProduct {}
-
-
-/// Alternate/surrogate key references for a location.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [locations reviews list accounts](struct.AccountLocationReviewListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LocationKey {
-    /// Output only. If this location has a Google+ page associated with it, this
-    /// is populated with the Google+ page ID for this location.
-    #[serde(rename="plusPageId")]
-    pub plus_page_id: Option<String>,
-    /// Output only. A value of true indicates that an unset place ID is
-    /// deliberate, which is different from no association being made yet.
-    #[serde(rename="explicitNoPlaceId")]
-    pub explicit_no_place_id: Option<bool>,
-    /// If this location has been verified and is connected to/appears on Google
-    /// Maps, this field is populated with the place ID for the location.
-    /// This ID can be used in various Places APIs.
-    /// 
-    /// If this location is unverified, this field may be populated if the location
-    /// has been associated with a place that appears on Google Maps.
-    /// 
-    /// This field can be set during Create calls, but not for Update.
-    /// 
-    /// The additional `explicit_no_place_id` bool qualifies whether an unset
-    /// place ID is deliberate or not.
-    #[serde(rename="placeId")]
-    pub place_id: Option<String>,
-    /// Output only. The `request_id` used to create this location. May be empty if
-    /// this location was created outside of the GMB API or Google My Business
-    /// Locations.
-    #[serde(rename="requestId")]
-    pub request_id: Option<String>,
+pub struct ListReviewsResponse {
+    /// If the number of reviews exceeded the requested page size, this field
+    /// is populated with a token to fetch the next page of reviews on a
+    /// subsequent call to ListReviews. If there are no more reviews, this
+    /// field is not present in the response.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The reviews.
+    pub reviews: Option<Vec<Review>>,
+    /// The total number of reviews for this location.
+    #[serde(rename="totalReviewCount")]
+    pub total_review_count: Option<i32>,
+    /// The average star rating of all reviews for this location
+    /// on a scale of 1 to 5, where 5 is the highest rating.
+    #[serde(rename="averageRating")]
+    pub average_rating: Option<f64>,
 }
 
-impl Part for LocationKey {}
+impl ResponseResult for ListReviewsResponse {}
 
 
 /// Metadata for an attribute. Contains display information for the attribute,
@@ -2230,11 +2199,13 @@ impl Part for LocationDrivingDirectionMetrics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
-    /// Output only. The human-readable name of the category. This is set when
+    /// @OutputOnly.
+    /// The human-readable name of the category. This is set when
     /// reading the location. When modifying the location, `category_id` must be
     /// set.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// @OutputOnly.
     /// A stable ID (provided by Google) for this category.
     /// The `category_id` must be specified when modifying the category (when
     /// creating or updating a location).
@@ -2733,35 +2704,41 @@ pub struct ReportLocalPostInsightsResponse {
 impl ResponseResult for ReportLocalPostInsightsResponse {}
 
 
-/// Response message for Reviews.ListReviews.
+/// Alternate/surrogate key references for a location.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations reviews list accounts](struct.AccountLocationReviewListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListReviewsResponse {
-    /// If the number of reviews exceeded the requested page size, this field
-    /// is populated with a token to fetch the next page of reviews on a
-    /// subsequent call to ListReviews. If there are no more reviews, this
-    /// field is not present in the response.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The reviews.
-    pub reviews: Option<Vec<Review>>,
-    /// The total number of reviews for this location.
-    #[serde(rename="totalReviewCount")]
-    pub total_review_count: Option<i32>,
-    /// The average star rating of all reviews for this location
-    /// on a scale of 1 to 5, where 5 is the highest rating.
-    #[serde(rename="averageRating")]
-    pub average_rating: Option<f64>,
+pub struct LocationKey {
+    /// Output only. If this location has a Google+ page associated with it, this
+    /// is populated with the Google+ page ID for this location.
+    #[serde(rename="plusPageId")]
+    pub plus_page_id: Option<String>,
+    /// Output only. A value of true indicates that an unset place ID is
+    /// deliberate, which is different from no association being made yet.
+    #[serde(rename="explicitNoPlaceId")]
+    pub explicit_no_place_id: Option<bool>,
+    /// If this location has been verified and is connected to/appears on Google
+    /// Maps, this field is populated with the place ID for the location.
+    /// This ID can be used in various Places APIs.
+    /// 
+    /// If this location is unverified, this field may be populated if the location
+    /// has been associated with a place that appears on Google Maps.
+    /// 
+    /// This field can be set during Create calls, but not for Update.
+    /// 
+    /// The additional `explicit_no_place_id` bool qualifies whether an unset
+    /// place ID is deliberate or not.
+    #[serde(rename="placeId")]
+    pub place_id: Option<String>,
+    /// Output only. The `request_id` used to create this location. May be empty if
+    /// this location was created outside of the GMB API or Google My Business
+    /// Locations.
+    #[serde(rename="requestId")]
+    pub request_id: Option<String>,
 }
 
-impl ResponseResult for ListReviewsResponse {}
+impl Part for LocationKey {}
 
 
 /// Token generated by a vetted partner.
@@ -2958,10 +2935,14 @@ pub struct LocalPost {
     /// The language of the local post.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
-    /// Additional data for product posts. This should only be set when the
-    /// topic_type is PRODUCT.
-    pub product: Option<LocalPostProduct>,
-    /// Required. The topic type of the post: standard, event, offer, or product.
+    /// Output only. Time of the last modification of the post made by the user.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// The type of alert the post is created for. This field is only applicable
+    /// for posts of topic_type Alert, and behaves as a sub-type of Alerts.
+    #[serde(rename="alertType")]
+    pub alert_type: Option<String>,
+    /// Required. The topic type of the post: standard, event, offer, or alert.
     #[serde(rename="topicType")]
     pub topic_type: Option<String>,
     /// Output only. Google identifier for this local post in the form:
@@ -2973,9 +2954,6 @@ pub struct LocalPost {
     /// The media associated with the post. source_url is the only supported data
     /// field for a LocalPost MediaItem.
     pub media: Option<Vec<MediaItem>>,
-    /// Output only. Time of the last modification of the post made by the user.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
     /// Output only. The link to the local post in Google search. This link can
     /// be used to share the post via social media, email, text, etc.
     #[serde(rename="searchUrl")]

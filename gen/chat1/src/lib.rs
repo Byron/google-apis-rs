@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Hangouts Chat* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *chat:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Hangouts Chat* crate version *1.0.14+20200701*, where *20200701* is the exact revision of the *chat:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Hangouts Chat* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/hangouts/chat).
@@ -316,7 +316,7 @@ impl<'a, C, A> HangoutsChat<C, A>
         HangoutsChat {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://chat.googleapis.com/".to_string(),
             _root_url: "https://chat.googleapis.com/".to_string(),
         }
@@ -327,7 +327,7 @@ impl<'a, C, A> HangoutsChat<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -418,9 +418,17 @@ impl Part for Thread {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Space {
     /// Output only. The display name (only if the space is a room).
+    /// Please note that this field might not be populated in direct messages
+    /// between humans.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Whether the space is a DM between a bot and a single human.
+    #[serde(rename="singleUserBotDm")]
+    pub single_user_bot_dm: Option<bool>,
+    /// Whether the messages are threaded in this space.
+    pub threaded: Option<bool>,
     /// Output only. The type of a space.
+    /// This is deprecated. Use `single_user_bot_dm` instead.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Resource name of the space, in the form "spaces/*".

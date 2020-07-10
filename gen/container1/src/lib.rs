@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container* crate version *1.0.13+20200324*, where *20200324* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Container* crate version *1.0.14+20200619*, where *20200619* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Container* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/).
@@ -374,7 +374,7 @@ impl<'a, C, A> Container<C, A>
         Container {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://container.googleapis.com/".to_string(),
             _root_url: "https://container.googleapis.com/".to_string(),
         }
@@ -385,7 +385,7 @@ impl<'a, C, A> Container<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -438,11 +438,11 @@ pub struct SetMaintenancePolicyRequest {
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster id) of the cluster to set maintenance
     /// policy.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Required. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides.
     pub zone: Option<String>,
 }
 
@@ -491,24 +491,6 @@ pub struct TimeWindow {
 }
 
 impl Part for TimeWindow {}
-
-
-/// AcceleratorConfig represents a Hardware Accelerator request.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AcceleratorConfig {
-    /// The number of the accelerator cards exposed to an instance.
-    #[serde(rename="acceleratorCount")]
-    pub accelerator_count: Option<String>,
-    /// The accelerator type resource name. List of supported accelerators
-    /// [here](/compute/docs/gpus)
-    #[serde(rename="acceleratorType")]
-    pub accelerator_type: Option<String>,
-}
-
-impl Part for AcceleratorConfig {}
 
 
 /// WorkloadMetadataConfig defines the metadata configuration to expose to
@@ -565,12 +547,12 @@ impl ResponseResult for Empty {}
 pub struct SetNodePoolAutoscalingRequest {
     /// The name (project, location, cluster, node pool) of the node pool to set
     /// autoscaler settings. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Deprecated. The Google Developers Console [project ID or project
     /// number](https://support.google.com/cloud/answer/6158840).
@@ -606,6 +588,53 @@ pub struct BigQueryDestination {
 impl Part for BigQueryDestination {}
 
 
+/// SetLoggingServiceRequest sets the logging service of a cluster.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters set logging projects](struct.ProjectLocationClusterSetLoggingCall.html) (request)
+/// * [zones clusters logging projects](struct.ProjectZoneClusterLoggingCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetLoggingServiceRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Required. The logging service the cluster should use to write logs.
+    /// Currently available options:
+    /// 
+    /// * `logging.googleapis.com/kubernetes` - The Cloud Logging
+    /// service with a Kubernetes-native resource model
+    /// * `logging.googleapis.com` - The legacy Cloud Logging service (no longer
+    ///   available as of GKE 1.15).
+    /// * `none` - no logs will be exported from the cluster.
+    /// 
+    /// If left as an empty string,`logging.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `logging.googleapis.com` for earlier versions.
+    #[serde(rename="loggingService")]
+    pub logging_service: Option<String>,
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The name (project, location, cluster) of the cluster to set logging.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
+    pub zone: Option<String>,
+}
+
+impl RequestValue for SetLoggingServiceRequest {}
+
+
 /// CreateClusterRequest creates a cluster.
 /// 
 /// # Activities
@@ -619,15 +648,15 @@ impl Part for BigQueryDestination {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateClusterRequest {
     /// Required. A [cluster
-    /// resource](/container-engine/reference/rest/v1/projects.zones.clusters)
+    /// resource](https://cloud.google.com/container-engine/reference/rest/v1/projects.locations.clusters)
     pub cluster: Option<Cluster>,
     /// The parent (project and location) where the cluster will be created.
-    /// Specified in the format 'projects/*/locations/*'.
+    /// Specified in the format `projects/*/locations/*`.
     pub parent: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the parent
+    /// field.
     pub zone: Option<String>,
     /// Deprecated. The Google Developers Console [project ID or project
     /// number](https://support.google.com/cloud/answer/6158840).
@@ -749,12 +778,12 @@ pub struct SetAddonsConfigRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster) of the cluster to set addons.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
 }
 
@@ -857,12 +886,12 @@ pub struct UpdateMasterRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster) of the cluster to update.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
 }
 
@@ -937,13 +966,14 @@ impl Part for IntraNodeVisibilityConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkConfig {
     /// Output only. The relative name of the Google Compute Engine
-    /// [subnetwork](/compute/docs/vpc) to which the cluster is connected.
-    /// Example: projects/my-project/regions/us-central1/subnetworks/my-subnet
+    /// [subnetwork](https://cloud.google.com/compute/docs/vpc) to which the
+    /// cluster is connected. Example:
+    /// projects/my-project/regions/us-central1/subnetworks/my-subnet
     pub subnetwork: Option<String>,
     /// Output only. The relative name of the Google Compute Engine
-    /// network(/compute/docs/networks-and-firewalls#networks) to which
-    /// the cluster is connected.
-    /// Example: projects/my-project/global/networks/my-network
+    /// network(https://cloud.google.com/compute/docs/networks-and-firewalls#networks)
+    /// to which the cluster is connected. Example:
+    /// projects/my-project/global/networks/my-network
     pub network: Option<String>,
     /// Whether Intra-node visibility is enabled for this cluster.
     /// This makes same node pod to pod traffic visible for VPC network.
@@ -977,12 +1007,12 @@ pub struct CreateNodePoolRequest {
     pub cluster_id: Option<String>,
     /// The parent (project, location, cluster id) where the node pool will be
     /// created. Specified in the format
-    /// 'projects/*/locations/*/clusters/*'.
+    /// `projects/*/locations/*/clusters/*`.
     pub parent: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the parent
+    /// field.
     pub zone: Option<String>,
     /// Required. The node pool to create.
     #[serde(rename="nodePool")]
@@ -1042,15 +1072,16 @@ pub struct NodePool {
     /// The name of the node pool.
     pub name: Option<String>,
     /// [Output only] The resource URLs of the [managed instance
-    /// groups](/compute/docs/instance-groups/creating-groups-of-managed-instances)
+    /// groups](https://cloud.google.com/compute/docs/instance-groups/creating-groups-of-managed-instances)
     /// associated with this node pool.
     #[serde(rename="instanceGroupUrls")]
     pub instance_group_urls: Option<Vec<String>>,
     /// Autoscaler configuration for this NodePool. Autoscaler is enabled
     /// only if a valid configuration is present.
     pub autoscaling: Option<NodePoolAutoscaling>,
-    /// The list of Google Compute Engine [zones](/compute/docs/zones#available)
-    /// in which the NodePool's nodes should be located.
+    /// The list of Google Compute Engine
+    /// [zones](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// NodePool's nodes should be located.
     pub locations: Option<Vec<String>>,
     /// The constraint on the maximum number of pods that can be run
     /// simultaneously on a node in the node pool.
@@ -1062,7 +1093,7 @@ pub struct NodePool {
     #[serde(rename="upgradeSettings")]
     pub upgrade_settings: Option<UpgradeSettings>,
     /// The initial node count for the pool. You must ensure that your
-    /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
+    /// Compute Engine [resource quota](https://cloud.google.com/compute/quotas)
     /// is sufficient for this number of instances. You must also have available
     /// firewall and routes quota.
     #[serde(rename="initialNodeCount")]
@@ -1083,6 +1114,29 @@ pub struct NodePool {
 impl ResponseResult for NodePool {}
 
 
+/// ListOperationsResponse is the result of ListOperationsRequest.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones operations list projects](struct.ProjectZoneOperationListCall.html) (response)
+/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// A list of operations in the project in the specified zone.
+    pub operations: Option<Vec<Operation>>,
+    /// If any zones are listed here, the list of operations returned
+    /// may be missing the operations from those zones.
+    #[serde(rename="missingZones")]
+    pub missing_zones: Option<Vec<String>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
+
+
 /// AutoprovisioningNodePoolDefaults contains defaults for a node pool created
 /// by NAP.
 /// 
@@ -1090,8 +1144,7 @@ impl ResponseResult for NodePool {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoprovisioningNodePoolDefaults {
-    /// The Google Cloud Platform Service Account to be used by the node VMs. If
-    /// service_account is specified, scopes should be empty.
+    /// The Google Cloud Platform Service Account to be used by the node VMs.
     #[serde(rename="serviceAccount")]
     pub service_account: Option<String>,
     /// Specifies the node management options for NAP created node-pools.
@@ -1099,8 +1152,7 @@ pub struct AutoprovisioningNodePoolDefaults {
     /// Specifies the upgrade settings for NAP created node pools
     #[serde(rename="upgradeSettings")]
     pub upgrade_settings: Option<UpgradeSettings>,
-    /// Scopes that are used by NAP when creating node pools. If oauth_scopes are
-    /// specified, service_account should be empty.
+    /// Scopes that are used by NAP when creating node pools.
     #[serde(rename="oauthScopes")]
     pub oauth_scopes: Option<Vec<String>>,
 }
@@ -1192,8 +1244,8 @@ pub struct Cluster {
     #[serde(rename="addonsConfig")]
     pub addons_config: Option<AddonsConfig>,
     /// The list of Google Compute Engine
-    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
-    /// should be located.
+    /// [zones](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster's nodes should be located.
     pub locations: Option<Vec<String>>,
     /// Kubernetes alpha features are enabled on this cluster. This includes alpha
     /// API groups (e.g. v1alpha1) and features that may not be production ready in
@@ -1208,14 +1260,13 @@ pub struct Cluster {
     /// if cluster created with IP Alias support.
     #[serde(rename="defaultMaxPodsConstraint")]
     pub default_max_pods_constraint: Option<MaxPodsConstraint>,
-    /// The resource labels for the cluster to use to annotate any related
-    /// Google Compute Engine resources.
-    #[serde(rename="resourceLabels")]
-    pub resource_labels: Option<HashMap<String, String>>,
+    /// Release channel configuration.
+    #[serde(rename="releaseChannel")]
+    pub release_channel: Option<ReleaseChannel>,
     /// The name of the Google Compute Engine
-    /// [network](/compute/docs/networks-and-firewalls#networks) to which the
-    /// cluster is connected. If left unspecified, the `default` network
-    /// will be used.
+    /// [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks)
+    /// to which the cluster is connected. If left unspecified, the `default`
+    /// network will be used.
     pub network: Option<String>,
     /// The logging service the cluster should use to write logs.
     /// Currently available options:
@@ -1233,6 +1284,10 @@ pub struct Cluster {
     /// Deprecated. Use node_pools.instance_group_urls.
     #[serde(rename="instanceGroupUrls")]
     pub instance_group_urls: Option<Vec<String>>,
+    /// The resource labels for the cluster to use to annotate any related
+    /// Google Compute Engine resources.
+    #[serde(rename="resourceLabels")]
+    pub resource_labels: Option<HashMap<String, String>>,
     /// Configuration for cluster networking.
     #[serde(rename="networkConfig")]
     pub network_config: Option<NetworkConfig>,
@@ -1248,9 +1303,10 @@ pub struct Cluster {
     #[serde(rename="shieldedNodes")]
     pub shielded_nodes: Option<ShieldedNodes>,
     /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/regions-zones/regions-zones#available) or
-    /// [region](/compute/docs/regions-zones/regions-zones#available) in which
-    /// the cluster resides.
+    /// [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
+    /// or
+    /// [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
+    /// in which the cluster resides.
     pub location: Option<String>,
     /// Configuration for Binary Authorization.
     #[serde(rename="binaryAuthorization")]
@@ -1279,7 +1335,7 @@ pub struct Cluster {
     /// An optional description of this cluster.
     pub description: Option<String>,
     /// [Output only] Deprecated, use
-    /// [NodePools.version](/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters.nodePools)
+    /// [NodePools.version](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools)
     /// instead. The current version of the node software components. If they are
     /// currently at multiple versions because they're in the process of being
     /// upgraded, this reflects the minimum version of all nodes.
@@ -1306,7 +1362,7 @@ pub struct Cluster {
     #[serde(rename="expireTime")]
     pub expire_time: Option<String>,
     /// The number of nodes to create in this cluster. You must ensure that your
-    /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
+    /// Compute Engine [resource quota](https://cloud.google.com/compute/quotas)
     /// is sufficient for this number of instances. You must also have available
     /// firewall and routes quota.
     /// For requests, this field should only be used in lieu of a
@@ -1357,9 +1413,8 @@ pub struct Cluster {
     #[serde(rename="currentNodeCount")]
     pub current_node_count: Option<i32>,
     /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field is deprecated, use location instead.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field is deprecated, use location instead.
     pub zone: Option<String>,
     /// Cluster-level Vertical Pod Autoscaling configuration.
     #[serde(rename="verticalPodAutoscaling")]
@@ -1405,8 +1460,8 @@ pub struct Cluster {
     #[serde(rename="authenticatorGroupsConfig")]
     pub authenticator_groups_config: Option<AuthenticatorGroupsConfig>,
     /// The name of the Google Compute Engine
-    /// [subnetwork](/compute/docs/subnetworks) to which the
-    /// cluster is connected.
+    /// [subnetwork](https://cloud.google.com/compute/docs/subnetworks) to which
+    /// the cluster is connected.
     pub subnetwork: Option<String>,
     /// [Output only] The IP address range of the Kubernetes services in
     /// this cluster, in
@@ -1569,46 +1624,161 @@ pub struct GetJSONWebKeysResponse {
 impl ResponseResult for GetJSONWebKeysResponse {}
 
 
-/// These upgrade settings control the level of parallelism and the level of
-/// disruption caused by an upgrade.
-/// 
-/// maxUnavailable controls the number of nodes that can be simultaneously
-/// unavailable.
-/// 
-/// maxSurge controls the number of additional nodes that can be added to the
-/// node pool temporarily for the time of the upgrade to increase the number of
-/// available nodes.
-/// 
-/// (maxUnavailable + maxSurge) determines the level of parallelism (how many
-/// nodes are being upgraded at the same time).
-/// 
-/// Note: upgrades inevitably introduce some disruption since workloads need to
-/// be moved from old nodes to new, upgraded ones. Even if maxUnavailable=0,
-/// this holds true. (Disruption stays within the limits of
-/// PodDisruptionBudget, if it is configured.)
-/// 
-/// Consider a hypothetical node pool with 5 nodes having maxSurge=2,
-/// maxUnavailable=1. This means the upgrade process upgrades 3 nodes
-/// simultaneously. It creates 2 additional (upgraded) nodes, then it brings
-/// down 3 old (not yet upgraded) nodes at the same time. This ensures that
-/// there are always at least 4 nodes available.
+/// Parameters that describe the nodes in a cluster.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpgradeSettings {
-    /// The maximum number of nodes that can be created beyond the current size
-    /// of the node pool during the upgrade process.
-    #[serde(rename="maxSurge")]
-    pub max_surge: Option<i32>,
-    /// The maximum number of nodes that can be simultaneously unavailable during
-    /// the upgrade process. A node is considered available if its status is
-    /// Ready.
-    #[serde(rename="maxUnavailable")]
-    pub max_unavailable: Option<i32>,
+pub struct NodeConfig {
+    /// The optional reservation affinity. Setting this field will apply
+    /// the specified [Zonal Compute
+    /// Reservation](https://cloud.google.com/compute/docs/instances/reserving-zonal-resources)
+    /// to this node pool.
+    #[serde(rename="reservationAffinity")]
+    pub reservation_affinity: Option<ReservationAffinity>,
+    /// The name of a Google Compute Engine [machine
+    /// type](https://cloud.google.com/compute/docs/machine-types) (e.g.
+    /// `n1-standard-1`).
+    /// 
+    /// If unspecified, the default machine type is
+    /// `n1-standard-1`.
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
+    /// The list of instance tags applied to all nodes. Tags are used to identify
+    /// valid sources or targets for network firewalls and are specified by
+    /// the client during cluster or node pool creation. Each tag within the list
+    /// must comply with RFC1035.
+    pub tags: Option<Vec<String>>,
+    /// Whether the nodes are created as preemptible VM instances. See:
+    /// https://cloud.google.com/compute/docs/instances/preemptible for more
+    /// information about preemptible VM instances.
+    pub preemptible: Option<bool>,
+    /// The map of Kubernetes labels (key/value pairs) to be applied to each node.
+    /// These will added in addition to any default label(s) that
+    /// Kubernetes may apply to the node.
+    /// In case of conflict in label keys, the applied set may differ depending on
+    /// the Kubernetes version -- it's best to assume the behavior is undefined
+    /// and conflicts should be avoided.
+    /// For more information, including usage and the valid values, see:
+    /// https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+    pub labels: Option<HashMap<String, String>>,
+    /// 
+    /// The Customer Managed Encryption Key used to encrypt the boot disk attached
+    /// to each node in the node pool. This should be of the form
+    /// projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME].
+    /// For more information about protecting resources with Cloud KMS Keys please
+    /// see:
+    /// https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+    #[serde(rename="bootDiskKmsKey")]
+    pub boot_disk_kms_key: Option<String>,
+    /// The set of Google API scopes to be made available on all of the
+    /// node VMs under the "default" service account.
+    /// 
+    /// The following scopes are recommended, but not required, and by default are
+    /// not included:
+    /// 
+    /// * `https://www.googleapis.com/auth/compute` is required for mounting
+    /// persistent storage on your nodes.
+    /// * `https://www.googleapis.com/auth/devstorage.read_only` is required for
+    /// communicating with **gcr.io**
+    /// (the [Google Container
+    /// Registry](https://cloud.google.com/container-registry/)).
+    /// 
+    /// If unspecified, no scopes are added, unless Cloud Logging or Cloud
+    /// Monitoring are enabled, in which case their required scopes will be added.
+    #[serde(rename="oauthScopes")]
+    pub oauth_scopes: Option<Vec<String>>,
+    /// A list of hardware accelerators to be attached to each node.
+    /// See https://cloud.google.com/compute/docs/gpus for more information about
+    /// support for GPUs.
+    pub accelerators: Option<Vec<AcceleratorConfig>>,
+    /// Minimum CPU platform to be used by this instance. The instance may be
+    /// scheduled on the specified or newer CPU platform. Applicable values are the
+    /// friendly names of CPU platforms, such as
+    /// <code>minCpuPlatform: &quot;Intel Haswell&quot;</code> or
+    /// <code>minCpuPlatform: &quot;Intel Sandy Bridge&quot;</code>. For more
+    /// information, read [how to specify min CPU
+    /// platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
+    #[serde(rename="minCpuPlatform")]
+    pub min_cpu_platform: Option<String>,
+    /// The number of local SSD disks to be attached to the node.
+    /// 
+    /// The limit for this value is dependent upon the maximum number of
+    /// disks available on a machine per zone. See:
+    /// https://cloud.google.com/compute/docs/disks/local-ssd
+    /// for more information.
+    #[serde(rename="localSsdCount")]
+    pub local_ssd_count: Option<i32>,
+    /// Sandbox configuration for this node.
+    #[serde(rename="sandboxConfig")]
+    pub sandbox_config: Option<SandboxConfig>,
+    /// Shielded Instance options.
+    #[serde(rename="shieldedInstanceConfig")]
+    pub shielded_instance_config: Option<ShieldedInstanceConfig>,
+    /// List of kubernetes taints to be applied to each node.
+    /// 
+    /// For more information, including usage and the valid values, see:
+    /// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    pub taints: Option<Vec<NodeTaint>>,
+    /// The Google Cloud Platform Service Account to be used by the node VMs.
+    /// Specify the email address of the Service Account; otherwise, if no Service
+    /// Account is specified, the "default" service account is used.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
+    /// Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')
+    /// 
+    /// If unspecified, the default disk type is 'pd-standard'
+    #[serde(rename="diskType")]
+    pub disk_type: Option<String>,
+    /// The workload metadata configuration for this node.
+    #[serde(rename="workloadMetadataConfig")]
+    pub workload_metadata_config: Option<WorkloadMetadataConfig>,
+    /// Size of the disk attached to each node, specified in GB.
+    /// The smallest allowed disk size is 10GB.
+    /// 
+    /// If unspecified, the default disk size is 100GB.
+    #[serde(rename="diskSizeGb")]
+    pub disk_size_gb: Option<i32>,
+    /// The image type to use for this node. Note that for a given image type,
+    /// the latest version of it will be used.
+    #[serde(rename="imageType")]
+    pub image_type: Option<String>,
+    /// The metadata key/value pairs assigned to instances in the cluster.
+    /// 
+    /// Keys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes
+    /// in length. These are reflected as part of a URL in the metadata server.
+    /// Additionally, to avoid ambiguity, keys must not conflict with any other
+    /// metadata keys for the project or be one of the reserved keys:
+    ///  "cluster-location"
+    ///  "cluster-name"
+    ///  "cluster-uid"
+    ///  "configure-sh"
+    ///  "containerd-configure-sh"
+    ///  "enable-os-login"
+    ///  "gci-ensure-gke-docker"
+    ///  "gci-metrics-enabled"
+    ///  "gci-update-strategy"
+    ///  "instance-template"
+    ///  "kube-env"
+    ///  "startup-script"
+    ///  "user-data"
+    ///  "disable-address-manager"
+    ///  "windows-startup-script-ps1"
+    ///  "common-psm1"
+    ///  "k8s-node-setup-psm1"
+    ///  "install-ssh-psm1"
+    ///  "user-profile-psm1"
+    ///  "serial-port-logging-enable"
+    /// 
+    /// Values are free-form strings, and only have meaning as interpreted by
+    /// the image running in the instance. The only restriction placed on them is
+    /// that each value's size must be less than or equal to 32 KB.
+    /// 
+    /// The total size of all keys and values must be less than 512 KB.
+    pub metadata: Option<HashMap<String, String>>,
 }
 
-impl Part for UpgradeSettings {}
+impl Part for NodeConfig {}
 
 
 /// This operation resource represents operations that may have happened or are
@@ -1680,9 +1850,8 @@ pub struct Operation {
     /// The server-assigned ID for the operation.
     pub name: Option<String>,
     /// The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the operation
-    /// is taking place.
-    /// This field is deprecated, use location instead.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// operation is taking place. This field is deprecated, use location instead.
     pub zone: Option<String>,
     /// Detailed operation progress, if available.
     pub detail: Option<String>,
@@ -1693,9 +1862,10 @@ pub struct Operation {
     #[serde(rename="targetLink")]
     pub target_link: Option<String>,
     /// [Output only] The name of the Google Compute Engine
-    /// [zone](/compute/docs/regions-zones/regions-zones#available) or
-    /// [region](/compute/docs/regions-zones/regions-zones#available) in which
-    /// the cluster resides.
+    /// [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
+    /// or
+    /// [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
+    /// in which the cluster resides.
     pub location: Option<String>,
     /// [Output only] The time the operation started, in
     /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
@@ -1793,10 +1963,10 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredAddonsConfig")]
     pub desired_addons_config: Option<AddonsConfig>,
     /// The desired list of Google Compute Engine
-    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
-    /// should be located. Changing the locations a cluster is in will result
-    /// in nodes being either created or removed from the cluster, depending on
-    /// whether locations are being added or removed.
+    /// [zones](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster's nodes should be located. Changing the locations a cluster is in
+    /// will result in nodes being either created or removed from the cluster,
+    /// depending on whether locations are being added or removed.
     /// 
     /// This list must always include the cluster's primary zone.
     #[serde(rename="desiredLocations")]
@@ -1823,6 +1993,9 @@ pub struct ClusterUpdate {
     /// The desired configuration options for master authorized networks feature.
     #[serde(rename="desiredMasterAuthorizedNetworksConfig")]
     pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
+    /// The desired release channel configuration.
+    #[serde(rename="desiredReleaseChannel")]
+    pub desired_release_channel: Option<ReleaseChannel>,
     /// The node pool to be upgraded. This field is mandatory if
     /// "desired_node_version", "desired_image_family" or
     /// "desired_node_pool_autoscaling" is specified and there is more than one
@@ -1887,23 +2060,6 @@ pub struct ClusterUpdate {
 impl Part for ClusterUpdate {}
 
 
-/// Configuration options for the horizontal pod autoscaling feature, which
-/// increases or decreases the number of replica pods a replication controller
-/// has based on the resource usage of the existing pods.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HorizontalPodAutoscaling {
-    /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.
-    /// When enabled, it ensures that metrics are collected into Stackdriver
-    /// Monitoring.
-    pub disabled: Option<bool>,
-}
-
-impl Part for HorizontalPodAutoscaling {}
-
-
 /// Kubernetes Engine service configuration.
 /// 
 /// # Activities
@@ -1916,171 +2072,68 @@ impl Part for HorizontalPodAutoscaling {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServerConfig {
-    /// Version of Kubernetes the service deploys by default.
-    #[serde(rename="defaultClusterVersion")]
-    pub default_cluster_version: Option<String>,
-    /// List of valid node upgrade target versions.
+    /// List of release channel configurations.
+    pub channels: Option<Vec<ReleaseChannelConfig>>,
+    /// List of valid node upgrade target versions, in descending order.
     #[serde(rename="validNodeVersions")]
     pub valid_node_versions: Option<Vec<String>>,
     /// List of valid image types.
     #[serde(rename="validImageTypes")]
     pub valid_image_types: Option<Vec<String>>,
-    /// List of valid master versions.
-    #[serde(rename="validMasterVersions")]
-    pub valid_master_versions: Option<Vec<String>>,
     /// Default image type.
     #[serde(rename="defaultImageType")]
     pub default_image_type: Option<String>,
+    /// Version of Kubernetes the service deploys by default.
+    #[serde(rename="defaultClusterVersion")]
+    pub default_cluster_version: Option<String>,
+    /// List of valid master versions, in descending order.
+    #[serde(rename="validMasterVersions")]
+    pub valid_master_versions: Option<Vec<String>>,
 }
 
 impl ResponseResult for ServerConfig {}
 
 
-/// Parameters that describe the nodes in a cluster.
+/// These upgrade settings control the level of parallelism and the level of
+/// disruption caused by an upgrade.
+/// 
+/// maxUnavailable controls the number of nodes that can be simultaneously
+/// unavailable.
+/// 
+/// maxSurge controls the number of additional nodes that can be added to the
+/// node pool temporarily for the time of the upgrade to increase the number of
+/// available nodes.
+/// 
+/// (maxUnavailable + maxSurge) determines the level of parallelism (how many
+/// nodes are being upgraded at the same time).
+/// 
+/// Note: upgrades inevitably introduce some disruption since workloads need to
+/// be moved from old nodes to new, upgraded ones. Even if maxUnavailable=0,
+/// this holds true. (Disruption stays within the limits of
+/// PodDisruptionBudget, if it is configured.)
+/// 
+/// Consider a hypothetical node pool with 5 nodes having maxSurge=2,
+/// maxUnavailable=1. This means the upgrade process upgrades 3 nodes
+/// simultaneously. It creates 2 additional (upgraded) nodes, then it brings
+/// down 3 old (not yet upgraded) nodes at the same time. This ensures that
+/// there are always at least 4 nodes available.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NodeConfig {
-    /// The optional reservation affinity. Setting this field will apply
-    /// the specified [Zonal Compute
-    /// Reservation](/compute/docs/instances/reserving-zonal-resources)
-    /// to this node pool.
-    #[serde(rename="reservationAffinity")]
-    pub reservation_affinity: Option<ReservationAffinity>,
-    /// The name of a Google Compute Engine [machine
-    /// type](/compute/docs/machine-types) (e.g.
-    /// `n1-standard-1`).
-    /// 
-    /// If unspecified, the default machine type is
-    /// `n1-standard-1`.
-    #[serde(rename="machineType")]
-    pub machine_type: Option<String>,
-    /// The list of instance tags applied to all nodes. Tags are used to identify
-    /// valid sources or targets for network firewalls and are specified by
-    /// the client during cluster or node pool creation. Each tag within the list
-    /// must comply with RFC1035.
-    pub tags: Option<Vec<String>>,
-    /// Whether the nodes are created as preemptible VM instances. See:
-    /// https://cloud.google.com/compute/docs/instances/preemptible for more
-    /// information about preemptible VM instances.
-    pub preemptible: Option<bool>,
-    /// The map of Kubernetes labels (key/value pairs) to be applied to each node.
-    /// These will added in addition to any default label(s) that
-    /// Kubernetes may apply to the node.
-    /// In case of conflict in label keys, the applied set may differ depending on
-    /// the Kubernetes version -- it's best to assume the behavior is undefined
-    /// and conflicts should be avoided.
-    /// For more information, including usage and the valid values, see:
-    /// https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-    pub labels: Option<HashMap<String, String>>,
-    /// The set of Google API scopes to be made available on all of the
-    /// node VMs under the "default" service account.
-    /// 
-    /// The following scopes are recommended, but not required, and by default are
-    /// not included:
-    /// 
-    /// * `https://www.googleapis.com/auth/compute` is required for mounting
-    /// persistent storage on your nodes.
-    /// * `https://www.googleapis.com/auth/devstorage.read_only` is required for
-    /// communicating with **gcr.io**
-    /// (the [Google Container Registry](/container-registry/)).
-    /// 
-    /// If unspecified, no scopes are added, unless Cloud Logging or Cloud
-    /// Monitoring are enabled, in which case their required scopes will be added.
-    #[serde(rename="oauthScopes")]
-    pub oauth_scopes: Option<Vec<String>>,
-    /// List of kubernetes taints to be applied to each node.
-    /// 
-    /// For more information, including usage and the valid values, see:
-    /// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    pub taints: Option<Vec<NodeTaint>>,
-    /// A list of hardware accelerators to be attached to each node.
-    /// See https://cloud.google.com/compute/docs/gpus for more information about
-    /// support for GPUs.
-    pub accelerators: Option<Vec<AcceleratorConfig>>,
-    /// Minimum CPU platform to be used by this instance. The instance may be
-    /// scheduled on the specified or newer CPU platform. Applicable values are the
-    /// friendly names of CPU platforms, such as
-    /// <code>minCpuPlatform: &quot;Intel Haswell&quot;</code> or
-    /// <code>minCpuPlatform: &quot;Intel Sandy Bridge&quot;</code>. For more
-    /// information, read [how to specify min CPU
-    /// platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
-    #[serde(rename="minCpuPlatform")]
-    pub min_cpu_platform: Option<String>,
-    /// The number of local SSD disks to be attached to the node.
-    /// 
-    /// The limit for this value is dependent upon the maximum number of
-    /// disks available on a machine per zone. See:
-    /// https://cloud.google.com/compute/docs/disks/local-ssd
-    /// for more information.
-    #[serde(rename="localSsdCount")]
-    pub local_ssd_count: Option<i32>,
-    /// Sandbox configuration for this node.
-    #[serde(rename="sandboxConfig")]
-    pub sandbox_config: Option<SandboxConfig>,
-    /// Shielded Instance options.
-    #[serde(rename="shieldedInstanceConfig")]
-    pub shielded_instance_config: Option<ShieldedInstanceConfig>,
-    /// The Google Cloud Platform Service Account to be used by the node VMs.
-    /// Specify the email address of the Service Account; otherwise, if no Service
-    /// Account is specified, the "default" service account is used.
-    #[serde(rename="serviceAccount")]
-    pub service_account: Option<String>,
-    /// Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')
-    /// 
-    /// If unspecified, the default disk type is 'pd-standard'
-    #[serde(rename="diskType")]
-    pub disk_type: Option<String>,
-    /// The workload metadata configuration for this node.
-    #[serde(rename="workloadMetadataConfig")]
-    pub workload_metadata_config: Option<WorkloadMetadataConfig>,
-    /// Size of the disk attached to each node, specified in GB.
-    /// The smallest allowed disk size is 10GB.
-    /// 
-    /// If unspecified, the default disk size is 100GB.
-    #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: Option<i32>,
-    /// The image type to use for this node. Note that for a given image type,
-    /// the latest version of it will be used.
-    #[serde(rename="imageType")]
-    pub image_type: Option<String>,
-    /// The metadata key/value pairs assigned to instances in the cluster.
-    /// 
-    /// Keys must conform to the regexp [a-zA-Z0-9-_]+ and be less than 128 bytes
-    /// in length. These are reflected as part of a URL in the metadata server.
-    /// Additionally, to avoid ambiguity, keys must not conflict with any other
-    /// metadata keys for the project or be one of the reserved keys:
-    ///  "cluster-location"
-    ///  "cluster-name"
-    ///  "cluster-uid"
-    ///  "configure-sh"
-    ///  "containerd-configure-sh"
-    ///  "enable-os-login"
-    ///  "gci-ensure-gke-docker"
-    ///  "gci-metrics-enabled"
-    ///  "gci-update-strategy"
-    ///  "instance-template"
-    ///  "kube-env"
-    ///  "startup-script"
-    ///  "user-data"
-    ///  "disable-address-manager"
-    ///  "windows-startup-script-ps1"
-    ///  "common-psm1"
-    ///  "k8s-node-setup-psm1"
-    ///  "install-ssh-psm1"
-    ///  "user-profile-psm1"
-    ///  "serial-port-logging-enable"
-    /// 
-    /// Values are free-form strings, and only have meaning as interpreted by
-    /// the image running in the instance. The only restriction placed on them is
-    /// that each value's size must be less than or equal to 32 KB.
-    /// 
-    /// The total size of all keys and values must be less than 512 KB.
-    pub metadata: Option<HashMap<String, String>>,
+pub struct UpgradeSettings {
+    /// The maximum number of nodes that can be created beyond the current size
+    /// of the node pool during the upgrade process.
+    #[serde(rename="maxSurge")]
+    pub max_surge: Option<i32>,
+    /// The maximum number of nodes that can be simultaneously unavailable during
+    /// the upgrade process. A node is considered available if its status is
+    /// Ready.
+    #[serde(rename="maxUnavailable")]
+    pub max_unavailable: Option<i32>,
 }
 
-impl Part for NodeConfig {}
+impl Part for UpgradeSettings {}
 
 
 /// AutoUpgradeOptions defines the set of options for the user to control how
@@ -2129,12 +2182,12 @@ pub struct StartIPRotationRequest {
     #[serde(rename="rotateCredentials")]
     pub rotate_credentials: Option<bool>,
     /// The name (project, location, cluster id) of the cluster to start IP
-    /// rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// rotation. Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
 }
 
@@ -2176,16 +2229,38 @@ pub struct SetMonitoringServiceRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster) of the cluster to set monitoring.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
 }
 
 impl RequestValue for SetMonitoringServiceRequest {}
+
+
+/// Kubernetes taint is comprised of three fields: key, value, and effect. Effect
+/// can only be one of three types:  NoSchedule, PreferNoSchedule or NoExecute.
+/// 
+/// See
+/// [here](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration)
+/// for more information, including usage and the valid values.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NodeTaint {
+    /// Key for taint.
+    pub key: Option<String>,
+    /// Effect for taint.
+    pub effect: Option<String>,
+    /// Value for taint.
+    pub value: Option<String>,
+}
+
+impl Part for NodeTaint {}
 
 
 /// RollbackNodePoolUpgradeRequest rollbacks the previously Aborted or Failed
@@ -2213,12 +2288,12 @@ pub struct RollbackNodePoolUpgradeRequest {
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster, node pool id) of the node poll to
     /// rollback upgrade.
-    /// Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Deprecated. The name of the node pool to rollback.
     /// This field has been deprecated and replaced by the name field.
@@ -2299,46 +2374,22 @@ pub struct NetworkPolicy {
 impl Part for NetworkPolicy {}
 
 
-/// SetNodePoolManagementRequest sets the node management properties of a node
-/// pool.
+/// AcceleratorConfig represents a Hardware Accelerator request.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters node pools set management projects](struct.ProjectLocationClusterNodePoolSetManagementCall.html) (request)
-/// * [zones clusters node pools set management projects](struct.ProjectZoneClusterNodePoolSetManagementCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetNodePoolManagementRequest {
-    /// Required. NodeManagement configuration for the node pool.
-    pub management: Option<NodeManagement>,
-    /// The name (project, location, cluster, node pool id) of the node pool to set
-    /// management properties. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Deprecated. The name of the cluster to update.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// Deprecated. The name of the node pool to update.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="nodePoolId")]
-    pub node_pool_id: Option<String>,
+pub struct AcceleratorConfig {
+    /// The number of the accelerator cards exposed to an instance.
+    #[serde(rename="acceleratorCount")]
+    pub accelerator_count: Option<String>,
+    /// The accelerator type resource name. List of supported accelerators
+    /// [here](https://cloud.google.com/compute/docs/gpus)
+    #[serde(rename="acceleratorType")]
+    pub accelerator_type: Option<String>,
 }
 
-impl RequestValue for SetNodePoolManagementRequest {}
+impl Part for AcceleratorConfig {}
 
 
 /// Configuration for the addons that can be automatically spun up in the
@@ -2348,15 +2399,22 @@ impl RequestValue for SetNodePoolManagementRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddonsConfig {
-    /// Configuration for the HTTP (L7) load balancing controller addon, which
-    /// makes it easy to set up HTTP load balancers for services in a cluster.
-    #[serde(rename="httpLoadBalancing")]
-    pub http_load_balancing: Option<HttpLoadBalancing>,
     /// Configuration for NetworkPolicy. This only tracks whether the addon
     /// is enabled or not on the Master, it does not track whether network policy
     /// is enabled for the nodes.
     #[serde(rename="networkPolicyConfig")]
     pub network_policy_config: Option<NetworkPolicyConfig>,
+    /// Configuration for NodeLocalDNS, a dns cache running on cluster nodes
+    #[serde(rename="dnsCacheConfig")]
+    pub dns_cache_config: Option<DnsCacheConfig>,
+    /// Configuration for the Cloud Run addon, which allows the user to use a
+    /// managed Knative service.
+    #[serde(rename="cloudRunConfig")]
+    pub cloud_run_config: Option<CloudRunConfig>,
+    /// Configuration for the HTTP (L7) load balancing controller addon, which
+    /// makes it easy to set up HTTP load balancers for services in a cluster.
+    #[serde(rename="httpLoadBalancing")]
+    pub http_load_balancing: Option<HttpLoadBalancing>,
     /// Configuration for the Kubernetes Dashboard.
     /// This addon is deprecated, and will be disabled in 1.15. It is recommended
     /// to use the Cloud Console to manage and monitor your Kubernetes clusters,
@@ -2364,10 +2422,6 @@ pub struct AddonsConfig {
     /// https://cloud.google.com/kubernetes-engine/docs/concepts/dashboards
     #[serde(rename="kubernetesDashboard")]
     pub kubernetes_dashboard: Option<KubernetesDashboard>,
-    /// Configuration for the Cloud Run addon, which allows the user to use a
-    /// managed Knative service.
-    #[serde(rename="cloudRunConfig")]
-    pub cloud_run_config: Option<CloudRunConfig>,
     /// Configuration for the horizontal pod autoscaling feature, which
     /// increases or decreases the number of replica pods a replication controller
     /// has based on the resource usage of the existing pods.
@@ -2443,24 +2497,61 @@ pub struct SetLocationsRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// Required. The desired list of Google Compute Engine
-    /// [zones](/compute/docs/zones#available) in which the cluster's nodes
-    /// should be located. Changing the locations a cluster is in will result
-    /// in nodes being either created or removed from the cluster, depending on
-    /// whether locations are being added or removed.
+    /// [zones](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster's nodes should be located. Changing the locations a cluster is in
+    /// will result in nodes being either created or removed from the cluster,
+    /// depending on whether locations are being added or removed.
     /// 
     /// This list must always include the cluster's primary zone.
     pub locations: Option<Vec<String>>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// The name (project, location, cluster) of the cluster to set locations.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
 }
 
 impl RequestValue for SetLocationsRequest {}
+
+
+/// ReleaseChannelConfig exposes configuration for a release channel.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReleaseChannelConfig {
+    /// List of valid versions for the channel.
+    #[serde(rename="validVersions")]
+    pub valid_versions: Option<Vec<String>>,
+    /// The default version for newly created clusters on the channel.
+    #[serde(rename="defaultVersion")]
+    pub default_version: Option<String>,
+    /// The release channel this configuration applies to.
+    pub channel: Option<String>,
+}
+
+impl Part for ReleaseChannelConfig {}
+
+
+/// ReleaseChannel indicates which release channel a cluster is
+/// subscribed to. Release channels are arranged in order of risk.
+/// 
+/// When a cluster is subscribed to a release channel, Google maintains
+/// both the master version and the node version. Node auto-upgrade
+/// defaults to true and cannot be disabled.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReleaseChannel {
+    /// channel specifies which release channel the cluster is subscribed to.
+    pub channel: Option<String>,
+}
+
+impl Part for ReleaseChannel {}
 
 
 /// Configuration for the Kubernetes Dashboard.
@@ -2545,12 +2636,12 @@ pub struct CompleteIPRotationRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster id) of the cluster to complete IP
-    /// rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// rotation. Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
 }
 
@@ -2572,12 +2663,12 @@ impl RequestValue for CompleteIPRotationRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetLabelsRequest {
     /// The name (project, location, cluster id) of the cluster to set labels.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Deprecated. The Google Developers Console [project ID or project
     /// number](https://developers.google.com/console/help/new/#projectnumber).
@@ -2617,8 +2708,9 @@ pub struct ClusterAutoscaling {
     /// created by NAP.
     #[serde(rename="autoprovisioningNodePoolDefaults")]
     pub autoprovisioning_node_pool_defaults: Option<AutoprovisioningNodePoolDefaults>,
-    /// The list of Google Compute Engine [zones](/compute/docs/zones#available)
-    /// in which the NodePool's nodes can be created by NAP.
+    /// The list of Google Compute Engine
+    /// [zones](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// NodePool's nodes can be created by NAP.
     #[serde(rename="autoprovisioningLocations")]
     pub autoprovisioning_locations: Option<Vec<String>>,
     /// Enables automatic node pool creation and deletion.
@@ -2657,24 +2749,21 @@ pub struct ListClustersResponse {
 impl ResponseResult for ListClustersResponse {}
 
 
-/// Secondary IP range of a usable subnetwork.
+/// Configuration options for the horizontal pod autoscaling feature, which
+/// increases or decreases the number of replica pods a replication controller
+/// has based on the resource usage of the existing pods.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UsableSubnetworkSecondaryRange {
-    /// This field is to determine the status of the secondary range programmably.
-    pub status: Option<String>,
-    /// The range of IP addresses belonging to this subnetwork secondary range.
-    #[serde(rename="ipCidrRange")]
-    pub ip_cidr_range: Option<String>,
-    /// The name associated with this subnetwork secondary range, used when adding
-    /// an alias IP range to a VM instance.
-    #[serde(rename="rangeName")]
-    pub range_name: Option<String>,
+pub struct HorizontalPodAutoscaling {
+    /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.
+    /// When enabled, it ensures that metrics are collected into Stackdriver
+    /// Monitoring.
+    pub disabled: Option<bool>,
 }
 
-impl Part for UsableSubnetworkSecondaryRange {}
+impl Part for HorizontalPodAutoscaling {}
 
 
 /// Configuration of Shielded Nodes feature.
@@ -2720,25 +2809,71 @@ pub struct Jwk {
 impl Part for Jwk {}
 
 
-/// Kubernetes taint is comprised of three fields: key, value, and effect. Effect
-/// can only be one of three types:  NoSchedule, PreferNoSchedule or NoExecute.
+/// UpdateNodePoolRequests update a node pool's image and/or version.
 /// 
-/// For more information, including usage and the valid values, see:
-/// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+/// # Activities
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [zones clusters node pools update projects](struct.ProjectZoneClusterNodePoolUpdateCall.html) (request)
+/// * [locations clusters node pools update projects](struct.ProjectLocationClusterNodePoolUpdateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NodeTaint {
-    /// Key for taint.
-    pub key: Option<String>,
-    /// Effect for taint.
-    pub effect: Option<String>,
-    /// Value for taint.
-    pub value: Option<String>,
+pub struct UpdateNodePoolRequest {
+    /// The name (project, location, cluster, node pool) of the node pool to
+    /// update. Specified in the format
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The desired list of Google Compute Engine
+    /// [zones](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// node pool's nodes should be located. Changing the locations for a node pool
+    /// will result in nodes being either created or removed from the node pool,
+    /// depending on whether locations are being added or removed.
+    pub locations: Option<Vec<String>>,
+    /// Deprecated. The name of the node pool to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="nodePoolId")]
+    pub node_pool_id: Option<String>,
+    /// The desired workload metadata config for the node pool.
+    #[serde(rename="workloadMetadataConfig")]
+    pub workload_metadata_config: Option<WorkloadMetadataConfig>,
+    /// Upgrade settings control disruption and speed of the upgrade.
+    #[serde(rename="upgradeSettings")]
+    pub upgrade_settings: Option<UpgradeSettings>,
+    /// Required. The Kubernetes version to change the nodes to (typically an
+    /// upgrade).
+    /// 
+    /// Users may specify either explicit versions offered by Kubernetes Engine or
+    /// version aliases, which have the following behavior:
+    /// 
+    /// - "latest": picks the highest valid Kubernetes version
+    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
+    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
+    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
+    /// - "-": picks the Kubernetes master version
+    #[serde(rename="nodeVersion")]
+    pub node_version: Option<String>,
+    /// Required. The desired image type for the node pool.
+    #[serde(rename="imageType")]
+    pub image_type: Option<String>,
 }
 
-impl Part for NodeTaint {}
+impl RequestValue for UpdateNodePoolRequest {}
 
 
 /// ListUsableSubnetworksResponse is the response of
@@ -2787,51 +2922,24 @@ pub struct ResourceUsageExportConfig {
 impl Part for ResourceUsageExportConfig {}
 
 
-/// SetLoggingServiceRequest sets the logging service of a cluster.
+/// Secondary IP range of a usable subnetwork.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters set logging projects](struct.ProjectLocationClusterSetLoggingCall.html) (request)
-/// * [zones clusters logging projects](struct.ProjectZoneClusterLoggingCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetLoggingServiceRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Required. The logging service the cluster should use to write logs.
-    /// Currently available options:
-    /// 
-    /// * `logging.googleapis.com/kubernetes` - The Cloud Logging
-    /// service with a Kubernetes-native resource model
-    /// * `logging.googleapis.com` - The legacy Cloud Logging service (no longer
-    ///   available as of GKE 1.15).
-    /// * `none` - no logs will be exported from the cluster.
-    /// 
-    /// If left as an empty string,`logging.googleapis.com/kubernetes` will be
-    /// used for GKE 1.14+ or `logging.googleapis.com` for earlier versions.
-    #[serde(rename="loggingService")]
-    pub logging_service: Option<String>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The name (project, location, cluster) of the cluster to set logging.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
+pub struct UsableSubnetworkSecondaryRange {
+    /// This field is to determine the status of the secondary range programmably.
+    pub status: Option<String>,
+    /// The range of IP addresses belonging to this subnetwork secondary range.
+    #[serde(rename="ipCidrRange")]
+    pub ip_cidr_range: Option<String>,
+    /// The name associated with this subnetwork secondary range, used when adding
+    /// an alias IP range to a VM instance.
+    #[serde(rename="rangeName")]
+    pub range_name: Option<String>,
 }
 
-impl RequestValue for SetLoggingServiceRequest {}
+impl Part for UsableSubnetworkSecondaryRange {}
 
 
 /// ListNodePoolsResponse is the result of ListNodePoolsRequest.
@@ -2854,8 +2962,8 @@ pub struct ListNodePoolsResponse {
 impl ResponseResult for ListNodePoolsResponse {}
 
 
-/// [ReservationAffinity](/compute/docs/instances/reserving-zonal-resources) is
-/// the configuration of desired reservation which instances could take
+/// [ReservationAffinity](https://cloud.google.com/compute/docs/instances/reserving-zonal-resources)
+/// is the configuration of desired reservation which instances could take
 /// capacity from.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2892,27 +3000,46 @@ pub struct StatusCondition {
 impl Part for StatusCondition {}
 
 
-/// ListOperationsResponse is the result of ListOperationsRequest.
+/// SetNodePoolManagementRequest sets the node management properties of a node
+/// pool.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [zones operations list projects](struct.ProjectZoneOperationListCall.html) (response)
-/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// * [locations clusters node pools set management projects](struct.ProjectLocationClusterNodePoolSetManagementCall.html) (request)
+/// * [zones clusters node pools set management projects](struct.ProjectZoneClusterNodePoolSetManagementCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// A list of operations in the project in the specified zone.
-    pub operations: Option<Vec<Operation>>,
-    /// If any zones are listed here, the list of operations returned
-    /// may be missing the operations from those zones.
-    #[serde(rename="missingZones")]
-    pub missing_zones: Option<Vec<String>>,
+pub struct SetNodePoolManagementRequest {
+    /// Required. NodeManagement configuration for the node pool.
+    pub management: Option<NodeManagement>,
+    /// The name (project, location, cluster, node pool id) of the node pool to set
+    /// management properties. Specified in the format
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
+    pub zone: Option<String>,
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://support.google.com/cloud/answer/6158840).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Deprecated. The name of the cluster to update.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// Deprecated. The name of the node pool to update.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="nodePoolId")]
+    pub node_pool_id: Option<String>,
 }
 
-impl ResponseResult for ListOperationsResponse {}
+impl RequestValue for SetNodePoolManagementRequest {}
 
 
 /// SetLegacyAbacRequest enables or disables the ABAC authorization mechanism for
@@ -2935,12 +3062,12 @@ pub struct SetLegacyAbacRequest {
     /// Required. Whether ABAC authorization will be enabled in the cluster.
     pub enabled: Option<bool>,
     /// The name (project, location, cluster id) of the cluster to set legacy abac.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Deprecated. The Google Developers Console [project ID or project
     /// number](https://support.google.com/cloud/answer/6158840).
@@ -3059,12 +3186,12 @@ pub struct UpdateClusterRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster) of the cluster to update.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Required. A description of the update.
     pub update: Option<ClusterUpdate>,
@@ -3086,12 +3213,12 @@ impl RequestValue for UpdateClusterRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetMasterAuthRequest {
     /// The name (project, location, cluster) of the cluster to set auth.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Required. The exact form of action to be taken on the master auth.
     pub action: Option<String>,
@@ -3133,12 +3260,12 @@ pub struct SetNetworkPolicyRequest {
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster id) of the cluster to set networking
-    /// policy. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// policy. Specified in the format `projects/*/locations/*/clusters/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Required. Configuration options for the NetworkPolicy feature.
     #[serde(rename="networkPolicy")]
@@ -3146,6 +3273,19 @@ pub struct SetNetworkPolicyRequest {
 }
 
 impl RequestValue for SetNetworkPolicyRequest {}
+
+
+/// Configuration for NodeLocal DNSCache
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DnsCacheConfig {
+    /// Whether NodeLocal DNSCache is enabled for this cluster.
+    pub enabled: Option<bool>,
+}
+
+impl Part for DnsCacheConfig {}
 
 
 /// CancelOperationRequest cancels a single operation.
@@ -3166,11 +3306,12 @@ pub struct CancelOperationRequest {
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// The name (project, location, operation id) of the operation to cancel.
-    /// Specified in the format 'projects/*/locations/*/operations/*'.
+    /// Specified in the format `projects/*/locations/*/operations/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the operation resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// operation resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Deprecated. The server-assigned `name` of the operation.
     /// This field has been deprecated and replaced by the name field.
@@ -3226,12 +3367,12 @@ impl Part for UsableSubnetwork {}
 pub struct SetNodePoolSizeRequest {
     /// The name (project, location, cluster, node pool id) of the node pool to set
     /// size.
-    /// Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     pub name: Option<String>,
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     pub zone: Option<String>,
     /// Required. The desired node count for the pool.
     #[serde(rename="nodeCount")]
@@ -3254,21 +3395,6 @@ pub struct SetNodePoolSizeRequest {
 impl RequestValue for SetNodePoolSizeRequest {}
 
 
-/// Parameters for controlling consumption metering.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ConsumptionMeteringConfig {
-    /// Whether to enable consumption metering for this cluster. If enabled, a
-    /// second BigQuery table will be created to hold resource consumption
-    /// records.
-    pub enabled: Option<bool>,
-}
-
-impl Part for ConsumptionMeteringConfig {}
-
-
 /// CidrBlock contains an optional name and one CIDR block.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3286,71 +3412,19 @@ pub struct CidrBlock {
 impl Part for CidrBlock {}
 
 
-/// UpdateNodePoolRequests update a node pool's image and/or version.
+/// Parameters for controlling consumption metering.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [zones clusters node pools update projects](struct.ProjectZoneClusterNodePoolUpdateCall.html) (request)
-/// * [locations clusters node pools update projects](struct.ProjectLocationClusterNodePoolUpdateCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateNodePoolRequest {
-    /// The name (project, location, cluster, node pool) of the node pool to
-    /// update. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://support.google.com/cloud/answer/6158840).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The desired list of Google Compute Engine
-    /// [zones](/compute/docs/zones#available) in which the node pool's nodes
-    /// should be located. Changing the locations for a node pool will result
-    /// in nodes being either created or removed from the node pool, depending
-    /// on whether locations are being added or removed.
-    pub locations: Option<Vec<String>>,
-    /// Deprecated. The name of the node pool to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="nodePoolId")]
-    pub node_pool_id: Option<String>,
-    /// The desired workload metadata config for the node pool.
-    #[serde(rename="workloadMetadataConfig")]
-    pub workload_metadata_config: Option<WorkloadMetadataConfig>,
-    /// Upgrade settings control disruption and speed of the upgrade.
-    #[serde(rename="upgradeSettings")]
-    pub upgrade_settings: Option<UpgradeSettings>,
-    /// Required. The Kubernetes version to change the nodes to (typically an
-    /// upgrade).
-    /// 
-    /// Users may specify either explicit versions offered by Kubernetes Engine or
-    /// version aliases, which have the following behavior:
-    /// 
-    /// - "latest": picks the highest valid Kubernetes version
-    /// - "1.X": picks the highest valid patch+gke.N patch in the 1.X version
-    /// - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version
-    /// - "1.X.Y-gke.N": picks an explicit Kubernetes version
-    /// - "-": picks the Kubernetes master version
-    #[serde(rename="nodeVersion")]
-    pub node_version: Option<String>,
-    /// Required. The desired image type for the node pool.
-    #[serde(rename="imageType")]
-    pub image_type: Option<String>,
+pub struct ConsumptionMeteringConfig {
+    /// Whether to enable consumption metering for this cluster. If enabled, a
+    /// second BigQuery table will be created to hold resource consumption
+    /// records.
+    pub enabled: Option<bool>,
 }
 
-impl RequestValue for UpdateNodePoolRequest {}
+impl Part for ConsumptionMeteringConfig {}
 
 
 
@@ -3408,8 +3482,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the operation resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            operation resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `operationId` - Deprecated. The server-assigned `name` of the operation.
     ///                   This field has been deprecated and replaced by the name field.
     pub fn zones_operations_cancel(&self, request: CancelOperationRequest, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationCancelCall<'a, C, A> {
@@ -3434,7 +3509,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool) of the node pool to set
     ///            autoscaler settings. Specified in the format
-    ///            'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_set_autoscaling(&self, request: SetNodePoolAutoscalingRequest, name: &str) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, C, A> {
         ProjectLocationClusterNodePoolSetAutoscalingCall {
             hub: self.hub,
@@ -3457,9 +3532,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the parent field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the parent
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the parent field.
     pub fn zones_clusters_node_pools_create(&self, request: CreateNodePoolRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, C, A> {
@@ -3486,9 +3561,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_monitoring(&self, request: SetMonitoringServiceRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterMonitoringCall<'a, C, A> {
@@ -3512,7 +3587,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to
     ///            get. Specified in the format
-    ///            'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_get(&self, name: &str) -> ProjectLocationClusterNodePoolGetCall<'a, C, A> {
         ProjectLocationClusterNodePoolGetCall {
             hub: self.hub,
@@ -3542,7 +3617,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, cluster) of the cluster to delete.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_delete(&self, name: &str) -> ProjectLocationClusterDeleteCall<'a, C, A> {
         ProjectLocationClusterDeleteCall {
             hub: self.hub,
@@ -3568,9 +3643,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to rollback.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to rollback.
@@ -3607,9 +3682,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to delete.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_delete(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
@@ -3635,8 +3710,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) to return operations for.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) to return
+    ///            operations for. This field has been deprecated and replaced by the name
+    ///            field.
     pub fn zones_get_serverconfig(&self, project_id: &str, zone: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
         ProjectZoneGetServerconfigCall {
             hub: self.hub,
@@ -3659,7 +3735,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The cluster (project, location, cluster id) to get keys for. Specified in
-    ///              the format 'projects/*/locations/*/clusters/*'.
+    ///              the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_get_jwks(&self, parent: &str) -> ProjectLocationClusterGetJwkCall<'a, C, A> {
         ProjectLocationClusterGetJwkCall {
             hub: self.hub,
@@ -3680,9 +3756,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to update.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_legacy_abac(&self, request: SetLegacyAbacRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLegacyAbacCall<'a, C, A> {
@@ -3709,9 +3785,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_addons(&self, request: SetAddonsConfigRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterAddonCall<'a, C, A> {
@@ -3736,7 +3812,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to set
     ///            size.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, name: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> {
         ProjectLocationClusterNodePoolSetSizeCall {
             hub: self.hub,
@@ -3761,7 +3837,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The cluster (project, location, cluster id) to get the discovery document
-    ///              for. Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///              for. Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_well_known_get_openid_configuration(&self, parent: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, A> {
         ProjectLocationClusterWellKnownGetOpenidConfigurationCall {
             hub: self.hub,
@@ -3779,7 +3855,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster id) of the cluster to complete IP
-    ///            rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            rotation. Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_complete_ip_rotation(&self, request: CompleteIPRotationRequest, name: &str) -> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> {
         ProjectLocationClusterCompleteIpRotationCall {
             hub: self.hub,
@@ -3799,7 +3875,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to
     ///            delete. Specified in the format
-    ///            'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_delete(&self, name: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> {
         ProjectLocationClusterNodePoolDeleteCall {
             hub: self.hub,
@@ -3825,9 +3901,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_start_ip_rotation(&self, request: StartIPRotationRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterStartIpRotationCall<'a, C, A> {
@@ -3850,7 +3926,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, cluster) of the cluster to retrieve.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_get(&self, name: &str) -> ProjectLocationClusterGetCall<'a, C, A> {
         ProjectLocationClusterGetCall {
             hub: self.hub,
@@ -3870,7 +3946,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Compute Engine instances.
     /// 
     /// By default, the cluster is created in the project's
-    /// [default network](/compute/docs/networks-and-firewalls#networks).
+    /// [default
+    /// network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks).
     /// 
     /// One firewall is added for the cluster. After cluster creation,
     /// the Kubelet creates routes for each node to allow the containers
@@ -3887,9 +3964,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the parent field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the parent
+    ///            field.
     pub fn zones_clusters_create(&self, request: CreateClusterRequest, project_id: &str, zone: &str) -> ProjectZoneClusterCreateCall<'a, C, A> {
         ProjectZoneClusterCreateCall {
             hub: self.hub,
@@ -3910,7 +3987,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set addons.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_addons(&self, request: SetAddonsConfigRequest, name: &str) -> ProjectLocationClusterSetAddonCall<'a, C, A> {
         ProjectLocationClusterSetAddonCall {
             hub: self.hub,
@@ -3929,7 +4006,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent (project, location, cluster id) where the node pools will be
-    ///              listed. Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///              listed. Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_node_pools_list(&self, parent: &str) -> ProjectLocationClusterNodePoolListCall<'a, C, A> {
         ProjectLocationClusterNodePoolListCall {
             hub: self.hub,
@@ -3950,7 +4027,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The name (project and location) of the server config to get,
-    ///            specified in the format 'projects/*/locations/*'.
+    ///            specified in the format `projects/*/locations/*`.
     pub fn locations_get_server_config(&self, name: &str) -> ProjectLocationGetServerConfigCall<'a, C, A> {
         ProjectLocationGetServerConfigCall {
             hub: self.hub,
@@ -3973,9 +4050,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the parent field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the parent
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the parent field.
     pub fn zones_clusters_node_pools_list(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
@@ -4000,7 +4077,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool) of the node pool to
     ///            update. Specified in the format
-    ///            'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_update(&self, request: UpdateNodePoolRequest, name: &str) -> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> {
         ProjectLocationClusterNodePoolUpdateCall {
             hub: self.hub,
@@ -4019,7 +4096,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent project where subnetworks are usable.
-    ///              Specified in the format 'projects/*'.
+    ///              Specified in the format `projects/*`.
     pub fn aggregated_usable_subnetworks_list(&self, parent: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> {
         ProjectAggregatedUsableSubnetworkListCall {
             hub: self.hub,
@@ -4041,7 +4118,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster id) of the cluster to set networking
-    ///            policy. Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            policy. Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_network_policy(&self, request: SetNetworkPolicyRequest, name: &str) -> ProjectLocationClusterSetNetworkPolicyCall<'a, C, A> {
         ProjectLocationClusterSetNetworkPolicyCall {
             hub: self.hub,
@@ -4064,9 +4141,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to update.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to update.
@@ -4095,9 +4172,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `operationId` - Deprecated. The server-assigned `name` of the operation.
     ///                   This field has been deprecated and replaced by the name field.
     pub fn zones_operations_get(&self, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
@@ -4121,7 +4198,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set monitoring.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_monitoring(&self, request: SetMonitoringServiceRequest, name: &str) -> ProjectLocationClusterSetMonitoringCall<'a, C, A> {
         ProjectLocationClusterSetMonitoringCall {
             hub: self.hub,
@@ -4137,14 +4214,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sets the locations for a specific cluster.
     /// Deprecated. Use
-    /// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+    /// [projects.locations.clusters.update](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
     /// instead.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set locations.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_locations(&self, request: SetLocationsRequest, name: &str) -> ProjectLocationClusterSetLocationCall<'a, C, A> {
         ProjectLocationClusterSetLocationCall {
             hub: self.hub,
@@ -4167,9 +4244,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_logging(&self, request: SetLoggingServiceRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLoggingCall<'a, C, A> {
@@ -4196,9 +4273,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_update(&self, request: UpdateClusterRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterUpdateCall<'a, C, A> {
@@ -4225,9 +4302,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides, or "-" for all zones.
-    ///            This field has been deprecated and replaced by the parent field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides, or "-" for all zones. This field has been deprecated and
+    ///            replaced by the parent field.
     pub fn zones_clusters_list(&self, project_id: &str, zone: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         ProjectZoneClusterListCall {
             hub: self.hub,
@@ -4251,9 +4328,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to upgrade.
@@ -4283,9 +4360,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to update.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to update.
@@ -4312,7 +4389,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster id) of the cluster to set legacy abac.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_legacy_abac(&self, request: SetLegacyAbacRequest, name: &str) -> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> {
         ProjectLocationClusterSetLegacyAbacCall {
             hub: self.hub,
@@ -4330,7 +4407,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Compute Engine instances.
     /// 
     /// By default, the cluster is created in the project's
-    /// [default network](/compute/docs/networks-and-firewalls#networks).
+    /// [default
+    /// network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks).
     /// 
     /// One firewall is added for the cluster. After cluster creation,
     /// the Kubelet creates routes for each node to allow the containers
@@ -4344,7 +4422,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent (project and location) where the cluster will be created.
-    ///              Specified in the format 'projects/*/locations/*'.
+    ///              Specified in the format `projects/*/locations/*`.
     pub fn locations_clusters_create(&self, request: CreateClusterRequest, parent: &str) -> ProjectLocationClusterCreateCall<'a, C, A> {
         ProjectLocationClusterCreateCall {
             hub: self.hub,
@@ -4365,7 +4443,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to set
     ///            management properties. Specified in the format
-    ///            'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_set_management(&self, request: SetNodePoolManagementRequest, name: &str) -> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> {
         ProjectLocationClusterNodePoolSetManagementCall {
             hub: self.hub,
@@ -4385,7 +4463,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent (project and location) where the clusters will be listed.
-    ///              Specified in the format 'projects/*/locations/*'.
+    ///              Specified in the format `projects/*/locations/*`.
     ///              Location "-" matches all zones and all regions.
     pub fn locations_clusters_list(&self, parent: &str) -> ProjectLocationClusterListCall<'a, C, A> {
         ProjectLocationClusterListCall {
@@ -4407,7 +4485,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to update.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_update_master(&self, request: UpdateMasterRequest, name: &str) -> ProjectLocationClusterUpdateMasterCall<'a, C, A> {
         ProjectLocationClusterUpdateMasterCall {
             hub: self.hub,
@@ -4429,8 +4507,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `projectId` - Required. The Google Developers Console [project ID or project
     ///                 number](https://support.google.com/cloud/answer/6158840).
     /// * `zone` - Required. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides.
     /// * `clusterId` - Required. The name of the cluster to update.
     pub fn zones_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> {
         ProjectZoneClusterSetMaintenancePolicyCall {
@@ -4455,7 +4533,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool id) of the node poll to
     ///            rollback upgrade.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     pub fn locations_clusters_node_pools_rollback(&self, request: RollbackNodePoolUpgradeRequest, name: &str) -> ProjectLocationClusterNodePoolRollbackCall<'a, C, A> {
         ProjectLocationClusterNodePoolRollbackCall {
             hub: self.hub,
@@ -4475,7 +4553,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to update.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_update(&self, request: UpdateClusterRequest, name: &str) -> ProjectLocationClusterUpdateCall<'a, C, A> {
         ProjectLocationClusterUpdateCall {
             hub: self.hub,
@@ -4497,9 +4575,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to delete.
@@ -4522,7 +4600,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sets the locations for a specific cluster.
     /// Deprecated. Use
-    /// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+    /// [projects.locations.clusters.update](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
     /// instead.
     /// 
     /// # Arguments
@@ -4532,9 +4610,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_locations(&self, request: SetLocationsRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLocationCall<'a, C, A> {
@@ -4558,7 +4636,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster id) of the cluster to start IP
-    ///            rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            rotation. Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_start_ip_rotation(&self, request: StartIPRotationRequest, name: &str) -> ProjectLocationClusterStartIpRotationCall<'a, C, A> {
         ProjectLocationClusterStartIpRotationCall {
             hub: self.hub,
@@ -4577,7 +4655,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent (project and location) where the operations will be listed.
-    ///              Specified in the format 'projects/*/locations/*'.
+    ///              Specified in the format `projects/*/locations/*`.
     ///              Location "-" matches all zones and all regions.
     pub fn locations_operations_list(&self, parent: &str) -> ProjectLocationOperationListCall<'a, C, A> {
         ProjectLocationOperationListCall {
@@ -4599,7 +4677,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster id) of the cluster to set labels.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_resource_labels(&self, request: SetLabelsRequest, name: &str) -> ProjectLocationClusterSetResourceLabelCall<'a, C, A> {
         ProjectLocationClusterSetResourceLabelCall {
             hub: self.hub,
@@ -4620,7 +4698,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `parent` - The parent (project, location, cluster id) where the node pool will be
     ///              created. Specified in the format
-    ///              'projects/*/locations/*/clusters/*'.
+    ///              `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_node_pools_create(&self, request: CreateNodePoolRequest, parent: &str) -> ProjectLocationClusterNodePoolCreateCall<'a, C, A> {
         ProjectLocationClusterNodePoolCreateCall {
             hub: self.hub,
@@ -4642,9 +4720,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to retrieve.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_get(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
@@ -4671,9 +4749,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_master(&self, request: UpdateMasterRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterMasterCall<'a, C, A> {
@@ -4700,9 +4778,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to upgrade.
@@ -4732,9 +4810,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_set_network_policy(&self, request: SetNetworkPolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a, C, A> {
@@ -4759,7 +4837,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster id) of the cluster to set maintenance
     ///            policy.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, name: &str) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> {
         ProjectLocationClusterSetMaintenancePolicyCall {
             hub: self.hub,
@@ -4781,9 +4859,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool.
@@ -4815,9 +4893,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_set_master_auth(&self, request: SetMasterAuthRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMasterAuthCall<'a, C, A> {
@@ -4843,7 +4921,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set auth.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_master_auth(&self, request: SetMasterAuthRequest, name: &str) -> ProjectLocationClusterSetMasterAuthCall<'a, C, A> {
         ProjectLocationClusterSetMasterAuthCall {
             hub: self.hub,
@@ -4866,9 +4944,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_complete_ip_rotation(&self, request: CompleteIPRotationRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a, C, A> {
@@ -4895,9 +4973,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://developers.google.com/console/help/new/#projectnumber).
     ///                 This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) in which the cluster
-    ///            resides.
-    ///            This field has been deprecated and replaced by the name field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    ///            cluster resides. This field has been deprecated and replaced by the name
+    ///            field.
     /// * `clusterId` - Deprecated. The name of the cluster.
     ///                 This field has been deprecated and replaced by the name field.
     pub fn zones_clusters_resource_labels(&self, request: SetLabelsRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterResourceLabelCall<'a, C, A> {
@@ -4921,7 +4999,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set logging.
-    ///            Specified in the format 'projects/*/locations/*/clusters/*'.
+    ///            Specified in the format `projects/*/locations/*/clusters/*`.
     pub fn locations_clusters_set_logging(&self, request: SetLoggingServiceRequest, name: &str) -> ProjectLocationClusterSetLoggingCall<'a, C, A> {
         ProjectLocationClusterSetLoggingCall {
             hub: self.hub,
@@ -4943,8 +5021,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///                 number](https://support.google.com/cloud/answer/6158840).
     ///                 This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine
-    ///            [zone](/compute/docs/zones#available) to return operations for, or `-` for
-    ///            all zones. This field has been deprecated and replaced by the parent field.
+    ///            [zone](https://cloud.google.com/compute/docs/zones#available) to return
+    ///            operations for, or `-` for all zones. This field has been deprecated and
+    ///            replaced by the parent field.
     pub fn zones_operations_list(&self, project_id: &str, zone: &str) -> ProjectZoneOperationListCall<'a, C, A> {
         ProjectZoneOperationListCall {
             hub: self.hub,
@@ -4965,7 +5044,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, operation id) of the operation to cancel.
-    ///            Specified in the format 'projects/*/locations/*/operations/*'.
+    ///            Specified in the format `projects/*/locations/*/operations/*`.
     pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a, C, A> {
         ProjectLocationOperationCancelCall {
             hub: self.hub,
@@ -4984,7 +5063,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, operation id) of the operation to get.
-    ///            Specified in the format 'projects/*/locations/*/operations/*'.
+    ///            Specified in the format `projects/*/locations/*/operations/*`.
     pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, C, A> {
         ProjectLocationOperationGetCall {
             hub: self.hub,
@@ -5232,8 +5311,9 @@ impl<'a, C, A> ProjectZoneOperationCancelCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the operation resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// operation resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -5531,7 +5611,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, C, A> where 
     }
     /// The name (project, location, cluster, node pool) of the node pool to set
     /// autoscaler settings. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5829,9 +5909,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolCreateCall<'a, C, A> where C: BorrowMut
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the parent
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -6140,9 +6220,9 @@ impl<'a, C, A> ProjectZoneClusterMonitoringCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -6429,7 +6509,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
 
     /// The name (project, location, cluster, node pool id) of the node pool to
     /// get. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6440,9 +6520,9 @@ impl<'a, C, A> ProjectLocationClusterNodePoolGetCall<'a, C, A> where C: BorrowMu
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a, C, A> {
@@ -6742,7 +6822,7 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
 
 
     /// The name (project, location, cluster) of the cluster to delete.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6753,9 +6833,9 @@ impl<'a, C, A> ProjectLocationClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a, C, A> {
@@ -7070,9 +7150,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolRollbackCall<'a, C, A> where C: BorrowM
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -7374,9 +7454,9 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -7398,7 +7478,7 @@ impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// The name (project, location, cluster) of the cluster to delete.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
@@ -7665,8 +7745,9 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) to return operations for.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) to return
+    /// operations for. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -7677,7 +7758,7 @@ impl<'a, C, A> ProjectZoneGetServerconfigCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// The name (project and location) of the server config to get,
-    /// specified in the format 'projects/*/locations/*'.
+    /// specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, C, A> {
@@ -7926,7 +8007,7 @@ impl<'a, C, A> ProjectLocationClusterGetJwkCall<'a, C, A> where C: BorrowMut<hyp
 
 
     /// The cluster (project, location, cluster id) to get keys for. Specified in
-    /// the format 'projects/*/locations/*/clusters/*'.
+    /// the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8201,9 +8282,9 @@ impl<'a, C, A> ProjectZoneClusterLegacyAbacCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -8512,9 +8593,9 @@ impl<'a, C, A> ProjectZoneClusterAddonCall<'a, C, A> where C: BorrowMut<hyper::C
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -8812,7 +8893,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetSizeCall<'a, C, A> where C: Borr
     }
     /// The name (project, location, cluster, node pool id) of the node pool to set
     /// size.
-    /// Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9067,7 +9148,7 @@ impl<'a, C, A> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, C, 
 
 
     /// The cluster (project, location, cluster id) to get the discovery document
-    /// for. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// for. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9330,7 +9411,7 @@ impl<'a, C, A> ProjectLocationClusterCompleteIpRotationCall<'a, C, A> where C: B
         self
     }
     /// The name (project, location, cluster id) of the cluster to complete IP
-    /// rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// rotation. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9606,7 +9687,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
 
     /// The name (project, location, cluster, node pool id) of the node pool to
     /// delete. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9617,9 +9698,9 @@ impl<'a, C, A> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> where C: Borro
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, C, A> {
@@ -9939,9 +10020,9 @@ impl<'a, C, A> ProjectZoneClusterStartIpRotationCall<'a, C, A> where C: BorrowMu
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -10222,7 +10303,7 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
 
 
     /// The name (project, location, cluster) of the cluster to retrieve.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10233,9 +10314,9 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a, C, A> {
@@ -10326,7 +10407,8 @@ impl<'a, C, A> ProjectLocationClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
 /// Compute Engine instances.
 /// 
 /// By default, the cluster is created in the project's
-/// [default network](/compute/docs/networks-and-firewalls#networks).
+/// [default
+/// network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks).
 /// 
 /// One firewall is added for the cluster. After cluster creation,
 /// the Kubelet creates routes for each node to allow the containers
@@ -10557,9 +10639,9 @@ impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the parent
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -10845,7 +10927,7 @@ impl<'a, C, A> ProjectLocationClusterSetAddonCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// The name (project, location, cluster) of the cluster to set addons.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11115,7 +11197,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
 
 
     /// The parent (project, location, cluster id) where the node pools will be
-    /// listed. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// listed. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11126,9 +11208,9 @@ impl<'a, C, A> ProjectLocationClusterNodePoolListCall<'a, C, A> where C: BorrowM
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the parent
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a, C, A> {
@@ -11407,7 +11489,7 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
 
 
     /// The name (project and location) of the server config to get,
-    /// specified in the format 'projects/*/locations/*'.
+    /// specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11418,8 +11500,9 @@ impl<'a, C, A> ProjectLocationGetServerConfigCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) to return operations for.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) to return
+    /// operations for. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a, C, A> {
@@ -11697,9 +11780,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the parent
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -11721,7 +11804,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolListCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// The parent (project, location, cluster id) where the node pools will be
-    /// listed. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// listed. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, C, A> {
@@ -12005,7 +12088,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolUpdateCall<'a, C, A> where C: Borro
     }
     /// The name (project, location, cluster, node pool) of the node pool to
     /// update. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12275,7 +12358,7 @@ impl<'a, C, A> ProjectAggregatedUsableSubnetworkListCall<'a, C, A> where C: Borr
 
 
     /// The parent project where subnetworks are usable.
-    /// Specified in the format 'projects/*'.
+    /// Specified in the format `projects/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12589,7 +12672,7 @@ impl<'a, C, A> ProjectLocationClusterSetNetworkPolicyCall<'a, C, A> where C: Bor
         self
     }
     /// The name (project, location, cluster id) of the cluster to set networking
-    /// policy. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// policy. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12889,9 +12972,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetManagementCall<'a, C, A> where C: Bo
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -13185,9 +13268,9 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -13209,7 +13292,7 @@ impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self
     }
     /// The name (project, location, operation id) of the operation to get.
-    /// Specified in the format 'projects/*/locations/*/operations/*'.
+    /// Specified in the format `projects/*/locations/*/operations/*`.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
@@ -13492,7 +13575,7 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
         self
     }
     /// The name (project, location, cluster) of the cluster to set monitoring.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -13567,7 +13650,7 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
 
 /// Sets the locations for a specific cluster.
 /// Deprecated. Use
-/// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+/// [projects.locations.clusters.update](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
 /// instead.
 ///
 /// A builder for the *locations.clusters.setLocations* method supported by a *project* resource.
@@ -13781,7 +13864,7 @@ impl<'a, C, A> ProjectLocationClusterSetLocationCall<'a, C, A> where C: BorrowMu
         self
     }
     /// The name (project, location, cluster) of the cluster to set locations.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -14079,9 +14162,9 @@ impl<'a, C, A> ProjectZoneClusterLoggingCall<'a, C, A> where C: BorrowMut<hyper:
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -14390,9 +14473,9 @@ impl<'a, C, A> ProjectZoneClusterUpdateCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -14674,9 +14757,9 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides, or "-" for all zones.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides, or "-" for all zones. This field has been deprecated and
+    /// replaced by the parent field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -14687,7 +14770,7 @@ impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
     /// The parent (project and location) where the clusters will be listed.
-    /// Specified in the format 'projects/*/locations/*'.
+    /// Specified in the format `projects/*/locations/*`.
     /// Location "-" matches all zones and all regions.
     ///
     /// Sets the *parent* query property to the given value.
@@ -14985,9 +15068,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolAutoscalingCall<'a, C, A> where C: Borr
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -15309,9 +15392,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolSetSizeCall<'a, C, A> where C: BorrowMu
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -15619,7 +15702,7 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
         self
     }
     /// The name (project, location, cluster id) of the cluster to set legacy abac.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -15696,7 +15779,8 @@ impl<'a, C, A> ProjectLocationClusterSetLegacyAbacCall<'a, C, A> where C: Borrow
 /// Compute Engine instances.
 /// 
 /// By default, the cluster is created in the project's
-/// [default network](/compute/docs/networks-and-firewalls#networks).
+/// [default
+/// network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks).
 /// 
 /// One firewall is added for the cluster. After cluster creation,
 /// the Kubelet creates routes for each node to allow the containers
@@ -15917,7 +16001,7 @@ impl<'a, C, A> ProjectLocationClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// The parent (project and location) where the cluster will be created.
-    /// Specified in the format 'projects/*/locations/*'.
+    /// Specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16204,7 +16288,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolSetManagementCall<'a, C, A> where C
     }
     /// The name (project, location, cluster, node pool id) of the node pool to set
     /// management properties. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -16470,7 +16554,7 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
 
 
     /// The parent (project and location) where the clusters will be listed.
-    /// Specified in the format 'projects/*/locations/*'.
+    /// Specified in the format `projects/*/locations/*`.
     /// Location "-" matches all zones and all regions.
     ///
     /// Sets the *parent* path property to the given value.
@@ -16482,9 +16566,9 @@ impl<'a, C, A> ProjectLocationClusterListCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides, or "-" for all zones.
-    /// This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides, or "-" for all zones. This field has been deprecated and
+    /// replaced by the parent field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, C, A> {
@@ -16776,7 +16860,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateMasterCall<'a, C, A> where C: BorrowM
         self
     }
     /// The name (project, location, cluster) of the cluster to update.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17073,8 +17157,8 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
         self
     }
     /// Required. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -17372,7 +17456,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolRollbackCall<'a, C, A> where C: Bor
     }
     /// The name (project, location, cluster, node pool id) of the node poll to
     /// rollback upgrade.
-    /// Specified in the format 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17658,7 +17742,7 @@ impl<'a, C, A> ProjectLocationClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// The name (project, location, cluster) of the cluster to update.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17932,9 +18016,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -17968,7 +18052,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
     }
     /// The name (project, location, cluster, node pool id) of the node pool to
     /// delete. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> {
@@ -18040,7 +18124,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
 
 /// Sets the locations for a specific cluster.
 /// Deprecated. Use
-/// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+/// [projects.locations.clusters.update](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
 /// instead.
 ///
 /// A builder for the *zones.clusters.locations* method supported by a *project* resource.
@@ -18266,9 +18350,9 @@ impl<'a, C, A> ProjectZoneClusterLocationCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -18565,7 +18649,7 @@ impl<'a, C, A> ProjectLocationClusterStartIpRotationCall<'a, C, A> where C: Borr
         self
     }
     /// The name (project, location, cluster id) of the cluster to start IP
-    /// rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// rotation. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -18830,7 +18914,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
 
 
     /// The parent (project and location) where the operations will be listed.
-    /// Specified in the format 'projects/*/locations/*'.
+    /// Specified in the format `projects/*/locations/*`.
     /// Location "-" matches all zones and all regions.
     ///
     /// Sets the *parent* path property to the given value.
@@ -18842,8 +18926,9 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) to return operations for, or `-` for
-    /// all zones. This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) to return
+    /// operations for, or `-` for all zones. This field has been deprecated and
+    /// replaced by the parent field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, C, A> {
@@ -19135,7 +19220,7 @@ impl<'a, C, A> ProjectLocationClusterSetResourceLabelCall<'a, C, A> where C: Bor
         self
     }
     /// The name (project, location, cluster id) of the cluster to set labels.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -19422,7 +19507,7 @@ impl<'a, C, A> ProjectLocationClusterNodePoolCreateCall<'a, C, A> where C: Borro
     }
     /// The parent (project, location, cluster id) where the node pool will be
     /// created. Specified in the format
-    /// 'projects/*/locations/*/clusters/*'.
+    /// `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -19694,9 +19779,9 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -19718,7 +19803,7 @@ impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self
     }
     /// The name (project, location, cluster) of the cluster to retrieve.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
@@ -20013,9 +20098,9 @@ impl<'a, C, A> ProjectZoneClusterMasterCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -20326,9 +20411,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolUpdateCall<'a, C, A> where C: BorrowMut
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -20648,9 +20733,9 @@ impl<'a, C, A> ProjectZoneClusterSetNetworkPolicyCall<'a, C, A> where C: BorrowM
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -20948,7 +21033,7 @@ impl<'a, C, A> ProjectLocationClusterSetMaintenancePolicyCall<'a, C, A> where C:
     }
     /// The name (project, location, cluster id) of the cluster to set maintenance
     /// policy.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -21222,9 +21307,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -21258,7 +21343,7 @@ impl<'a, C, A> ProjectZoneClusterNodePoolGetCall<'a, C, A> where C: BorrowMut<hy
     }
     /// The name (project, location, cluster, node pool id) of the node pool to
     /// get. Specified in the format
-    /// 'projects/*/locations/*/clusters/*/nodePools/*'.
+    /// `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, C, A> {
@@ -21555,9 +21640,9 @@ impl<'a, C, A> ProjectZoneClusterSetMasterAuthCall<'a, C, A> where C: BorrowMut<
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -21856,7 +21941,7 @@ impl<'a, C, A> ProjectLocationClusterSetMasterAuthCall<'a, C, A> where C: Borrow
         self
     }
     /// The name (project, location, cluster) of the cluster to set auth.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -22154,9 +22239,9 @@ impl<'a, C, A> ProjectZoneClusterCompleteIpRotationCall<'a, C, A> where C: Borro
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -22465,9 +22550,9 @@ impl<'a, C, A> ProjectZoneClusterResourceLabelCall<'a, C, A> where C: BorrowMut<
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -22764,7 +22849,7 @@ impl<'a, C, A> ProjectLocationClusterSetLoggingCall<'a, C, A> where C: BorrowMut
         self
     }
     /// The name (project, location, cluster) of the cluster to set logging.
-    /// Specified in the format 'projects/*/locations/*/clusters/*'.
+    /// Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -23034,8 +23119,9 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) to return operations for, or `-` for
-    /// all zones. This field has been deprecated and replaced by the parent field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) to return
+    /// operations for, or `-` for all zones. This field has been deprecated and
+    /// replaced by the parent field.
     ///
     /// Sets the *zone* path property to the given value.
     ///
@@ -23046,7 +23132,7 @@ impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// The parent (project and location) where the operations will be listed.
-    /// Specified in the format 'projects/*/locations/*'.
+    /// Specified in the format `projects/*/locations/*`.
     /// Location "-" matches all zones and all regions.
     ///
     /// Sets the *parent* query property to the given value.
@@ -23330,7 +23416,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// The name (project, location, operation id) of the operation to cancel.
-    /// Specified in the format 'projects/*/locations/*/operations/*'.
+    /// Specified in the format `projects/*/locations/*/operations/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -23600,7 +23686,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// The name (project, location, operation id) of the operation to get.
-    /// Specified in the format 'projects/*/locations/*/operations/*'.
+    /// Specified in the format `projects/*/locations/*/operations/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -23611,9 +23697,9 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
+    /// [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+    /// cluster resides. This field has been deprecated and replaced by the name
+    /// field.
     ///
     /// Sets the *zone* query property to the given value.
     pub fn zone(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, C, A> {

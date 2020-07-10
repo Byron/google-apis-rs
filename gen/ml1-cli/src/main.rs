@@ -321,20 +321,29 @@ impl<'n> Engine<'n> {
                     "training-input.master-type" => Some(("trainingInput.masterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.job-dir" => Some(("trainingInput.jobDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.scheduling.max-running-time" => Some(("trainingInput.scheduling.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.scheduling.max-wait-time" => Some(("trainingInput.scheduling.maxWaitTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-count" => Some(("trainingInput.parameterServerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.evaluator-count" => Some(("trainingInput.evaluatorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.network" => Some(("trainingInput.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.scale-tier" => Some(("trainingInput.scaleTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.service-account" => Some(("trainingInput.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.worker-config.container-args" => Some(("trainingInput.workerConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.worker-config.container-command" => Some(("trainingInput.workerConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.container-args" => Some(("trainingInput.evaluatorConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.evaluator-config.container-command" => Some(("trainingInput.evaluatorConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.evaluator-config.tpu-tf-version" => Some(("trainingInput.evaluatorConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.evaluator-config.accelerator-config.count" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.evaluator-config.accelerator-config.type" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.evaluator-config.image-uri" => Some(("trainingInput.evaluatorConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.use-chief-in-tf-config" => Some(("trainingInput.useChiefInTfConfig", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-input.master-config.container-args" => Some(("trainingInput.masterConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.master-config.container-command" => Some(("trainingInput.masterConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -352,6 +361,8 @@ impl<'n> Engine<'n> {
                     "training-input.python-module" => Some(("trainingInput.pythonModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-count" => Some(("trainingInput.workerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.encryption-config.kms-key-name" => Some(("trainingInput.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.container-args" => Some(("trainingInput.parameterServerConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.parameter-server-config.container-command" => Some(("trainingInput.parameterServerConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -367,7 +378,7 @@ impl<'n> Engine<'n> {
                     "prediction-output.error-count" => Some(("predictionOutput.errorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "encryption-config", "end-time", "error-count", "error-message", "etag", "evaluator-config", "evaluator-count", "evaluator-type", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "kms-key-name", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "scheduling", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "use-chief-in-tf-config", "version-name", "worker-config", "worker-count", "worker-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "container-args", "container-command", "count", "create-time", "data-format", "enable-trial-early-stopping", "encryption-config", "end-time", "error-count", "error-message", "etag", "evaluator-config", "evaluator-count", "evaluator-type", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "kms-key-name", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-wait-time", "max-worker-count", "model-name", "model-path", "network", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "scheduling", "service-account", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "use-chief-in-tf-config", "version-name", "worker-config", "worker-count", "worker-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -650,20 +661,29 @@ impl<'n> Engine<'n> {
                     "training-input.master-type" => Some(("trainingInput.masterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.job-dir" => Some(("trainingInput.jobDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.scheduling.max-running-time" => Some(("trainingInput.scheduling.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.scheduling.max-wait-time" => Some(("trainingInput.scheduling.maxWaitTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-count" => Some(("trainingInput.parameterServerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.evaluator-count" => Some(("trainingInput.evaluatorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.network" => Some(("trainingInput.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.scale-tier" => Some(("trainingInput.scaleTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.service-account" => Some(("trainingInput.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.worker-config.container-args" => Some(("trainingInput.workerConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.worker-config.container-command" => Some(("trainingInput.workerConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.container-args" => Some(("trainingInput.evaluatorConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.evaluator-config.container-command" => Some(("trainingInput.evaluatorConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.evaluator-config.tpu-tf-version" => Some(("trainingInput.evaluatorConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.evaluator-config.accelerator-config.count" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.evaluator-config.accelerator-config.type" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.evaluator-config.image-uri" => Some(("trainingInput.evaluatorConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.use-chief-in-tf-config" => Some(("trainingInput.useChiefInTfConfig", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-input.master-config.container-args" => Some(("trainingInput.masterConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.master-config.container-command" => Some(("trainingInput.masterConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -681,6 +701,8 @@ impl<'n> Engine<'n> {
                     "training-input.python-module" => Some(("trainingInput.pythonModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.worker-count" => Some(("trainingInput.workerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.encryption-config.kms-key-name" => Some(("trainingInput.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.container-args" => Some(("trainingInput.parameterServerConfig.containerArgs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.parameter-server-config.container-command" => Some(("trainingInput.parameterServerConfig.containerCommand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -696,7 +718,7 @@ impl<'n> Engine<'n> {
                     "prediction-output.error-count" => Some(("predictionOutput.errorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "encryption-config", "end-time", "error-count", "error-message", "etag", "evaluator-config", "evaluator-count", "evaluator-type", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "kms-key-name", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "scheduling", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "use-chief-in-tf-config", "version-name", "worker-config", "worker-count", "worker-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "container-args", "container-command", "count", "create-time", "data-format", "enable-trial-early-stopping", "encryption-config", "end-time", "error-count", "error-message", "etag", "evaluator-config", "evaluator-count", "evaluator-type", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "kms-key-name", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-wait-time", "max-worker-count", "model-name", "model-path", "network", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "scheduling", "service-account", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "use-chief-in-tf-config", "version-name", "worker-config", "worker-count", "worker-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3669,8 +3691,8 @@ fn main() {
         ("projects", "methods: 'explain', 'get-config', 'jobs-cancel', 'jobs-create', 'jobs-get', 'jobs-get-iam-policy', 'jobs-list', 'jobs-patch', 'jobs-set-iam-policy', 'jobs-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-studies-create', 'locations-studies-delete', 'locations-studies-get', 'locations-studies-list', 'locations-studies-trials-add-measurement', 'locations-studies-trials-check-early-stopping-state', 'locations-studies-trials-complete', 'locations-studies-trials-create', 'locations-studies-trials-delete', 'locations-studies-trials-get', 'locations-studies-trials-list', 'locations-studies-trials-stop', 'locations-studies-trials-suggest', 'models-create', 'models-delete', 'models-get', 'models-get-iam-policy', 'models-list', 'models-patch', 'models-set-iam-policy', 'models-test-iam-permissions', 'models-versions-create', 'models-versions-delete', 'models-versions-get', 'models-versions-list', 'models-versions-patch', 'models-versions-set-default', 'operations-cancel', 'operations-get', 'operations-list' and 'predict'", vec![
             ("explain",
                     Some(r##"Performs explanation on the data in the request.
-        AI Platform implements a custom `explain` verb on top of an HTTP POST
-        method."##),
+        
+        <div>{% dynamic include "/ai-platform/includes/___explain-request" %}</div>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_explain",
                   vec![
                     (Some(r##"name"##),
@@ -3886,7 +3908,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_jobs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3917,7 +3939,7 @@ fn main() {
             ("jobs-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -4147,8 +4169,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-add-measurement",
-                    Some(r##"Adds a measurement of the objective metrics to a Trial. This measurement
-        is assumed to have been taken before the Trial is complete."##),
+                    Some(r##"Adds a measurement of the objective metrics to a trial. This measurement
+        is assumed to have been taken before the trial is complete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-add-measurement",
                   vec![
                     (Some(r##"name"##),
@@ -4176,7 +4198,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-check-early-stopping-state",
-                    Some(r##"Checks whether a trial should stop or not."##),
+                    Some(r##"Checks  whether a trial should stop or not. Returns a
+        long-running operation. When the operation is successful,
+        it will contain a
+        CheckTrialEarlyStoppingStateResponse."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-check-early-stopping-state",
                   vec![
                     (Some(r##"name"##),
@@ -4204,12 +4229,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-complete",
-                    Some(r##"Marks a Trial as complete."##),
+                    Some(r##"Marks a trial as complete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-complete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The trial name."##),
+                     Some(r##"Required. The trial name.metat"##),
                      Some(true),
                      Some(false)),
         
@@ -4232,7 +4257,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-create",
-                    Some(r##"Adds a user provided trial to a Study."##),
+                    Some(r##"Adds a user provided trial to a study."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-create",
                   vec![
                     (Some(r##"parent"##),
@@ -4260,7 +4285,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-delete",
-                    Some(r##"Deletes a Trial."##),
+                    Some(r##"Deletes a trial."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-delete",
                   vec![
                     (Some(r##"name"##),
@@ -4282,7 +4307,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-get",
-                    Some(r##"Gets a Trial."##),
+                    Some(r##"Gets a trial."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-get",
                   vec![
                     (Some(r##"name"##),
@@ -4304,7 +4329,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-list",
-                    Some(r##"Lists the trials associated with a Study."##),
+                    Some(r##"Lists the trials associated with a study."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4354,8 +4379,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-studies-trials-suggest",
-                    Some(r##"Returns a long-running operation associated with the generation of trial
-        suggestions."##),
+                    Some(r##"Adds one or more trials to a study, with parameter values
+        suggested by AI Platform Optimizer. Returns a long-running
+        operation associated with the generation of trial suggestions.
+        When this long-running operation succeeds, it will contain
+        a SuggestTrialsResponse."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-suggest",
                   vec![
                     (Some(r##"parent"##),
@@ -4552,7 +4580,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4583,7 +4611,7 @@ fn main() {
             ("models-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -4928,7 +4956,7 @@ fn main() {
     
     let mut app = App::new("ml1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200328")
+           .version("1.0.14+20200703")
            .about("An API to enable creating and using machine learning models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ml1_cli")
            .arg(Arg::with_name("url")

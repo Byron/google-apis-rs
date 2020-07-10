@@ -221,7 +221,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -237,7 +237,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -333,7 +332,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -349,7 +348,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -486,7 +484,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -502,7 +500,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -998,7 +995,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1014,7 +1011,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1254,7 +1250,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1270,7 +1266,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1817,11 +1812,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "google-groups" => Some(("googleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "auto-enrolled-android-groups" => Some(("autoEnrolledAndroidGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "auto-enrolled-google-groups" => Some(("autoEnrolledGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "excluded-google-groups" => Some(("excludedGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-enrolled-android-groups", "auto-enrolled-google-groups", "excluded-google-groups", "google-groups"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1905,11 +1897,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "google-groups" => Some(("googleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "auto-enrolled-android-groups" => Some(("autoEnrolledAndroidGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "auto-enrolled-google-groups" => Some(("autoEnrolledGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "excluded-google-groups" => Some(("excludedGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-enrolled-android-groups", "auto-enrolled-google-groups", "excluded-google-groups", "google-groups"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2772,7 +2761,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -2788,7 +2777,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2828,7 +2816,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -2844,7 +2832,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3686,8 +3673,9 @@ impl<'n> Engine<'n> {
                     "device-spec.screen-density" => Some(("deviceSpec.screenDensity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "device-spec.supported-abis" => Some(("deviceSpec.supportedAbis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "device-spec.supported-locales" => Some(("deviceSpec.supportedLocales", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "variant-id" => Some(("variantId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-spec", "screen-density", "supported-abis", "supported-locales"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-spec", "screen-density", "supported-abis", "supported-locales", "variant-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3696,7 +3684,7 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::SystemApkVariantsCreateRequest = json::value::from_value(object).unwrap();
+        let mut request: api::Variant = json::value::from_value(object).unwrap();
         let mut call = self.hub.systemapks().variants_create(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("version-code").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4206,12 +4194,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::AndroidPublisher::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -4236,18 +4227,21 @@ fn main() {
     let arg_data = [
         ("edits", "methods: 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'bundles-list', 'bundles-upload', 'commit', 'delete', 'deobfuscationfiles-upload', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
             ("apks-addexternallyhosted",
-                    Some(r##"Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to enterprises using Google Play for Work whose application is configured to restrict distribution to the enterprise domain."##),
+                    Some(r##"Creates a new APK without uploading the APK itself to Google Play, instead
+        hosting the APK at a specified URL. This function is only available to
+        organizations using Managed Play whose application is configured to
+        restrict distribution to the organizations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_apks-addexternallyhosted",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4270,18 +4264,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("apks-list",
-                    None,
+                    Some(r##"Lists all current APKs of the app and edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_apks-list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4298,24 +4292,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("apks-upload",
-                    None,
+                    Some(r##"Uploads an APK and adds to the current edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_apks-upload",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -4332,18 +4326,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("bundles-list",
-                    None,
+                    Some(r##"Lists all current Android App Bundles of the app and edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_bundles-list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4360,24 +4354,30 @@ fn main() {
                      Some(false)),
                   ]),
             ("bundles-upload",
-                    Some(r##"Uploads a new Android App Bundle to this edit. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java."##),
+                    Some(r##"Uploads a new Android App Bundle to this edit.
+        If you are using the Google API client libraries, please increase the
+        timeout of the http request before calling this endpoint
+        (a timeout of 2 minutes is recommended).
+        See [Timeouts and
+        Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+        for an example in java."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_bundles-upload",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -4394,18 +4394,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("commit",
-                    Some(r##"Commits/applies the changes made in this edit back to the app."##),
+                    Some(r##"Commits an app edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_commit",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4422,18 +4422,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes an edit for an app. Creating a new edit will automatically delete any of your previous edits so this method need only be called if you want to preemptively abandon an edit."##),
+                    Some(r##"Deletes an app edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_delete",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4444,12 +4444,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("deobfuscationfiles-upload",
-                    Some(r##"Uploads the deobfuscation file of the specified APK. If a deobfuscation file already exists, it will be replaced."##),
+                    Some(r##"Uploads a new deobfuscation file and attaches to the specified APK."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_deobfuscationfiles-upload",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier of the Android app for which the deobfuscatiuon files are being uploaded; for example, "com.spiffygame"."##),
+                     Some(r##"Unique identifier for the Android app."##),
                      Some(true),
                      Some(false)),
         
@@ -4461,19 +4461,20 @@ fn main() {
         
                     (Some(r##"apk-version-code"##),
                      None,
-                     Some(r##"The version code of the APK whose deobfuscation file is being uploaded."##),
+                     Some(r##"The version code of the APK whose Deobfuscation File is being
+        uploaded."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"deobfuscation-file-type"##),
                      None,
-                     None,
+                     Some(r##"The type of the deobfuscation file."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -4490,18 +4491,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("details-get",
-                    Some(r##"Fetches app details for this edit. This includes the default language and developer support contact information."##),
+                    Some(r##"Gets details of an app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_details-get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4518,18 +4519,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("details-patch",
-                    Some(r##"Updates app details for this edit. This method supports patch semantics."##),
+                    Some(r##"Patches details of an app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_details-patch",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4552,18 +4553,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("details-update",
-                    Some(r##"Updates app details for this edit."##),
+                    Some(r##"Updates details of an app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_details-update",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4586,30 +4587,31 @@ fn main() {
                      Some(false)),
                   ]),
             ("expansionfiles-get",
-                    Some(r##"Fetches the Expansion File configuration for the APK specified."##),
+                    Some(r##"Fetches the expansion file configuration for the specified APK."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_expansionfiles-get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"apk-version-code"##),
                      None,
-                     Some(r##"The version code of the APK whose Expansion File configuration is being read or modified."##),
+                     Some(r##"The version code of the APK whose expansion file configuration is being
+        read or modified."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"expansion-file-type"##),
                      None,
-                     None,
+                     Some(r##"The file type of the file configuration which is being read or modified."##),
                      Some(true),
                      Some(false)),
         
@@ -4626,30 +4628,33 @@ fn main() {
                      Some(false)),
                   ]),
             ("expansionfiles-patch",
-                    Some(r##"Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method. This method supports patch semantics."##),
+                    Some(r##"Patches the APK's expansion file configuration to reference another APK's
+        expansion file.
+        To add a new expansion file use the Upload method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_expansionfiles-patch",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"apk-version-code"##),
                      None,
-                     Some(r##"The version code of the APK whose Expansion File configuration is being read or modified."##),
+                     Some(r##"The version code of the APK whose expansion file configuration is being
+        read or modified."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"expansion-file-type"##),
                      None,
-                     None,
+                     Some(r##"The file type of the expansion file configuration which is being updated."##),
                      Some(true),
                      Some(false)),
         
@@ -4672,30 +4677,33 @@ fn main() {
                      Some(false)),
                   ]),
             ("expansionfiles-update",
-                    Some(r##"Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method."##),
+                    Some(r##"Updates the APK's expansion file configuration to reference another APK's
+        expansion file.
+        To add a new expansion file use the Upload method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_expansionfiles-update",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"apk-version-code"##),
                      None,
-                     Some(r##"The version code of the APK whose Expansion File configuration is being read or modified."##),
+                     Some(r##"The version code of the APK whose expansion file configuration is being
+        read or modified."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"expansion-file-type"##),
                      None,
-                     None,
+                     Some(r##"The file type of the file configuration which is being read or modified."##),
                      Some(true),
                      Some(false)),
         
@@ -4718,36 +4726,37 @@ fn main() {
                      Some(false)),
                   ]),
             ("expansionfiles-upload",
-                    Some(r##"Uploads and attaches a new Expansion File to the APK specified."##),
+                    Some(r##"Uploads a new expansion file and attaches to the specified APK."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_expansionfiles-upload",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"apk-version-code"##),
                      None,
-                     Some(r##"The version code of the APK whose Expansion File configuration is being read or modified."##),
+                     Some(r##"The version code of the APK whose expansion file configuration is being
+        read or modified."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"expansion-file-type"##),
                      None,
-                     None,
+                     Some(r##"The file type of the expansion file configuration which is being updated."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -4764,18 +4773,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns information about the edit specified. Calls will fail if the edit is no long active (e.g. has been deleted, superseded or expired)."##),
+                    Some(r##"Gets an app edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -4797,25 +4806,26 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German)."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"image-type"##),
                      None,
-                     None,
+                     Some(r##"Type of the Image."##),
                      Some(true),
                      Some(false)),
         
@@ -4832,30 +4842,34 @@ fn main() {
                      Some(true)),
                   ]),
             ("images-deleteall",
-                    Some(r##"Deletes all images for the specified language and image type."##),
+                    Some(r##"Deletes all images for the specified language and image type.
+        Returns an empty response if no images are found."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_images-deleteall",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German).
+        Providing a language that is not supported by the App is a no-op."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"image-type"##),
                      None,
-                     None,
+                     Some(r##"Type of the Image.
+        Providing an image type that refers to no images is a no-op."##),
                      Some(true),
                      Some(false)),
         
@@ -4872,30 +4886,33 @@ fn main() {
                      Some(false)),
                   ]),
             ("images-list",
-                    Some(r##"Lists all images for the specified language and image type."##),
+                    Some(r##"Lists all images. The response may be empty."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_images-list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German).
+        There must be a store listing for the specified language."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"image-type"##),
                      None,
-                     None,
+                     Some(r##"Type of the Image. Providing an image type that refers to no images will
+        return an empty response."##),
                      Some(true),
                      Some(false)),
         
@@ -4912,36 +4929,39 @@ fn main() {
                      Some(false)),
                   ]),
             ("images-upload",
-                    Some(r##"Uploads a new image and adds it to the list of images for the specified language and image type."##),
+                    Some(r##"Uploads an image of the specified language and image type, and adds to the
+        edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_images-upload",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German).
+        Providing a language that is not supported by the App is a no-op."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"image-type"##),
                      None,
-                     None,
+                     Some(r##"Type of the Image."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -4958,12 +4978,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new edit for an app, populated with the app's current state."##),
+                    Some(r##"Creates a new edit for an app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_insert",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -4986,24 +5006,25 @@ fn main() {
                      Some(false)),
                   ]),
             ("listings-delete",
-                    Some(r##"Deletes the specified localized store listing from an edit."##),
+                    Some(r##"Deletes a localized store listing."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_listings-delete",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German)."##),
                      Some(true),
                      Some(false)),
         
@@ -5014,18 +5035,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("listings-deleteall",
-                    Some(r##"Deletes all localized listings from an edit."##),
+                    Some(r##"Deletes all store listings."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_listings-deleteall",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -5036,24 +5057,25 @@ fn main() {
                      Some(true)),
                   ]),
             ("listings-get",
-                    Some(r##"Fetches information about a localized store listing."##),
+                    Some(r##"Gets a localized store listing."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_listings-get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German)."##),
                      Some(true),
                      Some(false)),
         
@@ -5070,18 +5092,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("listings-list",
-                    Some(r##"Returns all of the localized store listings attached to this edit."##),
+                    Some(r##"Lists all localized store listings."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_listings-list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -5098,24 +5120,25 @@ fn main() {
                      Some(false)),
                   ]),
             ("listings-patch",
-                    Some(r##"Creates or updates a localized store listing. This method supports patch semantics."##),
+                    Some(r##"Patches a localized store listing."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_listings-patch",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German)."##),
                      Some(true),
                      Some(false)),
         
@@ -5143,19 +5166,20 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"language"##),
                      None,
-                     Some(r##"The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT"."##),
+                     Some(r##"Language localization code (a BCP-47 language tag; for example, "de-AT"
+        for Austrian German)."##),
                      Some(true),
                      Some(false)),
         
@@ -5178,24 +5202,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("testers-get",
-                    None,
+                    Some(r##"Gets testers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_testers-get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify."##),
+                     Some(r##"The track to read from."##),
                      Some(true),
                      Some(false)),
         
@@ -5212,24 +5236,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("testers-patch",
-                    None,
+                    Some(r##"Patches testers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_testers-patch",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify."##),
+                     Some(r##"The track to update."##),
                      Some(true),
                      Some(false)),
         
@@ -5252,24 +5276,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("testers-update",
-                    None,
+                    Some(r##"Updates testers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_testers-update",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify."##),
+                     Some(r##"The track to update."##),
                      Some(true),
                      Some(false)),
         
@@ -5292,24 +5316,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("tracks-get",
-                    Some(r##"Fetches the track configuration for the specified track type. Includes the APK version codes that are in this track."##),
+                    Some(r##"Gets a track."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_tracks-get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify."##),
+                     Some(r##"Identifier of the track."##),
                      Some(true),
                      Some(false)),
         
@@ -5326,18 +5350,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("tracks-list",
-                    Some(r##"Lists all the track configurations for this edit."##),
+                    Some(r##"Lists all tracks."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_tracks-list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -5354,24 +5378,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("tracks-patch",
-                    Some(r##"Updates the track configuration for the specified track type. This method supports patch semantics."##),
+                    Some(r##"Patches a track."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_tracks-patch",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify."##),
+                     Some(r##"Identifier of the track."##),
                      Some(true),
                      Some(false)),
         
@@ -5394,24 +5418,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("tracks-update",
-                    Some(r##"Updates the track configuration for the specified track type."##),
+                    Some(r##"Updates a track."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_tracks-update",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track to read or modify."##),
+                     Some(r##"Identifier of the track."##),
                      Some(true),
                      Some(false)),
         
@@ -5434,18 +5458,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("validate",
-                    Some(r##"Checks that the edit can be successfully committed. The edit's changes are not applied to the live app."##),
+                    Some(r##"Validates an app edit."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/edits_validate",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"edit-id"##),
                      None,
-                     Some(r##"Unique identifier for this edit."##),
+                     Some(r##"Identifier of the edit."##),
                      Some(true),
                      Some(false)),
         
@@ -5465,12 +5489,12 @@ fn main() {
         
         ("inappproducts", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Delete an in-app product for an app."##),
+                    Some(r##"Deletes an in-app product (i.e. a managed product or a subscriptions)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_delete",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app with the in-app product; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -5487,12 +5511,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Returns information about the in-app product specified."##),
+                    Some(r##"Gets an in-app product, which can be a managed product or a subscription."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     None,
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -5515,12 +5539,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new in-app product for an app."##),
+                    Some(r##"Creates an in-app product (i.e. a managed product or a subscriptions)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_insert",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -5543,12 +5567,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all the in-app products for an Android app, both subscriptions and managed in-app products.."##),
+                    Some(r##"Lists all in-app products - both managed products and subscriptions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app with in-app products; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -5565,12 +5589,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the details of an in-app product. This method supports patch semantics."##),
+                    Some(r##"Patches an in-app product (i.e. a managed product or a subscriptions)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_patch",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app with the in-app product; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -5599,12 +5623,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the details of an in-app product."##),
+                    Some(r##"Updates an in-app product (i.e. a managed product or a subscriptions)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/inappproducts_update",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app with the in-app product; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -5636,18 +5660,25 @@ fn main() {
         
         ("internalappsharingartifacts", "methods: 'uploadapk' and 'uploadbundle'", vec![
             ("uploadapk",
-                    Some(r##"Uploads an APK to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java."##),
+                    Some(r##"Uploads an APK to internal app sharing.
+        If you are using the Google API client libraries, please increase the
+        timeout of the http request before calling this endpoint
+        (a timeout of 2 minutes is recommended).
+        
+        See [Timeouts and
+        Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+        for an example in java."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/internalappsharingartifacts_uploadapk",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -5664,18 +5695,25 @@ fn main() {
                      Some(false)),
                   ]),
             ("uploadbundle",
-                    Some(r##"Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java."##),
+                    Some(r##"Uploads an app bundle to internal app sharing.
+        If you are using the Google API client libraries, please increase the
+        timeout of the http request before calling this endpoint
+        (a timeout of 2 minutes is recommended).
+        
+        See [Timeouts and
+        Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+        for an example in java."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/internalappsharingartifacts_uploadbundle",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -5700,13 +5738,15 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription or in-app
+        item was purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"order-id"##),
                      None,
-                     Some(r##"The order ID provided to the user when the subscription or in-app order was purchased."##),
+                     Some(r##"The order ID provided to the user when the subscription or in-app order was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5725,7 +5765,8 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application the inapp product was sold in (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application the inapp product was sold in (for
+        example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5737,7 +5778,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the inapp product was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5759,7 +5801,8 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application the inapp product was sold in (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application the inapp product was sold in (for
+        example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5771,7 +5814,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the inapp product was purchased."##),
+                     Some(r##"The token provided to the user's device when the inapp product was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5793,7 +5837,8 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription was
+        purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5805,7 +5850,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the subscription was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5822,12 +5868,14 @@ fn main() {
                      Some(true)),
                   ]),
             ("subscriptions-cancel",
-                    Some(r##"Cancels a user's subscription purchase. The subscription remains valid until its expiration time."##),
+                    Some(r##"Cancels a user's subscription purchase. The subscription remains valid
+        until its expiration time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-cancel",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription was
+        purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5839,7 +5887,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the subscription was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5850,12 +5899,14 @@ fn main() {
                      Some(true)),
                   ]),
             ("subscriptions-defer",
-                    Some(r##"Defers a user's subscription purchase until a specified future expiration time."##),
+                    Some(r##"Defers a user's subscription purchase until a specified future expiration
+        time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-defer",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription was
+        purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5867,7 +5918,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the subscription was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5890,12 +5942,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-get",
-                    Some(r##"Checks whether a user's subscription purchase is valid and returns its expiry time."##),
+                    Some(r##"Checks whether a user's subscription purchase is valid and returns its
+        expiry time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription was
+        purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5907,7 +5961,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the subscription was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5924,24 +5979,27 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-refund",
-                    Some(r##"Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur."##),
+                    Some(r##"Refunds a user's subscription purchase, but the subscription remains valid
+        until its expiration time and it will continue to recur."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-refund",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription was
+        purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"subscription-id"##),
                      None,
-                     Some(r##"The purchased subscription ID (for example, 'monthly001')."##),
+                     Some(r##""The purchased subscription ID (for example, 'monthly001')."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the subscription was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5952,12 +6010,14 @@ fn main() {
                      Some(true)),
                   ]),
             ("subscriptions-revoke",
-                    Some(r##"Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring."##),
+                    Some(r##"Refunds and immediately revokes a user's subscription purchase. Access to
+        the subscription will be terminated immediately and it will stop recurring."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-revoke",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which this subscription was
+        purchased (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5969,7 +6029,8 @@ fn main() {
         
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided to the user's device when the subscription was purchased."##),
+                     Some(r##"The token provided to the user's device when the subscription was
+        purchased."##),
                      Some(true),
                      Some(false)),
         
@@ -5985,7 +6046,8 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing')."##),
+                     Some(r##"The package name of the application for which voided purchases need to be
+        returned (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -6005,18 +6067,18 @@ fn main() {
         
         ("reviews", "methods: 'get', 'list' and 'reply'", vec![
             ("get",
-                    Some(r##"Returns a single review."##),
+                    Some(r##"Gets a single review."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/reviews_get",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"review-id"##),
                      None,
-                     None,
+                     Some(r##"Unique identifier for a review."##),
                      Some(true),
                      Some(false)),
         
@@ -6033,12 +6095,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of reviews. Only reviews from last week will be returned."##),
+                    Some(r##"Lists all reviews."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/reviews_list",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
@@ -6055,18 +6117,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("reply",
-                    Some(r##"Reply to a single review, or update an existing reply."##),
+                    Some(r##"Replies to a single review, or updates an existing reply."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/reviews_reply",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame"."##),
+                     Some(r##"Package name of the app."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"review-id"##),
                      None,
-                     None,
+                     Some(r##"Unique identifier for a review."##),
                      Some(true),
                      Some(false)),
         
@@ -6092,12 +6154,13 @@ fn main() {
         
         ("systemapks", "methods: 'variants-create', 'variants-download', 'variants-get' and 'variants-list'", vec![
             ("variants-create",
-                    Some(r##"Creates a new variant of APK which is suitable for inclusion in a system image."##),
+                    Some(r##"Creates an APK which is suitable for inclusion in a system image from an
+        already uploaded Android App Bundle."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/systemapks_variants-create",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Unique identifier of the Android app."##),
                      Some(true),
                      Some(false)),
         
@@ -6126,12 +6189,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("variants-download",
-                    Some(r##"Download a previously created APK which is suitable for inclusion in a system image."##),
+                    Some(r##"Downloads a previously created system APK which is suitable for inclusion
+        in a system image."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/systemapks_variants-download",
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Unique identifier of the Android app."##),
                      Some(true),
                      Some(false)),
         
@@ -6143,7 +6207,7 @@ fn main() {
         
                     (Some(r##"variant-id"##),
                      None,
-                     None,
+                     Some(r##"The ID of a previously created system APK variant."##),
                      Some(true),
                      Some(false)),
         
@@ -6165,7 +6229,7 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Unique identifier of the Android app."##),
                      Some(true),
                      Some(false)),
         
@@ -6177,7 +6241,7 @@ fn main() {
         
                     (Some(r##"variant-id"##),
                      None,
-                     Some(r##"Unique identifier for this variant."##),
+                     Some(r##"The ID of a previously created system APK variant."##),
                      Some(true),
                      Some(false)),
         
@@ -6199,7 +6263,7 @@ fn main() {
                   vec![
                     (Some(r##"package-name"##),
                      None,
-                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(r##"Unique identifier of the Android app."##),
                      Some(true),
                      Some(false)),
         
@@ -6227,8 +6291,8 @@ fn main() {
     
     let mut app = App::new("androidpublisher3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
-           .about("Accesses Android application developers' Google Play accounts.")
+           .version("1.0.14+20200709")
+           .about("Lets Android application developers access their Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

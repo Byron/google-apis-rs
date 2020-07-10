@@ -4,12 +4,12 @@
 [package]
 
 name = "google-manufacturers1"
-version = "1.0.13+20200317"
+version = "1.0.14+20200702"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Manufacturer Center (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/manufacturers1"
 homepage = "https://developers.google.com/manufacturers/"
-documentation = "https://docs.rs/google-manufacturers1/1.0.13+20200317"
+documentation = "https://docs.rs/google-manufacturers1/1.0.14+20200702"
 license = "MIT"
 keywords = ["manufacturers", "google", "protocol", "web", "api"]
 autobins = false

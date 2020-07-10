@@ -1,0 +1,20 @@
+site_name: AdMob v1.0.14+20200709
+site_url: http://byron.github.io/google-apis-rs/google-admob1-cli
+site_description: A complete library to interact with AdMob (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/admob1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_get.md', 'Accounts', 'Get']
+- ['accounts_list.md', 'Accounts', 'List']
+- ['accounts_mediation-report-generate.md', 'Accounts', 'Mediation Report Generate']
+- ['accounts_network-report-generate.md', 'Accounts', 'Network Report Generate']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

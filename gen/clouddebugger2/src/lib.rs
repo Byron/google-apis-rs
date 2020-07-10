@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Debugger* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Debugger* crate version *1.0.14+20200703*, where *20200703* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Debugger* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/debugger).
@@ -111,7 +111,8 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
-//!              .client_version("sed")
+//!              .client_version("et")
+//!              .canary_option("dolores")
 //!              .doit();
 //! 
 //! match result {
@@ -299,7 +300,8 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
-///              .client_version("dolores")
+///              .client_version("accusam")
+///              .canary_option("takimata")
 ///              .doit();
 /// 
 /// match result {
@@ -337,7 +339,7 @@ impl<'a, C, A> CloudDebugger<C, A>
         CloudDebugger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://clouddebugger.googleapis.com/".to_string(),
             _root_url: "https://clouddebugger.googleapis.com/".to_string(),
         }
@@ -351,7 +353,7 @@ impl<'a, C, A> CloudDebugger<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -686,6 +688,10 @@ pub struct RegisterDebuggeeResponse {
     /// itself by removing all breakpoints and detaching from the application.
     /// It should however continue to poll `RegisterDebuggee` until reenabled.
     pub debuggee: Option<Debuggee>,
+    /// A unique ID generated for the agent.
+    /// Each RegisterDebuggee request will generate a new agent ID.
+    #[serde(rename="agentId")]
+    pub agent_id: Option<String>,
 }
 
 impl ResponseResult for RegisterDebuggeeResponse {}
@@ -800,6 +806,9 @@ pub struct Debuggee {
     /// `google.com/java-gcp/v1.1`).
     #[serde(rename="agentVersion")]
     pub agent_version: Option<String>,
+    /// Used when setting breakpoint canary for this debuggee.
+    #[serde(rename="canaryMode")]
+    pub canary_mode: Option<String>,
     /// If set to `true`, indicates that Controller service does not detect any
     /// activity from the debuggee agents and the application is possibly stopped.
     #[serde(rename="isInactive")]
@@ -931,6 +940,10 @@ pub struct Breakpoint {
     /// recently entered function.
     #[serde(rename="stackFrames")]
     pub stack_frames: Option<Vec<StackFrame>>,
+    /// The deadline for the breakpoint to stay in CANARY_ACTIVE state. The value
+    /// is meaningless when the breakpoint is not in CANARY_ACTIVE state.
+    #[serde(rename="canaryExpireTime")]
+    pub canary_expire_time: Option<String>,
     /// List of read-only expressions to evaluate at the breakpoint location.
     /// The expressions are composed using expressions in the programming language
     /// at the source location. If the breakpoint action is `LOG`, the evaluated
@@ -964,6 +977,8 @@ pub struct Breakpoint {
     pub log_message_format: Option<String>,
     /// Breakpoint identifier, unique in the scope of the debuggee.
     pub id: Option<String>,
+    /// The current state of the breakpoint.
+    pub state: Option<String>,
     /// Breakpoint source location.
     pub location: Option<SourceLocation>,
     /// Action that the agent should perform when the code at the
@@ -1319,6 +1334,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
             _debuggee_id: debuggee_id.to_string(),
             _wait_token: Default::default(),
             _success_on_timeout: Default::default(),
+            _agent_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1436,6 +1452,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
             _request: request,
             _debuggee_id: debuggee_id.to_string(),
             _client_version: Default::default(),
+            _canary_option: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2071,8 +2088,9 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.controller().debuggees_breakpoints_list("debuggeeId")
-///              .wait_token("justo")
+///              .wait_token("labore")
 ///              .success_on_timeout(true)
+///              .agent_id("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -2083,6 +2101,7 @@ pub struct ControllerDebuggeeBreakpointListCall<'a, C, A>
     _debuggee_id: String,
     _wait_token: Option<String>,
     _success_on_timeout: Option<bool>,
+    _agent_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2104,7 +2123,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "clouddebugger.controller.debuggees.breakpoints.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("debuggeeId", self._debuggee_id.to_string()));
         if let Some(value) = self._wait_token {
             params.push(("waitToken", value.to_string()));
@@ -2112,7 +2131,10 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
         if let Some(value) = self._success_on_timeout {
             params.push(("successOnTimeout", value.to_string()));
         }
-        for &field in ["alt", "debuggeeId", "waitToken", "successOnTimeout"].iter() {
+        if let Some(value) = self._agent_id {
+            params.push(("agentId", value.to_string()));
+        }
+        for &field in ["alt", "debuggeeId", "waitToken", "successOnTimeout", "agentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2262,6 +2284,14 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
         self._success_on_timeout = Some(new_value);
         self
     }
+    /// Identifies the agent.
+    /// This is the ID returned in the RegisterDebuggee response.
+    ///
+    /// Sets the *agent id* query property to the given value.
+    pub fn agent_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
+        self._agent_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2353,7 +2383,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_get("debuggeeId", "breakpointId")
-///              .client_version("sea")
+///              .client_version("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -2628,7 +2658,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_delete("debuggeeId", "breakpointId")
-///              .client_version("gubergren")
+///              .client_version("no")
 ///              .doit();
 /// # }
 /// ```
@@ -2903,9 +2933,9 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_list()
-///              .project("sadipscing")
+///              .project("justo")
 ///              .include_inactive(true)
-///              .client_version("ea")
+///              .client_version("et")
 ///              .doit();
 /// # }
 /// ```
@@ -3164,7 +3194,8 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_set(req, "debuggeeId")
-///              .client_version("justo")
+///              .client_version("diam")
+///              .canary_option("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -3175,6 +3206,7 @@ pub struct DebuggerDebuggeeBreakpointSetCall<'a, C, A>
     _request: Breakpoint,
     _debuggee_id: String,
     _client_version: Option<String>,
+    _canary_option: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3196,12 +3228,15 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "clouddebugger.debugger.debuggees.breakpoints.set",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("debuggeeId", self._debuggee_id.to_string()));
         if let Some(value) = self._client_version {
             params.push(("clientVersion", value.to_string()));
         }
-        for &field in ["alt", "debuggeeId", "clientVersion"].iter() {
+        if let Some(value) = self._canary_option {
+            params.push(("canaryOption", value.to_string()));
+        }
+        for &field in ["alt", "debuggeeId", "clientVersion", "canaryOption"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3361,6 +3396,13 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         self._client_version = Some(new_value.to_string());
         self
     }
+    /// The canary option set by the user upon setting breakpoint.
+    ///
+    /// Sets the *canary option* query property to the given value.
+    pub fn canary_option(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
+        self._canary_option = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3453,11 +3495,11 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.debugger().debuggees_breakpoints_list("debuggeeId")
 ///              .wait_token("et")
-///              .strip_results(true)
+///              .strip_results(false)
 ///              .include_inactive(true)
-///              .include_all_users(false)
+///              .include_all_users(true)
 ///              .client_version("Lorem")
-///              .action_value("et")
+///              .action_value("eos")
 ///              .doit();
 /// # }
 /// ```

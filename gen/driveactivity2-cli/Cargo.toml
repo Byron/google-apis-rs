@@ -4,7 +4,7 @@
 [package]
 
 name = "google-driveactivity2-cli"
-version = "1.0.13+20200407"
+version = "1.0.14+20200707"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Drive Activity (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/driveactivity2-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-driveactivity2]
 path = "../driveactivity2"
-version = "1.0.13+20200407"
+version = "1.0.14+20200707"

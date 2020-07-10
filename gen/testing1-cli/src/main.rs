@@ -218,6 +218,7 @@ impl<'n> Engine<'n> {
                     "flaky-test-attempts" => Some(("flakyTestAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "test-specification.ios-test-setup.network-profile" => Some(("testSpecification.iosTestSetup.networkProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-xc-test.app-bundle-id" => Some(("testSpecification.iosXcTest.appBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-xc-test.test-special-entitlements" => Some(("testSpecification.iosXcTest.testSpecialEntitlements", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "test-specification.ios-xc-test.xctestrun.gcs-path" => Some(("testSpecification.iosXcTest.xctestrun.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-xc-test.tests-zip.gcs-path" => Some(("testSpecification.iosXcTest.testsZip.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-xc-test.xcode-version" => Some(("testSpecification.iosXcTest.xcodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -225,8 +226,9 @@ impl<'n> Engine<'n> {
                     "test-specification.ios-test-loop.app-bundle-id" => Some(("testSpecification.iosTestLoop.appBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-test-loop.app-ipa.gcs-path" => Some(("testSpecification.iosTestLoop.appIpa.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.test-timeout" => Some(("testSpecification.testTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-specification.test-setup.systrace.duration-seconds" => Some(("testSpecification.testSetup.systrace.durationSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "test-specification.test-setup.dont-autogrant-permissions" => Some(("testSpecification.testSetup.dontAutograntPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "test-specification.test-setup.directories-to-pull" => Some(("testSpecification.testSetup.directoriesToPull", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "test-specification.test-setup.systrace.duration-seconds" => Some(("testSpecification.testSetup.systrace.durationSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "test-specification.test-setup.network-profile" => Some(("testSpecification.testSetup.networkProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.disable-video-recording" => Some(("testSpecification.disableVideoRecording", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "test-specification.disable-performance-metrics" => Some(("testSpecification.disablePerformanceMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -261,7 +263,7 @@ impl<'n> Engine<'n> {
                     "environment-matrix.android-matrix.orientations" => Some(("environmentMatrix.androidMatrix.orientations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "outcome-summary" => Some(("outcomeSummary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-bundle", "app-bundle-id", "app-initial-activity", "app-ipa", "app-package-id", "bundle-location", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "duration-seconds", "environment-matrix", "execution-id", "flaky-test-attempts", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "ios-test-loop", "ios-test-setup", "ios-xc-test", "locales", "max-depth", "max-steps", "name", "network-profile", "num-shards", "orchestrator-option", "orientations", "outcome-summary", "project-id", "result-storage", "results-url", "robo-script", "scenario-labels", "scenarios", "sharding-option", "state", "systrace", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-specification", "test-targets", "test-timeout", "tests-zip", "timestamp", "tool-results-execution", "tool-results-history", "uniform-sharding", "xcode-version", "xctestrun"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-bundle", "app-bundle-id", "app-initial-activity", "app-ipa", "app-package-id", "bundle-location", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "dont-autogrant-permissions", "duration-seconds", "environment-matrix", "execution-id", "flaky-test-attempts", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "ios-test-loop", "ios-test-setup", "ios-xc-test", "locales", "max-depth", "max-steps", "name", "network-profile", "num-shards", "orchestrator-option", "orientations", "outcome-summary", "project-id", "result-storage", "results-url", "robo-script", "scenario-labels", "scenarios", "sharding-option", "state", "systrace", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-special-entitlements", "test-specification", "test-targets", "test-timeout", "tests-zip", "timestamp", "tool-results-execution", "tool-results-history", "uniform-sharding", "xcode-version", "xctestrun"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -731,7 +733,7 @@ fn main() {
     
     let mut app = App::new("testing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200408")
+           .version("1.0.14+20200708")
            .about("Allows developers to run automated tests for their mobile applications on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_testing1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storagetransfer* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *storagetransfer* crate version *1.0.14+20200702*, where *20200702* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *storagetransfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/storage-transfer/docs).
@@ -331,7 +331,7 @@ impl<'a, C, A> Storagetransfer<C, A>
         Storagetransfer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://storagetransfer.googleapis.com/".to_string(),
             _root_url: "https://storagetransfer.googleapis.com/".to_string(),
         }
@@ -348,7 +348,7 @@ impl<'a, C, A> Storagetransfer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1253,7 +1253,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should have the format of `transferOperations/some/unique/name`.
     pub name: Option<String>,
-    /// Represents the transfer operation object.
+    /// Represents the transfer operation object. To request a TransferOperation object, use transferOperations.get.
     pub metadata: Option<HashMap<String, String>>,
 }
 

@@ -340,7 +340,7 @@ fn main() {
     
     let mut app = App::new("indexing3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200402")
+           .version("1.0.14+20200625")
            .about("Notifies Google when your web pages change.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_indexing3_cli")
            .arg(Arg::with_name("url")

@@ -6022,7 +6022,7 @@ fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200331")
            .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")

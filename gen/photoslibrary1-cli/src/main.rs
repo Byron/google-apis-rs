@@ -339,18 +339,19 @@ impl<'n> Engine<'n> {
                     "album.media-items-count" => Some(("album.mediaItemsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "album.title" => Some(("album.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.is-writeable" => Some(("album.isWriteable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "album.share-info.shareable-url" => Some(("album.shareInfo.shareableUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.share-info.share-token" => Some(("album.shareInfo.shareToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "album.share-info.is-joined" => Some(("album.shareInfo.isJoined", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "album.share-info.is-owned" => Some(("album.shareInfo.isOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "album.share-info.shared-album-options.is-commentable" => Some(("album.shareInfo.sharedAlbumOptions.isCommentable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "album.share-info.shared-album-options.is-collaborative" => Some(("album.shareInfo.sharedAlbumOptions.isCollaborative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "album.share-info.is-joinable" => Some(("album.shareInfo.isJoinable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "album.share-info.is-joined" => Some(("album.shareInfo.isJoined", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "album.share-info.shareable-url" => Some(("album.shareInfo.shareableUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.cover-photo-base-url" => Some(("album.coverPhotoBaseUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.product-url" => Some(("album.productUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.cover-photo-media-item-id" => Some(("album.coverPhotoMediaItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.id" => Some(("album.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["album", "cover-photo-base-url", "cover-photo-media-item-id", "id", "is-collaborative", "is-commentable", "is-joined", "is-owned", "is-writeable", "media-items-count", "product-url", "share-info", "share-token", "shareable-url", "shared-album-options", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["album", "cover-photo-base-url", "cover-photo-media-item-id", "id", "is-collaborative", "is-commentable", "is-joinable", "is-joined", "is-owned", "is-writeable", "media-items-count", "product-url", "share-info", "share-token", "shareable-url", "shared-album-options", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -504,6 +505,105 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _albums_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "media-items-count" => Some(("mediaItemsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-writeable" => Some(("isWriteable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-info.share-token" => Some(("shareInfo.shareToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "share-info.is-owned" => Some(("shareInfo.isOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-info.shared-album-options.is-commentable" => Some(("shareInfo.sharedAlbumOptions.isCommentable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-info.shared-album-options.is-collaborative" => Some(("shareInfo.sharedAlbumOptions.isCollaborative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-info.is-joinable" => Some(("shareInfo.isJoinable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-info.is-joined" => Some(("shareInfo.isJoined", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-info.shareable-url" => Some(("shareInfo.shareableUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cover-photo-base-url" => Some(("coverPhotoBaseUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-url" => Some(("productUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cover-photo-media-item-id" => Some(("coverPhotoMediaItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cover-photo-base-url", "cover-photo-media-item-id", "id", "is-collaborative", "is-commentable", "is-joinable", "is-joined", "is-owned", "is-writeable", "media-items-count", "product-url", "share-info", "share-token", "shareable-url", "shared-album-options", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Album = json::value::from_value(object).unwrap();
+        let mut call = self.hub.albums().patch(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -949,6 +1049,112 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _media_items_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "mime-type" => Some(("mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-url" => Some(("baseUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-url" => Some(("productUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contributor-info.profile-picture-base-url" => Some(("contributorInfo.profilePictureBaseUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contributor-info.display-name" => Some(("contributorInfo.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.photo.exposure-time" => Some(("mediaMetadata.photo.exposureTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.photo.camera-make" => Some(("mediaMetadata.photo.cameraMake", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.photo.focal-length" => Some(("mediaMetadata.photo.focalLength", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "media-metadata.photo.iso-equivalent" => Some(("mediaMetadata.photo.isoEquivalent", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "media-metadata.photo.aperture-f-number" => Some(("mediaMetadata.photo.apertureFNumber", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "media-metadata.photo.camera-model" => Some(("mediaMetadata.photo.cameraModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.creation-time" => Some(("mediaMetadata.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.video.status" => Some(("mediaMetadata.video.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.video.camera-make" => Some(("mediaMetadata.video.cameraMake", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.video.fps" => Some(("mediaMetadata.video.fps", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "media-metadata.video.camera-model" => Some(("mediaMetadata.video.cameraModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.width" => Some(("mediaMetadata.width", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-metadata.height" => Some(("mediaMetadata.height", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aperture-f-number", "base-url", "camera-make", "camera-model", "contributor-info", "creation-time", "description", "display-name", "exposure-time", "filename", "focal-length", "fps", "height", "id", "iso-equivalent", "media-metadata", "mime-type", "photo", "product-url", "profile-picture-base-url", "status", "video", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::MediaItem = json::value::from_value(object).unwrap();
+        let mut call = self.hub.media_items().patch(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _media_items_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1351,6 +1557,9 @@ impl<'n> Engine<'n> {
                     ("list", Some(opt)) => {
                         call_result = self._albums_list(opt, dry_run, &mut err);
                     },
+                    ("patch", Some(opt)) => {
+                        call_result = self._albums_patch(opt, dry_run, &mut err);
+                    },
                     ("share", Some(opt)) => {
                         call_result = self._albums_share(opt, dry_run, &mut err);
                     },
@@ -1376,6 +1585,9 @@ impl<'n> Engine<'n> {
                     },
                     ("list", Some(opt)) => {
                         call_result = self._media_items_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._media_items_patch(opt, dry_run, &mut err);
                     },
                     ("search", Some(opt)) => {
                         call_result = self._media_items_search(opt, dry_run, &mut err);
@@ -1491,7 +1703,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("albums", "methods: 'add-enrichment', 'batch-add-media-items', 'batch-remove-media-items', 'create', 'get', 'list', 'share' and 'unshare'", vec![
+        ("albums", "methods: 'add-enrichment', 'batch-add-media-items', 'batch-remove-media-items', 'create', 'get', 'list', 'patch', 'share' and 'unshare'", vec![
             ("add-enrichment",
                     Some(r##"Adds an enrichment at a specified position in a defined album."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_add-enrichment",
@@ -1664,6 +1876,38 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("patch",
+                    Some(r##"Update the album with the specified `id`.
+        Only the `id`, `title` and `cover_photo_media_item_id` fields of the album
+        are read. The album must have been created by the developer via the API and
+        must be owned by the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_patch",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier for the album. This is a persistent identifier that
+        can be used between sessions to identify this album."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("share",
                     Some(r##"Marks an album as shared and accessible to other users. This action can
         only be performed on albums which were created by the developer via the
@@ -1731,7 +1975,7 @@ fn main() {
                   ]),
             ]),
         
-        ("media-items", "methods: 'batch-create', 'batch-get', 'get', 'list' and 'search'", vec![
+        ("media-items", "methods: 'batch-create', 'batch-get', 'get', 'list', 'patch' and 'search'", vec![
             ("batch-create",
                     Some(r##"Creates one or more media items in a user's Google Photos library.
         
@@ -1815,6 +2059,38 @@ fn main() {
                     Some(r##"List all media items from a user's Google Photos library."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_list",
                   vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",
+                    Some(r##"Update the media item with the specified `id`.
+        Only the `id` and `description` fields of the media item are read. The
+        media item must have been created by the developer via the API and must be
+        owned by the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_patch",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"Identifier for the media item. This is a persistent identifier that can be
+        used between sessions to identify this media item."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -1948,7 +2224,7 @@ fn main() {
     
     let mut app = App::new("photoslibrary1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200329")
+           .version("1.0.14+20200707")
            .about("Manage photos, videos, and albums in Google Photos
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli")

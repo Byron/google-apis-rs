@@ -1,0 +1,21 @@
+site_name: CloudBillingBudget v1.0.14+20200704
+site_url: http://byron.github.io/google-apis-rs/google-billingbudgets1_beta1-cli
+site_description: A complete library to interact with CloudBillingBudget (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/billingbudgets1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['billing-accounts_budgets-create.md', 'Billing Accounts', 'Budgets Create']
+- ['billing-accounts_budgets-delete.md', 'Billing Accounts', 'Budgets Delete']
+- ['billing-accounts_budgets-get.md', 'Billing Accounts', 'Budgets Get']
+- ['billing-accounts_budgets-list.md', 'Billing Accounts', 'Budgets List']
+- ['billing-accounts_budgets-patch.md', 'Billing Accounts', 'Budgets Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

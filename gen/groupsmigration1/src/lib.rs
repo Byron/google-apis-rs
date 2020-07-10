@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Groups Migration* crate version *1.0.13+20181126*, where *20181126* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Groups Migration* crate version *1.0.14+20200630*, where *20200630* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Groups Migration* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-migration/).
@@ -323,8 +323,8 @@ impl<'a, C, A> GroupsMigration<C, A>
         GroupsMigration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/groups/v1/groups/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -334,7 +334,7 @@ impl<'a, C, A> GroupsMigration<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -342,7 +342,7 @@ impl<'a, C, A> GroupsMigration<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/groups/v1/groups/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -529,8 +529,6 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/groups/v1/groups/{groupId}/archive", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/groups/v1/groups/{groupId}/archive", "resumable")
             } else {
                 unreachable!()
             };
@@ -564,9 +562,6 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -583,38 +578,23 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 26214400 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 26214400))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 26214400 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 26214400))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -648,51 +628,6 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 26214400 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 26214400))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -715,28 +650,12 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 25MB
+    /// * *max size*: 26214400
     /// * *multipart*: yes
     /// * *valid mime types*: 'message/rfc822'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Groups)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
-    }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 25MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'message/rfc822'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Groups)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     /// The group ID
@@ -769,13 +688,17 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

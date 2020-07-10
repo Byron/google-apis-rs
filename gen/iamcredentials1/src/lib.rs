@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *IAM Credentials* crate version *1.0.13+20200327*, where *20200327* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *IAM Credentials* crate version *1.0.14+20200703*, where *20200703* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *IAM Credentials* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials).
@@ -329,7 +329,7 @@ impl<'a, C, A> IAMCredentials<C, A>
         IAMCredentials {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://iamcredentials.googleapis.com/".to_string(),
             _root_url: "https://iamcredentials.googleapis.com/".to_string(),
         }
@@ -340,7 +340,7 @@ impl<'a, C, A> IAMCredentials<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -402,10 +402,26 @@ impl ResponseResult for GenerateAccessTokenResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignJwtResponse {
-    /// The ID of the key used to sign the JWT.
+    /// The ID of the key used to sign the JWT. The key used for signing will
+    /// remain valid for at least 12 hours after the JWT is signed. To verify the
+    /// signature, you can retrieve the public key in several formats from the
+    /// following endpoints:
+    /// 
+    /// - RSA public key wrapped in an X.509 v3 certificate:
+    /// `https://www.googleapis.com/service_accounts/v1/metadata/x509/{ACCOUNT_EMAIL}`
+    /// - Raw key in JSON format:
+    /// `https://www.googleapis.com/service_accounts/v1/metadata/raw/{ACCOUNT_EMAIL}`
+    /// - JSON Web Key (JWK):
+    /// `https://www.googleapis.com/service_accounts/v1/metadata/jwk/{ACCOUNT_EMAIL}`
     #[serde(rename="keyId")]
     pub key_id: Option<String>,
-    /// The signed JWT.
+    /// The signed JWT. Contains the automatically generated header; the
+    /// client-supplied payload; and the signature, which is generated using the
+    /// key referenced by the `kid` field in the header.
+    /// 
+    /// After the key pair referenced by the `key_id` response field expires,
+    /// Google no longer exposes the public key that can be used to verify the JWT.
+    /// As a result, the receiver can no longer verify the signature.
     #[serde(rename="signedJwt")]
     pub signed_jwt: Option<String>,
 }
@@ -435,7 +451,12 @@ pub struct SignJwtRequest {
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
-    /// Required. The JWT payload to sign: a JSON object that contains a JWT Claims Set.
+    /// Required. The JWT payload to sign. Must be a serialized JSON object that contains a
+    /// JWT Claims Set. For example: `{"sub": "user@example.com", "iat": 313435}`
+    /// 
+    /// If the JWT Claims Set contains an expiration time (`exp`) claim, it must be
+    /// an integer timestamp that is not in the past and no more than 12 hours in
+    /// the future.
     pub payload: Option<String>,
 }
 
@@ -453,10 +474,24 @@ impl RequestValue for SignJwtRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignBlobResponse {
-    /// The ID of the key used to sign the blob.
+    /// The ID of the key used to sign the blob. The key used for signing will
+    /// remain valid for at least 12 hours after the blob is signed. To verify the
+    /// signature, you can retrieve the public key in several formats from the
+    /// following endpoints:
+    /// 
+    /// - RSA public key wrapped in an X.509 v3 certificate:
+    /// `https://www.googleapis.com/service_accounts/v1/metadata/x509/{ACCOUNT_EMAIL}`
+    /// - Raw key in JSON format:
+    /// `https://www.googleapis.com/service_accounts/v1/metadata/raw/{ACCOUNT_EMAIL}`
+    /// - JSON Web Key (JWK):
+    /// `https://www.googleapis.com/service_accounts/v1/metadata/jwk/{ACCOUNT_EMAIL}`
     #[serde(rename="keyId")]
     pub key_id: Option<String>,
-    /// The signed blob.
+    /// The signature for the blob. Does not include the original blob.
+    /// 
+    /// After the key pair referenced by the `key_id` response field expires,
+    /// Google no longer exposes the public key that can be used to verify the
+    /// blob. As a result, the receiver can no longer verify the signature.
     #[serde(rename="signedBlob")]
     pub signed_blob: Option<String>,
 }

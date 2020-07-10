@@ -786,23 +786,22 @@ impl<'n> Engine<'n> {
                     "configuration.load.max-bad-records" => Some(("configuration.load.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "configuration.load.schema-update-options" => Some(("configuration.load.schemaUpdateOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.ignore-unknown-values" => Some(("configuration.load.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "configuration.load.skip-leading-rows" => Some(("configuration.load.skipLeadingRows", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "configuration.load.quote" => Some(("configuration.load.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.create-disposition" => Some(("configuration.load.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.schema-inline" => Some(("configuration.load.schemaInline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.use-avro-logical-types" => Some(("configuration.load.useAvroLogicalTypes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "configuration.load.quote" => Some(("configuration.load.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.skip-leading-rows" => Some(("configuration.load.skipLeadingRows", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.project-id" => Some(("configuration.load.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.table-id" => Some(("configuration.load.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.destination-table.dataset-id" => Some(("configuration.load.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.load.hive-partitioning-options.source-uri-prefix" => Some(("configuration.load.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.load.hive-partitioning-options.mode" => Some(("configuration.load.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.source-uris" => Some(("configuration.load.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.projection-fields" => Some(("configuration.load.projectionFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "configuration.load.source-format" => Some(("configuration.load.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.null-marker" => Some(("configuration.load.nullMarker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.allow-jagged-rows" => Some(("configuration.load.allowJaggedRows", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "configuration.load.write-disposition" => Some(("configuration.load.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.load.hive-partitioning-mode" => Some(("configuration.load.hivePartitioningMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.hive-partitioning-options.source-uri-prefix" => Some(("configuration.load.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.hive-partitioning-options.mode" => Some(("configuration.load.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.field-delimiter" => Some(("configuration.load.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.load.schema-inline-format" => Some(("configuration.load.schemaInlineFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.dry-run" => Some(("configuration.dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -836,12 +835,13 @@ impl<'n> Engine<'n> {
                     "configuration.query.range-partitioning.range.end" => Some(("configuration.query.rangePartitioning.range.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.query.maximum-bytes-billed" => Some(("configuration.query.maximumBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.query.parameter-mode" => Some(("configuration.query.parameterMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.create-disposition" => Some(("configuration.copy.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.write-disposition" => Some(("configuration.copy.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-encryption-configuration.kms-key-name" => Some(("configuration.copy.destinationEncryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.copy.destination-table.project-id" => Some(("configuration.copy.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.copy.destination-table.table-id" => Some(("configuration.copy.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.copy.destination-table.dataset-id" => Some(("configuration.copy.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration.copy.destination-encryption-configuration.kms-key-name" => Some(("configuration.copy.destinationEncryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.write-disposition" => Some(("configuration.copy.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.operation-type" => Some(("configuration.copy.operationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.create-disposition" => Some(("configuration.copy.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.copy.source-table.project-id" => Some(("configuration.copy.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.copy.source-table.table-id" => Some(("configuration.copy.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration.copy.source-table.dataset-id" => Some(("configuration.copy.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -862,7 +862,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "bad-records", "billing-tier", "cache-hit", "clustering", "completion-ratio", "compression", "configuration", "copy", "create-disposition", "creation-time", "current-iteration", "dataset-id", "ddl-affected-row-access-policy-count", "ddl-operation-performed", "ddl-target-routine", "ddl-target-row-access-policy", "ddl-target-table", "debug-info", "default-dataset", "description", "destination-encryption-configuration", "destination-format", "destination-table", "destination-table-properties", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end", "end-time", "error-result", "estimated-bytes-processed", "etag", "evaluation-kind", "expected-total-iterations", "expiration-ms", "extract", "field", "field-delimiter", "fields", "flatten-results", "friendly-name", "hive-partitioning-mode", "hive-partitioning-options", "id", "ignore-unknown-values", "input-bytes", "input-file-bytes", "input-files", "interval", "job-id", "job-reference", "job-timeout-ms", "job-type", "kind", "kms-key-name", "labels", "load", "location", "max-bad-records", "maximum-billing-tier", "maximum-bytes-billed", "message", "mode", "model-id", "model-training", "model-training-current-iteration", "model-training-expected-total-iteration", "null-marker", "num-child-jobs", "num-dml-affected-rows", "output-bytes", "output-rows", "parameter-mode", "parent-job-id", "policy-id", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quota-deferments", "quote", "range", "range-partitioning", "reason", "require-partition-filter", "reservation-id", "routine-id", "row-level-security-applied", "row-level-security-statistics", "schema-inline", "schema-inline-format", "schema-update-options", "script-statistics", "self-link", "skip-leading-rows", "source-format", "source-model", "source-table", "source-uri-prefix", "source-uris", "start", "start-time", "state", "statement-type", "statistics", "status", "table-id", "time-partitioning", "total-bytes-billed", "total-bytes-processed", "total-bytes-processed-accuracy", "total-partitions-processed", "total-slot-ms", "type", "use-avro-logical-types", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "bad-records", "billing-tier", "cache-hit", "clustering", "completion-ratio", "compression", "configuration", "copy", "create-disposition", "creation-time", "current-iteration", "dataset-id", "ddl-affected-row-access-policy-count", "ddl-operation-performed", "ddl-target-routine", "ddl-target-row-access-policy", "ddl-target-table", "debug-info", "default-dataset", "description", "destination-encryption-configuration", "destination-format", "destination-table", "destination-table-properties", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end", "end-time", "error-result", "estimated-bytes-processed", "etag", "evaluation-kind", "expected-total-iterations", "expiration-ms", "extract", "field", "field-delimiter", "fields", "flatten-results", "friendly-name", "hive-partitioning-options", "id", "ignore-unknown-values", "input-bytes", "input-file-bytes", "input-files", "interval", "job-id", "job-reference", "job-timeout-ms", "job-type", "kind", "kms-key-name", "labels", "load", "location", "max-bad-records", "maximum-billing-tier", "maximum-bytes-billed", "message", "mode", "model-id", "model-training", "model-training-current-iteration", "model-training-expected-total-iteration", "null-marker", "num-child-jobs", "num-dml-affected-rows", "operation-type", "output-bytes", "output-rows", "parameter-mode", "parent-job-id", "policy-id", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quota-deferments", "quote", "range", "range-partitioning", "reason", "require-partition-filter", "reservation-id", "routine-id", "row-level-security-applied", "row-level-security-statistics", "schema-inline", "schema-inline-format", "schema-update-options", "script-statistics", "self-link", "skip-leading-rows", "source-format", "source-model", "source-table", "source-uri-prefix", "source-uris", "start", "start-time", "state", "statement-type", "statistics", "status", "table-id", "time-partitioning", "total-bytes-billed", "total-bytes-processed", "total-bytes-processed-accuracy", "total-partitions-processed", "total-slot-ms", "type", "use-avro-logical-types", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1033,13 +1033,16 @@ impl<'n> Engine<'n> {
                     "use-query-cache" => Some(("useQueryCache", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "default-dataset.project-id" => Some(("defaultDataset.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-dataset.dataset-id" => Some(("defaultDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "use-legacy-sql" => Some(("useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "max-results" => Some(("maxResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preserve-nulls" => Some(("preserveNulls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "maximum-bytes-billed" => Some(("maximumBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "default-dataset", "dry-run", "kind", "location", "max-results", "parameter-mode", "preserve-nulls", "project-id", "query", "timeout-ms", "use-legacy-sql", "use-query-cache"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "default-dataset", "dry-run", "kind", "labels", "location", "max-results", "maximum-bytes-billed", "parameter-mode", "preserve-nulls", "project-id", "query", "request-id", "timeout-ms", "use-legacy-sql", "use-query-cache"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1588,8 +1591,8 @@ impl<'n> Engine<'n> {
                     "routine-type" => Some(("routineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "imported-libraries" => Some(("importedLibraries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.project-id" => Some(("routineReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.routine-id" => Some(("routineReference.routineId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.dataset-id" => Some(("routineReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1597,8 +1600,9 @@ impl<'n> Engine<'n> {
                     "definition-body" => Some(("definitionBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "return-type.type-kind" => Some(("returnType.typeKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "determinism-level" => Some(("determinismLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "definition-body", "description", "etag", "imported-libraries", "language", "last-modified-time", "project-id", "return-type", "routine-id", "routine-reference", "routine-type", "type-kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "definition-body", "description", "determinism-level", "etag", "imported-libraries", "language", "last-modified-time", "project-id", "return-type", "routine-id", "routine-reference", "routine-type", "type-kind"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1749,8 +1753,8 @@ impl<'n> Engine<'n> {
                     "routine-type" => Some(("routineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "imported-libraries" => Some(("importedLibraries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.project-id" => Some(("routineReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.routine-id" => Some(("routineReference.routineId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routine-reference.dataset-id" => Some(("routineReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1758,8 +1762,9 @@ impl<'n> Engine<'n> {
                     "definition-body" => Some(("definitionBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "return-type.type-kind" => Some(("returnType.typeKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "determinism-level" => Some(("determinismLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "definition-body", "description", "etag", "imported-libraries", "language", "last-modified-time", "project-id", "return-type", "routine-id", "routine-reference", "routine-type", "type-kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "definition-body", "description", "determinism-level", "etag", "imported-libraries", "language", "last-modified-time", "project-id", "return-type", "routine-id", "routine-reference", "routine-type", "type-kind"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2072,6 +2077,91 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _tables_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.tables().get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _tables_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2141,13 +2231,13 @@ impl<'n> Engine<'n> {
                     "external-data-configuration.csv-options.skip-leading-rows" => Some(("externalDataConfiguration.csvOptions.skipLeadingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.field-delimiter" => Some(("externalDataConfiguration.csvOptions.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.allow-quoted-newlines" => Some(("externalDataConfiguration.csvOptions.allowQuotedNewlines", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "external-data-configuration.hive-partitioning-mode" => Some(("externalDataConfiguration.hivePartitioningMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.hive-partitioning-options.mode" => Some(("externalDataConfiguration.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.autodetect" => Some(("externalDataConfiguration.autodetect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "external-data-configuration.connection-id" => Some(("externalDataConfiguration.connectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.max-bad-records" => Some(("externalDataConfiguration.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "external-data-configuration.ignore-unknown-values" => Some(("externalDataConfiguration.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-uris" => Some(("externalDataConfiguration.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "external-data-configuration.hive-partitioning-options.mode" => Some(("externalDataConfiguration.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.bigtable-options.read-rowkey-as-string" => Some(("externalDataConfiguration.bigtableOptions.readRowkeyAsString", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.bigtable-options.ignore-unspecified-column-families" => Some(("externalDataConfiguration.bigtableOptions.ignoreUnspecifiedColumnFamilies", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-format" => Some(("externalDataConfiguration.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2157,7 +2247,7 @@ impl<'n> Engine<'n> {
                     "view.query" => Some(("view.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view.use-legacy-sql" => Some(("view.useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "clustering", "compression", "creation-time", "csv-options", "dataset-id", "description", "enable-refresh", "encoding", "encryption-configuration", "end", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-mode", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "description", "enable-refresh", "encoding", "encryption-configuration", "end", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2345,13 +2435,13 @@ impl<'n> Engine<'n> {
                     "external-data-configuration.csv-options.skip-leading-rows" => Some(("externalDataConfiguration.csvOptions.skipLeadingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.field-delimiter" => Some(("externalDataConfiguration.csvOptions.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.allow-quoted-newlines" => Some(("externalDataConfiguration.csvOptions.allowQuotedNewlines", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "external-data-configuration.hive-partitioning-mode" => Some(("externalDataConfiguration.hivePartitioningMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.hive-partitioning-options.mode" => Some(("externalDataConfiguration.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.autodetect" => Some(("externalDataConfiguration.autodetect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "external-data-configuration.connection-id" => Some(("externalDataConfiguration.connectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.max-bad-records" => Some(("externalDataConfiguration.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "external-data-configuration.ignore-unknown-values" => Some(("externalDataConfiguration.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-uris" => Some(("externalDataConfiguration.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "external-data-configuration.hive-partitioning-options.mode" => Some(("externalDataConfiguration.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.bigtable-options.read-rowkey-as-string" => Some(("externalDataConfiguration.bigtableOptions.readRowkeyAsString", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.bigtable-options.ignore-unspecified-column-families" => Some(("externalDataConfiguration.bigtableOptions.ignoreUnspecifiedColumnFamilies", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-format" => Some(("externalDataConfiguration.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2361,7 +2451,7 @@ impl<'n> Engine<'n> {
                     "view.query" => Some(("view.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view.use-legacy-sql" => Some(("view.useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "clustering", "compression", "creation-time", "csv-options", "dataset-id", "description", "enable-refresh", "encoding", "encryption-configuration", "end", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-mode", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "description", "enable-refresh", "encoding", "encryption-configuration", "end", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2372,6 +2462,178 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.tables().patch(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""), opt.value_of("table-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _tables_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.tables().set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _tables_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.tables().test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2490,13 +2752,13 @@ impl<'n> Engine<'n> {
                     "external-data-configuration.csv-options.skip-leading-rows" => Some(("externalDataConfiguration.csvOptions.skipLeadingRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.field-delimiter" => Some(("externalDataConfiguration.csvOptions.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.csv-options.allow-quoted-newlines" => Some(("externalDataConfiguration.csvOptions.allowQuotedNewlines", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "external-data-configuration.hive-partitioning-mode" => Some(("externalDataConfiguration.hivePartitioningMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-data-configuration.hive-partitioning-options.mode" => Some(("externalDataConfiguration.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.autodetect" => Some(("externalDataConfiguration.autodetect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "external-data-configuration.connection-id" => Some(("externalDataConfiguration.connectionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.max-bad-records" => Some(("externalDataConfiguration.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "external-data-configuration.ignore-unknown-values" => Some(("externalDataConfiguration.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-uris" => Some(("externalDataConfiguration.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "external-data-configuration.hive-partitioning-options.source-uri-prefix" => Some(("externalDataConfiguration.hivePartitioningOptions.sourceUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "external-data-configuration.hive-partitioning-options.mode" => Some(("externalDataConfiguration.hivePartitioningOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-data-configuration.bigtable-options.read-rowkey-as-string" => Some(("externalDataConfiguration.bigtableOptions.readRowkeyAsString", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.bigtable-options.ignore-unspecified-column-families" => Some(("externalDataConfiguration.bigtableOptions.ignoreUnspecifiedColumnFamilies", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "external-data-configuration.source-format" => Some(("externalDataConfiguration.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2506,7 +2768,7 @@ impl<'n> Engine<'n> {
                     "view.query" => Some(("view.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view.use-legacy-sql" => Some(("view.useLegacySql", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "clustering", "compression", "creation-time", "csv-options", "dataset-id", "description", "enable-refresh", "encoding", "encryption-configuration", "end", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-mode", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-quoted-newlines", "autodetect", "bigtable-options", "clustering", "compression", "connection-id", "creation-time", "csv-options", "dataset-id", "description", "enable-refresh", "encoding", "encryption-configuration", "end", "estimated-bytes", "estimated-rows", "etag", "expiration-ms", "expiration-time", "external-data-configuration", "field", "field-delimiter", "fields", "friendly-name", "google-sheets-options", "hive-partitioning-options", "id", "ignore-unknown-values", "ignore-unspecified-column-families", "interval", "kind", "kms-key-name", "labels", "last-modified-time", "last-refresh-time", "location", "loss-type", "materialized-view", "max-bad-records", "mode", "model", "model-options", "model-type", "num-bytes", "num-long-term-bytes", "num-physical-bytes", "num-rows", "oldest-entry-time", "project-id", "query", "quote", "range", "range-partitioning", "read-rowkey-as-string", "refresh-interval-ms", "require-partition-filter", "self-link", "skip-leading-rows", "source-format", "source-uri-prefix", "source-uris", "start", "streaming-buffer", "table-id", "table-reference", "time-partitioning", "type", "use-legacy-sql", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2702,6 +2964,9 @@ impl<'n> Engine<'n> {
                     ("get", Some(opt)) => {
                         call_result = self._tables_get(opt, dry_run, &mut err);
                     },
+                    ("get-iam-policy", Some(opt)) => {
+                        call_result = self._tables_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("insert", Some(opt)) => {
                         call_result = self._tables_insert(opt, dry_run, &mut err);
                     },
@@ -2710,6 +2975,12 @@ impl<'n> Engine<'n> {
                     },
                     ("patch", Some(opt)) => {
                         call_result = self._tables_patch(opt, dry_run, &mut err);
+                    },
+                    ("set-iam-policy", Some(opt)) => {
+                        call_result = self._tables_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("test-iam-permissions", Some(opt)) => {
+                        call_result = self._tables_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("update", Some(opt)) => {
                         call_result = self._tables_update(opt, dry_run, &mut err);
@@ -3566,7 +3837,7 @@ fn main() {
                   ]),
             ]),
         
-        ("tables", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("tables", "methods: 'delete', 'get', 'get-iam-policy', 'insert', 'list', 'patch', 'set-iam-policy', 'test-iam-permissions' and 'update'", vec![
             ("delete",
                     Some(r##"Deletes the table specified by tableId from the dataset. If the table contains data, all the data will be deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/tables_delete",
@@ -3616,6 +3887,37 @@ fn main() {
                      Some(r##"Table ID of the requested table"##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource.
+        Returns an empty policy if the resource exists and does not have a policy
+        set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/tables_get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3731,6 +4033,73 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any
+        existing policy.
+        
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/tables_set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource.
+        If the resource does not exist, this will return an empty set of
+        permissions, not a `NOT_FOUND` error.
+        
+        Note: This operation is designed to be used for building permission-aware
+        UIs and command-line tools, not for authorization checking. This operation
+        may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/tables_test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("update",
                     Some(r##"Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/tables_update",
@@ -3777,7 +4146,7 @@ fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200330")
+           .version("1.0.14+20200625")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: compute v1.0.13+20200311
+site_name: compute v1.0.14+20200612
 site_url: http://byron.github.io/google-apis-rs/google-compute1-cli
 site_description: A complete library to interact with compute (protocol v1)
 
@@ -312,12 +312,19 @@ pages:
 - ['region-disks_create-snapshot.md', 'Region Disks', 'Create Snapshot']
 - ['region-disks_delete.md', 'Region Disks', 'Delete']
 - ['region-disks_get.md', 'Region Disks', 'Get']
+- ['region-disks_get-iam-policy.md', 'Region Disks', 'Get Iam Policy']
 - ['region-disks_insert.md', 'Region Disks', 'Insert']
 - ['region-disks_list.md', 'Region Disks', 'List']
 - ['region-disks_remove-resource-policies.md', 'Region Disks', 'Remove Resource Policies']
 - ['region-disks_resize.md', 'Region Disks', 'Resize']
+- ['region-disks_set-iam-policy.md', 'Region Disks', 'Set Iam Policy']
 - ['region-disks_set-labels.md', 'Region Disks', 'Set Labels']
 - ['region-disks_test-iam-permissions.md', 'Region Disks', 'Test Iam Permissions']
+- ['region-health-check-services_delete.md', 'Region Health Check Services', 'Delete']
+- ['region-health-check-services_get.md', 'Region Health Check Services', 'Get']
+- ['region-health-check-services_insert.md', 'Region Health Check Services', 'Insert']
+- ['region-health-check-services_list.md', 'Region Health Check Services', 'List']
+- ['region-health-check-services_patch.md', 'Region Health Check Services', 'Patch']
 - ['region-health-checks_delete.md', 'Region Health Checks', 'Delete']
 - ['region-health-checks_get.md', 'Region Health Checks', 'Get']
 - ['region-health-checks_insert.md', 'Region Health Checks', 'Insert']
@@ -343,6 +350,10 @@ pages:
 - ['region-instance-groups_list.md', 'Region Instance Groups', 'List']
 - ['region-instance-groups_list-instances.md', 'Region Instance Groups', 'List Instances']
 - ['region-instance-groups_set-named-ports.md', 'Region Instance Groups', 'Set Named Ports']
+- ['region-notification-endpoints_delete.md', 'Region Notification Endpoints', 'Delete']
+- ['region-notification-endpoints_get.md', 'Region Notification Endpoints', 'Get']
+- ['region-notification-endpoints_insert.md', 'Region Notification Endpoints', 'Insert']
+- ['region-notification-endpoints_list.md', 'Region Notification Endpoints', 'List']
 - ['region-operations_delete.md', 'Region Operations', 'Delete']
 - ['region-operations_get.md', 'Region Operations', 'Get']
 - ['region-operations_list.md', 'Region Operations', 'List']

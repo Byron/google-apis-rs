@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.13+20200623*, where *20200623* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Pubsub* crate version *1.0.14+20200627*, where *20200627* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -328,7 +328,7 @@ impl<'a, C, A> Pubsub<C, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://pubsub.googleapis.com/".to_string(),
             _root_url: "https://pubsub.googleapis.com/".to_string(),
         }
@@ -339,7 +339,7 @@ impl<'a, C, A> Pubsub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1120,10 +1120,8 @@ pub struct Subscription {
     /// Indicates whether to retain acknowledged messages. If true, then
     /// messages are not expunged from the subscription's backlog, even if they are
     /// acknowledged, until they fall out of the `message_retention_duration`
-    /// window. This must be true if you would like to
-    /// <a
-    /// href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">
-    /// Seek to a timestamp</a>.
+    /// window. This must be true if you would like to [Seek to a timestamp]
+    /// (https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time).
     #[serde(rename="retainAckedMessages")]
     pub retain_acked_messages: Option<bool>,
     /// A policy that specifies the conditions for dead lettering messages in
@@ -1294,11 +1292,10 @@ impl ResponseResult for PublishResponse {}
 
 
 /// A snapshot resource. Snapshots are used in
-/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-/// operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.
+/// [Seek](https://cloud.google.com/pubsub/docs/replay-overview)
+/// operations, which allow you to manage message acknowledgments in bulk. That
+/// is, you can set the acknowledgment state of messages in an existing
+/// subscription to the state captured by a snapshot.
 /// 
 /// # Activities
 /// 
@@ -1325,8 +1322,8 @@ pub struct Snapshot {
     pub expire_time: Option<String>,
     /// The name of the topic from which this snapshot is retaining messages.
     pub topic: Option<String>,
-    /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
-    /// managing labels</a>.
+    /// See [Creating and managing labels]
+    /// (https://cloud.google.com/pubsub/docs/labels).
     pub labels: Option<HashMap<String, String>>,
     /// The name of the snapshot.
     pub name: Option<String>,
@@ -1496,8 +1493,8 @@ impl RequestValue for CreateSnapshotRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Topic {
-    /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
-    /// managing labels</a>.
+    /// See [Creating and managing labels]
+    /// (https://cloud.google.com/pubsub/docs/labels).
     pub labels: Option<HashMap<String, String>>,
     /// Required. The name of the topic. It must have the format
     /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
@@ -1570,11 +1567,11 @@ impl RequestValue for UpdateSnapshotRequest {}
 /// A message that is published by publishers and consumed by subscribers. The
 /// message must contain either a non-empty data field or at least one attribute.
 /// Note that client libraries represent this object differently
-/// depending on the language. See the corresponding
-/// <a href="https://cloud.google.com/pubsub/docs/reference/libraries">client
-/// library documentation</a> for more information. See
-/// <a href="https://cloud.google.com/pubsub/quotas">Quotas and limits</a>
-/// for more information about message limits.
+/// depending on the language. See the corresponding [client library
+/// documentation](https://cloud.google.com/pubsub/docs/reference/libraries) for
+/// more information. See [quotas and limits]
+/// (https://cloud.google.com/pubsub/quotas) for more information about message
+/// limits.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1669,9 +1666,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates the given topic with the given name. See the
-    /// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-    /// resource name rules</a>.
+    /// Creates the given topic with the given name. See the [resource name rules](
+    /// https://cloud.google.com/pubsub/docs/admin#resource_names).
     /// 
     /// # Arguments
     ///
@@ -2081,12 +2077,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes an existing snapshot. Snapshots are used in
-    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-    /// operations, which allow
-    /// you to manage message acknowledgments in bulk. That is, you can set the
-    /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.<br><br>
+    /// Removes an existing snapshot. Snapshots are used in [Seek]
+    /// (https://cloud.google.com/pubsub/docs/replay-overview) operations, which
+    /// allow you to manage message acknowledgments in bulk. That is, you can set
+    /// the acknowledgment state of messages in an existing subscription to the
+    /// state captured by a snapshot.
     /// When the snapshot is deleted, all messages retained in the snapshot
     /// are immediately dropped. After a snapshot is deleted, a new one may be
     /// created with the same name, but the new one has no association with the old
@@ -2156,19 +2151,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a subscription to a given topic. See the
-    /// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-    /// resource name rules</a>.
+    /// Creates a subscription to a given topic. See the [resource name rules]
+    /// (https://cloud.google.com/pubsub/docs/admin#resource_names).
     /// If the subscription already exists, returns `ALREADY_EXISTS`.
     /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
     /// 
     /// If the name is not provided in the request, the server will assign a random
     /// name for this subscription on the same project as the topic, conforming
-    /// to the
-    /// [resource name
-    /// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
-    /// generated name is populated in the returned Subscription object. Note that
-    /// for REST API requests, you must specify a name in the request.
+    /// to the [resource name format]
+    /// (https://cloud.google.com/pubsub/docs/admin#resource_names). The generated
+    /// name is populated in the returned Subscription object. Note that for REST
+    /// API requests, you must specify a name in the request.
     /// 
     /// # Arguments
     ///
@@ -2218,21 +2211,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a snapshot from the requested subscription. Snapshots are used in
-    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-    /// operations, which allow
-    /// you to manage message acknowledgments in bulk. That is, you can set the
-    /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.
-    /// <br><br>If the snapshot already exists, returns `ALREADY_EXISTS`.
+    /// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
+    /// which allow you to manage message acknowledgments in bulk. That is, you can
+    /// set the acknowledgment state of messages in an existing subscription to the
+    /// state captured by a snapshot.
+    /// If the snapshot already exists, returns `ALREADY_EXISTS`.
     /// If the requested subscription doesn't exist, returns `NOT_FOUND`.
     /// If the backlog in the subscription is too old -- and the resulting snapshot
     /// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
     /// See also the `Snapshot.expire_time` field. If the name is not provided in
     /// the request, the server will assign a random
     /// name for this snapshot on the same project as the subscription, conforming
-    /// to the
-    /// [resource name
-    /// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+    /// to the [resource name format]
+    /// (https://cloud.google.com/pubsub/docs/admin#resource_names). The
     /// generated name is populated in the returned Snapshot object. Note that for
     /// REST API requests, you must specify a name in the request.
     /// 
@@ -2280,12 +2271,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the existing snapshots. Snapshots are used in
-    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-    /// operations, which allow
-    /// you to manage message acknowledgments in bulk. That is, you can set the
-    /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.
+    /// Lists the existing snapshots. Snapshots are used in [Seek](
+    /// https://cloud.google.com/pubsub/docs/replay-overview) operations, which
+    /// allow you to manage message acknowledgments in bulk. That is, you can set
+    /// the acknowledgment state of messages in an existing subscription to the
+    /// state captured by a snapshot.
     /// 
     /// # Arguments
     ///
@@ -2329,13 +2319,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Seeks an existing subscription to a point in time or to a given snapshot,
-    /// whichever is provided in the request. Snapshots are used in
-    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-    /// operations, which allow
-    /// you to manage message acknowledgments in bulk. That is, you can set the
-    /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot. Note that both the subscription and the snapshot
-    /// must be on the same topic.
+    /// whichever is provided in the request. Snapshots are used in [Seek](
+    /// https://cloud.google.com/pubsub/docs/replay-overview) operations, which
+    /// allow you to manage message acknowledgments in bulk. That is, you can set
+    /// the acknowledgment state of messages in an existing subscription to the
+    /// state captured by a snapshot. Note that both the subscription and the
+    /// snapshot must be on the same topic.
     /// 
     /// # Arguments
     ///
@@ -2393,11 +2382,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the names of the snapshots on this topic. Snapshots are used in
-    /// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-    /// operations, which allow
-    /// you to manage message acknowledgments in bulk. That is, you can set the
-    /// acknowledgment state of messages in an existing subscription to the state
-    /// captured by a snapshot.
+    /// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
+    /// which allow you to manage message acknowledgments in bulk. That is, you can
+    /// set the acknowledgment state of messages in an existing subscription to the
+    /// state captured by a snapshot.
     /// 
     /// # Arguments
     ///
@@ -2728,9 +2716,8 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Creates the given topic with the given name. See the
-/// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-/// resource name rules</a>.
+/// Creates the given topic with the given name. See the [resource name rules](
+/// https://cloud.google.com/pubsub/docs/admin#resource_names).
 ///
 /// A builder for the *topics.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7786,12 +7773,11 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Removes an existing snapshot. Snapshots are used in
-/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-/// operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.<br><br>
+/// Removes an existing snapshot. Snapshots are used in [Seek]
+/// (https://cloud.google.com/pubsub/docs/replay-overview) operations, which
+/// allow you to manage message acknowledgments in bulk. That is, you can set
+/// the acknowledgment state of messages in an existing subscription to the
+/// state captured by a snapshot.
 /// When the snapshot is deleted, all messages retained in the snapshot
 /// are immediately dropped. After a snapshot is deleted, a new one may be
 /// created with the same name, but the new one has no association with the old
@@ -8630,19 +8616,17 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Creates a subscription to a given topic. See the
-/// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-/// resource name rules</a>.
+/// Creates a subscription to a given topic. See the [resource name rules]
+/// (https://cloud.google.com/pubsub/docs/admin#resource_names).
 /// If the subscription already exists, returns `ALREADY_EXISTS`.
 /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
 /// 
 /// If the name is not provided in the request, the server will assign a random
 /// name for this subscription on the same project as the topic, conforming
-/// to the
-/// [resource name
-/// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
-/// generated name is populated in the returned Subscription object. Note that
-/// for REST API requests, you must specify a name in the request.
+/// to the [resource name format]
+/// (https://cloud.google.com/pubsub/docs/admin#resource_names). The generated
+/// name is populated in the returned Subscription object. Note that for REST
+/// API requests, you must specify a name in the request.
 ///
 /// A builder for the *subscriptions.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9224,21 +9208,19 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
 
 
 /// Creates a snapshot from the requested subscription. Snapshots are used in
-/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-/// operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.
-/// <br><br>If the snapshot already exists, returns `ALREADY_EXISTS`.
+/// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
+/// which allow you to manage message acknowledgments in bulk. That is, you can
+/// set the acknowledgment state of messages in an existing subscription to the
+/// state captured by a snapshot.
+/// If the snapshot already exists, returns `ALREADY_EXISTS`.
 /// If the requested subscription doesn't exist, returns `NOT_FOUND`.
 /// If the backlog in the subscription is too old -- and the resulting snapshot
 /// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
 /// See also the `Snapshot.expire_time` field. If the name is not provided in
 /// the request, the server will assign a random
 /// name for this snapshot on the same project as the subscription, conforming
-/// to the
-/// [resource name
-/// format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+/// to the [resource name format]
+/// (https://cloud.google.com/pubsub/docs/admin#resource_names). The
 /// generated name is populated in the returned Snapshot object. Note that for
 /// REST API requests, you must specify a name in the request.
 ///
@@ -9789,12 +9771,11 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the existing snapshots. Snapshots are used in
-/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-/// operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.
+/// Lists the existing snapshots. Snapshots are used in [Seek](
+/// https://cloud.google.com/pubsub/docs/replay-overview) operations, which
+/// allow you to manage message acknowledgments in bulk. That is, you can set
+/// the acknowledgment state of messages in an existing subscription to the
+/// state captured by a snapshot.
 ///
 /// A builder for the *snapshots.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10365,13 +10346,12 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
 
 /// Seeks an existing subscription to a point in time or to a given snapshot,
-/// whichever is provided in the request. Snapshots are used in
-/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-/// operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot. Note that both the subscription and the snapshot
-/// must be on the same topic.
+/// whichever is provided in the request. Snapshots are used in [Seek](
+/// https://cloud.google.com/pubsub/docs/replay-overview) operations, which
+/// allow you to manage message acknowledgments in bulk. That is, you can set
+/// the acknowledgment state of messages in an existing subscription to the
+/// state captured by a snapshot. Note that both the subscription and the
+/// snapshot must be on the same topic.
 ///
 /// A builder for the *subscriptions.seek* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11193,11 +11173,10 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 
 
 /// Lists the names of the snapshots on this topic. Snapshots are used in
-/// <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
-/// operations, which allow
-/// you to manage message acknowledgments in bulk. That is, you can set the
-/// acknowledgment state of messages in an existing subscription to the state
-/// captured by a snapshot.
+/// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
+/// which allow you to manage message acknowledgments in bulk. That is, you can
+/// set the acknowledgment state of messages in an existing subscription to the
+/// state captured by a snapshot.
 ///
 /// A builder for the *topics.snapshots.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

@@ -1,4 +1,4 @@
-site_name: Search Console v1.0.13+20200409
+site_name: Search Console v1.0.14+20200704
 site_url: http://byron.github.io/google-apis-rs/google-searchconsole1-cli
 site_description: A complete library to interact with Search Console (protocol v1)
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *1.0.13+20200330*, where *20200330* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *bigquery* crate version *1.0.14+20200625*, where *20200625* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -24,7 +24,7 @@
 //! * tabledata
 //!  * [*insert all*](struct.TabledataInsertAllCall.html) and [*list*](struct.TabledataListCall.html)
 //! * [tables](struct.Table.html)
-//!  * [*delete*](struct.TableDeleteCall.html), [*get*](struct.TableGetCall.html), [*insert*](struct.TableInsertCall.html), [*list*](struct.TableListCall.html), [*patch*](struct.TablePatchCall.html) and [*update*](struct.TableUpdateCall.html)
+//!  * [*delete*](struct.TableDeleteCall.html), [*get*](struct.TableGetCall.html), [*get iam policy*](struct.TableGetIamPolicyCall.html), [*insert*](struct.TableInsertCall.html), [*list*](struct.TableListCall.html), [*patch*](struct.TablePatchCall.html), [*set iam policy*](struct.TableSetIamPolicyCall.html), [*test iam permissions*](struct.TableTestIamPermissionCall.html) and [*update*](struct.TableUpdateCall.html)
 //! 
 //! 
 //! Upload supported by ...
@@ -63,11 +63,14 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.tables().delete(...).doit()
 //! let r = hub.tables().update(...).doit()
 //! let r = hub.tables().insert(...).doit()
 //! let r = hub.tables().list(...).doit()
-//! let r = hub.tables().delete(...).doit()
+//! let r = hub.tables().test_iam_permissions(...).doit()
+//! let r = hub.tables().get_iam_policy(...).doit()
 //! let r = hub.tables().get(...).doit()
+//! let r = hub.tables().set_iam_policy(...).doit()
 //! let r = hub.tables().patch(...).doit()
 //! ```
 //! 
@@ -378,7 +381,7 @@ impl<'a, C, A> Bigquery<C, A>
         Bigquery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://bigquery.googleapis.com/bigquery/v2/".to_string(),
             _root_url: "https://bigquery.googleapis.com/".to_string(),
         }
@@ -407,7 +410,7 @@ impl<'a, C, A> Bigquery<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -725,42 +728,50 @@ impl Part for RoutineReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryRequest {
+    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
+    #[serde(rename="useQueryCache")]
+    pub use_query_cache: Option<bool>,
+    /// The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
+    pub labels: Option<HashMap<String, String>>,
+    /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
+    #[serde(rename="maxResults")]
+    pub max_results: Option<u32>,
+    /// Query parameters for Standard SQL queries.
+    #[serde(rename="queryParameters")]
+    pub query_parameters: Option<Vec<QueryParameter>>,
+    /// [Required] A query string, following the BigQuery query syntax, of the query to execute. Example: "SELECT count(f1) FROM [myProjectId:myDatasetId.myTableId]".
+    pub query: Option<String>,
+    /// Connection properties.
+    #[serde(rename="connectionProperties")]
+    pub connection_properties: Option<Vec<ConnectionProperty>>,
+    /// [Optional] Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge). If unspecified, this will be set to your project default.
+    #[serde(rename="maximumBytesBilled")]
+    pub maximum_bytes_billed: Option<String>,
     /// [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).
     #[serde(rename="timeoutMs")]
     pub timeout_ms: Option<u32>,
     /// The resource type of the request.
     pub kind: Option<String>,
-    /// Connection properties.
-    #[serde(rename="connectionProperties")]
-    pub connection_properties: Option<Vec<String>>,
+    /// [Deprecated] This property is deprecated.
+    #[serde(rename="preserveNulls")]
+    pub preserve_nulls: Option<bool>,
     /// [Optional] If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
     /// Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
     #[serde(rename="parameterMode")]
     pub parameter_mode: Option<String>,
-    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
-    #[serde(rename="useQueryCache")]
-    pub use_query_cache: Option<bool>,
     /// [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
     #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
     /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
     #[serde(rename="useLegacySql")]
     pub use_legacy_sql: Option<bool>,
-    /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
-    #[serde(rename="maxResults")]
-    pub max_results: Option<u32>,
     /// The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
     pub location: Option<String>,
-    /// Query parameters for Standard SQL queries.
-    #[serde(rename="queryParameters")]
-    pub query_parameters: Option<Vec<QueryParameter>>,
-    /// [Required] A query string, following the BigQuery query syntax, of the query to execute. Example: "SELECT count(f1) FROM [myProjectId:myDatasetId.myTableId]".
-    pub query: Option<String>,
-    /// [Deprecated] This property is deprecated.
-    #[serde(rename="preserveNulls")]
-    pub preserve_nulls: Option<bool>,
+    /// A unique user provided identifier to ensure idempotent behavior for queries. Note that this is different from the job_id. It has the following properties: 1. It is case-sensitive, limited to up to 36 ASCII characters. A UUID is recommended. 2. Read only queries can ignore this token since they are nullipotent by definition. 3. For the purposes of idempotency ensured by the request_id, a request is considered duplicate of another only if they have the same request_id and are actually duplicates. When determining whether a request is a duplicate of the previous request, all parameters in the request that may affect the behavior are considered. For example, query, connection_properties, query_parameters, use_legacy_sql are parameters that affect the result and are considered when determining whether a request is a duplicate, but properties like timeout_ms don't affect the result and are thus not considered. Dry run query requests are never considered duplicate of another request. 4. When a duplicate mutating query request is detected, it returns: a. the results of the mutation if it completes successfully within the timeout. b. the running operation if it is still in progress at the end of the timeout. 5. Its lifetime is limited to 15 minutes. In other words, if two requests are sent with the same request_id, but more than 15 minutes apart, idempotency is not guaranteed.
+    #[serde(rename="requestId")]
+    pub request_id: Option<String>,
 }
 
 impl RequestValue for QueryRequest {}
@@ -890,6 +901,25 @@ pub struct BinaryConfusionMatrix {
 }
 
 impl Part for BinaryConfusionMatrix {}
+
+
+/// Response message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test iam permissions tables](struct.TableTestIamPermissionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsResponse {
+    /// A subset of `TestPermissionsRequest.permissions` that the caller is
+    /// allowed.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl ResponseResult for TestIamPermissionsResponse {}
 
 
 /// There is no detailed description.
@@ -1041,7 +1071,7 @@ impl NestedType for DatasetListDatasets {}
 impl Part for DatasetListDatasets {}
 
 
-/// There is no detailed description.
+/// This is used for defining User Defined Function (UDF) resources only when using legacy SQL. Users of Standard SQL should leverage either DDL (e.g. CREATE [TEMPORARY] FUNCTION ... ) or the Routines API to define UDF resources. For additional information on migrating, see: https://cloud.google.com/bigquery/docs/reference/standard-sql/migrating-from-legacy-sql#differences_in_user-defined_javascript_functions
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1104,22 +1134,14 @@ impl NestedType for RangePartitioningRange {}
 impl Part for RangePartitioningRange {}
 
 
-/// There is no detailed description.
+/// Represents a single JSON object.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DestinationTableProperties {
-    /// [Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail.
-    #[serde(rename="friendlyName")]
-    pub friendly_name: Option<String>,
-    /// [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
-    pub labels: Option<HashMap<String, String>>,
-    /// [Optional] The description for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current description is provided, the job will fail.
-    pub description: Option<String>,
-}
+pub struct JsonObject(Option<HashMap<String, JsonValue>>);
 
-impl Part for DestinationTableProperties {}
+impl Part for JsonObject {}
 
 
 /// [Optional] The categories attached to this field, used for field-level access control.
@@ -1142,12 +1164,12 @@ impl Part for TableFieldSchemaCategories {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ArimaFittingMetrics {
-    /// variance.
+    /// Variance.
     pub variance: Option<f64>,
-    /// log-likelihood
+    /// Log-likelihood.
     #[serde(rename="logLikelihood")]
     pub log_likelihood: Option<f64>,
-    /// AIC
+    /// AIC.
     pub aic: Option<f64>,
 }
 
@@ -1163,18 +1185,24 @@ pub struct JobConfigurationTableCopy {
     /// [Pick one] Source tables to copy.
     #[serde(rename="sourceTables")]
     pub source_tables: Option<Vec<TableReference>>,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="writeDisposition")]
-    pub write_disposition: Option<String>,
     /// Custom encryption configuration (e.g., Cloud KMS keys).
     #[serde(rename="destinationEncryptionConfiguration")]
     pub destination_encryption_configuration: Option<EncryptionConfiguration>,
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="createDisposition")]
-    pub create_disposition: Option<String>,
     /// [Required] The destination table
     #[serde(rename="destinationTable")]
     pub destination_table: Option<TableReference>,
+    /// [Optional] The time when the destination table expires. Expired tables will be deleted and their storage reclaimed.
+    #[serde(rename="destinationExpirationTime")]
+    pub destination_expiration_time: Option<String>,
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="writeDisposition")]
+    pub write_disposition: Option<String>,
+    /// [Optional] Supported operation types in table copy job.
+    #[serde(rename="operationType")]
+    pub operation_type: Option<String>,
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="createDisposition")]
+    pub create_disposition: Option<String>,
     /// [Pick one] Source table to copy.
     #[serde(rename="sourceTable")]
     pub source_table: Option<TableReference>,
@@ -1586,12 +1614,23 @@ impl Part for StandardSqlDataType {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ArimaModelInfo {
-    /// Arima coefficients.
-    #[serde(rename="arimaCoefficients")]
-    pub arima_coefficients: Option<ArimaCoefficients>,
     /// Arima fitting metrics.
     #[serde(rename="arimaFittingMetrics")]
     pub arima_fitting_metrics: Option<ArimaFittingMetrics>,
+    /// Seasonal periods. Repeated because multiple periods are supported
+    /// for one time series.
+    #[serde(rename="seasonalPeriods")]
+    pub seasonal_periods: Option<Vec<String>>,
+    /// Whether Arima model fitted with drift or not. It is always false
+    /// when d is not 1.
+    #[serde(rename="hasDrift")]
+    pub has_drift: Option<bool>,
+    /// The id to indicate different time series.
+    #[serde(rename="timeSeriesId")]
+    pub time_series_id: Option<String>,
+    /// Arima coefficients.
+    #[serde(rename="arimaCoefficients")]
+    pub arima_coefficients: Option<ArimaCoefficients>,
     /// Non-seasonal order.
     #[serde(rename="nonSeasonalOrder")]
     pub non_seasonal_order: Option<ArimaOrder>,
@@ -1750,7 +1789,7 @@ pub struct JobConfigurationQuery {
     pub time_partitioning: Option<TimePartitioning>,
     /// Connection properties.
     #[serde(rename="connectionProperties")]
-    pub connection_properties: Option<Vec<String>>,
+    pub connection_properties: Option<Vec<ConnectionProperty>>,
     /// [Optional] Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge). If unspecified, this will be set to your project default.
     #[serde(rename="maximumBytesBilled")]
     pub maximum_bytes_billed: Option<String>,
@@ -1878,21 +1917,76 @@ pub struct QueryParameterValue {
 impl Part for QueryParameterValue {}
 
 
-/// Confusion matrix for multi-class classification models.
+/// Associates `members` with a `role`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ConfusionMatrix {
-    /// Confidence threshold used when computing the entries of the
-    /// confusion matrix.
-    #[serde(rename="confidenceThreshold")]
-    pub confidence_threshold: Option<f64>,
-    /// One row per actual label.
-    pub rows: Option<Vec<Row>>,
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    pub role: Option<String>,
+    /// The condition that is associated with this binding.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@example.com` .
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
+    /// 
+    /// 
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
 }
 
-impl Part for ConfusionMatrix {}
+impl Part for Binding {}
 
 
 /// There is no detailed description.
@@ -1900,19 +1994,86 @@ impl Part for ConfusionMatrix {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableReference {
-    /// [Required] The ID of the project containing this table.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
-    #[serde(rename="tableId")]
-    pub table_id: Option<String>,
-    /// [Required] The ID of the dataset containing this table.
-    #[serde(rename="datasetId")]
-    pub dataset_id: Option<String>,
+pub struct JobConfigurationLoad {
+    /// [Optional] If sourceFormat is set to "AVRO", indicates whether to enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER).
+    #[serde(rename="useAvroLogicalTypes")]
+    pub use_avro_logical_types: Option<bool>,
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
+    #[serde(rename="destinationEncryptionConfiguration")]
+    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
+    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
+    pub encoding: Option<String>,
+    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
+    #[serde(rename="skipLeadingRows")]
+    pub skip_leading_rows: Option<i32>,
+    /// [Optional] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
+    pub autodetect: Option<bool>,
+    /// [Required] The destination table to load the data into.
+    #[serde(rename="destinationTable")]
+    pub destination_table: Option<TableReference>,
+    /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
+    #[serde(rename="sourceUris")]
+    pub source_uris: Option<Vec<String>>,
+    /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
+    #[serde(rename="nullMarker")]
+    pub null_marker: Option<String>,
+    /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
+    #[serde(rename="timePartitioning")]
+    pub time_partitioning: Option<TimePartitioning>,
+    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
+    #[serde(rename="allowQuotedNewlines")]
+    pub allow_quoted_newlines: Option<bool>,
+    /// If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
+    #[serde(rename="projectionFields")]
+    pub projection_fields: Option<Vec<String>>,
+    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
+    pub clustering: Option<Clustering>,
+    /// [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
+    #[serde(rename="fieldDelimiter")]
+    pub field_delimiter: Option<String>,
+    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
+    #[serde(rename="allowJaggedRows")]
+    pub allow_jagged_rows: Option<bool>,
+    /// [Beta] [Optional] Properties with which to create the destination table if it is new.
+    #[serde(rename="destinationTableProperties")]
+    pub destination_table_properties: Option<DestinationTableProperties>,
+    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". For parquet, specify "PARQUET". For orc, specify "ORC". The default value is CSV.
+    #[serde(rename="sourceFormat")]
+    pub source_format: Option<String>,
+    /// [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
+    #[serde(rename="rangePartitioning")]
+    pub range_partitioning: Option<RangePartitioning>,
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="writeDisposition")]
+    pub write_disposition: Option<String>,
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.
+    #[serde(rename="maxBadRecords")]
+    pub max_bad_records: Option<i32>,
+    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    #[serde(rename="schemaUpdateOptions")]
+    pub schema_update_options: Option<Vec<String>>,
+    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
+    #[serde(rename="ignoreUnknownValues")]
+    pub ignore_unknown_values: Option<bool>,
+    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
+    pub quote: Option<String>,
+    /// [Optional, Trusted Tester] Options to configure hive partitioning support.
+    #[serde(rename="hivePartitioningOptions")]
+    pub hive_partitioning_options: Option<HivePartitioningOptions>,
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="createDisposition")]
+    pub create_disposition: Option<String>,
+    /// [Deprecated] The format of the schemaInline property.
+    #[serde(rename="schemaInlineFormat")]
+    pub schema_inline_format: Option<String>,
+    /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
+    #[serde(rename="schemaInline")]
+    pub schema_inline: Option<String>,
+    /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists, or if you're loading data from Google Cloud Datastore.
+    pub schema: Option<TableSchema>,
 }
 
-impl Part for TableReference {}
+impl Part for JobConfigurationLoad {}
 
 
 /// Message containing the information about one cluster.
@@ -1952,6 +2113,31 @@ pub struct GetServiceAccountResponse {
 }
 
 impl ResponseResult for GetServiceAccountResponse {}
+
+
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
 
 
 /// There is no detailed description.
@@ -2049,6 +2235,34 @@ impl NestedType for TableDataInsertAllResponseInsertErrors {}
 impl Part for TableDataInsertAllResponseInsertErrors {}
 
 
+/// Request message for `SetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set iam policy tables](struct.TableSetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
+    pub policy: Option<Policy>,
+    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+    /// the fields in the mask will be modified. If no mask is provided, the
+    /// following default mask is used:
+    /// 
+    /// `paths: "bindings, etag"`
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
+
+impl RequestValue for SetIamPolicyRequest {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2069,25 +2283,21 @@ pub struct ModelReference {
 impl Part for ModelReference {}
 
 
-/// Representative value of a single feature within the cluster.
+/// Confusion matrix for multi-class classification models.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FeatureValue {
-    /// The feature column name.
-    #[serde(rename="featureColumn")]
-    pub feature_column: Option<String>,
-    /// The numerical feature value. This is the centroid value for this
-    /// feature.
-    #[serde(rename="numericalValue")]
-    pub numerical_value: Option<f64>,
-    /// The categorical feature value.
-    #[serde(rename="categoricalValue")]
-    pub categorical_value: Option<CategoricalValue>,
+pub struct ConfusionMatrix {
+    /// Confidence threshold used when computing the entries of the
+    /// confusion matrix.
+    #[serde(rename="confidenceThreshold")]
+    pub confidence_threshold: Option<f64>,
+    /// One row per actual label.
+    pub rows: Option<Vec<Row>>,
 }
 
-impl Part for FeatureValue {}
+impl Part for ConfusionMatrix {}
 
 
 /// There is no detailed description.
@@ -2188,94 +2398,23 @@ pub struct TableFieldSchema {
 impl Part for TableFieldSchema {}
 
 
-/// There is no detailed description.
+/// Request message for `GetIamPolicy` method.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get iam policy tables](struct.TableGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobConfigurationLoad {
-    /// [Optional] If sourceFormat is set to "AVRO", indicates whether to enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER).
-    #[serde(rename="useAvroLogicalTypes")]
-    pub use_avro_logical_types: Option<bool>,
-    /// Custom encryption configuration (e.g., Cloud KMS keys).
-    #[serde(rename="destinationEncryptionConfiguration")]
-    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
-    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
-    pub encoding: Option<String>,
-    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
-    pub quote: Option<String>,
-    /// [Optional] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
-    pub autodetect: Option<bool>,
-    /// [Required] The destination table to load the data into.
-    #[serde(rename="destinationTable")]
-    pub destination_table: Option<TableReference>,
-    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
-    #[serde(rename="skipLeadingRows")]
-    pub skip_leading_rows: Option<i32>,
-    /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
-    #[serde(rename="sourceUris")]
-    pub source_uris: Option<Vec<String>>,
-    /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
-    #[serde(rename="nullMarker")]
-    pub null_marker: Option<String>,
-    /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
-    #[serde(rename="timePartitioning")]
-    pub time_partitioning: Option<TimePartitioning>,
-    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
-    #[serde(rename="allowQuotedNewlines")]
-    pub allow_quoted_newlines: Option<bool>,
-    /// If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
-    #[serde(rename="projectionFields")]
-    pub projection_fields: Option<Vec<String>>,
-    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
-    pub clustering: Option<Clustering>,
-    /// [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
-    #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: Option<String>,
-    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
-    #[serde(rename="allowJaggedRows")]
-    pub allow_jagged_rows: Option<bool>,
-    /// [Beta] [Optional] Properties with which to create the destination table if it is new.
-    #[serde(rename="destinationTableProperties")]
-    pub destination_table_properties: Option<DestinationTableProperties>,
-    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". For parquet, specify "PARQUET". For orc, specify "ORC". The default value is CSV.
-    #[serde(rename="sourceFormat")]
-    pub source_format: Option<String>,
-    /// [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
-    #[serde(rename="rangePartitioning")]
-    pub range_partitioning: Option<RangePartitioning>,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.
-    #[serde(rename="maxBadRecords")]
-    pub max_bad_records: Option<i32>,
-    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
-    #[serde(rename="schemaUpdateOptions")]
-    pub schema_update_options: Option<Vec<String>>,
-    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
-    #[serde(rename="ignoreUnknownValues")]
-    pub ignore_unknown_values: Option<bool>,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="writeDisposition")]
-    pub write_disposition: Option<String>,
-    /// [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-    #[serde(rename="hivePartitioningMode")]
-    pub hive_partitioning_mode: Option<String>,
-    /// [Optional, Trusted Tester] Options to configure hive partitioning support.
-    #[serde(rename="hivePartitioningOptions")]
-    pub hive_partitioning_options: Option<HivePartitioningOptions>,
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="createDisposition")]
-    pub create_disposition: Option<String>,
-    /// [Deprecated] The format of the schemaInline property.
-    #[serde(rename="schemaInlineFormat")]
-    pub schema_inline_format: Option<String>,
-    /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
-    #[serde(rename="schemaInline")]
-    pub schema_inline: Option<String>,
-    /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists, or if you're loading data from Google Cloud Datastore.
-    pub schema: Option<TableSchema>,
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`.
+    pub options: Option<GetPolicyOptions>,
 }
 
-impl Part for JobConfigurationLoad {}
+impl RequestValue for GetIamPolicyRequest {}
 
 
 /// A user-defined function or a stored procedure.
@@ -2300,14 +2439,14 @@ pub struct Routine {
     pub description: Option<String>,
     /// Optional. Defaults to "SQL".
     pub language: Option<String>,
-    /// Output only. The time when this routine was created, in milliseconds since
-    /// the epoch.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
     /// Optional. If language = "JAVASCRIPT", this field stores the path of the
     /// imported JAVASCRIPT libraries.
     #[serde(rename="importedLibraries")]
     pub imported_libraries: Option<Vec<String>>,
+    /// Output only. The time when this routine was created, in milliseconds since
+    /// the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
     /// Required. Reference describing the ID of this routine.
     #[serde(rename="routineReference")]
     pub routine_reference: Option<RoutineReference>,
@@ -2343,6 +2482,9 @@ pub struct Routine {
     /// since the epoch.
     #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
+    /// Optional. [Experimental] The determinism level of the JavaScript UDF if defined.
+    #[serde(rename="determinismLevel")]
+    pub determinism_level: Option<String>,
     /// Required. The body of the routine.
     /// 
     /// For functions, this is the expression in the AS clause.
@@ -2373,6 +2515,151 @@ pub struct Routine {
 impl RequestValue for Routine {}
 impl Resource for Routine {}
 impl ResponseResult for Routine {}
+
+
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
+/// 
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
+/// 
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+/// 
+/// **JSON example:**
+/// 
+/// ````text
+/// {
+///   "bindings": [
+///     {
+///       "role": "roles/resourcemanager.organizationAdmin",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
+///       ]
+///     },
+///     {
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": [
+///         "user:eve@example.com"
+///       ],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
+///     }
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
+/// }
+/// ````
+/// 
+/// **YAML example:**
+/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
+/// - members:
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
+/// ````
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set iam policy tables](struct.TableSetIamPolicyCall.html) (response)
+/// * [get iam policy tables](struct.TableGetIamPolicyCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    pub etag: Option<String>,
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
+    pub bindings: Option<Vec<Binding>>,
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+    pub version: Option<i32>,
+}
+
+impl ResponseResult for Policy {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConnectionProperty {
+    /// [Required] Name of the connection property to set.
+    pub key: Option<String>,
+    /// [Required] Value of the connection property.
+    pub value: Option<String>,
+}
+
+impl Part for ConnectionProperty {}
 
 
 /// Additional details for a view.
@@ -2449,6 +2736,27 @@ pub struct StandardSqlStructType {
 }
 
 impl Part for StandardSqlStructType {}
+
+
+/// Representative value of a single feature within the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FeatureValue {
+    /// The feature column name.
+    #[serde(rename="featureColumn")]
+    pub feature_column: Option<String>,
+    /// The numerical feature value. This is the centroid value for this
+    /// feature.
+    #[serde(rename="numericalValue")]
+    pub numerical_value: Option<f64>,
+    /// The categorical feature value.
+    #[serde(rename="categoricalValue")]
+    pub categorical_value: Option<CategoricalValue>,
+}
+
+impl Part for FeatureValue {}
 
 
 /// There is no detailed description.
@@ -2612,6 +2920,75 @@ impl NestedType for TableListTables {}
 impl Part for TableListTables {}
 
 
+/// Specifies the audit configuration for a service.
+/// The configuration determines which permission types are logged, and what
+/// identities, if any, are exempted from logging.
+/// An AuditConfig must have one or more AuditLogConfigs.
+/// 
+/// If there are AuditConfigs for both `allServices` and a specific service,
+/// the union of the two AuditConfigs is used for that service: the log_types
+/// specified in each AuditConfig are enabled, and the exempted_members in each
+/// AuditLogConfig are exempted.
+/// 
+/// Example Policy with multiple AuditConfigs:
+/// 
+/// ````text
+/// {
+///   "audit_configs": [
+///     {
+///       "service": "allServices",
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:jose@example.com"
+///           ]
+///         },
+///         {
+///           "log_type": "DATA_WRITE"
+///         },
+///         {
+///           "log_type": "ADMIN_READ"
+///         }
+///       ]
+///     },
+///     {
+///       "service": "sampleservice.googleapis.com",
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ"
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:aliya@example.com"
+///           ]
+///         }
+///       ]
+///     }
+///   ]
+/// }
+/// ````
+/// 
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditConfig {
+    /// The configuration for logging of each type of permission.
+    #[serde(rename="auditLogConfigs")]
+    pub audit_log_configs: Option<Vec<AuditLogConfig>>,
+    /// Specifies a service that will be enabled for audit logging.
+    /// For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+    /// `allServices` is a special value that covers all services.
+    pub service: Option<String>,
+}
+
+impl Part for AuditConfig {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2714,6 +3091,12 @@ pub struct TrainingOptions {
     /// The method used to initialize the centroids for kmeans algorithm.
     #[serde(rename="kmeansInitializationMethod")]
     pub kmeans_initialization_method: Option<String>,
+    /// Whether to preserve the input structs in output feature names.
+    /// Suppose there is a struct A with field b.
+    /// When false (default), the output feature name is A_b.
+    /// When true, the output feature name is A.b.
+    #[serde(rename="preserveInputStructs")]
+    pub preserve_input_structs: Option<bool>,
     /// The strategy to determine learn rate for the current iteration.
     #[serde(rename="learnRateStrategy")]
     pub learn_rate_strategy: Option<String>,
@@ -2826,6 +3209,67 @@ impl Resource for Job {}
 impl ResponseResult for Job {}
 
 
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
+/// 
+/// ````text
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
+/// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// Optional. Description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
+    pub expression: Option<String>,
+    /// Optional. String indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// Optional. Title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+}
+
+impl Part for Expr {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2885,6 +3329,44 @@ pub struct ArimaResult {
 impl Part for ArimaResult {}
 
 
+/// Provides the configuration for logging a type of permissions.
+/// Example:
+/// 
+/// ````text
+/// {
+///   "audit_log_configs": [
+///     {
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:jose@example.com"
+///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE"
+///     }
+///   ]
+/// }
+/// ````
+/// 
+/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+/// jose@example.com from DATA_READ logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditLogConfig {
+    /// Specifies the identities that do not cause logging for this type of
+    /// permission.
+    /// Follows the same format of Binding.members.
+    #[serde(rename="exemptedMembers")]
+    pub exempted_members: Option<Vec<String>>,
+    /// The log type that this config enables.
+    #[serde(rename="logType")]
+    pub log_type: Option<String>,
+}
+
+impl Part for AuditLogConfig {}
+
+
 /// [Output-only] Job resource usage breakdown by reservation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2926,6 +3408,27 @@ pub struct BigtableColumnFamily {
 impl Part for BigtableColumnFamily {}
 
 
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test iam permissions tables](struct.TableTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2937,11 +3440,14 @@ pub struct ExternalDataConfiguration {
     /// Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename="csvOptions")]
     pub csv_options: Option<CsvOptions>,
-    /// [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
-    #[serde(rename="hivePartitioningMode")]
-    pub hive_partitioning_mode: Option<String>,
+    /// [Optional, Trusted Tester] Options to configure hive partitioning support.
+    #[serde(rename="hivePartitioningOptions")]
+    pub hive_partitioning_options: Option<HivePartitioningOptions>,
     /// Try to detect schema and format options automatically. Any option specified explicitly will be honored.
     pub autodetect: Option<bool>,
+    /// [Optional, Trusted Tester] Connection for external data source.
+    #[serde(rename="connectionId")]
+    pub connection_id: Option<String>,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
     #[serde(rename="maxBadRecords")]
     pub max_bad_records: Option<i32>,
@@ -2951,9 +3457,6 @@ pub struct ExternalDataConfiguration {
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// [Optional, Trusted Tester] Options to configure hive partitioning support.
-    #[serde(rename="hivePartitioningOptions")]
-    pub hive_partitioning_options: Option<HivePartitioningOptions>,
     /// [Optional] Additional options if sourceFormat is set to BIGTABLE.
     #[serde(rename="bigtableOptions")]
     pub bigtable_options: Option<BigtableOptions>,
@@ -3176,6 +3679,24 @@ impl ResponseResult for Model {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DestinationTableProperties {
+    /// [Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail.
+    #[serde(rename="friendlyName")]
+    pub friendly_name: Option<String>,
+    /// [Optional] The labels associated with this table. You can use these to organize and group your tables. This will only be used if the destination table is newly created. If the table already exists and labels are different than the current labels are provided, the job will fail.
+    pub labels: Option<HashMap<String, String>>,
+    /// [Optional] The description for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current description is provided, the job will fail.
+    pub description: Option<String>,
+}
+
+impl Part for DestinationTableProperties {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableSchema {
     /// Describes the fields in a table.
     pub fields: Option<Vec<TableFieldSchema>>,
@@ -3342,16 +3863,6 @@ pub struct ArimaOrder {
 impl Part for ArimaOrder {}
 
 
-/// Represents a single JSON object.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JsonObject(Option<HashMap<String, JsonValue>>);
-
-impl Part for JsonObject {}
-
-
 /// Input/output argument of a function or a stored procedure.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3372,6 +3883,26 @@ pub struct Argument {
 }
 
 impl Part for Argument {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableReference {
+    /// [Required] The ID of the project containing this table.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
+    #[serde(rename="tableId")]
+    pub table_id: Option<String>,
+    /// [Required] The ID of the dataset containing this table.
+    #[serde(rename="datasetId")]
+    pub dataset_id: Option<String>,
+}
+
+impl Part for TableReference {}
 
 
 /// There is no detailed description.
@@ -3504,11 +4035,14 @@ impl Part for DataSplitResult {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [delete tables](struct.TableDeleteCall.html) (none)
 /// * [update tables](struct.TableUpdateCall.html) (request|response)
 /// * [insert tables](struct.TableInsertCall.html) (request|response)
 /// * [list tables](struct.TableListCall.html) (none)
-/// * [delete tables](struct.TableDeleteCall.html) (none)
+/// * [test iam permissions tables](struct.TableTestIamPermissionCall.html) (none)
+/// * [get iam policy tables](struct.TableGetIamPolicyCall.html) (none)
 /// * [get tables](struct.TableGetCall.html) (response)
+/// * [set iam policy tables](struct.TableSetIamPolicyCall.html) (none)
 /// * [patch tables](struct.TablePatchCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -3748,7 +4282,7 @@ impl Part for Row {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.tables();
 /// # }
@@ -3787,6 +4321,29 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Sets the access control policy on the specified resource. Replaces any
+    /// existing policy.
+    /// 
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> TableSetIamPolicyCall<'a, C, A> {
+        TableSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.
     /// 
     /// # Arguments
@@ -3802,6 +4359,54 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
             _table_id: table_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that a caller has on the specified resource.
+    /// If the resource does not exist, this will return an empty set of
+    /// permissions, not a `NOT_FOUND` error.
+    /// 
+    /// Note: This operation is designed to be used for building permission-aware
+    /// UIs and command-line tools, not for authorization checking. This operation
+    /// may "fail open" without warning.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> TableTestIamPermissionCall<'a, C, A> {
+        TableTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the access control policy for a resource.
+    /// Returns an empty policy if the resource exists and does not have a policy
+    /// set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> TableGetIamPolicyCall<'a, C, A> {
+        TableGetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3959,25 +4564,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the dataset specified by datasetID.
-    /// 
-    /// # Arguments
-    ///
-    /// * `projectId` - Project ID of the requested dataset
-    /// * `datasetId` - Dataset ID of the requested dataset
-    pub fn get(&self, project_id: &str, dataset_id: &str) -> DatasetGetCall<'a, C, A> {
-        DatasetGetCall {
-            hub: self.hub,
-            _project_id: project_id.to_string(),
-            _dataset_id: dataset_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource. This method supports patch semantics.
     /// 
     /// # Arguments
@@ -3989,6 +4575,25 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
         DatasetPatchCall {
             hub: self.hub,
             _request: request,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the dataset specified by datasetID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the requested dataset
+    /// * `datasetId` - Dataset ID of the requested dataset
+    pub fn get(&self, project_id: &str, dataset_id: &str) -> DatasetGetCall<'a, C, A> {
+        DatasetGetCall {
+            hub: self.hub,
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
             _delegate: Default::default(),
@@ -4963,6 +5568,291 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
+/// Sets the access control policy on the specified resource. Replaces any
+/// existing policy.
+/// 
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+///
+/// A builder for the *setIamPolicy* method supported by a *table* resource.
+/// It is not used directly, but through a `TableMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::SetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.tables().set_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct TableSetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _request: SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TableSetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> TableSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.tables.setIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+resource}:setIamPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> TableSetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being specified.
+    /// See the operation documentation for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> TableSetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> TableSetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> TableSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableSetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *table* resource.
@@ -5253,6 +6143,578 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> TablePatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns permissions that a caller has on the specified resource.
+/// If the resource does not exist, this will return an empty set of
+/// permissions, not a `NOT_FOUND` error.
+/// 
+/// Note: This operation is designed to be used for building permission-aware
+/// UIs and command-line tools, not for authorization checking. This operation
+/// may "fail open" without warning.
+///
+/// A builder for the *testIamPermissions* method supported by a *table* resource.
+/// It is not used directly, but through a `TableMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.tables().test_iam_permissions(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct TableTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TableTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> TableTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.tables.testIamPermissions",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+resource}:testIamPermissions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> TableTestIamPermissionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy detail is being requested.
+    /// See the operation documentation for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> TableTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> TableTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> TableTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableTestIamPermissionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the access control policy for a resource.
+/// Returns an empty policy if the resource exists and does not have a policy
+/// set.
+///
+/// A builder for the *getIamPolicy* method supported by a *table* resource.
+/// It is not used directly, but through a `TableMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::GetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.tables().get_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct TableGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TableGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> TableGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.tables.getIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{+resource}:getIamPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> TableGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being requested.
+    /// See the operation documentation for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> TableGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> TableGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableGetIamPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5593,8 +7055,8 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().list("projectId", "datasetId")
-///              .page_token("justo")
-///              .max_results(80)
+///              .page_token("et")
+///              .max_results(60)
 ///              .doit();
 /// # }
 /// ```
@@ -6423,9 +7885,9 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().list("projectId")
-///              .page_token("duo")
-///              .max_results(69)
-///              .filter("sea")
+///              .page_token("Lorem")
+///              .max_results(26)
+///              .filter("erat")
 ///              .all(false)
 ///              .doit();
 /// # }
@@ -6678,264 +8140,6 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> DatasetListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Returns the dataset specified by datasetID.
-///
-/// A builder for the *get* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_bigquery2 as bigquery2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use bigquery2::Bigquery;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.datasets().get("projectId", "datasetId")
-///              .doit();
-/// # }
-/// ```
-pub struct DatasetGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Bigquery<C, A>,
-    _project_id: String,
-    _dataset_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DatasetGetCall<'a, C, A> {}
-
-impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "bigquery.datasets.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("projectId", self._project_id.to_string()));
-        params.push(("datasetId", self._dataset_id.to_string()));
-        for &field in ["alt", "projectId", "datasetId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["datasetId", "projectId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Project ID of the requested dataset
-    ///
-    /// Sets the *project id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
-        self._project_id = new_value.to_string();
-        self
-    }
-    /// Dataset ID of the requested dataset
-    ///
-    /// Sets the *dataset id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
-        self._dataset_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatasetGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7236,6 +8440,264 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
+/// Returns the dataset specified by datasetID.
+///
+/// A builder for the *get* method supported by a *dataset* resource.
+/// It is not used directly, but through a `DatasetMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigquery2::Bigquery;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.datasets().get("projectId", "datasetId")
+///              .doit();
+/// # }
+/// ```
+pub struct DatasetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Bigquery<C, A>,
+    _project_id: String,
+    _dataset_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DatasetGetCall<'a, C, A> {}
+
+impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigquery.datasets.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("datasetId", self._dataset_id.to_string()));
+        for &field in ["alt", "projectId", "datasetId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["datasetId", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID of the requested dataset
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Dataset ID of the requested dataset
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatasetGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Deletes the dataset specified by the datasetId value. Before you can delete a dataset, you must delete all its tables, either manually or by specifying deleteContents. Immediately after deletion, you can create another dataset with the same name.
 ///
 /// A builder for the *delete* method supported by a *dataset* resource.
@@ -7264,7 +8726,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().delete("projectId", "datasetId")
-///              .delete_contents(false)
+///              .delete_contents(true)
 ///              .doit();
 /// # }
 /// ```
@@ -8089,7 +9551,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get("projectId", "jobId")
-///              .location("aliquyam")
+///              .location("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -8359,7 +9821,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().cancel("projectId", "jobId")
-///              .location("sea")
+///              .location("et")
 ///              .doit();
 /// # }
 /// ```
@@ -9293,13 +10755,13 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("projectId")
-///              .add_state_filter("eirmod")
-///              .projection("sanctus")
-///              .parent_job_id("et")
-///              .page_token("amet")
-///              .min_creation_time("et")
-///              .max_results(56)
-///              .max_creation_time("ut")
+///              .add_state_filter("amet")
+///              .projection("et")
+///              .parent_job_id("consetetur")
+///              .page_token("ut")
+///              .min_creation_time("ea")
+///              .max_results(21)
+///              .max_creation_time("dolor")
 ///              .all_users(true)
 ///              .doit();
 /// # }
@@ -9638,11 +11100,11 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get_query_results("projectId", "jobId")
-///              .timeout_ms(53)
-///              .start_index("dolor")
-///              .page_token("et")
-///              .max_results(5)
-///              .location("amet.")
+///              .timeout_ms(5)
+///              .start_index("amet.")
+///              .page_token("voluptua.")
+///              .max_results(45)
+///              .location("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -10220,8 +11682,8 @@ impl<'a, C, A> ModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.models().list("projectId", "datasetId")
-///              .page_token("vero")
-///              .max_results(73)
+///              .page_token("consetetur")
+///              .max_results(57)
 ///              .doit();
 /// # }
 /// ```
@@ -11394,10 +12856,10 @@ impl<'a, C, A> RoutineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.routines().list("projectId", "datasetId")
-///              .read_mask("et")
-///              .page_token("clita")
-///              .max_results(56)
-///              .filter("takimata")
+///              .read_mask("takimata")
+///              .page_token("nonumy")
+///              .max_results(88)
+///              .filter("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -12269,7 +13731,7 @@ impl<'a, C, A> RoutineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.routines().get("projectId", "datasetId", "routineId")
-///              .read_mask("sadipscing")
+///              .read_mask("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -12556,10 +14018,10 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index("sed")
-///              .selected_fields("aliquyam")
-///              .page_token("sit")
-///              .max_results(61)
+///              .start_index("eirmod")
+///              .selected_fields("consetetur")
+///              .page_token("labore")
+///              .max_results(71)
 ///              .doit();
 /// # }
 /// ```
@@ -13421,8 +14883,8 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("gubergren")
-///              .max_results(19)
+///              .page_token("tempor")
+///              .max_results(42)
 ///              .doit();
 /// # }
 /// ```

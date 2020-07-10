@@ -2666,7 +2666,7 @@ fn main() {
     
     let mut app = App::new("cloudiot1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200519")
            .about("Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudiot1_cli")

@@ -1,4 +1,4 @@
-site_name: Cloud Video Intelligence v1.0.13+20200325
+site_name: Cloud Video Intelligence v1.0.14+20200706
 site_url: http://byron.github.io/google-apis-rs/google-videointelligence1-cli
 site_description: A complete library to interact with Cloud Video Intelligence (protocol v1)
 
@@ -12,6 +12,7 @@ pages:
 - ['operations_projects-locations-operations-cancel.md', 'Operations', 'Projects Locations Operations Cancel']
 - ['operations_projects-locations-operations-delete.md', 'Operations', 'Projects Locations Operations Delete']
 - ['operations_projects-locations-operations-get.md', 'Operations', 'Projects Locations Operations Get']
+- ['projects_locations-corpura-operations-get.md', 'Projects', 'Locations Corpura Operations Get']
 - ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
 - ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
 - ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']

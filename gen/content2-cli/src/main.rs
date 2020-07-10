@@ -5719,7 +5719,7 @@ impl<'n> Engine<'n> {
                     "additional-image-links" => Some(("additionalImageLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "adwords-labels" => Some(("adwordsLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "item-group-id" => Some(("itemGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "min-handling-time" => Some(("minHandlingTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "canonical-link" => Some(("canonicalLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expiration-date" => Some(("expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "google-product-category" => Some(("googleProductCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5784,6 +5784,7 @@ impl<'n> Engine<'n> {
                     "shipping-weight.unit" => Some(("shippingWeight.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "identifier-exists" => Some(("identifierExists", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "image-link" => Some(("imageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "min-handling-time" => Some(("minHandlingTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.currency" => Some(("salePrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.value" => Some(("salePrice.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5797,7 +5798,7 @@ impl<'n> Engine<'n> {
                     "age-group" => Some(("ageGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-ads-title" => Some(("displayAdsTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "additional-product-types", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "cost-of-goods-sold", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "max-energy-efficiency-class", "max-handling-time", "min-energy-efficiency-class", "min-handling-time", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "promotion-ids", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "source", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "additional-product-types", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "canonical-link", "channel", "color", "condition", "content-language", "cost-of-goods-sold", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "max-energy-efficiency-class", "max-handling-time", "min-energy-efficiency-class", "min-handling-time", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "promotion-ids", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "source", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7076,7 +7077,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7148,7 +7149,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7204,7 +7205,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7255,12 +7256,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a Merchant Center account."##),
+                    Some(r##"Updates a Merchant Center account. Any fields that are not provided are deleted from the resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounts_update",
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7319,7 +7320,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7394,7 +7395,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7439,12 +7440,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the tax settings of the account."##),
+                    Some(r##"Updates the tax settings of the account. Any fields that are not provided are deleted from the resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accounttax_update",
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7626,7 +7627,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a datafeed configuration of your Merchant Center account."##),
+                    Some(r##"Updates a datafeed configuration of your Merchant Center account. Any fields that are not provided are deleted from the resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_update",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -7771,7 +7772,7 @@ fn main() {
         
                     (Some(r##"store-code"##),
                      None,
-                     Some(r##"The code of the store for which to update price and availability. Use online to update price and availability of an online product."##),
+                     Some(r##"The code of the store for which to update price and availability. Use `online` to update price and availability of an online product."##),
                      Some(true),
                      Some(false)),
         
@@ -7830,7 +7831,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7858,7 +7859,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7924,7 +7925,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7958,7 +7959,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -7992,7 +7993,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -8044,7 +8045,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -8073,12 +8074,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the LIA settings of the account."##),
+                    Some(r##"Updates the LIA settings of the account. Any fields that are not provided are deleted from the resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/liasettings_update",
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -8144,7 +8145,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("createrefundinvoice",
-                    Some(r##"Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice."##),
+                    Some(r##"Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using `createChargeInvoice`. All amounts (except for the summary) are incremental with respect to the previous invoice."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orderinvoices_createrefundinvoice",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -8333,7 +8334,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("advancetestorder",
-                    Some(r##"Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment"."##),
+                    Some(r##"Sandbox only. Moves a test order from state "`inProgress`" to state "`pendingShipment`"."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_advancetestorder",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -8790,7 +8791,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("returnrefundlineitem",
-                    Some(r##"Returns and refunds a line item. Note that this method can only be called on fully shipped orders."##),
+                    Some(r##"Returns and refunds a line item. Note that this method can only be called on fully shipped orders. Please also note that the Orderreturns API is the preferred way to handle returns after you receive a return from a customer. You can use Orderreturns.list or Orderreturns.get to search for the return, and then use Orderreturns.processreturn to issue the refund. If the return cannot be found, then we recommend using this API to issue a refund."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_returnrefundlineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -9441,7 +9442,7 @@ fn main() {
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -9552,12 +9553,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the shipping settings of the account."##),
+                    Some(r##"Updates the shipping settings of the account. Any fields that are not provided are deleted from the resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/shippingsettings_update",
                   vec![
                     (Some(r##"merchant-id"##),
                      None,
-                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account."##),
+                     Some(r##"The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account."##),
                      Some(true),
                      Some(false)),
         
@@ -9591,7 +9592,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200310")
+           .version("1.0.14+20200617")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

@@ -1709,7 +1709,7 @@ fn main() {
     
     let mut app = App::new("tpu1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200318")
+           .version("1.0.14+20200707")
            .about("TPU API provides customers with access to Google TPU technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tpu1_cli")
            .arg(Arg::with_name("url")

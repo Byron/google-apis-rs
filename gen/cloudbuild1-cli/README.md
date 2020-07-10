@@ -25,20 +25,21 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Build* API at revision *20200323*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Cloud Build* API at revision *20200704*. The CLI is at version *1.0.14*.
 
 ```bash
 cloudbuild1 [options]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
-                list <name> [-p <v>]... [-o <out>]
         projects
                 builds-cancel <project-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 builds-create <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 builds-get <project-id> <id> [-p <v>]... [-o <out>]
                 builds-list <project-id> [-p <v>]... [-o <out>]
                 builds-retry <project-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
                 triggers-create <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 triggers-delete <project-id> <trigger-id> [-p <v>]... [-o <out>]
                 triggers-get <project-id> <trigger-id> [-p <v>]... [-o <out>]

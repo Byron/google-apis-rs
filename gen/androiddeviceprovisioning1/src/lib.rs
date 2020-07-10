@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Provisioning Partner* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Android Provisioning Partner* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Android Provisioning Partner* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/zero-touch/).
@@ -315,7 +315,7 @@ impl<'a, C, A> AndroidProvisioningPartner<C, A>
         AndroidProvisioningPartner {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://androiddeviceprovisioning.googleapis.com/".to_string(),
             _root_url: "https://androiddeviceprovisioning.googleapis.com/".to_string(),
         }
@@ -332,7 +332,7 @@ impl<'a, C, A> AndroidProvisioningPartner<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -366,17 +366,17 @@ impl<'a, C, A> AndroidProvisioningPartner<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PartnerUnclaim {
-    /// The duration of the vacation unlock starting from when the request is
+    /// Optional. The duration of the vacation unlock starting from when the request is
     /// processed. (1 day is treated as 24 hours)
     #[serde(rename="vacationModeDays")]
     pub vacation_mode_days: Option<i32>,
-    /// Device identifier of the device.
+    /// Required. Device identifier of the device.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
-    /// The expiration time of the vacation unlock.
+    /// Optional. The expiration time of the vacation unlock.
     #[serde(rename="vacationModeExpireTime")]
     pub vacation_mode_expire_time: Option<String>,
-    /// Device ID of the device.
+    /// Required. Device ID of the device.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
     /// Required. The section type of the device's provisioning record.
@@ -531,7 +531,7 @@ pub struct ClaimDeviceRequest {
     /// Optional. The metadata to attach to the device.
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
-    /// Required. The device identifier of the device to claim.
+    /// Required. Required. The device identifier of the device to claim.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
     /// Required. The section type of the device's provisioning record.
@@ -696,13 +696,13 @@ pub struct Company {
     /// TermsStatus.
     #[serde(rename="termsStatus")]
     pub terms_status: Option<String>,
-    /// Input only. Email address of customer's users in the owner role. At least
+    /// Required. Input only. Email address of customer's users in the owner role. At least
     /// one `owner_email` is required. Each email address must be associated with a
     /// Google Account. Owners share the same access as admins but can also add,
     /// delete, and edit your organization's portal users.
     #[serde(rename="ownerEmails")]
     pub owner_emails: Option<Vec<String>>,
-    /// Optional. Input only. Email address of customer's users in the admin role.
+    /// Optional. Email address of customer's users in the admin role.
     /// Each email address must be associated with a Google Account.
     #[serde(rename="adminEmails")]
     pub admin_emails: Option<Vec<String>>,
@@ -770,7 +770,7 @@ impl RequestValue for ClaimDevicesRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
     /// The hardware IDs that identify a manufactured device. To learn more, read
-    /// [Identifiers](/zero-touch/guides/identifiers).
+    /// [Identifiers](https://developers.google.com/zero-touch/guides/identifiers).
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
     /// Output only. The API resource name in the format
@@ -785,7 +785,8 @@ pub struct Device {
     /// to remove the device from zero-touch enrollment.
     pub claims: Option<Vec<DeviceClaim>>,
     /// The metadata attached to the device. Structured as key-value pairs. To
-    /// learn more, read [Device metadata](/zero-touch/guides/metadata).
+    /// learn more, read [Device
+    /// metadata](https://developers.google.com/zero-touch/guides/metadata).
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
     /// Not available to resellers.
@@ -949,7 +950,7 @@ impl ResponseResult for ClaimDeviceResponse {}
 
 /// Encapsulates hardware and product IDs to identify a manufactured device.
 /// To understand requirements on identifier sets, read
-/// [Identifiers](/zero-touch/guides/identifiers).
+/// [Identifiers](https://developers.google.com/zero-touch/guides/identifiers).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1017,13 +1018,13 @@ pub struct UnclaimDeviceRequest {
     /// processed. (1 day is treated as 24 hours)
     #[serde(rename="vacationModeDays")]
     pub vacation_mode_days: Option<i32>,
-    /// The device identifier you used when you claimed this device.
+    /// Required. The device identifier you used when you claimed this device.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
     /// The expiration time of the vacation unlock.
     #[serde(rename="vacationModeExpireTime")]
     pub vacation_mode_expire_time: Option<String>,
-    /// The device ID returned by `ClaimDevice`.
+    /// Required. The device ID returned by `ClaimDevice`.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
     /// Required. The section type of the device's provisioning record.
@@ -1115,10 +1116,10 @@ pub struct UpdateMetadataArguments {
     /// Required. The metadata to update.
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
-    /// Device identifier.
+    /// Required. Device identifier.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
-    /// Device ID of the device.
+    /// Required. Device ID of the device.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
 }
@@ -1135,7 +1136,8 @@ impl Part for UpdateMetadataArguments {}
 /// 
 /// Methods that operate on devices take a `DeviceReference` as a parameter type
 /// because it's more flexible for the caller. To learn more about device
-/// identifiers, read [Identifiers](/zero-touch/guides/identifiers).
+/// identifiers, read
+/// [Identifiers](https://developers.google.com/zero-touch/guides/identifiers).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1188,7 +1190,7 @@ impl ResponseResult for Operation {}
 
 
 /// Metadata entries that can be attached to a `Device`. To learn more, read
-/// [Device metadata](/zero-touch/guides/metadata).
+/// [Device metadata](https://developers.google.com/zero-touch/guides/metadata).
 /// 
 /// # Activities
 /// 
@@ -1279,7 +1281,7 @@ pub struct FindDevicesByDeviceIdentifierRequest {
     /// A token specifying which result page to return.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
-    /// Required. The device identifier to search for.
+    /// Required. Required. The device identifier to search for.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
     /// Required. The maximum number of devices to show in a page of results. Must
@@ -1299,7 +1301,7 @@ pub struct PartnerClaim {
     /// Required. The metadata to attach to the device at claim.
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
-    /// Required. Device identifier of the device.
+    /// Required. Required. Device identifier of the device.
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
     /// Required. The section type of the device's provisioning record.

@@ -1,0 +1,41 @@
+site_name: Artifact Registry v1.0.14+20200703
+site_url: http://byron.github.io/google-apis-rs/google-artifactregistry1_beta1-cli
+site_description: A complete library to interact with Artifact Registry (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/artifactregistry1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-repositories-create.md', 'Projects', 'Locations Repositories Create']
+- ['projects_locations-repositories-delete.md', 'Projects', 'Locations Repositories Delete']
+- ['projects_locations-repositories-files-get.md', 'Projects', 'Locations Repositories Files Get']
+- ['projects_locations-repositories-files-list.md', 'Projects', 'Locations Repositories Files List']
+- ['projects_locations-repositories-get.md', 'Projects', 'Locations Repositories Get']
+- ['projects_locations-repositories-get-iam-policy.md', 'Projects', 'Locations Repositories Get Iam Policy']
+- ['projects_locations-repositories-list.md', 'Projects', 'Locations Repositories List']
+- ['projects_locations-repositories-packages-delete.md', 'Projects', 'Locations Repositories Packages Delete']
+- ['projects_locations-repositories-packages-get.md', 'Projects', 'Locations Repositories Packages Get']
+- ['projects_locations-repositories-packages-list.md', 'Projects', 'Locations Repositories Packages List']
+- ['projects_locations-repositories-packages-tags-create.md', 'Projects', 'Locations Repositories Packages Tags Create']
+- ['projects_locations-repositories-packages-tags-delete.md', 'Projects', 'Locations Repositories Packages Tags Delete']
+- ['projects_locations-repositories-packages-tags-get.md', 'Projects', 'Locations Repositories Packages Tags Get']
+- ['projects_locations-repositories-packages-tags-list.md', 'Projects', 'Locations Repositories Packages Tags List']
+- ['projects_locations-repositories-packages-tags-patch.md', 'Projects', 'Locations Repositories Packages Tags Patch']
+- ['projects_locations-repositories-packages-versions-delete.md', 'Projects', 'Locations Repositories Packages Versions Delete']
+- ['projects_locations-repositories-packages-versions-get.md', 'Projects', 'Locations Repositories Packages Versions Get']
+- ['projects_locations-repositories-packages-versions-list.md', 'Projects', 'Locations Repositories Packages Versions List']
+- ['projects_locations-repositories-patch.md', 'Projects', 'Locations Repositories Patch']
+- ['projects_locations-repositories-set-iam-policy.md', 'Projects', 'Locations Repositories Set Iam Policy']
+- ['projects_locations-repositories-test-iam-permissions.md', 'Projects', 'Locations Repositories Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

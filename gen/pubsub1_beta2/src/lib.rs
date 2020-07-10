@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Pubsub* crate version *1.0.14+20200627*, where *20200627* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Pubsub* *v1_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -337,7 +337,7 @@ impl<'a, C, A> Pubsub<C, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://pubsub.googleapis.com/".to_string(),
             _root_url: "https://pubsub.googleapis.com/".to_string(),
         }
@@ -348,7 +348,7 @@ impl<'a, C, A> Pubsub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -586,10 +586,12 @@ impl RequestValue for PublishRequest {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -607,7 +609,9 @@ impl RequestValue for PublishRequest {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -693,6 +697,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -920,9 +927,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1252,7 +1267,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -1406,7 +1421,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -1504,7 +1519,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -1607,7 +1622,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2494,7 +2509,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -3822,6 +3837,10 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
@@ -4441,7 +4460,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *topics.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5521,6 +5540,10 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A> {
@@ -5592,7 +5615,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -6957,7 +6980,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *subscriptions.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

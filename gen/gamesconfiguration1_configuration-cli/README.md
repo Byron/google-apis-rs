@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games Configuration* API at revision *20200402*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Games Configuration* API at revision *20200701*. The CLI is at version *1.0.14*.
 
 ```bash
 gamesconfiguration1-configuration [options]

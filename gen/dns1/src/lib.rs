@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *1.0.13+20191205*, where *20191205* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *dns* crate version *1.0.14+20200515*, where *20200515* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *dns* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).
@@ -360,7 +360,7 @@ impl<'a, C, A> Dns<C, A>
         Dns {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://dns.googleapis.com/dns/v1/projects/".to_string(),
             _root_url: "https://dns.googleapis.com/".to_string(),
         }
@@ -389,7 +389,7 @@ impl<'a, C, A> Dns<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -417,43 +417,6 @@ impl<'a, C, A> Dns<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Parameters for DnsKey key generation. Used for generating initial keys for a new ManagedZone and as default when adding a new DnsKey.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKeySpec {
-    /// Specifies whether this is a key signing key (KSK) or a zone signing key (ZSK). Key signing keys have the Secure Entry Point flag set and, when active, will only be used to sign resource record sets of type DNSKEY. Zone signing keys do not have the Secure Entry Point flag set and will be used to sign all other types of resource record sets.
-    #[serde(rename="keyType")]
-    pub key_type: Option<String>,
-    /// Length of the keys in bits.
-    #[serde(rename="keyLength")]
-    pub key_length: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKeySpec".
-    pub kind: Option<String>,
-    /// String mnemonic specifying the DNSSEC algorithm of this key.
-    pub algorithm: Option<String>,
-}
-
-impl Part for DnsKeySpec {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonePrivateVisibilityConfigNetwork {
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePrivateVisibilityConfigNetwork".
-    pub kind: Option<String>,
-    /// The fully qualified URL of the VPC network to bind to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}
-    #[serde(rename="networkUrl")]
-    pub network_url: Option<String>,
-}
-
-impl Part for ManagedZonePrivateVisibilityConfigNetwork {}
-
-
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -462,7 +425,7 @@ impl Part for ManagedZonePrivateVisibilityConfigNetwork {}
 pub struct PolicyNetwork {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#policyNetwork".
     pub kind: Option<String>,
-    /// The fully qualified URL of the VPC network to bind to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}
+    /// no description provided
     #[serde(rename="networkUrl")]
     pub network_url: Option<String>,
 }
@@ -475,48 +438,23 @@ impl Part for PolicyNetwork {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZoneForwardingConfig {
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneForwardingConfig".
+pub struct DnsKeySpec {
+    /// no description provided
+    #[serde(rename="keyType")]
+    pub key_type: Option<String>,
+    /// no description provided
+    #[serde(rename="keyLength")]
+    pub key_length: Option<u32>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKeySpec".
     pub kind: Option<String>,
-    /// List of target name servers to forward to. Cloud DNS will select the best available name server if more than one target is given.
-    #[serde(rename="targetNameServers")]
-    pub target_name_servers: Option<Vec<ManagedZoneForwardingConfigNameServerTarget>>,
+    /// no description provided
+    pub algorithm: Option<String>,
 }
 
-impl Part for ManagedZoneForwardingConfig {}
+impl Part for DnsKeySpec {}
 
 
-/// A unit of data that will be returned by the DNS servers.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list resource record sets](struct.ResourceRecordSetListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecordSet {
-    /// As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1) -- see examples.
-    pub rrdatas: Option<Vec<String>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".
-    pub kind: Option<String>,
-    /// For example, www.example.com.
-    pub name: Option<String>,
-    /// Number of seconds that this ResourceRecordSet can be cached by resolvers.
-    pub ttl: Option<i32>,
-    /// The identifier of a supported record type. See the list of Supported DNS record types.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// As defined in RFC 4034 (section 3.2).
-    #[serde(rename="signatureRrdatas")]
-    pub signature_rrdatas: Option<Vec<String>>,
-}
-
-impl Resource for ResourceRecordSet {}
-
-
-/// A zone is a subtree of the DNS namespace under one administrative responsibility. A ManagedZone is a resource that represents a DNS zone hosted by the Cloud DNS service.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -532,41 +470,44 @@ impl Resource for ResourceRecordSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZone {
+    /// no description provided
+    #[serde(rename="reverseLookupConfig")]
+    pub reverse_lookup_config: Option<ManagedZoneReverseLookupConfig>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZone".
     pub kind: Option<String>,
-    /// The presence for this field indicates that outbound forwarding is enabled for this zone. The value of this field contains the set of destinations to forward to.
+    /// no description provided
     #[serde(rename="forwardingConfig")]
     pub forwarding_config: Option<ManagedZoneForwardingConfig>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
+    /// no description provided
     pub description: Option<String>,
-    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
+    /// no description provided
     #[serde(rename="nameServers")]
     pub name_servers: Option<Vec<String>>,
-    /// User labels.
+    /// no description provided
     pub labels: Option<HashMap<String, String>>,
-    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
+    /// no description provided
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// The zone's visibility: public zones are exposed to the Internet, while private zones are visible only to Virtual Private Cloud resources.
+    /// no description provided
     pub visibility: Option<String>,
-    /// Unique identifier for the resource; defined by the server (output only)
+    /// no description provided
     pub id: Option<String>,
-    /// For privately visible zones, the set of Virtual Private Cloud resources that the zone is visible from.
+    /// no description provided
     #[serde(rename="privateVisibilityConfig")]
     pub private_visibility_config: Option<ManagedZonePrivateVisibilityConfig>,
-    /// The DNS name of this managed zone, for instance "example.com.".
+    /// no description provided
     #[serde(rename="dnsName")]
     pub dns_name: Option<String>,
-    /// DNSSEC configuration.
+    /// no description provided
     #[serde(rename="dnssecConfig")]
     pub dnssec_config: Option<ManagedZoneDnsSecConfig>,
-    /// The presence of this field indicates that DNS Peering is enabled for this zone. The value of this field contains the network to peer with.
+    /// no description provided
     #[serde(rename="peeringConfig")]
     pub peering_config: Option<ManagedZonePeeringConfig>,
-    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.
+    /// no description provided
     #[serde(rename="nameServerSet")]
     pub name_server_set: Option<String>,
-    /// User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
+    /// no description provided
     pub name: Option<String>,
 }
 
@@ -586,136 +527,18 @@ impl ResponseResult for ManagedZone {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZoneOperationsListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The operation resources.
+    /// no description provided
     pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ManagedZoneOperationsListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OperationDnsKeyContext {
-    /// The post-operation DnsKey resource.
-    #[serde(rename="newValue")]
-    pub new_value: Option<DnsKey>,
-    /// The pre-operation DnsKey resource.
-    #[serde(rename="oldValue")]
-    pub old_value: Option<DnsKey>,
-}
-
-impl Part for OperationDnsKeyContext {}
-
-
-/// The response to a request to enumerate DnsKeys in a ManagedZone.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list dns keys](struct.DnsKeyListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKeysListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// The requested resources.
-    #[serde(rename="dnsKeys")]
-    pub dns_keys: Option<Vec<DnsKey>>,
-    /// Type of resource.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for DnsKeysListResponse {}
-
-
-/// A project resource. The project is a top level container for resources including Cloud DNS ManagedZones. Projects can be created only in the APIs console.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get projects](struct.ProjectGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Project {
-    /// Quotas assigned to this project (output only).
-    pub quota: Option<Quota>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#project".
-    pub kind: Option<String>,
-    /// User assigned unique identifier for the resource (output only).
-    pub id: Option<String>,
-    /// Unique numeric identifier for the resource; defined by the server (output only).
-    pub number: Option<String>,
-}
-
-impl Resource for Project {}
-impl ResponseResult for Project {}
-
-
-/// A DNSSEC key pair.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list dns keys](struct.DnsKeyListCall.html) (none)
-/// * [get dns keys](struct.DnsKeyGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DnsKey {
-    /// The key tag is a non-cryptographic hash of the a DNSKEY resource record associated with this DnsKey. The key tag can be used to identify a DNSKEY more quickly (but it is not a unique identifier). In particular, the key tag is used in a parent zone's DS record to point at the DNSKEY in this child ManagedZone. The key tag is a number in the range [0, 65535] and the algorithm to calculate it is specified in RFC4034 Appendix B. Output only.
-    #[serde(rename="keyTag")]
-    pub key_tag: Option<i32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKey".
-    pub kind: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the resource's function.
-    pub description: Option<String>,
-    /// String mnemonic specifying the DNSSEC algorithm of this key. Immutable after creation time.
-    pub algorithm: Option<String>,
-    /// Length of the key in bits. Specified at creation time then immutable.
-    #[serde(rename="keyLength")]
-    pub key_length: Option<u32>,
-    /// The time that this resource was created in the control plane. This is in RFC3339 text format. Output only.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// Cryptographic hashes of the DNSKEY resource record associated with this DnsKey. These digests are needed to construct a DS record that points at this DNS key. Output only.
-    pub digests: Option<Vec<DnsKeyDigest>>,
-    /// Base64 encoded public half of this key. Output only.
-    #[serde(rename="publicKey")]
-    pub public_key: Option<String>,
-    /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, will be used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag will be cleared and this key will be used to sign only resource record sets of other types. Immutable after creation time.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Unique identifier for the resource; defined by the server (output only).
-    pub id: Option<String>,
-    /// Active keys will be used to sign subsequent changes to the ManagedZone. Inactive keys will still be present as DNSKEY Resource Records for the use of resolvers validating existing signatures.
-    #[serde(rename="isActive")]
-    pub is_active: Option<bool>,
-}
-
-impl Resource for DnsKey {}
-impl ResponseResult for DnsKey {}
 
 
 /// There is no detailed description.
@@ -729,16 +552,14 @@ impl ResponseResult for DnsKey {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZonesListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The managed zone resources.
+    /// no description provided
     #[serde(rename="managedZones")]
     pub managed_zones: Option<Vec<ManagedZone>>,
 }
@@ -746,7 +567,7 @@ pub struct ManagedZonesListResponse {
 impl ResponseResult for ManagedZonesListResponse {}
 
 
-/// A policy is a collection of DNS rules applied to one or more Virtual Private Cloud resources.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -760,56 +581,29 @@ impl ResponseResult for ManagedZonesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Sets an alternative name server for the associated networks. When specified, all DNS queries are forwarded to a name server that you choose. Names such as .internal are not available when an alternative name server is specified.
+    /// no description provided
     #[serde(rename="alternativeNameServerConfig")]
     pub alternative_name_server_config: Option<PolicyAlternativeNameServerConfig>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#policy".
     pub kind: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the policy's function.
+    /// no description provided
     pub description: Option<String>,
-    /// Allows networks bound to this policy to receive DNS queries sent by VMs or applications over VPN connections. When enabled, a virtual IP address will be allocated from each of the sub-networks that are bound to this policy.
+    /// no description provided
     #[serde(rename="enableInboundForwarding")]
     pub enable_inbound_forwarding: Option<bool>,
-    /// Controls whether logging is enabled for the networks bound to this policy. Defaults to no logging if not set.
+    /// no description provided
     #[serde(rename="enableLogging")]
     pub enable_logging: Option<bool>,
-    /// Unique identifier for the resource; defined by the server (output only).
+    /// no description provided
     pub id: Option<String>,
-    /// List of network names specifying networks to which this policy is applied.
+    /// no description provided
     pub networks: Option<Vec<PolicyNetwork>>,
-    /// User assigned name for this policy.
+    /// no description provided
     pub name: Option<String>,
 }
 
 impl RequestValue for Policy {}
 impl ResponseResult for Policy {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list resource record sets](struct.ResourceRecordSetListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecordSetsListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-    /// Type of resource.
-    pub kind: Option<String>,
-    /// The resource record set resources.
-    pub rrsets: Option<Vec<ResourceRecordSet>>,
-}
-
-impl ResponseResult for ResourceRecordSetsListResponse {}
 
 
 /// There is no detailed description.
@@ -820,54 +614,17 @@ impl ResponseResult for ResourceRecordSetsListResponse {}
 pub struct ManagedZoneDnsSecConfig {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneDnsSecConfig".
     pub kind: Option<String>,
-    /// Specifies parameters for generating initial DnsKeys for this ManagedZone. Can only be changed while the state is OFF.
+    /// no description provided
     #[serde(rename="defaultKeySpecs")]
     pub default_key_specs: Option<Vec<DnsKeySpec>>,
-    /// Specifies whether DNSSEC is enabled, and what mode it is in.
+    /// no description provided
     pub state: Option<String>,
-    /// Specifies the mechanism for authenticated denial-of-existence responses. Can only be changed while the state is OFF.
+    /// no description provided
     #[serde(rename="nonExistence")]
     pub non_existence: Option<String>,
 }
 
 impl Part for ManagedZoneDnsSecConfig {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch policies](struct.PolicyPatchCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PoliciesPatchResponse {
-    /// no description provided
-    pub policy: Option<Policy>,
-    /// no description provided
-    pub header: Option<ResponseHeader>,
-}
-
-impl ResponseResult for PoliciesPatchResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OperationManagedZoneContext {
-    /// The post-operation ManagedZone resource.
-    #[serde(rename="newValue")]
-    pub new_value: Option<ManagedZone>,
-    /// The pre-operation ManagedZone resource.
-    #[serde(rename="oldValue")]
-    pub old_value: Option<ManagedZone>,
-}
-
-impl Part for OperationManagedZoneContext {}
 
 
 /// There is no detailed description.
@@ -878,7 +635,7 @@ impl Part for OperationManagedZoneContext {}
 pub struct PolicyAlternativeNameServerConfig {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#policyAlternativeNameServerConfig".
     pub kind: Option<String>,
-    /// Sets an alternative name server for the associated networks. When specified, all DNS queries are forwarded to a name server that you choose. Names such as .internal are not available when an alternative name server is specified.
+    /// no description provided
     #[serde(rename="targetNameServers")]
     pub target_name_servers: Option<Vec<PolicyAlternativeNameServerConfigTargetNameServer>>,
 }
@@ -894,60 +651,60 @@ impl Part for PolicyAlternativeNameServerConfig {}
 pub struct ManagedZonePrivateVisibilityConfig {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePrivateVisibilityConfig".
     pub kind: Option<String>,
-    /// The list of VPC networks that can see this zone.
+    /// no description provided
     pub networks: Option<Vec<ManagedZonePrivateVisibilityConfigNetwork>>,
 }
 
 impl Part for ManagedZonePrivateVisibilityConfig {}
 
 
-/// Limits associated with a Project.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Quota {
-    /// Maximum allowed number of networks per policy.
+    /// no description provided
     #[serde(rename="networksPerPolicy")]
     pub networks_per_policy: Option<i32>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".
     pub kind: Option<String>,
-    /// Maximum allowed number of managed zones which can be attached to a network.
+    /// no description provided
     #[serde(rename="managedZonesPerNetwork")]
     pub managed_zones_per_network: Option<i32>,
-    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
+    /// no description provided
     #[serde(rename="totalRrdataSizePerChange")]
     pub total_rrdata_size_per_change: Option<i32>,
-    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
+    /// no description provided
     #[serde(rename="resourceRecordsPerRrset")]
     pub resource_records_per_rrset: Option<i32>,
-    /// Maximum allowed number of target name servers per managed forwarding zone.
+    /// no description provided
     #[serde(rename="targetNameServersPerManagedZone")]
     pub target_name_servers_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of DnsKeys per ManagedZone.
+    /// no description provided
     #[serde(rename="dnsKeysPerManagedZone")]
     pub dns_keys_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets per zone in the project.
+    /// no description provided
     #[serde(rename="rrsetsPerManagedZone")]
     pub rrsets_per_managed_zone: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
+    /// no description provided
     #[serde(rename="rrsetAdditionsPerChange")]
     pub rrset_additions_per_change: Option<i32>,
-    /// Maximum allowed number of policies per project.
+    /// no description provided
     pub policies: Option<i32>,
-    /// Maximum allowed number of alternative target name servers per policy.
+    /// no description provided
     #[serde(rename="targetNameServersPerPolicy")]
     pub target_name_servers_per_policy: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
+    /// no description provided
     #[serde(rename="rrsetDeletionsPerChange")]
     pub rrset_deletions_per_change: Option<i32>,
-    /// Maximum allowed number of managed zones in the project.
+    /// no description provided
     #[serde(rename="managedZones")]
     pub managed_zones: Option<i32>,
-    /// Maximum allowed number of networks to which a privately scoped zone can be attached.
+    /// no description provided
     #[serde(rename="networksPerManagedZone")]
     pub networks_per_managed_zone: Option<i32>,
-    /// DNSSEC algorithm and key length types that can be used for DnsKeys.
+    /// no description provided
     #[serde(rename="whitelistedKeySpecs")]
     pub whitelisted_key_specs: Option<Vec<DnsKeySpec>>,
 }
@@ -961,10 +718,10 @@ impl Part for Quota {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DnsKeyDigest {
-    /// Specifies the algorithm used to calculate this digest.
+    /// no description provided
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The base-16 encoded bytes of this digest. Suitable for use in a DS resource record.
+    /// no description provided
     pub digest: Option<String>,
 }
 
@@ -977,9 +734,12 @@ impl Part for DnsKeyDigest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolicyAlternativeNameServerConfigTargetNameServer {
-    /// IPv4 address to forward to.
+    /// no description provided
     #[serde(rename="ipv4Address")]
     pub ipv4_address: Option<String>,
+    /// no description provided
+    #[serde(rename="forwardingPath")]
+    pub forwarding_path: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#policyAlternativeNameServerConfigTargetNameServer".
     pub kind: Option<String>,
 }
@@ -987,7 +747,7 @@ pub struct PolicyAlternativeNameServerConfigTargetNameServer {
 impl Part for PolicyAlternativeNameServerConfigTargetNameServer {}
 
 
-/// The response to a request to enumerate Changes to a ResourceRecordSets collection.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -998,16 +758,14 @@ impl Part for PolicyAlternativeNameServerConfigTargetNameServer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChangesListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The requested changes.
+    /// no description provided
     pub changes: Option<Vec<Change>>,
 }
 
@@ -1020,9 +778,12 @@ impl ResponseResult for ChangesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZoneForwardingConfigNameServerTarget {
-    /// IPv4 address of a target name server.
+    /// no description provided
     #[serde(rename="ipv4Address")]
     pub ipv4_address: Option<String>,
+    /// no description provided
+    #[serde(rename="forwardingPath")]
+    pub forwarding_path: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneForwardingConfigNameServerTarget".
     pub kind: Option<String>,
 }
@@ -1057,33 +818,334 @@ impl ResponseResult for PoliciesUpdateResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list policies](struct.PolicyListCall.html) (response)
+/// * [get changes](struct.ChangeGetCall.html) (response)
+/// * [create changes](struct.ChangeCreateCall.html) (request|response)
+/// * [list changes](struct.ChangeListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PoliciesListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+pub struct Change {
+    /// no description provided
+    pub deletions: Option<Vec<ResourceRecordSet>>,
+    /// no description provided
+    pub status: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#change".
+    pub kind: Option<String>,
+    /// no description provided
+    #[serde(rename="isServing")]
+    pub is_serving: Option<bool>,
+    /// no description provided
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// no description provided
+    pub additions: Option<Vec<ResourceRecordSet>>,
+    /// no description provided
+    pub id: Option<String>,
+}
+
+impl RequestValue for Change {}
+impl Resource for Change {}
+impl ResponseResult for Change {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZoneForwardingConfig {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneForwardingConfig".
+    pub kind: Option<String>,
+    /// no description provided
+    #[serde(rename="targetNameServers")]
+    pub target_name_servers: Option<Vec<ManagedZoneForwardingConfigNameServerTarget>>,
+}
+
+impl Part for ManagedZoneForwardingConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZonePrivateVisibilityConfigNetwork {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePrivateVisibilityConfigNetwork".
+    pub kind: Option<String>,
+    /// no description provided
+    #[serde(rename="networkUrl")]
+    pub network_url: Option<String>,
+}
+
+impl Part for ManagedZonePrivateVisibilityConfigNetwork {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list resource record sets](struct.ResourceRecordSetListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceRecordSet {
+    /// no description provided
+    pub rrdatas: Option<Vec<String>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".
+    pub kind: Option<String>,
+    /// no description provided
+    pub name: Option<String>,
+    /// no description provided
+    pub ttl: Option<i32>,
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// no description provided
+    #[serde(rename="signatureRrdatas")]
+    pub signature_rrdatas: Option<Vec<String>>,
+}
+
+impl Resource for ResourceRecordSet {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OperationDnsKeyContext {
+    /// no description provided
+    #[serde(rename="newValue")]
+    pub new_value: Option<DnsKey>,
+    /// no description provided
+    #[serde(rename="oldValue")]
+    pub old_value: Option<DnsKey>,
+}
+
+impl Part for OperationDnsKeyContext {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list dns keys](struct.DnsKeyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DnsKeysListResponse {
+    /// no description provided
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+    /// no description provided
+    #[serde(rename="dnsKeys")]
+    pub dns_keys: Option<Vec<DnsKey>>,
+    /// Type of resource.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for DnsKeysListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get projects](struct.ProjectGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Project {
+    /// no description provided
+    pub quota: Option<Quota>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#project".
+    pub kind: Option<String>,
+    /// no description provided
+    pub id: Option<String>,
+    /// no description provided
+    pub number: Option<String>,
+}
+
+impl Resource for Project {}
+impl ResponseResult for Project {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list dns keys](struct.DnsKeyListCall.html) (none)
+/// * [get dns keys](struct.DnsKeyGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DnsKey {
+    /// no description provided
+    #[serde(rename="keyTag")]
+    pub key_tag: Option<i32>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKey".
+    pub kind: Option<String>,
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    pub algorithm: Option<String>,
+    /// no description provided
+    #[serde(rename="keyLength")]
+    pub key_length: Option<u32>,
+    /// no description provided
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// no description provided
+    pub digests: Option<Vec<DnsKeyDigest>>,
+    /// no description provided
+    #[serde(rename="publicKey")]
+    pub public_key: Option<String>,
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// no description provided
+    pub id: Option<String>,
+    /// no description provided
+    #[serde(rename="isActive")]
+    pub is_active: Option<bool>,
+}
+
+impl Resource for DnsKey {}
+impl ResponseResult for DnsKey {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZonePeeringConfig {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePeeringConfig".
+    pub kind: Option<String>,
+    /// no description provided
+    #[serde(rename="targetNetwork")]
+    pub target_network: Option<ManagedZonePeeringConfigTargetNetwork>,
+}
+
+impl Part for ManagedZonePeeringConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list resource record sets](struct.ResourceRecordSetListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceRecordSetsListResponse {
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
     pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
-    /// The policy resources.
+    /// no description provided
+    pub rrsets: Option<Vec<ResourceRecordSet>>,
+}
+
+impl ResponseResult for ResourceRecordSetsListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [patch policies](struct.PolicyPatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PoliciesPatchResponse {
+    /// no description provided
+    pub policy: Option<Policy>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+}
+
+impl ResponseResult for PoliciesPatchResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OperationManagedZoneContext {
+    /// no description provided
+    #[serde(rename="newValue")]
+    pub new_value: Option<ManagedZone>,
+    /// no description provided
+    #[serde(rename="oldValue")]
+    pub old_value: Option<ManagedZone>,
+}
+
+impl Part for OperationManagedZoneContext {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZoneReverseLookupConfig {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneReverseLookupConfig".
+    pub kind: Option<String>,
+}
+
+impl Part for ManagedZoneReverseLookupConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list policies](struct.PolicyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PoliciesListResponse {
+    /// no description provided
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+    /// Type of resource.
+    pub kind: Option<String>,
+    /// no description provided
     pub policies: Option<Vec<Policy>>,
 }
 
 impl ResponseResult for PoliciesListResponse {}
 
 
-/// Elements common to every response.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResponseHeader {
-    /// For mutating operation requests that completed successfully. This is the client_operation_id if the client specified it, otherwise it is generated by the server (output only).
+    /// no description provided
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
 }
@@ -1091,7 +1153,7 @@ pub struct ResponseHeader {
 impl Part for ResponseHeader {}
 
 
-/// An operation represents a successful mutation performed on a Cloud DNS resource. Operations provide: - An audit log of server resource mutations. - A way to recover/retry API calls in the case where the response is never received by the caller. Use the caller specified client_operation_id.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -1104,25 +1166,25 @@ impl Part for ResponseHeader {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
-    /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only). A status of "DONE" means that the request to update the authoritative servers has been sent, but the servers might not be updated yet.
+    /// no description provided
     pub status: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#operation".
     pub kind: Option<String>,
-    /// Only populated if the operation targeted a DnsKey (output only).
+    /// no description provided
     #[serde(rename="dnsKeyContext")]
     pub dns_key_context: Option<OperationDnsKeyContext>,
-    /// Only populated if the operation targeted a ManagedZone (output only).
+    /// no description provided
     #[serde(rename="zoneContext")]
     pub zone_context: Option<OperationManagedZoneContext>,
-    /// User who requested the operation, for example: user@example.com. cloud-dns-system for operations automatically done by the system. (output only)
+    /// no description provided
     pub user: Option<String>,
-    /// The time that this operation was started by the server. This is in RFC3339 text format (output only).
+    /// no description provided
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Type of the operation. Operations include insert, update, and delete (output only).
+    /// no description provided
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Unique identifier for the resource. This is the client_operation_id if the client specified it when the mutation was initiated, otherwise, it is generated by the server. The name must be 1-63 characters long and match the regular expression [-a-z0-9]? (output only)
+    /// no description provided
     pub id: Option<String>,
 }
 
@@ -1137,67 +1199,15 @@ impl ResponseResult for Operation {}
 pub struct ManagedZonePeeringConfigTargetNetwork {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePeeringConfigTargetNetwork".
     pub kind: Option<String>,
-    /// The time at which the zone was deactivated, in RFC 3339 date-time format. An empty string indicates that the peering connection is active. The producer network can deactivate a zone. The zone is automatically deactivated if the producer network that the zone targeted is deleted. Output only.
+    /// no description provided
     #[serde(rename="deactivateTime")]
     pub deactivate_time: Option<String>,
-    /// The fully qualified URL of the VPC network to forward queries to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}
+    /// no description provided
     #[serde(rename="networkUrl")]
     pub network_url: Option<String>,
 }
 
 impl Part for ManagedZonePeeringConfigTargetNetwork {}
-
-
-/// A Change represents a set of ResourceRecordSet additions and deletions applied atomically to a ManagedZone. ResourceRecordSets within a ManagedZone are modified by creating a new Change element in the Changes collection. In turn the Changes collection also records the past modifications to the ResourceRecordSets in a ManagedZone. The current state of the ManagedZone is the sum effect of applying all Change elements in the Changes collection in sequence.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get changes](struct.ChangeGetCall.html) (response)
-/// * [create changes](struct.ChangeCreateCall.html) (request|response)
-/// * [list changes](struct.ChangeListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Change {
-    /// Which ResourceRecordSets to remove? Must match existing data exactly.
-    pub deletions: Option<Vec<ResourceRecordSet>>,
-    /// Status of the operation (output only). A status of "done" means that the request to update the authoritative servers has been sent, but the servers might not be updated yet.
-    pub status: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#change".
-    pub kind: Option<String>,
-    /// If the DNS queries for the zone will be served.
-    #[serde(rename="isServing")]
-    pub is_serving: Option<bool>,
-    /// The time that this operation was started by the server (output only). This is in RFC3339 text format.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Which ResourceRecordSets to add?
-    pub additions: Option<Vec<ResourceRecordSet>>,
-    /// Unique identifier for the resource; defined by the server (output only).
-    pub id: Option<String>,
-}
-
-impl RequestValue for Change {}
-impl Resource for Change {}
-impl ResponseResult for Change {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZonePeeringConfig {
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZonePeeringConfig".
-    pub kind: Option<String>,
-    /// The network with which to peer.
-    #[serde(rename="targetNetwork")]
-    pub target_network: Option<ManagedZonePeeringConfigTargetNetwork>,
-}
-
-impl Part for ManagedZonePeeringConfig {}
 
 
 
@@ -1246,12 +1256,12 @@ impl<'a, C, A> ResourceRecordSetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate ResourceRecordSets that have been created but not yet deleted.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> ResourceRecordSetListCall<'a, C, A> {
         ResourceRecordSetListCall {
             hub: self.hub,
@@ -1311,13 +1321,13 @@ impl<'a, C, A> DnsKeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing DnsKey.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    /// * `dnsKeyId` - The identifier of the requested DnsKey.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
+    /// * `dnsKeyId` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str, dns_key_id: &str) -> DnsKeyGetCall<'a, C, A> {
         DnsKeyGetCall {
             hub: self.hub,
@@ -1334,12 +1344,12 @@ impl<'a, C, A> DnsKeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate DnsKeys to a ResourceRecordSet collection.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> DnsKeyListCall<'a, C, A> {
         DnsKeyListCall {
             hub: self.hub,
@@ -1398,12 +1408,12 @@ impl<'a, C, A> ManagedZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate Operations for the given ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> ManagedZoneOperationListCall<'a, C, A> {
         ManagedZoneOperationListCall {
             hub: self.hub,
@@ -1420,13 +1430,13 @@ impl<'a, C, A> ManagedZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Operation.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request.
-    /// * `operation` - Identifies the operation addressed by this request.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
+    /// * `operation` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str, operation: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
         ManagedZoneOperationGetCall {
             hub: self.hub,
@@ -1484,13 +1494,13 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn update(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZoneUpdateCall<'a, C, A> {
         ManagedZoneUpdateCall {
             hub: self.hub,
@@ -1506,13 +1516,13 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Apply a partial update to an existing ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn patch(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZonePatchCall<'a, C, A> {
         ManagedZonePatchCall {
             hub: self.hub,
@@ -1528,12 +1538,12 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn create(&self, request: ManagedZone, project: &str) -> ManagedZoneCreateCall<'a, C, A> {
         ManagedZoneCreateCall {
             hub: self.hub,
@@ -1548,12 +1558,12 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a previously created ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn delete(&self, project: &str, managed_zone: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         ManagedZoneDeleteCall {
             hub: self.hub,
@@ -1568,12 +1578,12 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing ManagedZone.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str) -> ManagedZoneGetCall<'a, C, A> {
         ManagedZoneGetCall {
             hub: self.hub,
@@ -1588,11 +1598,11 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate ManagedZones that have been created but not yet deleted.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn list(&self, project: &str) -> ManagedZoneListCall<'a, C, A> {
         ManagedZoneListCall {
             hub: self.hub,
@@ -1650,12 +1660,12 @@ impl<'a, C, A> PolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new Policy
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn create(&self, request: Policy, project: &str) -> PolicyCreateCall<'a, C, A> {
         PolicyCreateCall {
             hub: self.hub,
@@ -1670,12 +1680,12 @@ impl<'a, C, A> PolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a previously created Policy. Will fail if the policy is still being referenced by a network.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
+    /// * `project` - No description provided.
+    /// * `policy` - No description provided.
     pub fn delete(&self, project: &str, policy: &str) -> PolicyDeleteCall<'a, C, A> {
         PolicyDeleteCall {
             hub: self.hub,
@@ -1690,13 +1700,13 @@ impl<'a, C, A> PolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Apply a partial update to an existing Policy.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
+    /// * `project` - No description provided.
+    /// * `policy` - No description provided.
     pub fn patch(&self, request: Policy, project: &str, policy: &str) -> PolicyPatchCall<'a, C, A> {
         PolicyPatchCall {
             hub: self.hub,
@@ -1712,12 +1722,12 @@ impl<'a, C, A> PolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Policy.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
+    /// * `project` - No description provided.
+    /// * `policy` - No description provided.
     pub fn get(&self, project: &str, policy: &str) -> PolicyGetCall<'a, C, A> {
         PolicyGetCall {
             hub: self.hub,
@@ -1732,11 +1742,11 @@ impl<'a, C, A> PolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate all Policies associated with a project.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn list(&self, project: &str) -> PolicyListCall<'a, C, A> {
         PolicyListCall {
             hub: self.hub,
@@ -1751,13 +1761,13 @@ impl<'a, C, A> PolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing Policy.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `policy` - User given friendly name of the policy addressed by this request.
+    /// * `project` - No description provided.
+    /// * `policy` - No description provided.
     pub fn update(&self, request: Policy, project: &str, policy: &str) -> PolicyUpdateCall<'a, C, A> {
         PolicyUpdateCall {
             hub: self.hub,
@@ -1815,13 +1825,13 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Atomically update the ResourceRecordSet collection.
+    /// 
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn create(&self, request: Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, A> {
         ChangeCreateCall {
             hub: self.hub,
@@ -1837,12 +1847,12 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate Changes to a ResourceRecordSet collection.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
     pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, A> {
         ChangeListCall {
             hub: self.hub,
@@ -1860,13 +1870,13 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Change.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
+    /// * `project` - No description provided.
+    /// * `managedZone` - No description provided.
+    /// * `changeId` - No description provided.
     pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, A> {
         ChangeGetCall {
             hub: self.hub,
@@ -1924,11 +1934,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Project.
+    /// 
     /// 
     /// # Arguments
     ///
-    /// * `project` - Identifies the project addressed by this request.
+    /// * `project` - No description provided.
     pub fn get(&self, project: &str) -> ProjectGetCall<'a, C, A> {
         ProjectGetCall {
             hub: self.hub,
@@ -1949,7 +1959,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Enumerate ResourceRecordSets that have been created but not yet deleted.
+/// 
 ///
 /// A builder for the *list* method supported by a *resourceRecordSet* resource.
 /// It is not used directly, but through a `ResourceRecordSetMethods` instance.
@@ -2148,7 +2158,6 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2158,7 +2167,6 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2168,28 +2176,24 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.
     ///
     /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Restricts the list to return only records with this fully qualified domain name.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a, C, A> {
@@ -2255,7 +2259,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Fetch the representation of an existing DnsKey.
+/// 
 ///
 /// A builder for the *get* method supported by a *dnsKey* resource.
 /// It is not used directly, but through a `DnsKeyMethods` instance.
@@ -2446,7 +2450,6 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2456,7 +2459,6 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2466,7 +2468,6 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._managed_zone = new_value.to_string();
         self
     }
-    /// The identifier of the requested DnsKey.
     ///
     /// Sets the *dns key id* path property to the given value.
     ///
@@ -2476,14 +2477,12 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._dns_key_id = new_value.to_string();
         self
     }
-    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type will be computed and displayed.
     ///
     /// Sets the *digest type* query property to the given value.
     pub fn digest_type(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
         self._digest_type = Some(new_value.to_string());
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
@@ -2549,7 +2548,7 @@ impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Enumerate DnsKeys to a ResourceRecordSet collection.
+/// 
 ///
 /// A builder for the *list* method supported by a *dnsKey* resource.
 /// It is not used directly, but through a `DnsKeyMethods` instance.
@@ -2743,7 +2742,6 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2753,7 +2751,6 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -2763,21 +2760,18 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> DnsKeyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type will be computed and displayed.
     ///
     /// Sets the *digest type* query property to the given value.
     pub fn digest_type(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
@@ -2843,7 +2837,7 @@ impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Enumerate Operations for the given ManagedZone.
+/// 
 ///
 /// A builder for the *list* method supported by a *managedZoneOperation* resource.
 /// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
@@ -3037,7 +3031,6 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3047,7 +3040,6 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3057,21 +3049,18 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sorting criterion. The only supported values are START_TIME and ID.
     ///
     /// Sets the *sort by* query property to the given value.
     pub fn sort_by(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
         self._sort_by = Some(new_value.to_string());
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagedZoneOperationListCall<'a, C, A> {
@@ -3137,7 +3126,7 @@ impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Fetch the representation of an existing Operation.
+/// 
 ///
 /// A builder for the *get* method supported by a *managedZoneOperation* resource.
 /// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
@@ -3323,7 +3312,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3333,7 +3321,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3343,7 +3330,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Identifies the operation addressed by this request.
     ///
     /// Sets the *operation* path property to the given value.
     ///
@@ -3353,7 +3339,6 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._operation = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
@@ -3419,7 +3404,7 @@ impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Update an existing ManagedZone.
+/// 
 ///
 /// A builder for the *update* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -3634,7 +3619,6 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3644,7 +3628,6 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3654,7 +3637,6 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a, C, A> {
@@ -3720,7 +3702,7 @@ impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Apply a partial update to an existing ManagedZone.
+/// 
 ///
 /// A builder for the *patch* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -3935,7 +3917,6 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -3945,7 +3926,6 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -3955,7 +3935,6 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZonePatchCall<'a, C, A> {
@@ -4021,7 +4000,7 @@ impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Create a new ManagedZone.
+/// 
 ///
 /// A builder for the *create* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -4234,7 +4213,6 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -4244,7 +4222,6 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, A> {
@@ -4310,7 +4287,7 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Delete a previously created ManagedZone.
+/// 
 ///
 /// A builder for the *delete* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -4483,7 +4460,6 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -4493,7 +4469,6 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -4503,7 +4478,6 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
@@ -4569,7 +4543,7 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Fetch the representation of an existing ManagedZone.
+/// 
 ///
 /// A builder for the *get* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -4753,7 +4727,6 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -4763,7 +4736,6 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -4773,7 +4745,6 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
@@ -4839,7 +4810,7 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Enumerate ManagedZones that have been created but not yet deleted.
+/// 
 ///
 /// A builder for the *list* method supported by a *managedZone* resource.
 /// It is not used directly, but through a `ManagedZoneMethods` instance.
@@ -5031,7 +5002,6 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5041,21 +5011,18 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._project = new_value.to_string();
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Restricts the list to return only zones with this domain name.
     ///
     /// Sets the *dns name* query property to the given value.
     pub fn dns_name(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
@@ -5121,7 +5088,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Create a new Policy
+/// 
 ///
 /// A builder for the *create* method supported by a *policy* resource.
 /// It is not used directly, but through a `PolicyMethods` instance.
@@ -5334,7 +5301,6 @@ impl<'a, C, A> PolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5344,7 +5310,6 @@ impl<'a, C, A> PolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._project = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> PolicyCreateCall<'a, C, A> {
@@ -5410,7 +5375,7 @@ impl<'a, C, A> PolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Delete a previously created Policy. Will fail if the policy is still being referenced by a network.
+/// 
 ///
 /// A builder for the *delete* method supported by a *policy* resource.
 /// It is not used directly, but through a `PolicyMethods` instance.
@@ -5583,7 +5548,6 @@ impl<'a, C, A> PolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5593,7 +5557,6 @@ impl<'a, C, A> PolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._project = new_value.to_string();
         self
     }
-    /// User given friendly name of the policy addressed by this request.
     ///
     /// Sets the *policy* path property to the given value.
     ///
@@ -5603,7 +5566,6 @@ impl<'a, C, A> PolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._policy = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> PolicyDeleteCall<'a, C, A> {
@@ -5669,7 +5631,7 @@ impl<'a, C, A> PolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Apply a partial update to an existing Policy.
+/// 
 ///
 /// A builder for the *patch* method supported by a *policy* resource.
 /// It is not used directly, but through a `PolicyMethods` instance.
@@ -5884,7 +5846,6 @@ impl<'a, C, A> PolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5894,7 +5855,6 @@ impl<'a, C, A> PolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._project = new_value.to_string();
         self
     }
-    /// User given friendly name of the policy addressed by this request.
     ///
     /// Sets the *policy* path property to the given value.
     ///
@@ -5904,7 +5864,6 @@ impl<'a, C, A> PolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._policy = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> PolicyPatchCall<'a, C, A> {
@@ -5970,7 +5929,7 @@ impl<'a, C, A> PolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Fetch the representation of an existing Policy.
+/// 
 ///
 /// A builder for the *get* method supported by a *policy* resource.
 /// It is not used directly, but through a `PolicyMethods` instance.
@@ -6154,7 +6113,6 @@ impl<'a, C, A> PolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -6164,7 +6122,6 @@ impl<'a, C, A> PolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project = new_value.to_string();
         self
     }
-    /// User given friendly name of the policy addressed by this request.
     ///
     /// Sets the *policy* path property to the given value.
     ///
@@ -6174,7 +6131,6 @@ impl<'a, C, A> PolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._policy = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> PolicyGetCall<'a, C, A> {
@@ -6240,7 +6196,7 @@ impl<'a, C, A> PolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Enumerate all Policies associated with a project.
+/// 
 ///
 /// A builder for the *list* method supported by a *policy* resource.
 /// It is not used directly, but through a `PolicyMethods` instance.
@@ -6427,7 +6383,6 @@ impl<'a, C, A> PolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -6437,14 +6392,12 @@ impl<'a, C, A> PolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PolicyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> PolicyListCall<'a, C, A> {
@@ -6510,7 +6463,7 @@ impl<'a, C, A> PolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Update an existing Policy.
+/// 
 ///
 /// A builder for the *update* method supported by a *policy* resource.
 /// It is not used directly, but through a `PolicyMethods` instance.
@@ -6725,7 +6678,6 @@ impl<'a, C, A> PolicyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -6735,7 +6687,6 @@ impl<'a, C, A> PolicyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._project = new_value.to_string();
         self
     }
-    /// User given friendly name of the policy addressed by this request.
     ///
     /// Sets the *policy* path property to the given value.
     ///
@@ -6745,7 +6696,6 @@ impl<'a, C, A> PolicyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._policy = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> PolicyUpdateCall<'a, C, A> {
@@ -6811,7 +6761,7 @@ impl<'a, C, A> PolicyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Atomically update the ResourceRecordSet collection.
+/// 
 ///
 /// A builder for the *create* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -7026,7 +6976,6 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -7036,7 +6985,6 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -7046,7 +6994,6 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._managed_zone = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
@@ -7112,7 +7059,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Enumerate Changes to a ResourceRecordSet collection.
+/// 
 ///
 /// A builder for the *list* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -7311,7 +7258,6 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -7321,7 +7267,6 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -7331,28 +7276,24 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sorting order direction: 'ascending' or 'descending'.
     ///
     /// Sets the *sort order* query property to the given value.
     pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// Sorting criterion. The only supported value is change sequence.
     ///
     /// Sets the *sort by* query property to the given value.
     pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_by = Some(new_value.to_string());
         self
     }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
@@ -7418,7 +7359,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Fetch the representation of an existing Change.
+/// 
 ///
 /// A builder for the *get* method supported by a *change* resource.
 /// It is not used directly, but through a `ChangeMethods` instance.
@@ -7604,7 +7545,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -7614,7 +7554,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project = new_value.to_string();
         self
     }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     ///
     /// Sets the *managed zone* path property to the given value.
     ///
@@ -7624,7 +7563,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._managed_zone = new_value.to_string();
         self
     }
-    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
     ///
     /// Sets the *change id* path property to the given value.
     ///
@@ -7634,7 +7572,6 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._change_id = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
@@ -7700,7 +7637,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Fetch the representation of an existing Project.
+/// 
 ///
 /// A builder for the *get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7882,7 +7819,6 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -7892,7 +7828,6 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
     /// Sets the *client operation id* query property to the given value.
     pub fn client_operation_id(mut self, new_value: &str) -> ProjectGetCall<'a, C, A> {

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Hosting* API at revision *20200325*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Firebase Hosting* API at revision *20200709*. The CLI is at version *1.0.14*.
 
 ```bash
 firebasehosting1-beta1 [options]
@@ -33,8 +33,21 @@ firebasehosting1-beta1 [options]
                 operations-get <name> [-p <v>]... [-o <out>]
                 sites-channels-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-channels-releases-list <parent> [-p <v>]... [-o <out>]
+                sites-domains-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-domains-delete <name> [-p <v>]... [-o <out>]
+                sites-domains-get <name> [-p <v>]... [-o <out>]
+                sites-domains-list <parent> [-p <v>]... [-o <out>]
+                sites-domains-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-get-config <name> [-p <v>]... [-o <out>]
                 sites-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-releases-list <parent> [-p <v>]... [-o <out>]
+                sites-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-versions-delete <name> [-p <v>]... [-o <out>]
+                sites-versions-files-list <parent> [-p <v>]... [-o <out>]
+                sites-versions-list <parent> [-p <v>]... [-o <out>]
+                sites-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-versions-populate-files <parent> (-r <kv>)... [-p <v>]... [-o <out>]
         sites
                 channels-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-releases-list <parent> [-p <v>]... [-o <out>]
@@ -47,7 +60,6 @@ firebasehosting1-beta1 [options]
                 releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 releases-list <parent> [-p <v>]... [-o <out>]
                 update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                versions-clone <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-delete <name> [-p <v>]... [-o <out>]
                 versions-files-list <parent> [-p <v>]... [-o <out>]

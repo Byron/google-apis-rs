@@ -2608,7 +2608,8 @@ fn main() {
                   ]),
             ("notification-configs-patch",
                     Some(r##"
-        Updates a notification config."##),
+        Updates a notification config. The following update
+        fields are allowed: description, pubsub_topic, streaming_config.filter"##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_notification-configs-patch",
                   vec![
                     (Some(r##"name"##),
@@ -3167,7 +3168,7 @@ fn main() {
     
     let mut app = App::new("securitycenter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200406")
+           .version("1.0.14+20200703")
            .about("Security Command Center API provides access to temporal views of assets and findings within an organization.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_securitycenter1_cli")
            .arg(Arg::with_name("url")

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-qpxexpress1-cli"
-version = "1.0.13+20160708"
+version = "1.0.14+20160708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with QPX Express (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/qpxexpress1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-qpxexpress1]
 path = "../qpxexpress1"
-version = "1.0.13+20160708"
+version = "1.0.14+20160708"

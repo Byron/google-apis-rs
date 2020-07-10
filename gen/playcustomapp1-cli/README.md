@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *playcustomapp* API can be found at the
-[official documentation site](https://developers.google.com/android/work/play/custom-app-api).
+[official documentation site](https://developers.google.com/android/work/play/custom-app-api/).
 
 # Installation and Source Code
 
@@ -25,12 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *playcustomapp* API at revision *20170622*. The CLI is at version *1.0.13*.
+This documentation was generated from the *playcustomapp* API at revision *20200707*. The CLI is at version *1.0.14*.
 
 ```bash
 playcustomapp1 [options]
         accounts
-                custom-apps-create <account> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                custom-apps-create <account> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
   playcustomapp1 --help
 
 Configuration:

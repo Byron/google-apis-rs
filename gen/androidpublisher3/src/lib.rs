@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.14+20200709*, where *20200709* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Android Publisher* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -360,8 +360,8 @@ impl<'a, C, A> AndroidPublisher<C, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/androidpublisher/v3/applications/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -389,7 +389,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -397,7 +397,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/androidpublisher/v3/applications/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -417,7 +417,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// There is no detailed description.
+/// Response listing all bundles.
 /// 
 /// # Activities
 /// 
@@ -428,56 +428,73 @@ impl<'a, C, A> AndroidPublisher<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BundlesListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#bundlesListResponse".
+    /// The kind of this response ("androidpublisher#bundlesListResponse").
     pub kind: Option<String>,
-    /// no description provided
+    /// All bundles.
     pub bundles: Option<Vec<Bundle>>,
 }
 
 impl ResponseResult for BundlesListResponse {}
 
 
-/// There is no detailed description.
+/// Request for the purchases.subscriptions.defer API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionPurchasesDeferRequest {
+    /// The information about the new desired expiry time for the subscription.
+    #[serde(rename="deferralInfo")]
+    pub deferral_info: Option<SubscriptionDeferralInfo>,
+}
+
+impl RequestValue for SubscriptionPurchasesDeferRequest {}
+
+
+/// A release within a track.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrackRelease {
-    /// The desired status of this release.
+    /// The status of the release.
     pub status: Option<String>,
-    /// no description provided
-    #[serde(rename="pinnedVersions")]
-    pub pinned_versions: Option<Vec<TrackReleasePin>>,
-    /// The release name, used to identify this release in the Play Console UI. Not required to be unique. This is optional, if not set it will be generated from the version_name in the APKs.
-    pub name: Option<String>,
-    /// A list of all version codes of APKs that will be exposed to the users of this track when this release is rolled out. Note that this list should contain all versions you wish to be active, including those you wish to retain from previous releases.
-    #[serde(rename="versionCodes")]
-    pub version_codes: Option<Vec<String>>,
-    /// The description of what is new in the app in this release.
-    #[serde(rename="releaseNotes")]
-    pub release_notes: Option<Vec<LocalizedText>>,
-    /// no description provided
-    pub controls: Option<Vec<Control>>,
-    /// no description provided
-    #[serde(rename="countryTargeting")]
-    pub country_targeting: Option<CountryTargeting>,
-    /// Fraction of users who are eligible to receive the release. 0 < fraction < 1. To be set, release status must be "inProgress" or "halted".
+    /// Fraction of users who are eligible for a staged release. 0 < fraction < 1.
+    /// Can only be set when status is "inProgress" or "halted".
     #[serde(rename="userFraction")]
     pub user_fraction: Option<f64>,
-    /// no description provided
-    #[serde(rename="rollbackEnabled")]
-    pub rollback_enabled: Option<bool>,
-    /// In-app update priority of the release. All newly added APKs in the release will be considered at this priority. in_app_update_priority can take values between [0, 5]. 5 is the highest priority. Default priority is 0. See https://developer.android.com/guide/playcore/in-app-updates.
+    /// The release name. Not required to be unique. If not set, the name is
+    /// generated from the APK's version_name. If the release contains multiple
+    /// APKs, the name is generated from the date.
+    pub name: Option<String>,
+    /// Version codes of all APKs in the release. Must include version codes to
+    /// retain from previous releases.
+    #[serde(rename="versionCodes")]
+    pub version_codes: Option<Vec<String>>,
+    /// A description of what is new in this release.
+    #[serde(rename="releaseNotes")]
+    pub release_notes: Option<Vec<LocalizedText>>,
+    /// In-app update priority of the release. All newly added APKs in the
+    /// release will be considered at this priority. Can take values in the range
+    /// [0, 5], with 5 the highest priority. Defaults to 0.
+    /// in_app_update_priority can not be updated once the release is rolled out.
+    /// See https://developer.android.com/guide/playcore/in-app-updates.
     #[serde(rename="inAppUpdatePriority")]
     pub in_app_update_priority: Option<i32>,
-    /// no description provided
-    pub sampling: Option<Sampling>,
+    /// Restricts a release to a specific set of countries.
+    #[serde(rename="countryTargeting")]
+    pub country_targeting: Option<CountryTargeting>,
 }
 
 impl Part for TrackRelease {}
 
 
-/// There is no detailed description.
+/// An Android app review.
 /// 
 /// # Activities
 /// 
@@ -504,7 +521,91 @@ impl Resource for Review {}
 impl ResponseResult for Review {}
 
 
-/// There is no detailed description.
+/// Response listing reviews.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list reviews](struct.ReviewListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReviewsListResponse {
+    /// List of reviews.
+    pub reviews: Option<Vec<Review>>,
+    /// Pagination token, to handle a number of products that is over one page.
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// Information about the current page.
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for ReviewsListResponse {}
+
+
+/// An in-app product. The resource for InappproductsService.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [patch inappproducts](struct.InappproductPatchCall.html) (request|response)
+/// * [insert inappproducts](struct.InappproductInsertCall.html) (request|response)
+/// * [get inappproducts](struct.InappproductGetCall.html) (response)
+/// * [update inappproducts](struct.InappproductUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InAppProduct {
+    /// Stock-keeping-unit (SKU) of the product, unique within an app.
+    pub sku: Option<String>,
+    /// The status of the product, e.g. whether it's active.
+    pub status: Option<String>,
+    /// Subscription period, specified in ISO 8601 format. Acceptable values are
+    /// P1W (one week), P1M (one month), P3M (three months), P6M (six months),
+    /// and P1Y (one year).
+    #[serde(rename="subscriptionPeriod")]
+    pub subscription_period: Option<String>,
+    /// Grace period of the subscription, specified in ISO 8601 format. Allows
+    /// developers to give their subscribers a grace period when the payment
+    /// for the new recurrence period is declined.
+    /// Acceptable values are P0D (zero days), P3D (three days), P7D (seven days),
+    /// P14D (14 days), and P30D (30 days).
+    #[serde(rename="gracePeriod")]
+    pub grace_period: Option<String>,
+    /// Package name of the parent app.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// List of localized title and description data. Map key is the language of
+    /// the localized data, as defined by BCP-47, e.g. "en-US".
+    pub listings: Option<HashMap<String, InAppProductListing>>,
+    /// Trial period, specified in ISO 8601 format. Acceptable values are anything
+    /// between P7D (seven days) and P999D (999 days).
+    #[serde(rename="trialPeriod")]
+    pub trial_period: Option<String>,
+    /// The type of the product, e.g. a recurring subscription.
+    #[serde(rename="purchaseType")]
+    pub purchase_type: Option<String>,
+    /// Default language of the localized data, as defined by BCP-47. e.g. "en-US".
+    #[serde(rename="defaultLanguage")]
+    pub default_language: Option<String>,
+    /// Prices per buyer region. None of these can be zero, as in-app products are
+    /// never free. Map key is region code, as defined by ISO 3166-2.
+    pub prices: Option<HashMap<String, Price>>,
+    /// Default price. Cannot be zero, as in-app products are never free.
+    /// Always in the developer's Checkout merchant currency.
+    #[serde(rename="defaultPrice")]
+    pub default_price: Option<Price>,
+}
+
+impl RequestValue for InAppProduct {}
+impl Resource for InAppProduct {}
+impl ResponseResult for InAppProduct {}
+
+
+/// Response listing all images.
 /// 
 /// # Activities
 /// 
@@ -515,14 +616,14 @@ impl ResponseResult for Review {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImagesListResponse {
-    /// no description provided
+    /// All listed Images.
     pub images: Option<Vec<Image>>,
 }
 
 impl ResponseResult for ImagesListResponse {}
 
 
-/// There is no detailed description.
+/// Response for uploading an expansion file.
 /// 
 /// # Activities
 /// 
@@ -533,7 +634,7 @@ impl ResponseResult for ImagesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExpansionFilesUploadResponse {
-    /// no description provided
+    /// The uploaded expansion file configuration.
     #[serde(rename="expansionFile")]
     pub expansion_file: Option<ExpansionFile>,
 }
@@ -541,16 +642,21 @@ pub struct ExpansionFilesUploadResponse {
 impl ResponseResult for ExpansionFilesUploadResponse {}
 
 
-/// A SubscriptionDeferralInfo contains the data needed to defer a subscription purchase to a future expiry time.
+/// A SubscriptionDeferralInfo contains the data needed to defer a
+/// subscription purchase to a future expiry time.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionDeferralInfo {
-    /// The expected expiry time for the subscription. If the current expiry time for the subscription is not the value specified here, the deferral will not occur.
+    /// The expected expiry time for the subscription.  If the current
+    /// expiry time for the subscription is not the value specified
+    /// here, the deferral will not occur.
     #[serde(rename="expectedExpiryTimeMillis")]
     pub expected_expiry_time_millis: Option<String>,
-    /// The desired next expiry time to assign to the subscription, in milliseconds since the Epoch. The given time must be later/greater than the current expiry time for the subscription.
+    /// The desired next expiry time to assign to the subscription, in
+    /// milliseconds since the Epoch. The given time must be later/greater
+    /// than the current expiry time for the subscription.
     #[serde(rename="desiredExpiryTimeMillis")]
     pub desired_expiry_time_millis: Option<String>,
 }
@@ -558,7 +664,7 @@ pub struct SubscriptionDeferralInfo {
 impl Part for SubscriptionDeferralInfo {}
 
 
-/// There is no detailed description.
+/// A localized store listing. The resource for ListingsService.
 /// 
 /// # Activities
 /// 
@@ -573,15 +679,16 @@ impl Part for SubscriptionDeferralInfo {}
 pub struct Listing {
     /// URL of a promotional YouTube video for the app.
     pub video: Option<String>,
-    /// Short description of the app (previously known as promo text); this may be up to 80 characters in length.
+    /// Short description of the app.
     #[serde(rename="shortDescription")]
     pub short_description: Option<String>,
-    /// Full description of the app; this may be up to 4000 characters in length.
+    /// Full description of the app.
     #[serde(rename="fullDescription")]
     pub full_description: Option<String>,
-    /// Language localization code (for example, "de-AT" for Austrian German).
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     pub language: Option<String>,
-    /// App's localized title.
+    /// Localized title of the app.
     pub title: Option<String>,
 }
 
@@ -589,7 +696,35 @@ impl RequestValue for Listing {}
 impl ResponseResult for Listing {}
 
 
-/// There is no detailed description.
+/// Contains the price change information for a subscription that can be used to
+/// control the user journey for the price change in the app. This can be in the
+/// form of seeking confirmation from the user or tailoring the experience for a
+/// successful conversion.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionPriceChange {
+    /// The current state of the price change. Possible values are:
+    /// 0. Outstanding: State for a pending price change waiting for the user to
+    /// agree. In this state, you can optionally seek confirmation from the
+    /// user using the In-App API.
+    /// 
+    /// 1. Accepted: State for an accepted price change that the subscription
+    ///    will renew with unless it's canceled. The price change takes effect on
+    ///    a future date when the subscription renews. Note that the change might
+    ///    not occur when the subscription is renewed next.
+    pub state: Option<i32>,
+    /// The new price the subscription will renew with if the price change is
+    /// accepted by the user.
+    #[serde(rename="newPrice")]
+    pub new_price: Option<Price>,
+}
+
+impl Part for SubscriptionPriceChange {}
+
+
+/// Characteristics of the user's device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -601,7 +736,7 @@ pub struct DeviceMetadata {
     /// Screen height in pixels
     #[serde(rename="screenHeightPx")]
     pub screen_height_px: Option<i32>,
-    /// Device CPU model e.g. "MSM8974"
+    /// Device CPU model, e.g. "MSM8974"
     #[serde(rename="cpuModel")]
     pub cpu_model: Option<String>,
     /// Device model name (e.g. Droid)
@@ -613,10 +748,10 @@ pub struct DeviceMetadata {
     /// Device class (e.g. tablet)
     #[serde(rename="deviceClass")]
     pub device_class: Option<String>,
-    /// Device CPU make e.g. "Qualcomm"
+    /// Device CPU make, e.g. "Qualcomm"
     #[serde(rename="cpuMake")]
     pub cpu_make: Option<String>,
-    /// Device RAM in Megabytes e.g. "2048"
+    /// Device RAM in Megabytes, e.g. "2048"
     #[serde(rename="ramMb")]
     pub ram_mb: Option<i32>,
     /// Device manufacturer (e.g. Motorola)
@@ -632,7 +767,8 @@ pub struct DeviceMetadata {
 impl Part for DeviceMetadata {}
 
 
-/// A ProductPurchase resource indicates the status of a user's inapp product purchase.
+/// A ProductPurchase resource indicates the status of a user's inapp
+/// product purchase.
 /// 
 /// # Activities
 /// 
@@ -646,40 +782,57 @@ pub struct ProductPurchase {
     /// The order id associated with the purchase of the inapp product.
     #[serde(rename="orderId")]
     pub order_id: Option<String>,
-    /// This kind represents an inappPurchase object in the androidpublisher service.
+    /// This kind represents an inappPurchase object in the androidpublisher
+    /// service.
     pub kind: Option<String>,
     /// The purchase token generated to identify this purchase.
     #[serde(rename="purchaseToken")]
     pub purchase_token: Option<String>,
-    /// The consumption state of the inapp product. Possible values are:  
-    /// - Yet to be consumed 
-    /// - Consumed
+    /// The consumption state of the inapp product. Possible values are:
+    /// 0. Yet to be consumed
+    /// 1. Consumed
     #[serde(rename="consumptionState")]
     pub consumption_state: Option<i32>,
-    /// The type of purchase of the inapp product. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  
-    /// - Test (i.e. purchased from a license testing account) 
-    /// - Promo (i.e. purchased using a promo code) 
-    /// - Rewarded (i.e. from watching a video ad instead of paying)
+    /// The type of purchase of the inapp product. This field is only set if
+    /// this purchase was not made using the standard in-app billing flow.
+    /// Possible values are:
+    /// 0. Test (i.e. purchased from a license testing account)
+    /// 1. Promo (i.e. purchased using a promo code)
+    /// 2. Rewarded (i.e. from watching a video ad instead of paying)
     #[serde(rename="purchaseType")]
     pub purchase_type: Option<i32>,
-    /// A developer-specified string that contains supplemental information about an order.
+    /// A developer-specified string that contains supplemental
+    /// information about an order.
     #[serde(rename="developerPayload")]
     pub developer_payload: Option<String>,
+    /// An obfuscated version of the id that is uniquely associated with the
+    /// user's profile in your app. Only present if specified using
+    /// https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.Builder#setobfuscatedprofileid
+    /// when the purchase was made.
+    #[serde(rename="obfuscatedExternalProfileId")]
+    pub obfuscated_external_profile_id: Option<String>,
     /// The inapp product SKU.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
-    /// The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
+    /// The time the product was purchased, in milliseconds since the
+    /// epoch (Jan 1, 1970).
     #[serde(rename="purchaseTimeMillis")]
     pub purchase_time_millis: Option<String>,
-    /// The purchase state of the order. Possible values are:  
-    /// - Purchased 
-    /// - Canceled 
-    /// - Pending
+    /// An obfuscated version of the id that is uniquely associated with the
+    /// user's account in your app. Only present if specified using
+    /// https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.Builder#setobfuscatedaccountid
+    /// when the purchase was made.
+    #[serde(rename="obfuscatedExternalAccountId")]
+    pub obfuscated_external_account_id: Option<String>,
+    /// The purchase state of the order. Possible values are:
+    /// 0. Purchased
+    /// 1. Canceled
+    /// 2. Pending
     #[serde(rename="purchaseState")]
     pub purchase_state: Option<i32>,
-    /// The acknowledgement state of the inapp product. Possible values are:  
-    /// - Yet to be acknowledged 
-    /// - Acknowledged
+    /// The acknowledgement state of the inapp product. Possible values are:
+    /// 0. Yet to be acknowledged
+    /// 1. Acknowledged
     #[serde(rename="acknowledgementState")]
     pub acknowledgement_state: Option<i32>,
     /// The quantity associated with the purchase of the inapp product.
@@ -689,155 +842,92 @@ pub struct ProductPurchase {
 impl ResponseResult for ProductPurchase {}
 
 
-/// A SubscriptionPurchase resource indicates the status of a user's subscription purchase.
+/// Response for deleting all images.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [subscriptions get purchases](struct.PurchaseSubscriptionGetCall.html) (response)
+/// * [images deleteall edits](struct.EditImageDeleteallCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchase {
-    /// The order id of the latest recurring order associated with the purchase of the subscription.
-    #[serde(rename="orderId")]
-    pub order_id: Option<String>,
-    /// User account identifier in the third-party service. Only present if account linking happened as part of the subscription purchase flow.
-    #[serde(rename="externalAccountId")]
-    pub external_account_id: Option<String>,
-    /// The type of promotion applied on this purchase. This field is only set if a promotion is applied when the subscription was purchased. Possible values are:  
-    /// - One time code 
-    /// - Vanity code
-    #[serde(rename="promotionType")]
-    pub promotion_type: Option<i32>,
-    /// ISO 3166-1 alpha-2 billing country/region code of the user at the time the subscription was granted.
-    #[serde(rename="countryCode")]
-    pub country_code: Option<String>,
-    /// A developer-specified string that contains supplemental information about an order.
-    #[serde(rename="developerPayload")]
-    pub developer_payload: Option<String>,
-    /// The family name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="familyName")]
-    pub family_name: Option<String>,
-    /// Whether the subscription will automatically be renewed when it reaches its current expiry time.
-    #[serde(rename="autoRenewing")]
-    pub auto_renewing: Option<bool>,
-    /// The payment state of the subscription. Possible values are:  
-    /// - Payment pending 
-    /// - Payment received 
-    /// - Free trial 
-    /// - Pending deferred upgrade/downgrade
-    #[serde(rename="paymentState")]
-    pub payment_state: Option<i32>,
-    /// The email address of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="emailAddress")]
-    pub email_address: Option<String>,
-    /// The reason why a subscription was canceled or is not auto-renewing. Possible values are:  
-    /// - User canceled the subscription 
-    /// - Subscription was canceled by the system, for example because of a billing problem 
-    /// - Subscription was replaced with a new subscription 
-    /// - Subscription was canceled by the developer
-    #[serde(rename="cancelReason")]
-    pub cancel_reason: Option<i32>,
-    /// The profile name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="profileName")]
-    pub profile_name: Option<String>,
-    /// Time at which the subscription was granted, in milliseconds since the Epoch.
-    #[serde(rename="startTimeMillis")]
-    pub start_time_millis: Option<String>,
-    /// The time at which the subscription was canceled by the user, in milliseconds since the epoch. Only present if cancelReason is 0.
-    #[serde(rename="userCancellationTimeMillis")]
-    pub user_cancellation_time_millis: Option<String>,
-    /// Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
-    #[serde(rename="priceAmountMicros")]
-    pub price_amount_micros: Option<String>,
-    /// This kind represents a subscriptionPurchase object in the androidpublisher service.
-    pub kind: Option<String>,
-    /// The acknowledgement state of the subscription product. Possible values are:  
-    /// - Yet to be acknowledged 
-    /// - Acknowledged
-    #[serde(rename="acknowledgementState")]
-    pub acknowledgement_state: Option<i32>,
-    /// Introductory price information of the subscription. This is only present when the subscription was purchased with an introductory price.
-    /// 
-    /// This field does not indicate the subscription is currently in introductory price period.
-    #[serde(rename="introductoryPriceInfo")]
-    pub introductory_price_info: Option<IntroductoryPriceInfo>,
-    /// The latest price change information available. This is present only when there is an upcoming price change for the subscription yet to be applied.
-    /// 
-    /// Once the subscription renews with the new price or the subscription is canceled, no price change information will be returned.
-    #[serde(rename="priceChange")]
-    pub price_change: Option<SubscriptionPriceChange>,
-    /// The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  
-    /// - Test (i.e. purchased from a license testing account) 
-    /// - Promo (i.e. purchased using a promo code)
-    #[serde(rename="purchaseType")]
-    pub purchase_type: Option<i32>,
-    /// ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
-    #[serde(rename="priceCurrencyCode")]
-    pub price_currency_code: Option<String>,
-    /// Time at which the subscription will be automatically resumed, in milliseconds since the Epoch. Only present if the user has requested to pause the subscription.
-    #[serde(rename="autoResumeTimeMillis")]
-    pub auto_resume_time_millis: Option<String>,
-    /// Time at which the subscription will expire, in milliseconds since the Epoch.
-    #[serde(rename="expiryTimeMillis")]
-    pub expiry_time_millis: Option<String>,
-    /// Information provided by the user when they complete the subscription cancellation flow (cancellation reason survey).
-    #[serde(rename="cancelSurveyResult")]
-    pub cancel_survey_result: Option<SubscriptionCancelSurveyResult>,
-    /// The Google profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="profileId")]
-    pub profile_id: Option<String>,
-    /// The purchase token of the originating purchase if this subscription is one of the following:  
-    /// - Re-signup of a canceled but non-lapsed subscription 
-    /// - Upgrade/downgrade from a previous subscription  For example, suppose a user originally signs up and you receive purchase token X, then the user cancels and goes through the resignup flow (before their subscription lapses) and you receive purchase token Y, and finally the user upgrades their subscription and you receive purchase token Z. If you call this API with purchase token Z, this field will be set to Y. If you call this API with purchase token Y, this field will be set to X. If you call this API with purchase token X, this field will not be set.
-    #[serde(rename="linkedPurchaseToken")]
-    pub linked_purchase_token: Option<String>,
-    /// The given name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="givenName")]
-    pub given_name: Option<String>,
-    /// The promotion code applied on this purchase. This field is only set if a vanity code promotion is applied when the subscription was purchased.
-    #[serde(rename="promotionCode")]
-    pub promotion_code: Option<String>,
+pub struct ImagesDeleteAllResponse {
+    /// The deleted images.
+    pub deleted: Option<Vec<Image>>,
 }
 
-impl ResponseResult for SubscriptionPurchase {}
+impl ResponseResult for ImagesDeleteAllResponse {}
 
 
-/// There is no detailed description.
+/// An artifact resource which gets created when uploading an APK or Android
+/// App Bundle through internal app sharing.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [uploadapk internalappsharingartifacts](struct.InternalappsharingartifactUploadapkCall.html) (response)
+/// * [uploadbundle internalappsharingartifacts](struct.InternalappsharingartifactUploadbundleCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InternalAppSharingArtifact {
+    /// The download URL generated for the uploaded artifact.
+    /// Users that are authorized to download can follow the link to the Play
+    /// Store app to install it.
+    #[serde(rename="downloadUrl")]
+    pub download_url: Option<String>,
+    /// The sha256 hash of the artifact represented as a lowercase hexadecimal
+    /// number, matching the output of the sha256sum command.
+    pub sha256: Option<String>,
+    /// The sha256 fingerprint of the certificate used to sign the generated
+    /// artifact.
+    #[serde(rename="certificateFingerprint")]
+    pub certificate_fingerprint: Option<String>,
+}
+
+impl Resource for InternalAppSharingArtifact {}
+impl ResponseResult for InternalAppSharingArtifact {}
+
+
+/// A Timestamp represents a point in time independent of any time zone or local
+/// calendar, encoded as a count of seconds and fractions of seconds at
+/// nanosecond resolution. The count is relative to an epoch at UTC midnight on
+/// January 1, 1970.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Timestamp {
-    /// no description provided
+    /// Non-negative fractions of a second at nanosecond resolution.
+    /// Must be from 0 to 999,999,999 inclusive.
     pub nanos: Option<i32>,
-    /// no description provided
+    /// Represents seconds of UTC time since Unix epoch.
     pub seconds: Option<String>,
 }
 
 impl Part for Timestamp {}
 
 
-/// There is no detailed description.
+/// Store listing of a single in-app product.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TrackReleasePinPinTargetingDevicePin {
-    /// no description provided
-    pub device: Option<String>,
-    /// no description provided
-    pub brand: Option<String>,
-    /// no description provided
-    pub product: Option<String>,
+pub struct InAppProductListing {
+    /// Localized entitlement benefits for a subscription.
+    pub benefits: Option<Vec<String>>,
+    /// Description for the store listing.
+    pub description: Option<String>,
+    /// Title for the store listing.
+    pub title: Option<String>,
 }
 
-impl Part for TrackReleasePinPinTargetingDevicePin {}
+impl Part for InAppProductListing {}
 
 
-/// There is no detailed description.
+/// Request to reply to review or update existing reply.
 /// 
 /// # Activities
 /// 
@@ -848,7 +938,8 @@ impl Part for TrackReleasePinPinTargetingDevicePin {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReviewsReplyRequest {
-    /// The text to set as the reply. Replies of more than approximately 350 characters will be rejected. HTML tags will be stripped.
+    /// The text to set as the reply. Replies of more than approximately 350
+    /// characters will be rejected. HTML tags will be stripped.
     #[serde(rename="replyText")]
     pub reply_text: Option<String>,
 }
@@ -856,7 +947,46 @@ pub struct ReviewsReplyRequest {
 impl RequestValue for ReviewsReplyRequest {}
 
 
-/// There is no detailed description.
+/// APK that is suitable for inclusion in a system image. The resource of
+/// SystemApksService.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [variants create systemapks](struct.SystemapkVariantCreateCall.html) (request|response)
+/// * [variants get systemapks](struct.SystemapkVariantGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Variant {
+    /// The device spec used to generate the APK.
+    #[serde(rename="deviceSpec")]
+    pub device_spec: Option<DeviceSpec>,
+    /// Output only. The ID of a previously created system APK variant.
+    #[serde(rename="variantId")]
+    pub variant_id: Option<u32>,
+}
+
+impl RequestValue for Variant {}
+impl ResponseResult for Variant {}
+
+
+/// Represents a deobfuscation file.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeobfuscationFile {
+    /// The type of the deobfuscation file.
+    #[serde(rename="symbolType")]
+    pub symbol_type: Option<String>,
+}
+
+impl Part for DeobfuscationFile {}
+
+
+/// Information about a bundle. The resource for BundlesService.
 /// 
 /// # Activities
 /// 
@@ -867,35 +997,42 @@ impl RequestValue for ReviewsReplyRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bundle {
-    /// The version code of the Android App Bundle. As specified in the Android App Bundle's base module APK manifest file.
+    /// The version code of the Android App Bundle, as specified in the Android App
+    /// Bundle's base module APK manifest file.
     #[serde(rename="versionCode")]
     pub version_code: Option<i32>,
-    /// A sha256 hash of the upload payload, encoded as a hex string and matching the output of the sha256sum command.
+    /// A sha256 hash of the upload payload, encoded as a hex string and matching
+    /// the output of the sha256sum command.
     pub sha256: Option<String>,
-    /// A sha1 hash of the upload payload, encoded as a hex string and matching the output of the sha1sum command.
+    /// A sha1 hash of the upload payload, encoded as a hex string and matching
+    /// the output of the sha1sum command.
     pub sha1: Option<String>,
 }
 
 impl ResponseResult for Bundle {}
 
 
-/// There is no detailed description.
+/// Country targeting specification.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CountryTargeting {
-    /// no description provided
+    /// Include "rest of world" as well as explicitly targeted countries.
     #[serde(rename="includeRestOfWorld")]
     pub include_rest_of_world: Option<bool>,
-    /// no description provided
+    /// Countries to target, specified as two letter [CLDR
+    /// codes](https://unicode.org/cldr/charts/latest/supplemental/territory_containment_un_m_49.html).
     pub countries: Option<Vec<String>>,
 }
 
 impl Part for CountryTargeting {}
 
 
-/// Defines an APK available for this application that is hosted externally and not uploaded to Google Play. This function is only available to enterprises who are using Google Play for Work, and whos application is restricted to the enterprise private channel
+/// Defines an APK available for this application that is hosted externally
+/// and not uploaded to Google Play.
+/// This function is only available to organizations using Managed Play whose
+/// application is configured to restrict distribution to the organizations.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -904,7 +1041,8 @@ pub struct ExternallyHostedApk {
     /// The icon image from the APK, as a base64 encoded byte array.
     #[serde(rename="iconBase64")]
     pub icon_base64: Option<String>,
-    /// A certificate (or array of certificates if a certificate-chain is used) used to signed this APK, represented as a base64 encoded byte array.
+    /// A certificate (or array of certificates if a certificate-chain is used)
+    /// used to sign this APK, represented as a base64 encoded byte array.
     #[serde(rename="certificateBase64s")]
     pub certificate_base64s: Option<Vec<String>>,
     /// The URL at which the APK is hosted. This must be an https URL.
@@ -913,13 +1051,15 @@ pub struct ExternallyHostedApk {
     /// The maximum SDK supported by this APK (optional).
     #[serde(rename="maximumSdk")]
     pub maximum_sdk: Option<i32>,
-    /// The SHA256 checksum of this APK, represented as a base64 encoded byte array.
+    /// The sha256 checksum of this APK, represented as a base64 encoded byte
+    /// array.
     #[serde(rename="fileSha256Base64")]
     pub file_sha256_base64: Option<String>,
     /// The permissions requested by this APK.
     #[serde(rename="usesPermissions")]
-    pub uses_permissions: Option<Vec<ExternallyHostedApkUsesPermission>>,
-    /// The SHA1 checksum of this APK, represented as a base64 encoded byte array.
+    pub uses_permissions: Option<Vec<UsesPermission>>,
+    /// The sha1 checksum of this APK, represented as a base64 encoded byte
+    /// array.
     #[serde(rename="fileSha1Base64")]
     pub file_sha1_base64: Option<String>,
     /// The features required by this APK (optional).
@@ -951,7 +1091,7 @@ pub struct ExternallyHostedApk {
 impl Part for ExternallyHostedApk {}
 
 
-/// There is no detailed description.
+/// The app details. The resource for DetailsService.
 /// 
 /// # Activities
 /// 
@@ -982,7 +1122,7 @@ impl RequestValue for AppDetails {}
 impl ResponseResult for AppDetails {}
 
 
-/// There is no detailed description.
+/// Request for the purchases.subscriptions.acknowledge API.
 /// 
 /// # Activities
 /// 
@@ -1001,72 +1141,23 @@ pub struct SubscriptionPurchasesAcknowledgeRequest {
 impl RequestValue for SubscriptionPurchasesAcknowledgeRequest {}
 
 
-/// There is no detailed description.
+/// Release notes specification, i.e. language and text.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedText {
-    /// The text in the given `language`.
+    /// The text in the given language.
     pub text: Option<String>,
-    /// The language code, in BCP 47 format (eg "en-US").
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     pub language: Option<String>,
 }
 
 impl Part for LocalizedText {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [variants create systemapks](struct.SystemapkVariantCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SystemApkVariantsCreateRequest {
-    /// no description provided
-    #[serde(rename="deviceSpec")]
-    pub device_spec: Option<DeviceSpec>,
-}
-
-impl RequestValue for SystemApkVariantsCreateRequest {}
-
-
-/// A permission used by this APK.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExternallyHostedApkUsesPermission {
-    /// Optionally, the maximum SDK version for which the permission is required.
-    #[serde(rename="maxSdkVersion")]
-    pub max_sdk_version: Option<i32>,
-    /// The name of the permission requested.
-    pub name: Option<String>,
-}
-
-impl Part for ExternallyHostedApkUsesPermission {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InAppProductListing {
-    /// no description provided
-    pub description: Option<String>,
-    /// no description provided
-    pub title: Option<String>,
-}
-
-impl Part for InAppProductListing {}
-
-
-/// There is no detailed description.
+/// Request for the product.purchases.acknowledge API.
 /// 
 /// # Activities
 /// 
@@ -1085,7 +1176,7 @@ pub struct ProductPurchasesAcknowledgeRequest {
 impl RequestValue for ProductPurchasesAcknowledgeRequest {}
 
 
-/// There is no detailed description.
+/// Response listing all tracks.
 /// 
 /// # Activities
 /// 
@@ -1096,16 +1187,16 @@ impl RequestValue for ProductPurchasesAcknowledgeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TracksListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#tracksListResponse".
+    /// The kind of this response ("androidpublisher#tracksListResponse").
     pub kind: Option<String>,
-    /// no description provided
+    /// All tracks.
     pub tracks: Option<Vec<Track>>,
 }
 
 impl ResponseResult for TracksListResponse {}
 
 
-/// There is no detailed description.
+/// Response for the purchases.subscriptions.defer API.
 /// 
 /// # Activities
 /// 
@@ -1124,21 +1215,82 @@ pub struct SubscriptionPurchasesDeferResponse {
 impl ResponseResult for SubscriptionPurchasesDeferResponse {}
 
 
-/// Information provided by the user when they complete the subscription cancellation flow (cancellation reason survey).
+/// Response listing all in-app products.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list inappproducts](struct.InappproductListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsListResponse {
+    /// The kind of this response ("androidpublisher#inappproductsListResponse").
+    pub kind: Option<String>,
+    /// Pagination token, to handle a number of products that is over one page.
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// Information about the current page.
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+    /// All in-app products.
+    pub inappproduct: Option<Vec<InAppProduct>>,
+}
+
+impl ResponseResult for InappproductsListResponse {}
+
+
+/// Contains the introductory price information for a subscription.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IntroductoryPriceInfo {
+    /// Introductory price period, specified in ISO 8601 format.
+    /// Common values are (but not limited to) "P1W" (one
+    /// week), "P1M" (one month), "P3M" (three months), "P6M" (six months),
+    /// and "P1Y" (one year).
+    #[serde(rename="introductoryPricePeriod")]
+    pub introductory_price_period: Option<String>,
+    /// ISO 4217 currency code for the introductory subscription price.
+    /// For example, if the price is specified in British pounds sterling,
+    /// price_currency_code is "GBP".
+    #[serde(rename="introductoryPriceCurrencyCode")]
+    pub introductory_price_currency_code: Option<String>,
+    /// Introductory price of the subscription, not including tax.
+    /// The currency is the same as price_currency_code. Price is
+    /// expressed in micro-units, where 1,000,000 micro-units represents one unit
+    /// of the currency. For example, if the subscription price is €1.99,
+    /// price_amount_micros is 1990000.
+    #[serde(rename="introductoryPriceAmountMicros")]
+    pub introductory_price_amount_micros: Option<String>,
+    /// The number of billing period to offer introductory pricing.
+    #[serde(rename="introductoryPriceCycles")]
+    pub introductory_price_cycles: Option<i32>,
+}
+
+impl Part for IntroductoryPriceInfo {}
+
+
+/// Information provided by the user when they complete the subscription
+/// cancellation flow (cancellation reason survey).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionCancelSurveyResult {
-    /// The cancellation reason the user chose in the survey. Possible values are:  
-    /// - Other 
-    /// - I don't use this service enough 
-    /// - Technical issues 
-    /// - Cost-related reasons 
-    /// - I found a better app
+    /// The cancellation reason the user chose in the survey.
+    /// Possible values are:
+    /// 0. Other
+    /// 1. I don't use this service enough
+    /// 2. Technical issues
+    /// 3. Cost-related reasons
+    /// 4. I found a better app
     #[serde(rename="cancelSurveyReason")]
     pub cancel_survey_reason: Option<i32>,
-    /// The customized input cancel reason from the user. Only present when cancelReason is 0.
+    /// The customized input cancel reason from the user. Only present when
+    /// cancelReason is 0.
     #[serde(rename="userInputCancelReason")]
     pub user_input_cancel_reason: Option<String>,
 }
@@ -1146,44 +1298,53 @@ pub struct SubscriptionCancelSurveyResult {
 impl Part for SubscriptionCancelSurveyResult {}
 
 
-/// There is no detailed description.
+/// User entry from conversation between user and developer.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserComment {
-    /// Integer version code of the app as installed at the time the review was written. May be absent.
+    /// Integer version code of the app as installed at the time the
+    /// review was written. May be absent.
     #[serde(rename="appVersionCode")]
     pub app_version_code: Option<i32>,
-    /// Untranslated text of the review, in the case where the review has been translated. If the review has not been translated this is left blank.
+    /// Untranslated text of the review, where the review was translated.
+    /// If the review was not translated this is left blank.
     #[serde(rename="originalText")]
     pub original_text: Option<String>,
-    /// Language code for the reviewer. This is taken from the device settings so is not guaranteed to match the language the review is written in. May be absent.
+    /// Language code for the reviewer. This is taken from the device
+    /// settings so is not guaranteed to match the language the review
+    /// is written in. May be absent.
     #[serde(rename="reviewerLanguage")]
     pub reviewer_language: Option<String>,
     /// The last time at which this comment was updated.
     #[serde(rename="lastModified")]
     pub last_modified: Option<Timestamp>,
-    /// Number of users who have given this review a thumbs up
+    /// Number of users who have given this review a thumbs up.
     #[serde(rename="thumbsUpCount")]
     pub thumbs_up_count: Option<i32>,
     /// The star rating associated with the review, from 1 to 5.
     #[serde(rename="starRating")]
     pub star_rating: Option<i32>,
-    /// The content of the comment, i.e. review body. In some cases users have been able to write a review with separate title and body; in those cases the title and body are concatenated and separated by a tab character.
+    /// The content of the comment, i.e. review body. In some cases
+    /// users have been able to write a review with separate title and
+    /// body; in those cases the title and body are concatenated and
+    /// separated by a tab character.
     pub text: Option<String>,
     /// Codename for the reviewer's device, e.g. klte, flounder. May be absent.
     pub device: Option<String>,
-    /// Integer Android SDK version of the user's device at the time the review was written, e.g. 23 is Marshmallow. May be absent.
+    /// Integer Android SDK version of the user's device at the time the
+    /// review was written, e.g. 23 is Marshmallow. May be absent.
     #[serde(rename="androidOsVersion")]
     pub android_os_version: Option<i32>,
-    /// Some information about the characteristics of the user's device
+    /// Information about the characteristics of the user's device.
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
-    /// String version name of the app as installed at the time the review was written. May be absent.
+    /// String version name of the app as installed at the time the
+    /// review was written. May be absent.
     #[serde(rename="appVersionName")]
     pub app_version_name: Option<String>,
-    /// Number of users who have given this review a thumbs down
+    /// Number of users who have given this review a thumbs down.
     #[serde(rename="thumbsDownCount")]
     pub thumbs_down_count: Option<i32>,
 }
@@ -1191,13 +1352,24 @@ pub struct UserComment {
 impl Part for UserComment {}
 
 
-/// There is no detailed description.
+/// Pagination information returned by a List operation when token pagination
+/// is enabled.
+/// 
+/// List operations that supports paging return only one "page" of results. This
+/// protocol buffer message describes the page that has been returned.
+/// 
+/// When using token pagination, clients should use the next/previous token
+/// to get another page of the result. The presence or absence of next/previous
+/// token indicates whether a next/previous page is available and provides a
+/// mean of accessing this page. ListRequest.page_token should be set to either
+/// next_page_token or previous_page_token to access another page.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TokenPagination {
-    /// no description provided
+    /// Tokens to pass to the standard list field 'page_token'. Whenever available,
+    /// tokens are preferred over manipulating start_index.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
@@ -1208,7 +1380,83 @@ pub struct TokenPagination {
 impl Part for TokenPagination {}
 
 
-/// There is no detailed description.
+/// Response for the voidedpurchases.list API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [voidedpurchases list purchases](struct.PurchaseVoidedpurchaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VoidedPurchasesListResponse {
+    /// no description provided
+    #[serde(rename="voidedPurchases")]
+    pub voided_purchases: Option<Vec<VoidedPurchase>>,
+    /// Pagination information for token pagination.
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// General pagination information.
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for VoidedPurchasesListResponse {}
+
+
+/// Response to list previously created system APK variants.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [variants list systemapks](struct.SystemapkVariantListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SystemApksListResponse {
+    /// All system APK variants created.
+    pub variants: Option<Vec<Variant>>,
+}
+
+impl ResponseResult for SystemApksListResponse {}
+
+
+/// A permission used by this APK.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsesPermission {
+    /// Optionally, the maximum SDK version for which the permission is
+    /// required.
+    #[serde(rename="maxSdkVersion")]
+    pub max_sdk_version: Option<i32>,
+    /// The name of the permission requested.
+    pub name: Option<String>,
+}
+
+impl Part for UsesPermission {}
+
+
+/// Developer entry from conversation between user and developer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeveloperComment {
+    /// The last time at which this comment was updated.
+    #[serde(rename="lastModified")]
+    pub last_modified: Option<Timestamp>,
+    /// The content of the comment, i.e. reply body.
+    pub text: Option<String>,
+}
+
+impl Part for DeveloperComment {}
+
+
+/// The testers of an app. The resource for TestersService.
 /// 
 /// # Activities
 /// 
@@ -1221,25 +1469,65 @@ impl Part for TokenPagination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Testers {
-    /// A list of all Google Groups, as email addresses, that define testers for this track.
+    /// All testing Google Groups, as email addresses.
     #[serde(rename="googleGroups")]
     pub google_groups: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="autoEnrolledAndroidGroups")]
-    pub auto_enrolled_android_groups: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="autoEnrolledGoogleGroups")]
-    pub auto_enrolled_google_groups: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="excludedGoogleGroups")]
-    pub excluded_google_groups: Option<Vec<String>>,
 }
 
 impl RequestValue for Testers {}
 impl ResponseResult for Testers {}
 
 
-/// There is no detailed description.
+/// A VoidedPurchase resource indicates a purchase that was either
+/// canceled/refunded/charged-back.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VoidedPurchase {
+    /// The order id which uniquely identifies a one-time purchase, subscription
+    /// purchase, or subscription renewal.
+    #[serde(rename="orderId")]
+    pub order_id: Option<String>,
+    /// This kind represents a voided purchase object in the androidpublisher
+    /// service.
+    pub kind: Option<String>,
+    /// The time at which the purchase was canceled/refunded/charged-back,
+    /// in milliseconds since the epoch (Jan 1, 1970).
+    #[serde(rename="voidedTimeMillis")]
+    pub voided_time_millis: Option<String>,
+    /// The token which uniquely identifies a one-time purchase or subscription.
+    /// To uniquely identify subscription renewals use order_id (available
+    /// starting from version 3 of the API).
+    #[serde(rename="purchaseToken")]
+    pub purchase_token: Option<String>,
+    /// The initiator of voided purchase, possible values are:
+    /// 0. User
+    /// 1. Developer
+    /// 2. Google
+    #[serde(rename="voidedSource")]
+    pub voided_source: Option<i32>,
+    /// The reason why the purchase was voided, possible values are:
+    /// 0. Other
+    /// 1. Remorse
+    /// 2. Not_received
+    /// 3. Defective
+    /// 4. Accidental_purchase
+    /// 5. Fraud
+    /// 6. Friendly_fraud
+    /// 7. Chargeback
+    #[serde(rename="voidedReason")]
+    pub voided_reason: Option<i32>,
+    /// The time at which the purchase was made, in milliseconds since the
+    /// epoch (Jan 1, 1970).
+    #[serde(rename="purchaseTimeMillis")]
+    pub purchase_time_millis: Option<String>,
+}
+
+impl Part for VoidedPurchase {}
+
+
+/// An expansion file. The resource for ExpansionFilesService.
 /// 
 /// # Activities
 /// 
@@ -1252,10 +1540,13 @@ impl ResponseResult for Testers {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExpansionFile {
-    /// If set this APK's Expansion File references another APK's Expansion File. The file_size field will not be set.
+    /// If set, this APK's expansion file references another APK's expansion file.
+    /// The file_size field will not be set.
     #[serde(rename="referencesVersion")]
     pub references_version: Option<i32>,
-    /// If set this field indicates that this APK has an Expansion File uploaded to it: this APK does not reference another APK's Expansion File. The field's value is the size of the uploaded Expansion File in bytes.
+    /// If set, this field indicates that this APK has an expansion file uploaded
+    /// to it: this APK does not reference another APK's expansion file.
+    /// The field's value is the size of the uploaded expansion file in bytes.
     #[serde(rename="fileSize")]
     pub file_size: Option<String>,
 }
@@ -1264,27 +1555,7 @@ impl RequestValue for ExpansionFile {}
 impl ResponseResult for ExpansionFile {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Control {
-    /// no description provided
-    #[serde(rename="stratifiedSamplings")]
-    pub stratified_samplings: Option<Vec<StratifiedSampling>>,
-    /// no description provided
-    #[serde(rename="modRanges")]
-    pub mod_ranges: Option<Vec<ModRange>>,
-    /// no description provided
-    #[serde(rename="versionCodes")]
-    pub version_codes: Option<Vec<String>>,
-}
-
-impl Part for Control {}
-
-
-/// There is no detailed description.
+/// Response for creating a new externally hosted APK.
 /// 
 /// # Activities
 /// 
@@ -1303,7 +1574,224 @@ pub struct ApksAddExternallyHostedResponse {
 impl ResponseResult for ApksAddExternallyHostedResponse {}
 
 
-/// There is no detailed description.
+/// An entry of conversation between user and developer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Comment {
+    /// A comment from a developer.
+    #[serde(rename="developerComment")]
+    pub developer_comment: Option<DeveloperComment>,
+    /// A comment from a user.
+    #[serde(rename="userComment")]
+    pub user_comment: Option<UserComment>,
+}
+
+impl Part for Comment {}
+
+
+/// A SubscriptionPurchase resource indicates the status of a user's
+/// subscription purchase.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions get purchases](struct.PurchaseSubscriptionGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionPurchase {
+    /// The order id of the latest recurring order associated with
+    /// the purchase of the subscription.
+    #[serde(rename="orderId")]
+    pub order_id: Option<String>,
+    /// User account identifier in the third-party service.
+    /// Only present if account linking happened as part of the subscription
+    /// purchase flow.
+    #[serde(rename="externalAccountId")]
+    pub external_account_id: Option<String>,
+    /// The type of promotion applied on this purchase. This field is only set if
+    /// a promotion is applied when the subscription was purchased. Possible
+    /// values are:
+    /// 0. One time code
+    /// 1. Vanity code
+    #[serde(rename="promotionType")]
+    pub promotion_type: Option<i32>,
+    /// ISO 3166-1 alpha-2 billing country/region code of the user at the time
+    /// the subscription was granted.
+    #[serde(rename="countryCode")]
+    pub country_code: Option<String>,
+    /// A developer-specified string that contains supplemental
+    /// information about an order.
+    #[serde(rename="developerPayload")]
+    pub developer_payload: Option<String>,
+    /// The family name of the user when the subscription was purchased.
+    /// Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="familyName")]
+    pub family_name: Option<String>,
+    /// Whether the subscription will automatically be renewed when it
+    /// reaches its current expiry time.
+    #[serde(rename="autoRenewing")]
+    pub auto_renewing: Option<bool>,
+    /// The payment state of the subscription. Possible values are:
+    /// 0. Payment pending
+    /// 1. Payment received
+    /// 2. Free trial
+    /// 3. Pending deferred upgrade/downgrade
+    #[serde(rename="paymentState")]
+    pub payment_state: Option<i32>,
+    /// The email address of the user when the subscription was purchased.
+    /// Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="emailAddress")]
+    pub email_address: Option<String>,
+    /// The reason why a subscription was canceled or is not auto-renewing.
+    /// Possible values are:
+    /// 0. User canceled the subscription
+    /// 
+    /// 1. Subscription was canceled by the system,
+    ///    for example because of a billing problem
+    /// 1. Subscription was replaced with a new subscription
+    /// 1. Subscription was canceled by the developer
+    #[serde(rename="cancelReason")]
+    pub cancel_reason: Option<i32>,
+    /// The profile name of the user when the subscription was purchased.
+    /// Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="profileName")]
+    pub profile_name: Option<String>,
+    /// Time at which the subscription was granted, in milliseconds
+    /// since the Epoch.
+    #[serde(rename="startTimeMillis")]
+    pub start_time_millis: Option<String>,
+    /// The time at which the subscription was canceled by the user, in
+    /// milliseconds since the epoch. Only present if cancelReason is 0.
+    #[serde(rename="userCancellationTimeMillis")]
+    pub user_cancellation_time_millis: Option<String>,
+    /// Price of the subscription, not including tax. Price is expressed
+    /// in micro-units, where 1,000,000 micro-units represents one unit of
+    /// the currency. For example, if the subscription price is &euro;1.99,
+    /// price_amount_micros is 1990000.
+    #[serde(rename="priceAmountMicros")]
+    pub price_amount_micros: Option<String>,
+    /// This kind represents a subscriptionPurchase object in the androidpublisher
+    /// service.
+    pub kind: Option<String>,
+    /// The acknowledgement state of the subscription product. Possible values
+    /// are:
+    /// 0. Yet to be acknowledged
+    /// 1. Acknowledged
+    #[serde(rename="acknowledgementState")]
+    pub acknowledgement_state: Option<i32>,
+    /// Introductory price information of the subscription. This is only present
+    /// when the subscription was purchased with an introductory price.
+    /// 
+    /// This field does not indicate the subscription is currently in introductory
+    /// price period.
+    #[serde(rename="introductoryPriceInfo")]
+    pub introductory_price_info: Option<IntroductoryPriceInfo>,
+    /// The latest price change information available. This is present only when
+    /// there is an upcoming price change for the subscription yet to be applied.
+    /// 
+    /// Once the subscription renews with the new price or the subscription is
+    /// canceled, no price change information will be returned.
+    #[serde(rename="priceChange")]
+    pub price_change: Option<SubscriptionPriceChange>,
+    /// The type of purchase of the subscription. This field is only set if
+    /// this purchase was not made using the standard in-app billing flow.
+    /// Possible values are:
+    /// 0. Test (i.e. purchased from a license testing account)
+    /// 1. Promo (i.e. purchased using a promo code)
+    #[serde(rename="purchaseType")]
+    pub purchase_type: Option<i32>,
+    /// ISO 4217 currency code for the subscription price. For example,
+    /// if the price is specified in British pounds sterling,
+    /// price_currency_code is "GBP".
+    #[serde(rename="priceCurrencyCode")]
+    pub price_currency_code: Option<String>,
+    /// Time at which the subscription will be automatically resumed, in
+    /// milliseconds since the Epoch. Only present if the user has requested to
+    /// pause the subscription.
+    #[serde(rename="autoResumeTimeMillis")]
+    pub auto_resume_time_millis: Option<String>,
+    /// An obfuscated version of the id that is uniquely associated with the
+    /// user's profile in your app. Only present if specified using
+    /// https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.Builder#setobfuscatedprofileid
+    /// when the purchase was made.
+    #[serde(rename="obfuscatedExternalProfileId")]
+    pub obfuscated_external_profile_id: Option<String>,
+    /// Time at which the subscription will expire, in milliseconds
+    /// since the Epoch.
+    #[serde(rename="expiryTimeMillis")]
+    pub expiry_time_millis: Option<String>,
+    /// Information provided by the user when they complete the subscription
+    /// cancellation flow (cancellation reason survey).
+    #[serde(rename="cancelSurveyResult")]
+    pub cancel_survey_result: Option<SubscriptionCancelSurveyResult>,
+    /// An obfuscated version of the id that is uniquely associated with the
+    /// user's account in your app. Present for the following purchases:
+    /// 
+    /// * If account linking happened as part of the subscription purchase flow.
+    /// * It was specified using
+    ///   https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.Builder#setobfuscatedaccountid
+    ///   when the purchase was made.
+    #[serde(rename="obfuscatedExternalAccountId")]
+    pub obfuscated_external_account_id: Option<String>,
+    /// The Google profile id of the user when the subscription was purchased.
+    /// Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="profileId")]
+    pub profile_id: Option<String>,
+    /// The purchase token of the originating purchase if this subscription
+    /// is one of the following:
+    /// 0. Re-signup of a canceled but non-lapsed subscription
+    /// 1. Upgrade/downgrade from a previous subscription
+    /// 
+    /// For example, suppose a user originally signs up and you receive
+    /// purchase token X, then the user cancels and goes through the
+    /// resignup flow (before their subscription lapses) and you receive
+    /// purchase token Y, and finally the user upgrades their subscription
+    /// and you receive purchase token Z. If you call this API with purchase
+    /// token Z, this field will be set to Y. If you call this API with
+    /// purchase token Y, this field will be set to X. If you call this API
+    /// with purchase token X, this field will not be set.
+    #[serde(rename="linkedPurchaseToken")]
+    pub linked_purchase_token: Option<String>,
+    /// The given name of the user when the subscription was purchased.
+    /// Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="givenName")]
+    pub given_name: Option<String>,
+    /// The promotion code applied on this purchase. This field is only set if
+    /// a vanity code promotion is applied when the subscription was purchased.
+    #[serde(rename="promotionCode")]
+    pub promotion_code: Option<String>,
+}
+
+impl ResponseResult for SubscriptionPurchase {}
+
+
+/// The device spec used to generate a system APK.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceSpec {
+    /// Screen dpi.
+    #[serde(rename="screenDensity")]
+    pub screen_density: Option<u32>,
+    /// Supported ABI architectures in the order of preference.
+    /// The values should be the string as reported by the platform, e.g.
+    /// "armeabi-v7a", "x86_64".
+    #[serde(rename="supportedAbis")]
+    pub supported_abis: Option<Vec<String>>,
+    /// All installed locales represented as BCP-47 strings, e.g. "en-US".
+    #[serde(rename="supportedLocales")]
+    pub supported_locales: Option<Vec<String>>,
+}
+
+impl Part for DeviceSpec {}
+
+
+/// Responses for the upload.
 /// 
 /// # Activities
 /// 
@@ -1314,7 +1802,7 @@ impl ResponseResult for ApksAddExternallyHostedResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeobfuscationFilesUploadResponse {
-    /// no description provided
+    /// The uploaded Deobfuscation File configuration.
     #[serde(rename="deobfuscationFile")]
     pub deobfuscation_file: Option<DeobfuscationFile>,
 }
@@ -1322,7 +1810,7 @@ pub struct DeobfuscationFilesUploadResponse {
 impl ResponseResult for DeobfuscationFilesUploadResponse {}
 
 
-/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
+/// An app edit. The resource for EditsService.
 /// 
 /// # Activities
 /// 
@@ -1336,10 +1824,11 @@ impl ResponseResult for DeobfuscationFilesUploadResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppEdit {
-    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
+    /// Output only. The time (as seconds since Epoch) at which the edit will expire and
+    /// will be no longer valid for use.
     #[serde(rename="expiryTimeSeconds")]
     pub expiry_time_seconds: Option<String>,
-    /// The ID of the edit that can be used in subsequent API calls.
+    /// Output only. Identifier of the edit. Can be used in subsequent API calls.
     pub id: Option<String>,
 }
 
@@ -1347,31 +1836,91 @@ impl RequestValue for AppEdit {}
 impl ResponseResult for AppEdit {}
 
 
-/// There is no detailed description.
+/// Response listing all APKs.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [apks list edits](struct.EditApkListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApksListResponse {
+    /// All APKs.
+    pub apks: Option<Vec<Apk>>,
+    /// The kind of this response ("androidpublisher#apksListResponse").
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for ApksListResponse {}
+
+
+/// Information about the current page.
+/// 
+/// List operations that supports paging return only one "page" of results. This
+/// protocol buffer message describes the page that has been returned.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Sampling {
-    /// no description provided
-    #[serde(rename="stratifiedSamplings")]
-    pub stratified_samplings: Option<Vec<StratifiedSampling>>,
-    /// no description provided
-    pub modulus: Option<String>,
-    /// no description provided
-    #[serde(rename="modRanges")]
-    pub mod_ranges: Option<Vec<ModRange>>,
-    /// no description provided
-    pub salt: Option<i32>,
-    /// no description provided
-    #[serde(rename="useAndroidId")]
-    pub use_android_id: Option<bool>,
+pub struct PageInfo {
+    /// Maximum number of results returned in one page.
+    /// ! The number of results included in the API response.
+    #[serde(rename="resultPerPage")]
+    pub result_per_page: Option<i32>,
+    /// Index of the first result returned in the current page.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// Total number of results available on the backend
+    /// ! The total number of results in the result set.
+    #[serde(rename="totalResults")]
+    pub total_results: Option<i32>,
 }
 
-impl Part for Sampling {}
+impl Part for PageInfo {}
 
 
-/// There is no detailed description.
+/// Response for uploading an image.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [images upload edits](struct.EditImageUploadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImagesUploadResponse {
+    /// The uploaded image.
+    pub image: Option<Image>,
+}
+
+impl ResponseResult for ImagesUploadResponse {}
+
+
+/// Information about an APK. The resource for ApksService.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [apks upload edits](struct.EditApkUploadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Apk {
+    /// The version code of the APK, as specified in the manifest file.
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
+    /// Information about the binary payload of this APK.
+    pub binary: Option<ApkBinary>,
+}
+
+impl ResponseResult for Apk {}
+
+
+/// The result of replying/updating a reply to review.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1388,7 +1937,50 @@ pub struct ReviewReplyResult {
 impl Part for ReviewReplyResult {}
 
 
-/// There is no detailed description.
+/// A track configuration. The resource for TracksService.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [tracks update edits](struct.EditTrackUpdateCall.html) (request|response)
+/// * [tracks patch edits](struct.EditTrackPatchCall.html) (request|response)
+/// * [tracks get edits](struct.EditTrackGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Track {
+    /// Identifier of the track.
+    pub track: Option<String>,
+    /// In a read request, represents all active releases in the track.
+    /// In an update request, represents desired changes.
+    pub releases: Option<Vec<TrackRelease>>,
+}
+
+impl RequestValue for Track {}
+impl ResponseResult for Track {}
+
+
+/// An uploaded image. The resource for ImagesService.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Image {
+    /// A URL that will serve a preview of the image.
+    pub url: Option<String>,
+    /// A sha256 hash of the image.
+    pub sha256: Option<String>,
+    /// A unique id representing this image.
+    pub id: Option<String>,
+    /// A sha1 hash of the image.
+    pub sha1: Option<String>,
+}
+
+impl Part for Image {}
+
+
+/// Request to create a new externally hosted APK.
 /// 
 /// # Activities
 /// 
@@ -1407,601 +1999,7 @@ pub struct ApksAddExternallyHostedRequest {
 impl RequestValue for ApksAddExternallyHostedRequest {}
 
 
-/// Represents the binary payload of an APK.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApkBinary {
-    /// A sha256 hash of the APK payload, encoded as a hex string and matching the output of the sha256sum command.
-    pub sha256: Option<String>,
-    /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.
-    pub sha1: Option<String>,
-}
-
-impl Part for ApkBinary {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [listings list edits](struct.EditListingListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListingsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#listingsListResponse".
-    pub kind: Option<String>,
-    /// no description provided
-    pub listings: Option<Vec<Listing>>,
-}
-
-impl ResponseResult for ListingsListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ModRange {
-    /// no description provided
-    pub start: Option<String>,
-    /// no description provided
-    pub end: Option<String>,
-}
-
-impl Part for ModRange {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list reviews](struct.ReviewListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReviewsListResponse {
-    /// no description provided
-    pub reviews: Option<Vec<Review>>,
-    /// no description provided
-    #[serde(rename="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
-    /// no description provided
-    #[serde(rename="pageInfo")]
-    pub page_info: Option<PageInfo>,
-}
-
-impl ResponseResult for ReviewsListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch inappproducts](struct.InappproductPatchCall.html) (request|response)
-/// * [insert inappproducts](struct.InappproductInsertCall.html) (request|response)
-/// * [get inappproducts](struct.InappproductGetCall.html) (response)
-/// * [update inappproducts](struct.InappproductUpdateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InAppProduct {
-    /// The stock-keeping-unit (SKU) of the product, unique within an app.
-    pub sku: Option<String>,
-    /// no description provided
-    pub status: Option<String>,
-    /// Subscription period, specified in ISO 8601 format. Acceptable values are "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
-    #[serde(rename="subscriptionPeriod")]
-    pub subscription_period: Option<String>,
-    /// Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = "P3D" (three days), "P7D" (seven days), "P14D" (fourteen days), and "P30D" (thirty days)
-    #[serde(rename="gracePeriod")]
-    pub grace_period: Option<String>,
-    /// The package name of the parent app.
-    #[serde(rename="packageName")]
-    pub package_name: Option<String>,
-    /// List of localized title and description data.
-    pub listings: Option<HashMap<String, InAppProductListing>>,
-    /// Trial period, specified in ISO 8601 format. Acceptable values are anything between "P7D" (seven days) and "P999D" (999 days). Seasonal subscriptions cannot have a trial period.
-    #[serde(rename="trialPeriod")]
-    pub trial_period: Option<String>,
-    /// Purchase type enum value. Unmodifiable after creation.
-    #[serde(rename="purchaseType")]
-    pub purchase_type: Option<String>,
-    /// The default language of the localized data, as defined by BCP 47. e.g. "en-US", "en-GB".
-    #[serde(rename="defaultLanguage")]
-    pub default_language: Option<String>,
-    /// Prices per buyer region. None of these prices should be zero. In-app products can never be free.
-    pub prices: Option<HashMap<String, Price>>,
-    /// Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency.
-    #[serde(rename="defaultPrice")]
-    pub default_price: Option<Price>,
-}
-
-impl RequestValue for InAppProduct {}
-impl Resource for InAppProduct {}
-impl ResponseResult for InAppProduct {}
-
-
-/// Contains the price change information for a subscription that can be used to control the user journey for the price change in the app. This can be in the form of seeking confirmation from the user or tailoring the experience for a successful conversion.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPriceChange {
-    /// The current state of the price change. Possible values are:  
-    /// - Outstanding: State for a pending price change waiting for the user to agree. In this state, you can optionally seek confirmation from the user using the In-App API. 
-    /// - Accepted: State for an accepted price change that the subscription will renew with unless it's canceled. The price change takes effect on a future date when the subscription renews. Note that the change might not occur when the subscription is renewed next.
-    pub state: Option<i32>,
-    /// The new price the subscription will renew with if the price change is accepted by the user.
-    #[serde(rename="newPrice")]
-    pub new_price: Option<Price>,
-}
-
-impl Part for SubscriptionPriceChange {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StratifiedSampling {
-    /// no description provided
-    #[serde(rename="modRanges")]
-    pub mod_ranges: Option<Vec<ModRange>>,
-    /// no description provided
-    pub stratum: Option<Stratum>,
-}
-
-impl Part for StratifiedSampling {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [images deleteall edits](struct.EditImageDeleteallCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ImagesDeleteAllResponse {
-    /// no description provided
-    pub deleted: Option<Vec<Image>>,
-}
-
-impl ResponseResult for ImagesDeleteAllResponse {}
-
-
-/// An artifact resource which gets created when uploading an APK or Android App Bundle through internal app sharing.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [uploadapk internalappsharingartifacts](struct.InternalappsharingartifactUploadapkCall.html) (response)
-/// * [uploadbundle internalappsharingartifacts](struct.InternalappsharingartifactUploadbundleCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InternalAppSharingArtifact {
-    /// The download URL generated for the uploaded artifact. Users that are authorized to download can follow the link to the Play Store app to install it.
-    #[serde(rename="downloadUrl")]
-    pub download_url: Option<String>,
-    /// The SHA-256 hash of the artifact represented as a lowercase hexadecimal number, matching the output of the sha256sum command.
-    pub sha256: Option<String>,
-    /// The SHA256 fingerprint of the certificate used to signed the generated artifact.
-    #[serde(rename="certificateFingerprint")]
-    pub certificate_fingerprint: Option<String>,
-}
-
-impl Resource for InternalAppSharingArtifact {}
-impl ResponseResult for InternalAppSharingArtifact {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Price {
-    /// 3 letter Currency code, as defined by ISO 4217.
-    pub currency: Option<String>,
-    /// The price in millionths of the currency base unit represented as a string.
-    #[serde(rename="priceMicros")]
-    pub price_micros: Option<String>,
-}
-
-impl Part for Price {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchasesDeferRequest {
-    /// The information about the new desired expiry time for the subscription.
-    #[serde(rename="deferralInfo")]
-    pub deferral_info: Option<SubscriptionDeferralInfo>,
-}
-
-impl RequestValue for SubscriptionPurchasesDeferRequest {}
-
-
-/// Represents the variant of a generated system APK from an uploaded App Bundle.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [variants create systemapks](struct.SystemapkVariantCreateCall.html) (response)
-/// * [variants get systemapks](struct.SystemapkVariantGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Variant {
-    /// no description provided
-    #[serde(rename="deviceSpec")]
-    pub device_spec: Option<DeviceSpec>,
-    /// no description provided
-    #[serde(rename="variantId")]
-    pub variant_id: Option<u32>,
-}
-
-impl ResponseResult for Variant {}
-
-
-/// Represents a deobfuscation file.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeobfuscationFile {
-    /// The type of the deobfuscation file.
-    #[serde(rename="symbolType")]
-    pub symbol_type: Option<String>,
-}
-
-impl Part for DeobfuscationFile {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [variants list systemapks](struct.SystemapkVariantListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SystemApkVariantsListResponse {
-    /// no description provided
-    pub variants: Option<Vec<Variant>>,
-}
-
-impl ResponseResult for SystemApkVariantsListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Stratum {
-    /// no description provided
-    pub brand: Option<String>,
-}
-
-impl Part for Stratum {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list inappproducts](struct.InappproductListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".
-    pub kind: Option<String>,
-    /// no description provided
-    #[serde(rename="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
-    /// no description provided
-    #[serde(rename="pageInfo")]
-    pub page_info: Option<PageInfo>,
-    /// no description provided
-    pub inappproduct: Option<Vec<InAppProduct>>,
-}
-
-impl ResponseResult for InappproductsListResponse {}
-
-
-/// Contains the introductory price information for a subscription.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IntroductoryPriceInfo {
-    /// Introductory price period, specified in ISO 8601 format. Common values are (but not limited to) "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
-    #[serde(rename="introductoryPricePeriod")]
-    pub introductory_price_period: Option<String>,
-    /// ISO 4217 currency code for the introductory subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
-    #[serde(rename="introductoryPriceCurrencyCode")]
-    pub introductory_price_currency_code: Option<String>,
-    /// Introductory price of the subscription, not including tax. The currency is the same as price_currency_code. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
-    #[serde(rename="introductoryPriceAmountMicros")]
-    pub introductory_price_amount_micros: Option<String>,
-    /// The number of billing period to offer introductory pricing.
-    #[serde(rename="introductoryPriceCycles")]
-    pub introductory_price_cycles: Option<i32>,
-}
-
-impl Part for IntroductoryPriceInfo {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [voidedpurchases list purchases](struct.PurchaseVoidedpurchaseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VoidedPurchasesListResponse {
-    /// no description provided
-    #[serde(rename="voidedPurchases")]
-    pub voided_purchases: Option<Vec<VoidedPurchase>>,
-    /// no description provided
-    #[serde(rename="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
-    /// no description provided
-    #[serde(rename="pageInfo")]
-    pub page_info: Option<PageInfo>,
-}
-
-impl ResponseResult for VoidedPurchasesListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeveloperComment {
-    /// The last time at which this comment was updated.
-    #[serde(rename="lastModified")]
-    pub last_modified: Option<Timestamp>,
-    /// The content of the comment, i.e. reply body.
-    pub text: Option<String>,
-}
-
-impl Part for DeveloperComment {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TrackReleasePin {
-    /// no description provided
-    pub targetings: Option<Vec<TrackReleasePinPinTargeting>>,
-    /// no description provided
-    #[serde(rename="versionCodes")]
-    pub version_codes: Option<Vec<String>>,
-}
-
-impl Part for TrackReleasePin {}
-
-
-/// A VoidedPurchase resource indicates a purchase that was either canceled/refunded/charged-back.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VoidedPurchase {
-    /// The order id which uniquely identifies a one-time purchase, subscription purchase, or subscription renewal.
-    #[serde(rename="orderId")]
-    pub order_id: Option<String>,
-    /// This kind represents a voided purchase object in the androidpublisher service.
-    pub kind: Option<String>,
-    /// The time at which the purchase was canceled/refunded/charged-back, in milliseconds since the epoch (Jan 1, 1970).
-    #[serde(rename="voidedTimeMillis")]
-    pub voided_time_millis: Option<String>,
-    /// The token which uniquely identifies a one-time purchase or subscription. To uniquely identify subscription renewals use order_id (available starting from version 3 of the API).
-    #[serde(rename="purchaseToken")]
-    pub purchase_token: Option<String>,
-    /// The initiator of voided purchase, possible values are:  
-    /// - User 
-    /// - Developer 
-    /// - Google
-    #[serde(rename="voidedSource")]
-    pub voided_source: Option<i32>,
-    /// The reason why the purchase was voided, possible values are:  
-    /// - Other 
-    /// - Remorse 
-    /// - Not_received 
-    /// - Defective 
-    /// - Accidental_purchase 
-    /// - Fraud 
-    /// - Friendly_fraud 
-    /// - Chargeback
-    #[serde(rename="voidedReason")]
-    pub voided_reason: Option<i32>,
-    /// The time at which the purchase was made, in milliseconds since the epoch (Jan 1, 1970).
-    #[serde(rename="purchaseTimeMillis")]
-    pub purchase_time_millis: Option<String>,
-}
-
-impl Part for VoidedPurchase {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Comment {
-    /// A comment from a developer.
-    #[serde(rename="developerComment")]
-    pub developer_comment: Option<DeveloperComment>,
-    /// A comment from a user.
-    #[serde(rename="userComment")]
-    pub user_comment: Option<UserComment>,
-}
-
-impl Part for Comment {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceSpec {
-    /// no description provided
-    #[serde(rename="screenDensity")]
-    pub screen_density: Option<u32>,
-    /// no description provided
-    #[serde(rename="supportedAbis")]
-    pub supported_abis: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="supportedLocales")]
-    pub supported_locales: Option<Vec<String>>,
-}
-
-impl Part for DeviceSpec {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Image {
-    /// A URL that will serve a preview of the image.
-    pub url: Option<String>,
-    /// A sha256 hash of the image that was uploaded.
-    pub sha256: Option<String>,
-    /// A unique id representing this image.
-    pub id: Option<String>,
-    /// A sha1 hash of the image that was uploaded.
-    pub sha1: Option<String>,
-}
-
-impl Part for Image {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [apks list edits](struct.EditApkListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApksListResponse {
-    /// no description provided
-    pub apks: Option<Vec<Apk>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for ApksListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [images upload edits](struct.EditImageUploadCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ImagesUploadResponse {
-    /// no description provided
-    pub image: Option<Image>,
-}
-
-impl ResponseResult for ImagesUploadResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [apks upload edits](struct.EditApkUploadCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Apk {
-    /// The version code of the APK, as specified in the APK's manifest file.
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
-    /// Information about the binary payload of this APK.
-    pub binary: Option<ApkBinary>,
-    /// no description provided
-    #[serde(rename="testBinary")]
-    pub test_binary: Option<ApkBinary>,
-}
-
-impl ResponseResult for Apk {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [tracks update edits](struct.EditTrackUpdateCall.html) (request|response)
-/// * [tracks patch edits](struct.EditTrackPatchCall.html) (request|response)
-/// * [tracks get edits](struct.EditTrackGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Track {
-    /// Identifier for this track.
-    pub track: Option<String>,
-    /// A list of all active releases in this track during a read request. On an update request, it represents desired changes.
-    pub releases: Option<Vec<TrackRelease>>,
-}
-
-impl RequestValue for Track {}
-impl ResponseResult for Track {}
-
-
-/// There is no detailed description.
+/// Response on status of replying to a review.
 /// 
 /// # Activities
 /// 
@@ -2012,53 +2010,65 @@ impl ResponseResult for Track {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReviewsReplyResponse {
-    /// no description provided
+    /// The result of replying/updating a reply to review.
     pub result: Option<ReviewReplyResult>,
 }
 
 impl ResponseResult for ReviewsReplyResponse {}
 
 
-/// There is no detailed description.
+/// Represents the binary payload of an APK.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TrackReleasePinPinTargeting {
-    /// no description provided
-    #[serde(rename="countryCodes")]
-    pub country_codes: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="phoneskyVersions")]
-    pub phonesky_versions: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="sdkVersions")]
-    pub sdk_versions: Option<Vec<i32>>,
-    /// no description provided
-    pub devices: Option<Vec<TrackReleasePinPinTargetingDevicePin>>,
+pub struct ApkBinary {
+    /// A sha256 hash of the APK payload, encoded as a hex string and matching
+    /// the output of the sha256sum command.
+    pub sha256: Option<String>,
+    /// A sha1 hash of the APK payload, encoded as a hex string and matching the
+    /// output of the sha1sum command.
+    pub sha1: Option<String>,
 }
 
-impl Part for TrackReleasePinPinTargeting {}
+impl Part for ApkBinary {}
 
 
-/// There is no detailed description.
+/// Definition of a price, i.e. currency and units.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PageInfo {
-    /// no description provided
-    #[serde(rename="resultPerPage")]
-    pub result_per_page: Option<i32>,
-    /// no description provided
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// no description provided
-    #[serde(rename="totalResults")]
-    pub total_results: Option<i32>,
+pub struct Price {
+    /// 3 letter Currency code, as defined by ISO 4217.
+    /// See java/com/google/common/money/CurrencyCode.java
+    pub currency: Option<String>,
+    /// Price in 1/million of the currency base unit, represented as a string.
+    #[serde(rename="priceMicros")]
+    pub price_micros: Option<String>,
 }
 
-impl Part for PageInfo {}
+impl Part for Price {}
+
+
+/// Response listing all localized listings.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [listings list edits](struct.EditListingListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListingsListResponse {
+    /// The kind of this response ("androidpublisher#listingsListResponse").
+    pub kind: Option<String>,
+    /// All localized listings.
+    pub listings: Option<Vec<Listing>>,
+}
+
+impl ResponseResult for ListingsListResponse {}
 
 
 
@@ -2107,13 +2117,16 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring.
+    /// Refunds and immediately revokes a user's subscription purchase. Access to
+    /// the subscription will be terminated immediately and it will stop recurring.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application for which this subscription was
+    ///                   purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `token` - The token provided to the user's device when the subscription was
+    ///             purchased.
     pub fn subscriptions_revoke(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         PurchaseSubscriptionRevokeCall {
             hub: self.hub,
@@ -2132,9 +2145,11 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application the inapp product was sold in (for
+    ///                   example, 'com.some.thing').
     /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
-    /// * `token` - The token provided to the user's device when the inapp product was purchased.
+    /// * `token` - The token provided to the user's device when the inapp product was
+    ///             purchased.
     pub fn products_get(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductGetCall<'a, C, A> {
         PurchaseProductGetCall {
             hub: self.hub,
@@ -2149,13 +2164,16 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks whether a user's subscription purchase is valid and returns its expiry time.
+    /// Checks whether a user's subscription purchase is valid and returns its
+    /// expiry time.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application for which this subscription was
+    ///                   purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `token` - The token provided to the user's device when the subscription was
+    ///             purchased.
     pub fn subscriptions_get(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         PurchaseSubscriptionGetCall {
             hub: self.hub,
@@ -2174,7 +2192,8 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application for which voided purchases need to be
+    ///                   returned (for example, 'com.some.thing').
     pub fn voidedpurchases_list(&self, package_name: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         PurchaseVoidedpurchaseListCall {
             hub: self.hub,
@@ -2193,13 +2212,16 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a user's subscription purchase. The subscription remains valid until its expiration time.
+    /// Cancels a user's subscription purchase. The subscription remains valid
+    /// until its expiration time.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application for which this subscription was
+    ///                   purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `token` - The token provided to the user's device when the subscription was
+    ///             purchased.
     pub fn subscriptions_cancel(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         PurchaseSubscriptionCancelCall {
             hub: self.hub,
@@ -2219,9 +2241,11 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application for which this subscription was
+    ///                   purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `token` - The token provided to the user's device when the subscription was
+    ///             purchased.
     pub fn subscriptions_acknowledge(&self, request: SubscriptionPurchasesAcknowledgeRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionAcknowledgeCall<'a, C, A> {
         PurchaseSubscriptionAcknowledgeCall {
             hub: self.hub,
@@ -2242,9 +2266,11 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application the inapp product was sold in (for
+    ///                   example, 'com.some.thing').
     /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `token` - The token provided to the user's device when the inapp product was
+    ///             purchased.
     pub fn products_acknowledge(&self, request: ProductPurchasesAcknowledgeRequest, package_name: &str, product_id: &str, token: &str) -> PurchaseProductAcknowledgeCall<'a, C, A> {
         PurchaseProductAcknowledgeCall {
             hub: self.hub,
@@ -2260,13 +2286,16 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur.
+    /// Refunds a user's subscription purchase, but the subscription remains valid
+    /// until its expiration time and it will continue to recur.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
-    /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `packageName` - The package name of the application for which this subscription was
+    ///                   purchased (for example, 'com.some.thing').
+    /// * `subscriptionId` - "The purchased subscription ID (for example, 'monthly001').
+    /// * `token` - The token provided to the user's device when the subscription was
+    ///             purchased.
     pub fn subscriptions_refund(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         PurchaseSubscriptionRefundCall {
             hub: self.hub,
@@ -2281,14 +2310,17 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Defers a user's subscription purchase until a specified future expiration time.
+    /// Defers a user's subscription purchase until a specified future expiration
+    /// time.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `packageName` - The package name of the application for which this subscription was
+    ///                   purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
-    /// * `token` - The token provided to the user's device when the subscription was purchased.
+    /// * `token` - The token provided to the user's device when the subscription was
+    ///             purchased.
     pub fn subscriptions_defer(&self, request: SubscriptionPurchasesDeferRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         PurchaseSubscriptionDeferCall {
             hub: self.hub,
@@ -2346,14 +2378,15 @@ impl<'a, C, A> SystemapkMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new variant of APK which is suitable for inclusion in a system image.
+    /// Creates an APK which is suitable for inclusion in a system image from an
+    /// already uploaded Android App Bundle.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Unique identifier of the Android app.
     /// * `versionCode` - The version code of the App Bundle.
-    pub fn variants_create(&self, request: SystemApkVariantsCreateRequest, package_name: &str, version_code: &str) -> SystemapkVariantCreateCall<'a, C, A> {
+    pub fn variants_create(&self, request: Variant, package_name: &str, version_code: &str) -> SystemapkVariantCreateCall<'a, C, A> {
         SystemapkVariantCreateCall {
             hub: self.hub,
             _request: request,
@@ -2371,7 +2404,7 @@ impl<'a, C, A> SystemapkMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Unique identifier of the Android app.
     /// * `versionCode` - The version code of the App Bundle.
     pub fn variants_list(&self, package_name: &str, version_code: &str) -> SystemapkVariantListCall<'a, C, A> {
         SystemapkVariantListCall {
@@ -2386,13 +2419,14 @@ impl<'a, C, A> SystemapkMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Download a previously created APK which is suitable for inclusion in a system image.
+    /// Downloads a previously created system APK which is suitable for inclusion
+    /// in a system image.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Unique identifier of the Android app.
     /// * `versionCode` - The version code of the App Bundle.
-    /// * `variantId` - No description provided.
+    /// * `variantId` - The ID of a previously created system APK variant.
     pub fn variants_download(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantDownloadCall<'a, C, A> {
         SystemapkVariantDownloadCall {
             hub: self.hub,
@@ -2411,9 +2445,9 @@ impl<'a, C, A> SystemapkMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Unique identifier of the Android app.
     /// * `versionCode` - The version code of the App Bundle.
-    /// * `variantId` - Unique identifier for this variant.
+    /// * `variantId` - The ID of a previously created system APK variant.
     pub fn variants_get(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantGetCall<'a, C, A> {
         SystemapkVariantGetCall {
             hub: self.hub,
@@ -2470,13 +2504,13 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reply to a single review, or update an existing reply.
+    /// Replies to a single review, or updates an existing reply.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
-    /// * `reviewId` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `reviewId` - Unique identifier for a review.
     pub fn reply(&self, request: ReviewsReplyRequest, package_name: &str, review_id: &str) -> ReviewReplyCall<'a, C, A> {
         ReviewReplyCall {
             hub: self.hub,
@@ -2491,12 +2525,12 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a single review.
+    /// Gets a single review.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
-    /// * `reviewId` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `reviewId` - Unique identifier for a review.
     pub fn get(&self, package_name: &str, review_id: &str) -> ReviewGetCall<'a, C, A> {
         ReviewGetCall {
             hub: self.hub,
@@ -2511,11 +2545,11 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of reviews. Only reviews from last week will be returned.
+    /// Lists all reviews.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     pub fn list(&self, package_name: &str) -> ReviewListCall<'a, C, A> {
         ReviewListCall {
             hub: self.hub,
@@ -2574,14 +2608,15 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads the deobfuscation file of the specified APK. If a deobfuscation file already exists, it will be replaced.
+    /// Uploads a new deobfuscation file and attaches to the specified APK.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier of the Android app for which the deobfuscatiuon files are being uploaded; for example, "com.spiffygame".
+    /// * `packageName` - Unique identifier for the Android app.
     /// * `editId` - Unique identifier for this edit.
-    /// * `apkVersionCode` - The version code of the APK whose deobfuscation file is being uploaded.
-    /// * `deobfuscationFileType` - No description provided.
+    /// * `apkVersionCode` - The version code of the APK whose Deobfuscation File is being
+    ///                      uploaded.
+    /// * `deobfuscationFileType` - The type of the deobfuscation file.
     pub fn deobfuscationfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, deobfuscation_file_type: &str) -> EditDeobfuscationfileUploadCall<'a, C, A> {
         EditDeobfuscationfileUploadCall {
             hub: self.hub,
@@ -2597,14 +2632,17 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a new image and adds it to the list of images for the specified language and image type.
+    /// Uploads an image of the specified language and image type, and adds to the
+    /// edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    /// * `imageType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
+    ///                Providing a language that is not supported by the App is a no-op.
+    /// * `imageType` - Type of the Image.
     pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a, C, A> {
         EditImageUploadCall {
             hub: self.hub,
@@ -2620,15 +2658,18 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method.
+    /// Updates the APK's expansion file configuration to reference another APK's
+    /// expansion file.
+    /// To add a new expansion file use the Upload method.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
-    /// * `expansionFileType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being
+    ///                      read or modified.
+    /// * `expansionFileType` - The file type of the file configuration which is being read or modified.
     pub fn expansionfiles_update(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         EditExpansionfileUpdateCall {
             hub: self.hub,
@@ -2645,12 +2686,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches app details for this edit. This includes the default language and developer support contact information.
+    /// Gets details of an app.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn details_get(&self, package_name: &str, edit_id: &str) -> EditDetailGetCall<'a, C, A> {
         EditDetailGetCall {
             hub: self.hub,
@@ -2664,12 +2705,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all localized listings from an edit.
+    /// Deletes all store listings.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn listings_deleteall(&self, package_name: &str, edit_id: &str) -> EditListingDeleteallCall<'a, C, A> {
         EditListingDeleteallCall {
             hub: self.hub,
@@ -2683,13 +2724,16 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to enterprises using Google Play for Work whose application is configured to restrict distribution to the enterprise domain.
+    /// Creates a new APK without uploading the APK itself to Google Play, instead
+    /// hosting the APK at a specified URL. This function is only available to
+    /// organizations using Managed Play whose application is configured to
+    /// restrict distribution to the organizations.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn apks_addexternallyhosted(&self, request: ApksAddExternallyHostedRequest, package_name: &str, edit_id: &str) -> EditApkAddexternallyhostedCall<'a, C, A> {
         EditApkAddexternallyhostedCall {
             hub: self.hub,
@@ -2704,13 +2748,13 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates app details for this edit.
+    /// Updates details of an app.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn details_update(&self, request: AppDetails, package_name: &str, edit_id: &str) -> EditDetailUpdateCall<'a, C, A> {
         EditDetailUpdateCall {
             hub: self.hub,
@@ -2725,13 +2769,13 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches the track configuration for the specified track type. Includes the APK version codes that are in this track.
+    /// Gets a track.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `track` - Identifier of the track.
     pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a, C, A> {
         EditTrackGetCall {
             hub: self.hub,
@@ -2746,15 +2790,18 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method. This method supports patch semantics.
+    /// Patches the APK's expansion file configuration to reference another APK's
+    /// expansion file.
+    /// To add a new expansion file use the Upload method.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
-    /// * `expansionFileType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being
+    ///                      read or modified.
+    /// * `expansionFileType` - The file type of the expansion file configuration which is being updated.
     pub fn expansionfiles_patch(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         EditExpansionfilePatchCall {
             hub: self.hub,
@@ -2771,14 +2818,17 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all images for the specified language and image type.
+    /// Lists all images. The response may be empty.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    /// * `imageType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
+    ///                There must be a store listing for the specified language.
+    /// * `imageType` - Type of the Image. Providing an image type that refers to no images will
+    ///                 return an empty response.
     pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a, C, A> {
         EditImageListCall {
             hub: self.hub,
@@ -2794,14 +2844,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the track configuration for the specified track type.
+    /// Updates a track.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `track` - Identifier of the track.
     pub fn tracks_update(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a, C, A> {
         EditTrackUpdateCall {
             hub: self.hub,
@@ -2817,14 +2867,15 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates or updates a localized store listing. This method supports patch semantics.
+    /// Patches a localized store listing.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
     pub fn listings_patch(&self, request: Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingPatchCall<'a, C, A> {
         EditListingPatchCall {
             hub: self.hub,
@@ -2840,12 +2891,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about the edit specified. Calls will fail if the edit is no long active (e.g. has been deleted, superseded or expired).
+    /// Gets an app edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn get(&self, package_name: &str, edit_id: &str) -> EditGetCall<'a, C, A> {
         EditGetCall {
             hub: self.hub,
@@ -2863,10 +2914,11 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    /// * `imageType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
+    /// * `imageType` - Type of the Image.
     /// * `imageId` - Unique identifier an image within the set of images attached to this edit.
     pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a, C, A> {
         EditImageDeleteCall {
@@ -2882,11 +2934,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads an APK and adds to the current edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn apks_upload(&self, package_name: &str, edit_id: &str) -> EditApkUploadCall<'a, C, A> {
         EditApkUploadCall {
             hub: self.hub,
@@ -2898,11 +2953,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all current APKs of the app and edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn apks_list(&self, package_name: &str, edit_id: &str) -> EditApkListCall<'a, C, A> {
         EditApkListCall {
             hub: self.hub,
@@ -2916,13 +2974,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches information about a localized store listing.
+    /// Gets a localized store listing.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
     pub fn listings_get(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingGetCall<'a, C, A> {
         EditListingGetCall {
             hub: self.hub,
@@ -2935,11 +2994,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all current Android App Bundles of the app and edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn bundles_list(&self, package_name: &str, edit_id: &str) -> EditBundleListCall<'a, C, A> {
         EditBundleListCall {
             hub: self.hub,
@@ -2953,12 +3015,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an edit for an app. Creating a new edit will automatically delete any of your previous edits so this method need only be called if you want to preemptively abandon an edit.
+    /// Deletes an app edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn delete(&self, package_name: &str, edit_id: &str) -> EditDeleteCall<'a, C, A> {
         EditDeleteCall {
             hub: self.hub,
@@ -2972,14 +3034,15 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads and attaches a new Expansion File to the APK specified.
+    /// Uploads a new expansion file and attaches to the specified APK.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
-    /// * `expansionFileType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being
+    ///                      read or modified.
+    /// * `expansionFileType` - The file type of the expansion file configuration which is being updated.
     pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         EditExpansionfileUploadCall {
             hub: self.hub,
@@ -2995,12 +3058,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new edit for an app, populated with the app's current state.
+    /// Creates a new edit for an app.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     pub fn insert(&self, request: AppEdit, package_name: &str) -> EditInsertCall<'a, C, A> {
         EditInsertCall {
             hub: self.hub,
@@ -3014,12 +3077,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all of the localized store listings attached to this edit.
+    /// Lists all localized store listings.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn listings_list(&self, package_name: &str, edit_id: &str) -> EditListingListCall<'a, C, A> {
         EditListingListCall {
             hub: self.hub,
@@ -3031,13 +3094,16 @@ impl<'a, C, A> EditMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Patches testers.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `track` - The track to update.
     pub fn testers_patch(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a, C, A> {
         EditTesterPatchCall {
             hub: self.hub,
@@ -3053,12 +3119,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Commits/applies the changes made in this edit back to the app.
+    /// Commits an app edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn commit(&self, package_name: &str, edit_id: &str) -> EditCommitCall<'a, C, A> {
         EditCommitCall {
             hub: self.hub,
@@ -3072,12 +3138,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the track configurations for this edit.
+    /// Lists all tracks.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn tracks_list(&self, package_name: &str, edit_id: &str) -> EditTrackListCall<'a, C, A> {
         EditTrackListCall {
             hub: self.hub,
@@ -3089,12 +3155,15 @@ impl<'a, C, A> EditMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets testers.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `track` - The track to read from.
     pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a, C, A> {
         EditTesterGetCall {
             hub: self.hub,
@@ -3109,12 +3178,12 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks that the edit can be successfully committed. The edit's changes are not applied to the live app.
+    /// Validates an app edit.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn validate(&self, package_name: &str, edit_id: &str) -> EditValidateCall<'a, C, A> {
         EditValidateCall {
             hub: self.hub,
@@ -3128,12 +3197,18 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a new Android App Bundle to this edit. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+    /// Uploads a new Android App Bundle to this edit.
+    /// If you are using the Google API client libraries, please increase the
+    /// timeout of the http request before calling this endpoint
+    /// (a timeout of 2 minutes is recommended).
+    /// See [Timeouts and
+    /// Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+    /// for an example in java.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn bundles_upload(&self, package_name: &str, edit_id: &str) -> EditBundleUploadCall<'a, C, A> {
         EditBundleUploadCall {
             hub: self.hub,
@@ -3153,9 +3228,10 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
     pub fn listings_update(&self, request: Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingUpdateCall<'a, C, A> {
         EditListingUpdateCall {
             hub: self.hub,
@@ -3171,14 +3247,15 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches the Expansion File configuration for the APK specified.
+    /// Fetches the expansion file configuration for the specified APK.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
-    /// * `expansionFileType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being
+    ///                      read or modified.
+    /// * `expansionFileType` - The file type of the file configuration which is being read or modified.
     pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a, C, A> {
         EditExpansionfileGetCall {
             hub: self.hub,
@@ -3195,13 +3272,17 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes all images for the specified language and image type.
+    /// Returns an empty response if no images are found.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    /// * `imageType` - No description provided.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
+    ///                Providing a language that is not supported by the App is a no-op.
+    /// * `imageType` - Type of the Image.
+    ///                 Providing an image type that refers to no images is a no-op.
     pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a, C, A> {
         EditImageDeleteallCall {
             hub: self.hub,
@@ -3217,13 +3298,13 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates app details for this edit. This method supports patch semantics.
+    /// Patches details of an app.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
     pub fn details_patch(&self, request: AppDetails, package_name: &str, edit_id: &str) -> EditDetailPatchCall<'a, C, A> {
         EditDetailPatchCall {
             hub: self.hub,
@@ -3238,14 +3319,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the track configuration for the specified track type. This method supports patch semantics.
+    /// Patches a track.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `track` - Identifier of the track.
     pub fn tracks_patch(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a, C, A> {
         EditTrackPatchCall {
             hub: self.hub,
@@ -3261,13 +3342,14 @@ impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified localized store listing from an edit.
+    /// Deletes a localized store listing.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT"
+    ///                for Austrian German).
     pub fn listings_delete(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingDeleteCall<'a, C, A> {
         EditListingDeleteCall {
             hub: self.hub,
@@ -3280,13 +3362,16 @@ impl<'a, C, A> EditMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates testers.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `track` - The track to read or modify.
+    /// * `packageName` - Package name of the app.
+    /// * `editId` - Identifier of the edit.
+    /// * `track` - The track to update.
     pub fn testers_update(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a, C, A> {
         EditTesterUpdateCall {
             hub: self.hub,
@@ -3344,12 +3429,12 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the details of an in-app product.
+    /// Updates an in-app product (i.e. a managed product or a subscriptions).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
     pub fn update(&self, request: InAppProduct, package_name: &str, sku: &str) -> InappproductUpdateCall<'a, C, A> {
         InappproductUpdateCall {
@@ -3366,11 +3451,11 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all the in-app products for an Android app, both subscriptions and managed in-app products..
+    /// Lists all in-app products - both managed products and subscriptions.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     pub fn list(&self, package_name: &str) -> InappproductListCall<'a, C, A> {
         InappproductListCall {
             hub: self.hub,
@@ -3386,12 +3471,12 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new in-app product for an app.
+    /// Creates an in-app product (i.e. a managed product or a subscriptions).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     pub fn insert(&self, request: InAppProduct, package_name: &str) -> InappproductInsertCall<'a, C, A> {
         InappproductInsertCall {
             hub: self.hub,
@@ -3406,11 +3491,11 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete an in-app product for an app.
+    /// Deletes an in-app product (i.e. a managed product or a subscriptions).
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
     pub fn delete(&self, package_name: &str, sku: &str) -> InappproductDeleteCall<'a, C, A> {
         InappproductDeleteCall {
@@ -3425,11 +3510,11 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about the in-app product specified.
+    /// Gets an in-app product, which can be a managed product or a subscription.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - No description provided.
+    /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
     pub fn get(&self, package_name: &str, sku: &str) -> InappproductGetCall<'a, C, A> {
         InappproductGetCall {
@@ -3444,12 +3529,12 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the details of an in-app product. This method supports patch semantics.
+    /// Patches an in-app product (i.e. a managed product or a subscriptions).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
     pub fn patch(&self, request: InAppProduct, package_name: &str, sku: &str) -> InappproductPatchCall<'a, C, A> {
         InappproductPatchCall {
@@ -3512,8 +3597,10 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing').
-    /// * `orderId` - The order ID provided to the user when the subscription or in-app order was purchased.
+    /// * `packageName` - The package name of the application for which this subscription or in-app
+    ///                   item was purchased (for example, 'com.some.thing').
+    /// * `orderId` - The order ID provided to the user when the subscription or in-app order was
+    ///               purchased.
     pub fn refund(&self, package_name: &str, order_id: &str) -> OrderRefundCall<'a, C, A> {
         OrderRefundCall {
             hub: self.hub,
@@ -3570,11 +3657,18 @@ impl<'a, C, A> InternalappsharingartifactMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads an APK to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+    /// Uploads an APK to internal app sharing.
+    /// If you are using the Google API client libraries, please increase the
+    /// timeout of the http request before calling this endpoint
+    /// (a timeout of 2 minutes is recommended).
+    /// 
+    /// See [Timeouts and
+    /// Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+    /// for an example in java.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     pub fn uploadapk(&self, package_name: &str) -> InternalappsharingartifactUploadapkCall<'a, C, A> {
         InternalappsharingartifactUploadapkCall {
             hub: self.hub,
@@ -3587,11 +3681,18 @@ impl<'a, C, A> InternalappsharingartifactMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+    /// Uploads an app bundle to internal app sharing.
+    /// If you are using the Google API client libraries, please increase the
+    /// timeout of the http request before calling this endpoint
+    /// (a timeout of 2 minutes is recommended).
+    /// 
+    /// See [Timeouts and
+    /// Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+    /// for an example in java.
     /// 
     /// # Arguments
     ///
-    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `packageName` - Package name of the app.
     pub fn uploadbundle(&self, package_name: &str) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
         InternalappsharingartifactUploadbundleCall {
             hub: self.hub,
@@ -3611,7 +3712,8 @@ impl<'a, C, A> InternalappsharingartifactMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring.
+/// Refunds and immediately revokes a user's subscription purchase. Access to
+/// the subscription will be terminated immediately and it will stop recurring.
 ///
 /// A builder for the *subscriptions.revoke* method supported by a *purchase* resource.
 /// It is not used directly, but through a `PurchaseMethods` instance.
@@ -3685,7 +3787,7 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:revoke";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:revoke";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3781,7 +3883,8 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription was
+    /// purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -3801,7 +3904,8 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
         self._subscription_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the subscription was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -3831,13 +3935,17 @@ impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRevokeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3945,7 +4053,7 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/products/{productId}/tokens/{token}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4051,7 +4159,8 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    /// The package name of the application the inapp product was sold in (for
+    /// example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -4071,7 +4180,8 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._product_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the inapp product was purchased.
+    /// The token provided to the user's device when the inapp product was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -4101,13 +4211,17 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4140,7 +4254,8 @@ impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Checks whether a user's subscription purchase is valid and returns its expiry time.
+/// Checks whether a user's subscription purchase is valid and returns its
+/// expiry time.
 ///
 /// A builder for the *subscriptions.get* method supported by a *purchase* resource.
 /// It is not used directly, but through a `PurchaseMethods` instance.
@@ -4215,7 +4330,7 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4321,7 +4436,8 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription was
+    /// purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -4341,7 +4457,8 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._subscription_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the subscription was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -4371,13 +4488,17 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4511,7 +4632,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/voidedpurchases";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/voidedpurchases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4617,7 +4738,8 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing').
+    /// The package name of the application for which voided purchases need to be
+    /// returned (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -4627,41 +4749,69 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._package_name = new_value.to_string();
         self
     }
-    /// The type of voided purchases that you want to see in the response. Possible values are:  
-    /// - 0: Only voided in-app product purchases will be returned in the response. This is the default value.
-    /// - 1: Both voided in-app purchases and voided subscription purchases will be returned in the response.  Note: Before requesting to receive voided subscription purchases, you must switch to use orderId in the response which uniquely identifies one-time purchases and subscriptions. Otherwise, you will receive multiple subscription orders with the same PurchaseToken, because subscription renewal orders share the same PurchaseToken.
+    /// The type of voided purchases that you want to see in the response.
+    /// Possible values are:
+    /// 0. Only voided in-app product purchases will be returned in the
+    ///    response. This is the default value.
+    /// 1. Both voided in-app purchases and voided subscription purchases
+    ///    will be returned in the response.
+    /// 
+    /// Note: Before requesting to receive voided subscription purchases, you
+    /// must switch to use orderId in the response which uniquely identifies
+    /// one-time purchases and subscriptions. Otherwise, you will receive multiple
+    /// subscription orders with the same PurchaseToken, because subscription
+    /// renewal orders share the same PurchaseToken.
     ///
     /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: i32) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         self._type_ = Some(new_value);
         self
     }
+    /// Defines the token of the page to return, usually taken from
+    /// TokenPagination.
+    /// This can only be used if token paging is enabled.
     ///
     /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
-    /// The time, in milliseconds since the Epoch, of the oldest voided purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
+    /// The time, in milliseconds since the Epoch, of the oldest voided purchase
+    /// that you want to see in the response. The value of this parameter cannot
+    /// be older than 30 days and is ignored if a pagination token is set.
+    /// Default value is current time minus 30 days.
+    /// Note: This filter is applied on the time at which the record is seen as
+    /// voided by our systems and not the actual voided time returned in the
+    /// response.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
+    /// Defines the index of the first element to return.
+    /// This can only be used if indexed paging is enabled.
     ///
     /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
+    /// Defines how many results the list operation should return.
+    /// The default number depends on the resource collection.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// The time, in milliseconds since the Epoch, of the newest voided purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
+    /// The time, in milliseconds since the Epoch, of the newest voided purchase
+    /// that you want to see in the response. The value of this parameter cannot
+    /// be greater than the current time and is ignored if a pagination token is
+    /// set. Default value is current time.
+    /// Note: This filter is applied on the time at which the record is seen as
+    /// voided by our systems and not the actual voided time returned in the
+    /// response.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -4688,13 +4838,17 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseVoidedpurchaseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4727,7 +4881,8 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Cancels a user's subscription purchase. The subscription remains valid until its expiration time.
+/// Cancels a user's subscription purchase. The subscription remains valid
+/// until its expiration time.
 ///
 /// A builder for the *subscriptions.cancel* method supported by a *purchase* resource.
 /// It is not used directly, but through a `PurchaseMethods` instance.
@@ -4801,7 +4956,7 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:cancel";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:cancel";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4897,7 +5052,8 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription was
+    /// purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -4917,7 +5073,8 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
         self._subscription_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the subscription was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -4947,13 +5104,17 @@ impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionCancelCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5067,7 +5228,7 @@ impl<'a, C, A> PurchaseSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:acknowledge";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:acknowledge";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5187,7 +5348,8 @@ impl<'a, C, A> PurchaseSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription was
+    /// purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -5207,7 +5369,8 @@ impl<'a, C, A> PurchaseSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<
         self._subscription_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the subscription was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -5237,13 +5400,17 @@ impl<'a, C, A> PurchaseSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionAcknowledgeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5357,7 +5524,7 @@ impl<'a, C, A> PurchaseProductAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/products/{productId}/tokens/{token}:acknowledge";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5477,7 +5644,8 @@ impl<'a, C, A> PurchaseProductAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    /// The package name of the application the inapp product was sold in (for
+    /// example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -5497,7 +5665,8 @@ impl<'a, C, A> PurchaseProductAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper
         self._product_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the inapp product was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -5527,13 +5696,17 @@ impl<'a, C, A> PurchaseProductAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductAcknowledgeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5566,7 +5739,8 @@ impl<'a, C, A> PurchaseProductAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur.
+/// Refunds a user's subscription purchase, but the subscription remains valid
+/// until its expiration time and it will continue to recur.
 ///
 /// A builder for the *subscriptions.refund* method supported by a *purchase* resource.
 /// It is not used directly, but through a `PurchaseMethods` instance.
@@ -5640,7 +5814,7 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:refund";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:refund";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5736,7 +5910,8 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription was
+    /// purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -5746,7 +5921,7 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
         self._package_name = new_value.to_string();
         self
     }
-    /// The purchased subscription ID (for example, 'monthly001').
+    /// "The purchased subscription ID (for example, 'monthly001').
     ///
     /// Sets the *subscription id* path property to the given value.
     ///
@@ -5756,7 +5931,8 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
         self._subscription_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the subscription was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -5786,13 +5962,17 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRefundCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5825,7 +6005,8 @@ impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Defers a user's subscription purchase until a specified future expiration time.
+/// Defers a user's subscription purchase until a specified future expiration
+/// time.
 ///
 /// A builder for the *subscriptions.defer* method supported by a *purchase* resource.
 /// It is not used directly, but through a `PurchaseMethods` instance.
@@ -5907,7 +6088,7 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:defer";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/purchases/subscriptions/{subscriptionId}/tokens/{token}:defer";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6037,7 +6218,8 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription was
+    /// purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -6057,7 +6239,8 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
         self._subscription_id = new_value.to_string();
         self
     }
-    /// The token provided to the user's device when the subscription was purchased.
+    /// The token provided to the user's device when the subscription was
+    /// purchased.
     ///
     /// Sets the *token* path property to the given value.
     ///
@@ -6087,13 +6270,17 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionDeferCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6126,7 +6313,8 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Creates a new variant of APK which is suitable for inclusion in a system image.
+/// Creates an APK which is suitable for inclusion in a system image from an
+/// already uploaded Android App Bundle.
 ///
 /// A builder for the *variants.create* method supported by a *systemapk* resource.
 /// It is not used directly, but through a `SystemapkMethods` instance.
@@ -6140,7 +6328,7 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_androidpublisher3 as androidpublisher3;
-/// use androidpublisher3::SystemApkVariantsCreateRequest;
+/// use androidpublisher3::Variant;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6154,7 +6342,7 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = SystemApkVariantsCreateRequest::default();
+/// let mut req = Variant::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6167,7 +6355,7 @@ pub struct SystemapkVariantCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AndroidPublisher<C, A>,
-    _request: SystemApkVariantsCreateRequest,
+    _request: Variant,
     _package_name: String,
     _version_code: String,
     _delegate: Option<&'a mut dyn Delegate>,
@@ -6206,7 +6394,7 @@ impl<'a, C, A> SystemapkVariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6332,11 +6520,11 @@ impl<'a, C, A> SystemapkVariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SystemApkVariantsCreateRequest) -> SystemapkVariantCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: Variant) -> SystemapkVariantCreateCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Unique identifier of the Android app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -6376,13 +6564,17 @@ impl<'a, C, A> SystemapkVariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6463,7 +6655,7 @@ impl<'a, C, A> SystemapkVariantListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, SystemApkVariantsListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SystemApksListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6488,7 +6680,7 @@ impl<'a, C, A> SystemapkVariantListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6594,7 +6786,7 @@ impl<'a, C, A> SystemapkVariantListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Unique identifier of the Android app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -6634,13 +6826,17 @@ impl<'a, C, A> SystemapkVariantListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6673,7 +6869,8 @@ impl<'a, C, A> SystemapkVariantListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Download a previously created APK which is suitable for inclusion in a system image.
+/// Downloads a previously created system APK which is suitable for inclusion
+/// in a system image.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -6750,7 +6947,7 @@ impl<'a, C, A> SystemapkVariantDownloadCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants/{variantId}:download";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants/{variantId}:download";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6846,7 +7043,7 @@ impl<'a, C, A> SystemapkVariantDownloadCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Unique identifier of the Android app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -6866,6 +7063,7 @@ impl<'a, C, A> SystemapkVariantDownloadCall<'a, C, A> where C: BorrowMut<hyper::
         self._version_code = new_value.to_string();
         self
     }
+    /// The ID of a previously created system APK variant.
     ///
     /// Sets the *variant id* path property to the given value.
     ///
@@ -6895,13 +7093,17 @@ impl<'a, C, A> SystemapkVariantDownloadCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantDownloadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7009,7 +7211,7 @@ impl<'a, C, A> SystemapkVariantGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants/{variantId}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/systemApks/{versionCode}/variants/{variantId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7115,7 +7317,7 @@ impl<'a, C, A> SystemapkVariantGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Unique identifier of the Android app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -7135,7 +7337,7 @@ impl<'a, C, A> SystemapkVariantGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._version_code = new_value.to_string();
         self
     }
-    /// Unique identifier for this variant.
+    /// The ID of a previously created system APK variant.
     ///
     /// Sets the *variant id* path property to the given value.
     ///
@@ -7165,13 +7367,17 @@ impl<'a, C, A> SystemapkVariantGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7204,7 +7410,7 @@ impl<'a, C, A> SystemapkVariantGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Reply to a single review, or update an existing reply.
+/// Replies to a single review, or updates an existing reply.
 ///
 /// A builder for the *reply* method supported by a *review* resource.
 /// It is not used directly, but through a `ReviewMethods` instance.
@@ -7284,7 +7490,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/reviews/{reviewId}:reply";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/reviews/{reviewId}:reply";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7414,7 +7620,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -7424,6 +7630,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for a review.
     ///
     /// Sets the *review id* path property to the given value.
     ///
@@ -7453,13 +7660,17 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ReviewReplyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7492,7 +7703,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Returns a single review.
+/// Gets a single review.
 ///
 /// A builder for the *get* method supported by a *review* resource.
 /// It is not used directly, but through a `ReviewMethods` instance.
@@ -7570,7 +7781,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/reviews/{reviewId}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/reviews/{reviewId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7676,7 +7887,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -7686,6 +7897,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._package_name = new_value.to_string();
         self
     }
+    /// Unique identifier for a review.
     ///
     /// Sets the *review id* path property to the given value.
     ///
@@ -7695,6 +7907,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._review_id = new_value.to_string();
         self
     }
+    /// Language localization code.
     ///
     /// Sets the *translation language* query property to the given value.
     pub fn translation_language(mut self, new_value: &str) -> ReviewGetCall<'a, C, A> {
@@ -7721,13 +7934,17 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ReviewGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7760,7 +7977,7 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Returns a list of reviews. Only reviews from last week will be returned.
+/// Lists all reviews.
 ///
 /// A builder for the *list* method supported by a *review* resource.
 /// It is not used directly, but through a `ReviewMethods` instance.
@@ -7851,7 +8068,7 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/reviews";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/reviews";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7957,7 +8174,7 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Unique identifier for the Android app for which we want reviews; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -7967,24 +8184,28 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._package_name = new_value.to_string();
         self
     }
+    /// Language localization code.
     ///
     /// Sets the *translation language* query property to the given value.
     pub fn translation_language(mut self, new_value: &str) -> ReviewListCall<'a, C, A> {
         self._translation_language = Some(new_value.to_string());
         self
     }
+    /// Pagination token. If empty, list starts at the first review.
     ///
     /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> ReviewListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
+    /// The index of the first element to return.
     ///
     /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> ReviewListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
+    /// How many results the list operation should return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> ReviewListCall<'a, C, A> {
@@ -8011,13 +8232,17 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ReviewListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8050,7 +8275,7 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Uploads the deobfuscation file of the specified APK. If a deobfuscation file already exists, it will be replaced.
+/// Uploads a new deobfuscation file and attaches to the specified APK.
 ///
 /// A builder for the *deobfuscationfiles.upload* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -8076,10 +8301,10 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -48, "deobfuscationFileType")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct EditDeobfuscationfileUploadCall<'a, C, A>
@@ -8132,8 +8357,6 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/deobfuscationFiles/{deobfuscationFileType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -8167,9 +8390,6 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -8186,38 +8406,23 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 314572800 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 314572800))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 314572800 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 314572800))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -8251,51 +8456,6 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 314572800 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 314572800))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -8318,31 +8478,15 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 300MB
+    /// * *max size*: 314572800
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, DeobfuscationFilesUploadResponse)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 300MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, DeobfuscationFilesUploadResponse)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier of the Android app for which the deobfuscatiuon files are being uploaded; for example, "com.spiffygame".
+    /// Unique identifier for the Android app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -8362,7 +8506,8 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
         self._edit_id = new_value.to_string();
         self
     }
-    /// The version code of the APK whose deobfuscation file is being uploaded.
+    /// The version code of the APK whose Deobfuscation File is being
+    /// uploaded.
     ///
     /// Sets the *apk version code* path property to the given value.
     ///
@@ -8372,6 +8517,7 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
         self._apk_version_code = new_value;
         self
     }
+    /// The type of the deobfuscation file.
     ///
     /// Sets the *deobfuscation file type* path property to the given value.
     ///
@@ -8401,13 +8547,17 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditDeobfuscationfileUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8440,7 +8590,8 @@ impl<'a, C, A> EditDeobfuscationfileUploadCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Uploads a new image and adds it to the list of images for the specified language and image type.
+/// Uploads an image of the specified language and image type, and adds to the
+/// edit.
 ///
 /// A builder for the *images.upload* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -8522,8 +8673,6 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -8557,9 +8706,6 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -8576,38 +8722,23 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 15728640 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 15728640 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -8641,51 +8772,6 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 15728640 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -8708,31 +8794,15 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 15MB
+    /// * *max size*: 15728640
     /// * *multipart*: yes
     /// * *valid mime types*: 'image/*'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ImagesUploadResponse)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 15MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'image/*'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ImagesUploadResponse)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -8742,7 +8812,7 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -8752,7 +8822,9 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
+    /// Providing a language that is not supported by the App is a no-op.
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -8762,6 +8834,7 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = new_value.to_string();
         self
     }
+    /// Type of the Image.
     ///
     /// Sets the *image type* path property to the given value.
     ///
@@ -8791,13 +8864,17 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditImageUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8830,7 +8907,9 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method.
+/// Updates the APK's expansion file configuration to reference another APK's
+/// expansion file.
+/// To add a new expansion file use the Upload method.
 ///
 /// A builder for the *expansionfiles.update* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -8914,7 +8993,7 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9044,7 +9123,7 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -9054,7 +9133,7 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -9064,7 +9143,8 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._edit_id = new_value.to_string();
         self
     }
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    /// The version code of the APK whose expansion file configuration is being
+    /// read or modified.
     ///
     /// Sets the *apk version code* path property to the given value.
     ///
@@ -9074,6 +9154,7 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._apk_version_code = new_value;
         self
     }
+    /// The file type of the file configuration which is being read or modified.
     ///
     /// Sets the *expansion file type* path property to the given value.
     ///
@@ -9103,13 +9184,17 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9142,7 +9227,7 @@ impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Fetches app details for this edit. This includes the default language and developer support contact information.
+/// Gets details of an app.
 ///
 /// A builder for the *details.get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -9215,7 +9300,7 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/details";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/details";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9321,7 +9406,7 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -9331,7 +9416,7 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -9361,13 +9446,17 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditDetailGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9400,7 +9489,7 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Deletes all localized listings from an edit.
+/// Deletes all store listings.
 ///
 /// A builder for the *listings.deleteall* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -9472,7 +9561,7 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9568,7 +9657,7 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -9578,7 +9667,7 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -9608,13 +9697,17 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteallCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9647,7 +9740,10 @@ impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to enterprises using Google Play for Work whose application is configured to restrict distribution to the enterprise domain.
+/// Creates a new APK without uploading the APK itself to Google Play, instead
+/// hosting the APK at a specified URL. This function is only available to
+/// organizations using Managed Play whose application is configured to
+/// restrict distribution to the organizations.
 ///
 /// A builder for the *apks.addexternallyhosted* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -9727,7 +9823,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/externallyHosted";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/externallyHosted";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9857,7 +9953,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -9867,7 +9963,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -9897,13 +9993,17 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditApkAddexternallyhostedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9936,7 +10036,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Updates app details for this edit.
+/// Updates details of an app.
 ///
 /// A builder for the *details.update* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -10016,7 +10116,7 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/details";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/details";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10146,7 +10246,7 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -10156,7 +10256,7 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -10186,13 +10286,17 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditDetailUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10225,7 +10329,7 @@ impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Fetches the track configuration for the specified track type. Includes the APK version codes that are in this track.
+/// Gets a track.
 ///
 /// A builder for the *tracks.get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -10300,7 +10404,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks/{track}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10406,7 +10510,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -10416,7 +10520,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -10426,7 +10530,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify.
+    /// Identifier of the track.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -10456,13 +10560,17 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTrackGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10495,7 +10603,9 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method. This method supports patch semantics.
+/// Patches the APK's expansion file configuration to reference another APK's
+/// expansion file.
+/// To add a new expansion file use the Upload method.
 ///
 /// A builder for the *expansionfiles.patch* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -10579,7 +10689,7 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10709,7 +10819,7 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -10719,7 +10829,7 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -10729,7 +10839,8 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._edit_id = new_value.to_string();
         self
     }
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    /// The version code of the APK whose expansion file configuration is being
+    /// read or modified.
     ///
     /// Sets the *apk version code* path property to the given value.
     ///
@@ -10739,6 +10850,7 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._apk_version_code = new_value;
         self
     }
+    /// The file type of the expansion file configuration which is being updated.
     ///
     /// Sets the *expansion file type* path property to the given value.
     ///
@@ -10768,13 +10880,17 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfilePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10807,7 +10923,7 @@ impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Lists all images for the specified language and image type.
+/// Lists all images. The response may be empty.
 ///
 /// A builder for the *images.list* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -10884,7 +11000,7 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}/{imageType}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10990,7 +11106,7 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -11000,7 +11116,7 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -11010,7 +11126,9 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
+    /// There must be a store listing for the specified language.
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -11020,6 +11138,8 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._language = new_value.to_string();
         self
     }
+    /// Type of the Image. Providing an image type that refers to no images will
+    /// return an empty response.
     ///
     /// Sets the *image type* path property to the given value.
     ///
@@ -11049,13 +11169,17 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditImageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11088,7 +11212,7 @@ impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates the track configuration for the specified track type.
+/// Updates a track.
 ///
 /// A builder for the *tracks.update* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -11170,7 +11294,7 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks/{track}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11300,7 +11424,7 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -11310,7 +11434,7 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -11320,7 +11444,7 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify.
+    /// Identifier of the track.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -11350,13 +11474,17 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTrackUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11389,7 +11517,7 @@ impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Creates or updates a localized store listing. This method supports patch semantics.
+/// Patches a localized store listing.
 ///
 /// A builder for the *listings.patch* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -11471,7 +11599,7 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11601,7 +11729,7 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -11611,7 +11739,7 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -11621,7 +11749,8 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -11651,13 +11780,17 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditListingPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11690,7 +11823,7 @@ impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Returns information about the edit specified. Calls will fail if the edit is no long active (e.g. has been deleted, superseded or expired).
+/// Gets an app edit.
 ///
 /// A builder for the *get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -11763,7 +11896,7 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11869,7 +12002,7 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -11879,7 +12012,7 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -11909,13 +12042,17 @@ impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12026,7 +12163,7 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}/{imageType}/{imageId}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}/{imageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12122,7 +12259,7 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -12132,7 +12269,7 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -12142,7 +12279,8 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -12152,6 +12290,7 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = new_value.to_string();
         self
     }
+    /// Type of the Image.
     ///
     /// Sets the *image type* path property to the given value.
     ///
@@ -12191,13 +12330,17 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12230,6 +12373,8 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
+/// Uploads an APK and adds to the current edit.
+///
 /// A builder for the *apks.upload* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -12254,10 +12399,10 @@ impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().apks_upload("packageName", "editId")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct EditApkUploadCall<'a, C, A>
@@ -12306,8 +12451,6 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks", "resumable")
             } else {
                 unreachable!()
             };
@@ -12341,9 +12484,6 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -12360,38 +12500,23 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 1073741824 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 10737418240 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 10737418240))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -12425,51 +12550,6 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 1073741824 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -12492,31 +12572,15 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 1GB
+    /// * *max size*: 10737418240
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'application/vnd.android.package-archive'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Apk)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 1GB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream' and 'application/vnd.android.package-archive'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Apk)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -12526,7 +12590,7 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -12556,13 +12620,17 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditApkUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12595,6 +12663,8 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Lists all current APKs of the app and edit.
+///
 /// A builder for the *apks.list* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -12666,7 +12736,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/apks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12772,7 +12842,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -12782,7 +12852,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -12812,13 +12882,17 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditApkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12851,7 +12925,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Fetches information about a localized store listing.
+/// Gets a localized store listing.
 ///
 /// A builder for the *listings.get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -12926,7 +13000,7 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13032,7 +13106,7 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -13042,7 +13116,7 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -13052,7 +13126,8 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -13082,13 +13157,17 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditListingGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13121,6 +13200,8 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
+/// Lists all current Android App Bundles of the app and edit.
+///
 /// A builder for the *bundles.list* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -13192,7 +13273,7 @@ impl<'a, C, A> EditBundleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/bundles";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/bundles";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13298,7 +13379,7 @@ impl<'a, C, A> EditBundleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -13308,7 +13389,7 @@ impl<'a, C, A> EditBundleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -13338,13 +13419,17 @@ impl<'a, C, A> EditBundleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditBundleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13377,7 +13462,7 @@ impl<'a, C, A> EditBundleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Deletes an edit for an app. Creating a new edit will automatically delete any of your previous edits so this method need only be called if you want to preemptively abandon an edit.
+/// Deletes an app edit.
 ///
 /// A builder for the *delete* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -13449,7 +13534,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -13545,7 +13630,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -13555,7 +13640,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -13585,13 +13670,17 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13624,7 +13713,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Uploads and attaches a new Expansion File to the APK specified.
+/// Uploads a new expansion file and attaches to the specified APK.
 ///
 /// A builder for the *expansionfiles.upload* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -13650,10 +13739,10 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().expansionfiles_upload("packageName", "editId", -69, "expansionFileType")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct EditExpansionfileUploadCall<'a, C, A>
@@ -13706,8 +13795,6 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -13741,9 +13828,6 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -13760,38 +13844,23 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 2147483648 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 2147483648 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -13825,51 +13894,6 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 2147483648 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -13892,31 +13916,15 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 2048MB
+    /// * *max size*: 2147483648
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ExpansionFilesUploadResponse)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 2048MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ExpansionFilesUploadResponse)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -13926,7 +13934,7 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -13936,7 +13944,8 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         self._edit_id = new_value.to_string();
         self
     }
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    /// The version code of the APK whose expansion file configuration is being
+    /// read or modified.
     ///
     /// Sets the *apk version code* path property to the given value.
     ///
@@ -13946,6 +13955,7 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         self._apk_version_code = new_value;
         self
     }
+    /// The file type of the expansion file configuration which is being updated.
     ///
     /// Sets the *expansion file type* path property to the given value.
     ///
@@ -13975,13 +13985,17 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14014,7 +14028,7 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Creates a new edit for an app, populated with the app's current state.
+/// Creates a new edit for an app.
 ///
 /// A builder for the *insert* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -14092,7 +14106,7 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14222,7 +14236,7 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -14252,13 +14266,17 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14291,7 +14309,7 @@ impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Returns all of the localized store listings attached to this edit.
+/// Lists all localized store listings.
 ///
 /// A builder for the *listings.list* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -14364,7 +14382,7 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14470,7 +14488,7 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -14480,7 +14498,7 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -14510,13 +14528,17 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditListingListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14549,6 +14571,8 @@ impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
+/// Patches testers.
+///
 /// A builder for the *testers.patch* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -14629,7 +14653,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/testers/{track}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/testers/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -14759,7 +14783,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -14769,7 +14793,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -14779,7 +14803,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify.
+    /// The track to update.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -14809,13 +14833,17 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTesterPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14848,7 +14876,7 @@ impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Commits/applies the changes made in this edit back to the app.
+/// Commits an app edit.
 ///
 /// A builder for the *commit* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -14921,7 +14949,7 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}:commit";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}:commit";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15027,7 +15055,7 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -15037,7 +15065,7 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -15067,13 +15095,17 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditCommitCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15106,7 +15138,7 @@ impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Lists all the track configurations for this edit.
+/// Lists all tracks.
 ///
 /// A builder for the *tracks.list* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -15179,7 +15211,7 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15285,7 +15317,7 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -15295,7 +15327,7 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -15325,13 +15357,17 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTrackListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15364,6 +15400,8 @@ impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Gets testers.
+///
 /// A builder for the *testers.get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -15437,7 +15475,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/testers/{track}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/testers/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15543,7 +15581,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -15553,7 +15591,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -15563,7 +15601,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify.
+    /// The track to read from.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -15593,13 +15631,17 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTesterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15632,7 +15674,7 @@ impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Checks that the edit can be successfully committed. The edit's changes are not applied to the live app.
+/// Validates an app edit.
 ///
 /// A builder for the *validate* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -15705,7 +15747,7 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}:validate";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}:validate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -15811,7 +15853,7 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -15821,7 +15863,7 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -15851,13 +15893,17 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditValidateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15890,7 +15936,13 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Uploads a new Android App Bundle to this edit. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+/// Uploads a new Android App Bundle to this edit.
+/// If you are using the Google API client libraries, please increase the
+/// timeout of the http request before calling this endpoint
+/// (a timeout of 2 minutes is recommended).
+/// See [Timeouts and
+/// Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+/// for an example in java.
 ///
 /// A builder for the *bundles.upload* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -15916,11 +15968,11 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().bundles_upload("packageName", "editId")
 ///              .ack_bundle_installation_warning(false)
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct EditBundleUploadCall<'a, C, A>
@@ -15973,8 +16025,6 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/bundles", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/{packageName}/edits/{editId}/bundles", "resumable")
             } else {
                 unreachable!()
             };
@@ -16008,9 +16058,6 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -16027,38 +16074,23 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 2147483648 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 10737418240 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 10737418240))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -16092,51 +16124,6 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 2147483648 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -16159,31 +16146,15 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 2GB
+    /// * *max size*: 10737418240
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Bundle)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 2GB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Bundle)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -16193,7 +16164,7 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -16203,7 +16174,9 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._edit_id = new_value.to_string();
         self
     }
-    /// Must be set to true if the bundle installation may trigger a warning on user devices (for example, if installation size may be over a threshold, typically 100 MB).
+    /// Must be set to true if the bundle installation may trigger a warning on
+    /// user devices (for example, if installation size may be over a threshold,
+    /// typically 100 MB).
     ///
     /// Sets the *ack bundle installation warning* query property to the given value.
     pub fn ack_bundle_installation_warning(mut self, new_value: bool) -> EditBundleUploadCall<'a, C, A> {
@@ -16230,13 +16203,17 @@ impl<'a, C, A> EditBundleUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditBundleUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16351,7 +16328,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16481,7 +16458,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -16491,7 +16468,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -16501,7 +16478,8 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -16531,13 +16509,17 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditListingUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16570,7 +16552,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Fetches the Expansion File configuration for the APK specified.
+/// Fetches the expansion file configuration for the specified APK.
 ///
 /// A builder for the *expansionfiles.get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -16647,7 +16629,7 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/expansionFiles/{expansionFileType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16753,7 +16735,7 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -16763,7 +16745,7 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -16773,7 +16755,8 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._edit_id = new_value.to_string();
         self
     }
-    /// The version code of the APK whose Expansion File configuration is being read or modified.
+    /// The version code of the APK whose expansion file configuration is being
+    /// read or modified.
     ///
     /// Sets the *apk version code* path property to the given value.
     ///
@@ -16783,6 +16766,7 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._apk_version_code = new_value;
         self
     }
+    /// The file type of the file configuration which is being read or modified.
     ///
     /// Sets the *expansion file type* path property to the given value.
     ///
@@ -16812,13 +16796,17 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16852,6 +16840,7 @@ impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
 /// Deletes all images for the specified language and image type.
+/// Returns an empty response if no images are found.
 ///
 /// A builder for the *images.deleteall* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -16928,7 +16917,7 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}/{imageType}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}/{imageType}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17034,7 +17023,7 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -17044,7 +17033,7 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -17054,7 +17043,9 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
+    /// Providing a language that is not supported by the App is a no-op.
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -17064,6 +17055,8 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._language = new_value.to_string();
         self
     }
+    /// Type of the Image.
+    /// Providing an image type that refers to no images is a no-op.
     ///
     /// Sets the *image type* path property to the given value.
     ///
@@ -17093,13 +17086,17 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteallCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17132,7 +17129,7 @@ impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Updates app details for this edit. This method supports patch semantics.
+/// Patches details of an app.
 ///
 /// A builder for the *details.patch* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -17212,7 +17209,7 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/details";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/details";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17342,7 +17339,7 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -17352,7 +17349,7 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -17382,13 +17379,17 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditDetailPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17421,7 +17422,7 @@ impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates the track configuration for the specified track type. This method supports patch semantics.
+/// Patches a track.
 ///
 /// A builder for the *tracks.patch* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -17503,7 +17504,7 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/tracks/{track}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/tracks/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17633,7 +17634,7 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -17643,7 +17644,7 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -17653,7 +17654,7 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify.
+    /// Identifier of the track.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -17683,13 +17684,17 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTrackPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17722,7 +17727,7 @@ impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Deletes the specified localized store listing from an edit.
+/// Deletes a localized store listing.
 ///
 /// A builder for the *listings.delete* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
@@ -17796,7 +17801,7 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/listings/{language}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/listings/{language}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -17892,7 +17897,7 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -17902,7 +17907,7 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -17912,7 +17917,8 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._edit_id = new_value.to_string();
         self
     }
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    /// Language localization code (a BCP-47 language tag; for example, "de-AT"
+    /// for Austrian German).
     ///
     /// Sets the *language* path property to the given value.
     ///
@@ -17942,13 +17948,17 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17981,6 +17991,8 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
+/// Updates testers.
+///
 /// A builder for the *testers.update* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -18061,7 +18073,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/edits/{editId}/testers/{track}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/edits/{editId}/testers/{track}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18191,7 +18203,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -18201,7 +18213,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._package_name = new_value.to_string();
         self
     }
-    /// Unique identifier for this edit.
+    /// Identifier of the edit.
     ///
     /// Sets the *edit id* path property to the given value.
     ///
@@ -18211,7 +18223,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._edit_id = new_value.to_string();
         self
     }
-    /// The track to read or modify.
+    /// The track to update.
     ///
     /// Sets the *track* path property to the given value.
     ///
@@ -18241,13 +18253,17 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> EditTesterUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18280,7 +18296,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Updates the details of an in-app product.
+/// Updates an in-app product (i.e. a managed product or a subscriptions).
 ///
 /// A builder for the *update* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
@@ -18365,7 +18381,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18495,7 +18511,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -18515,7 +18531,9 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._sku = new_value.to_string();
         self
     }
-    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    /// If true the prices for all regions targeted by the parent app that don't
+    /// have a price specified for this in-app product will be auto converted to
+    /// the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a, C, A> {
@@ -18542,13 +18560,17 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InappproductUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18581,7 +18603,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// List all the in-app products for an Android app, both subscriptions and managed in-app products..
+/// Lists all in-app products - both managed products and subscriptions.
 ///
 /// A builder for the *list* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
@@ -18667,7 +18689,7 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18773,7 +18795,7 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -18783,18 +18805,21 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._package_name = new_value.to_string();
         self
     }
+    /// Pagination token. If empty, list starts at the first product.
     ///
     /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> InappproductListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
+    /// The index of the first element to return.
     ///
     /// Sets the *start index* query property to the given value.
     pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
+    /// How many results the list operation should return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> InappproductListCall<'a, C, A> {
@@ -18821,13 +18846,17 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InappproductListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18860,7 +18889,7 @@ impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Creates a new in-app product for an app.
+/// Creates an in-app product (i.e. a managed product or a subscriptions).
 ///
 /// A builder for the *insert* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
@@ -18943,7 +18972,7 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19073,7 +19102,7 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -19083,7 +19112,9 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._package_name = new_value.to_string();
         self
     }
-    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    /// If true the prices for all regions targeted by the parent app that don't
+    /// have a price specified for this in-app product will be auto converted to
+    /// the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a, C, A> {
@@ -19110,13 +19141,17 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InappproductInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19149,7 +19184,7 @@ impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Delete an in-app product for an app.
+/// Deletes an in-app product (i.e. a managed product or a subscriptions).
 ///
 /// A builder for the *delete* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
@@ -19221,7 +19256,7 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19317,7 +19352,7 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -19357,13 +19392,17 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InappproductDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19396,7 +19435,7 @@ impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Returns information about the in-app product specified.
+/// Gets an in-app product, which can be a managed product or a subscription.
 ///
 /// A builder for the *get* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
@@ -19469,7 +19508,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19575,6 +19614,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -19614,13 +19654,17 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InappproductGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19653,7 +19697,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates the details of an in-app product. This method supports patch semantics.
+/// Patches an in-app product (i.e. a managed product or a subscriptions).
 ///
 /// A builder for the *patch* method supported by a *inappproduct* resource.
 /// It is not used directly, but through a `InappproductMethods` instance.
@@ -19738,7 +19782,7 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/inappproducts/{sku}";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/inappproducts/{sku}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -19868,7 +19912,7 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -19888,7 +19932,9 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._sku = new_value.to_string();
         self
     }
-    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
+    /// If true the prices for all regions targeted by the parent app that don't
+    /// have a price specified for this in-app product will be auto converted to
+    /// the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a, C, A> {
@@ -19915,13 +19961,17 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InappproductPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20031,7 +20081,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{packageName}/orders/{orderId}:refund";
+        let mut url = self.hub._base_url.clone() + "androidpublisher/v3/applications/{packageName}/orders/{orderId}:refund";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -20127,7 +20177,8 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing').
+    /// The package name of the application for which this subscription or in-app
+    /// item was purchased (for example, 'com.some.thing').
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -20137,7 +20188,8 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._package_name = new_value.to_string();
         self
     }
-    /// The order ID provided to the user when the subscription or in-app order was purchased.
+    /// The order ID provided to the user when the subscription or in-app order was
+    /// purchased.
     ///
     /// Sets the *order id* path property to the given value.
     ///
@@ -20147,7 +20199,10 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._order_id = new_value.to_string();
         self
     }
-    /// Whether to revoke the purchased item. If set to true, access to the subscription or in-app item will be terminated immediately. If the item is a recurring subscription, all future payments will also be terminated. Consumed in-app items need to be handled by developer's app. (optional)
+    /// Whether to revoke the purchased item. If set to true, access to the
+    /// subscription or in-app item will be terminated immediately. If the item is
+    /// a recurring subscription, all future payments will also be terminated.
+    /// Consumed in-app items need to be handled by developer's app. (optional).
     ///
     /// Sets the *revoke* query property to the given value.
     pub fn revoke(mut self, new_value: bool) -> OrderRefundCall<'a, C, A> {
@@ -20174,13 +20229,17 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20213,7 +20272,14 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Uploads an APK to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+/// Uploads an APK to internal app sharing.
+/// If you are using the Google API client libraries, please increase the
+/// timeout of the http request before calling this endpoint
+/// (a timeout of 2 minutes is recommended).
+/// 
+/// See [Timeouts and
+/// Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+/// for an example in java.
 ///
 /// A builder for the *uploadapk* method supported by a *internalappsharingartifact* resource.
 /// It is not used directly, but through a `InternalappsharingartifactMethods` instance.
@@ -20239,10 +20305,10 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.internalappsharingartifacts().uploadapk("packageName")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct InternalappsharingartifactUploadapkCall<'a, C, A>
@@ -20289,8 +20355,6 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/apk", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/apk", "resumable")
             } else {
                 unreachable!()
             };
@@ -20324,9 +20388,6 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -20343,38 +20404,23 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 1073741824 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 1073741824 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -20408,51 +20454,6 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 1073741824 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -20475,31 +20476,15 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 1GB
+    /// * *max size*: 1073741824
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'application/vnd.android.package-archive'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 1GB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream' and 'application/vnd.android.package-archive'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -20529,13 +20514,17 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadapkCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20568,7 +20557,14 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
 }
 
 
-/// Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+/// Uploads an app bundle to internal app sharing.
+/// If you are using the Google API client libraries, please increase the
+/// timeout of the http request before calling this endpoint
+/// (a timeout of 2 minutes is recommended).
+/// 
+/// See [Timeouts and
+/// Errors](https://developers.google.com/api-client-library/java/google-api-java-client/errors)
+/// for an example in java.
 ///
 /// A builder for the *uploadbundle* method supported by a *internalappsharingartifact* resource.
 /// It is not used directly, but through a `InternalappsharingartifactMethods` instance.
@@ -20594,10 +20590,10 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.internalappsharingartifacts().uploadbundle("packageName")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct InternalappsharingartifactUploadbundleCall<'a, C, A>
@@ -20644,8 +20640,6 @@ impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: Bor
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle", "resumable")
             } else {
                 unreachable!()
             };
@@ -20679,9 +20673,6 @@ impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: Bor
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -20698,38 +20689,23 @@ impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: Bor
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 2147483648 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 10737418240 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 10737418240))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -20763,51 +20739,6 @@ impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: Bor
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 2147483648 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -20830,31 +20761,15 @@ impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: Bor
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 2GB
+    /// * *max size*: 10737418240
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 2GB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    /// Package name of the app.
     ///
     /// Sets the *package name* path property to the given value.
     ///
@@ -20884,13 +20799,17 @@ impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadbundleCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Games Management* API can be found at the
-[official documentation site](https://developers.google.com/games/services).
+[official documentation site](https://developers.google.com/games/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games Management* API at revision *20200402*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Games Management* API at revision *20200701*. The CLI is at version *1.0.14*.
 
 ```bash
 gamesmanagement1-management [options]
@@ -46,18 +46,12 @@ gamesmanagement1-management [options]
         players
                 hide <application-id> <player-id> [-p <v>]...
                 unhide <application-id> <player-id> [-p <v>]...
-        rooms
-                reset [-p <v>]...
-                reset-for-all-players [-p <v>]...
         scores
                 reset <leaderboard-id> [-p <v>]... [-o <out>]
                 reset-all [-p <v>]... [-o <out>]
                 reset-all-for-all-players [-p <v>]...
                 reset-for-all-players <leaderboard-id> [-p <v>]...
                 reset-multiple-for-all-players (-r <kv>)... [-p <v>]...
-        turn-based-matches
-                reset [-p <v>]...
-                reset-for-all-players [-p <v>]...
   gamesmanagement1-management --help
 
 Configuration:

@@ -1247,7 +1247,7 @@ fn main() {
     
     let mut app = App::new("cloudscheduler1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200618")
            .about("Creates and manages jobs run on a regular recurring schedule.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudscheduler1_cli")
            .arg(Arg::with_name("url")

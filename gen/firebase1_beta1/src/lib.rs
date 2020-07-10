@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Management* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *firebase:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Firebase Management* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *firebase:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Firebase Management* *v1_beta1* API can be found at the
 //! [official documentation site](https://firebase.google.com).
@@ -351,7 +351,7 @@ impl<'a, C, A> FirebaseManagement<C, A>
         FirebaseManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://firebase.googleapis.com/".to_string(),
             _root_url: "https://firebase.googleapis.com/".to_string(),
         }
@@ -368,7 +368,7 @@ impl<'a, C, A> FirebaseManagement<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -542,18 +542,8 @@ pub struct WebAppConfig {
     /// <br><code><var>projectId</var>.firebaseapp.com</code>
     #[serde(rename="authDomain")]
     pub auth_domain: Option<String>,
-    /// The unique Google-assigned identifier of the Google Analytics web stream
-    /// associated with the Firebase Web App. Firebase SDKs use this ID to interact
-    /// with Google Analytics APIs.
-    /// <br>
-    /// <br>This field is only present if the App is linked to a web stream in a
-    /// Google Analytics App + Web property. Learn more about this ID and Google
-    /// Analytics web streams in the [Analytics
-    /// documentation](https://support.google.com/analytics/topic/9303475).
-    /// <br>
-    /// <br>To generate a `measurementId` and link the Web App with a Google
-    /// Analytics web stream, call
-    /// [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics).
+    /// This field will no longer be provided here. Instead, use
+    /// `GetAnalyticsDetails`
     #[serde(rename="measurementId")]
     pub measurement_id: Option<String>,
 }
@@ -993,11 +983,11 @@ impl ResponseResult for ListWebAppsResponse {}
 pub struct StreamMapping {
     /// The fully qualified resource name of the Firebase App associated with the
     /// Google Analytics data stream, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
     /// or
-    /// <code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
+    /// <code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var></code>
     /// or
-    /// <code>projects/<var>projectId</var>/webApps/<var>appId</var></code>
+    /// <code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var></code>
     pub app: Option<String>,
     /// Applicable for Firebase Web Apps only.<br>
     /// <br>The unique Google-assigned identifier of the Google Analytics web
@@ -1053,7 +1043,7 @@ impl ResponseResult for AndroidAppConfig {}
 pub struct ProjectInfo {
     /// The resource name of the GCP `Project` to which Firebase resources can be
     /// added, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub project: Option<String>,
     /// The user-assigned display name of the GCP `Project`, for example:
     /// <code>My App</code>
@@ -1381,7 +1371,7 @@ pub struct ShaCertificate {
     #[serde(rename="shaHash")]
     pub sha_hash: Option<String>,
     /// The fully qualified resource name of the `sha-key`, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/sha/<var>shaId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/sha/<var>SHA_ID</var></code>
     pub name: Option<String>,
     /// The SHA certificate type.
     #[serde(rename="certType")]
@@ -1634,7 +1624,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the Project for which the default GCP resource
     ///              location will be set, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn default_location_finalize(&self, request: FinalizeDefaultLocationRequest, parent: &str) -> ProjectDefaultLocationFinalizeCall<'a, C, A> {
         ProjectDefaultLocationFinalizeCall {
             hub: self.hub,
@@ -1653,10 +1643,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the App, in the format:
-    ///            <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-    ///            <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+    ///            <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///            from Sub-Collection access pattern may be used here, in the format:
-    ///            <br><code>projects/-/androidApps/<var>appId</var></code>
+    ///            <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     pub fn android_apps_get(&self, name: &str) -> ProjectAndroidAppGetCall<'a, C, A> {
         ProjectAndroidAppGetCall {
             hub: self.hub,
@@ -1675,10 +1665,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent App for which to list SHA certificates, in the format:
-    ///              <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-    ///              <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+    ///              <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///              from Sub-Collection access pattern may be used here, in the format:
-    ///              <br><code>projects/-/androidApps/<var>appId</var></code>
+    ///              <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     pub fn android_apps_sha_list(&self, parent: &str) -> ProjectAndroidAppShaListCall<'a, C, A> {
         ProjectAndroidAppShaListCall {
             hub: self.hub,
@@ -1718,7 +1708,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the Project, in the format:
-    ///            <br><code>projects/<var>projectId</var></code>
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn get(&self, name: &str) -> ProjectGetCall<'a, C, A> {
         ProjectGetCall {
             hub: self.hub,
@@ -1764,7 +1754,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// <br>
     /// <br>Since a FirebaseProject is actually also a GCP `Project`, a
     /// `FirebaseProject` uses underlying GCP identifiers (most importantly,
-    /// the `projectId`) as its own for easy interop with GCP APIs.
+    /// the `PROJECT_NUMBER`) as its own for easy interop with GCP APIs.
     /// <br>
     /// <br>The result of this call is an [`Operation`](../../v1beta1/operations).
     /// Poll the `Operation` to track the provisioning process by calling
@@ -1782,18 +1772,21 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// <br>This method does not modify any billing account information on the
     /// underlying GCP `Project`.
     /// <br>
-    /// <br>To call `AddFirebase`, a member must be an Editor or Owner for the
-    /// existing GCP `Project`. Service accounts cannot call `AddFirebase`.
+    /// <br>To call `AddFirebase`, a project member or service account must have
+    /// the following permissions (the IAM roles of Editor and Owner contain these
+    /// permissions):
+    /// `firebase.projects.update`, `resourcemanager.projects.get`,
+    /// `serviceusage.services.enable`, and `serviceusage.services.get`.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `project` - The resource name of the GCP `Project` to which Firebase resources will be
     ///               added, in the format:
-    ///               <br><code>projects/<var>projectId</var></code>
+    ///               <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///               After calling `AddFirebase`, the
-    ///               [`projectId`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
-    ///               of the GCP `Project` is also the `projectId` of the FirebaseProject.
+    ///               [`project_id`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
+    ///               of the GCP `Project` is also the `project_id` of the FirebaseProject.
     pub fn add_firebase(&self, request: AddFirebaseRequest, project: &str) -> ProjectAddFirebaseCall<'a, C, A> {
         ProjectAddFirebaseCall {
             hub: self.hub,
@@ -1817,7 +1810,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent Project for which to list Apps, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn search_apps(&self, parent: &str) -> ProjectSearchAppCall<'a, C, A> {
         ProjectSearchAppCall {
             hub: self.hub,
@@ -1841,7 +1834,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent Project for which to list Apps, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn ios_apps_list(&self, parent: &str) -> ProjectIosAppListCall<'a, C, A> {
         ProjectIosAppListCall {
             hub: self.hub,
@@ -1865,7 +1858,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name, in the format:
-    ///            <br><code>projects/<var>projectId</var>/analyticsDetails</code>
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/analyticsDetails</code>
     pub fn get_analytics_details(&self, name: &str) -> ProjectGetAnalyticsDetailCall<'a, C, A> {
         ProjectGetAnalyticsDetailCall {
             hub: self.hub,
@@ -1909,7 +1902,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent Project for which to list Apps, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn web_apps_list(&self, parent: &str) -> ProjectWebAppListCall<'a, C, A> {
         ProjectWebAppListCall {
             hub: self.hub,
@@ -1983,7 +1976,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `parent` - The parent `FirebaseProject` to link to an existing Google Analytics
     ///              account, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn add_google_analytics(&self, request: AddGoogleAnalyticsRequest, parent: &str) -> ProjectAddGoogleAnalyticCall<'a, C, A> {
         ProjectAddGoogleAnalyticCall {
             hub: self.hub,
@@ -2002,10 +1995,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the App, in the format:
-    ///            <code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
-    ///            <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///            <code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var></code>
+    ///            <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///            from Sub-Collection access pattern may be used here, in the format:
-    ///            <br><code>projects/-/iosApps/<var>appId</var></code>
+    ///            <br><code>projects/-/iosApps/<var>APP_ID</var></code>
     pub fn ios_apps_get(&self, name: &str) -> ProjectIosAppGetCall<'a, C, A> {
         ProjectIosAppGetCall {
             hub: self.hub,
@@ -2028,7 +2021,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent Project in which to create an App, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn web_apps_create(&self, request: WebApp, parent: &str) -> ProjectWebAppCreateCall<'a, C, A> {
         ProjectWebAppCreateCall {
             hub: self.hub,
@@ -2047,10 +2040,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the App configuration to download, in the format:
-    ///            <br><code>projects/<var>projectId</var>/webApps/<var>appId</var>/config</code>
-    ///            <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var>/config</code>
+    ///            <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///            from Sub-Collection access pattern may be used here, in the format:
-    ///            <br><code>projects/-/webApps/<var>appId</var></code>
+    ///            <br><code>projects/-/webApps/<var>APP_ID</var></code>
     pub fn web_apps_get_config(&self, name: &str) -> ProjectWebAppGetConfigCall<'a, C, A> {
         ProjectWebAppGetConfigCall {
             hub: self.hub,
@@ -2069,10 +2062,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the App configuration to download, in the format:
-    ///            <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/config</code>
-    ///            <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/config</code>
+    ///            <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///            from Sub-Collection access pattern may be used here, in the format:
-    ///            <br><code>projects/-/androidApps/<var>appId</var></code>
+    ///            <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     pub fn android_apps_get_config(&self, name: &str) -> ProjectAndroidAppGetConfigCall<'a, C, A> {
         ProjectAndroidAppGetConfigCall {
             hub: self.hub,
@@ -2100,9 +2093,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
     /// for the specified Project and, thus, might return a subset of all possible
     /// GCP resource locations. To list all GCP resource locations (regardless of
-    /// any restrictions), call the endpoint without specifying a `projectId` (that
-    /// is, `/v1beta1/{parent=projects/-}/listAvailableLocations`).
-    /// <br>
+    /// any restrictions), call the endpoint without specifying a `PROJECT_NUMBER`
+    /// (that is, `/v1beta1/{parent=projects/-}/listAvailableLocations`). <br>
     /// <br>To call `ListAvailableLocations` with a specified project, a member
     /// must be at minimum a Viewer of the project. Calls without a specified
     /// project do not require any specific project permissions.
@@ -2110,7 +2102,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The Project for which to list GCP resource locations, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///              <br>If no project is specified (that is, `projects/-`), the returned list
     ///              does not take into account org-specific or project-specific location
     ///              restrictions.
@@ -2138,7 +2130,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent Project in which to create an App, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn ios_apps_create(&self, request: IosApp, parent: &str) -> ProjectIosAppCreateCall<'a, C, A> {
         ProjectIosAppCreateCall {
             hub: self.hub,
@@ -2157,7 +2149,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the `sha-key`, in the format:
-    ///            <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/sha/<var>shaId</var></code>
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/sha/<var>SHA_ID</var></code>
     ///            <br>You can obtain the full name from the response of
     ///            [`ListShaCertificates`](../projects.androidApps.sha/list) or the original
     ///            [`CreateShaCertificate`](../projects.androidApps.sha/create).
@@ -2178,10 +2170,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the App, in the format:
-    ///            <br><code>projects/<var>projectId</var>/webApps/<var>appId</var></code>
-    ///            <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var></code>
+    ///            <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///            from Sub-Collection access pattern may be used here, in the format:
-    ///            <br><code>projects/-/webApps/<var>appId</var></code>
+    ///            <br><code>projects/-/webApps/<var>APP_ID</var></code>
     pub fn web_apps_get(&self, name: &str) -> ProjectWebAppGetCall<'a, C, A> {
         ProjectWebAppGetCall {
             hub: self.hub,
@@ -2200,10 +2192,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent App to which a SHA certificate will be added, in the format:
-    ///              <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-    ///              <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+    ///              <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///              from Sub-Collection access pattern may be used here, in the format:
-    ///              <br><code>projects/-/androidApps/<var>appId</var></code>
+    ///              <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     pub fn android_apps_sha_create(&self, request: ShaCertificate, parent: &str) -> ProjectAndroidAppShaCreateCall<'a, C, A> {
         ProjectAndroidAppShaCreateCall {
             hub: self.hub,
@@ -2251,7 +2243,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent Project in which to create an App, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn android_apps_create(&self, request: AndroidApp, parent: &str) -> ProjectAndroidAppCreateCall<'a, C, A> {
         ProjectAndroidAppCreateCall {
             hub: self.hub,
@@ -2274,7 +2266,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the Project, in the format:
-    ///            <br><code>projects/<var>projectId</var>/adminSdkConfig</code>
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/adminSdkConfig</code>
     pub fn get_admin_sdk_config(&self, name: &str) -> ProjectGetAdminSdkConfigCall<'a, C, A> {
         ProjectGetAdminSdkConfigCall {
             hub: self.hub,
@@ -2296,7 +2288,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `parent` - The parent Project for which to list Apps, in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn android_apps_list(&self, parent: &str) -> ProjectAndroidAppListCall<'a, C, A> {
         ProjectAndroidAppListCall {
             hub: self.hub,
@@ -2316,10 +2308,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the App configuration to download, in the format:
-    ///            <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var>/config</code>
-    ///            <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    ///            <br><code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var>/config</code>
+    ///            <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     ///            from Sub-Collection access pattern may be used here, in the format:
-    ///            <br><code>projects/-/iosApps/<var>appId</var></code>
+    ///            <br><code>projects/-/iosApps/<var>APP_ID</var></code>
     pub fn ios_apps_get_config(&self, name: &str) -> ProjectIosAppGetConfigCall<'a, C, A> {
         ProjectIosAppGetConfigCall {
             hub: self.hub,
@@ -2355,7 +2347,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `parent` - The parent `FirebaseProject` to unlink from its Google Analytics account,
     ///              in the format:
-    ///              <br><code>projects/<var>projectId</var></code>
+    ///              <br><code>projects/<var>PROJECT_NUMBER</var></code>
     pub fn remove_analytics(&self, request: RemoveAnalyticsRequest, parent: &str) -> ProjectRemoveAnalyticCall<'a, C, A> {
         ProjectRemoveAnalyticCall {
             hub: self.hub,
@@ -3445,7 +3437,7 @@ impl<'a, C, A> ProjectDefaultLocationFinalizeCall<'a, C, A> where C: BorrowMut<h
     }
     /// The resource name of the Project for which the default GCP resource
     /// location will be set, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3700,10 +3692,10 @@ impl<'a, C, A> ProjectAndroidAppGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
     /// The fully qualified resource name of the App, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/androidApps/<var>appId</var></code>
+    /// <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3959,10 +3951,10 @@ impl<'a, C, A> ProjectAndroidAppShaListCall<'a, C, A> where C: BorrowMut<hyper::
 
 
     /// The parent App for which to list SHA certificates, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/androidApps/<var>appId</var></code>
+    /// <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4265,7 +4257,7 @@ impl<'a, C, A> ProjectAndroidAppPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self
     }
     /// Specifies which fields to update.
-    /// <br>Note that the fields `name`, `appId`, `projectId`, and `packageName`
+    /// <br>Note that the fields `name`, `app_id`, `project_id`, and `package_name`
     /// are all immutable.
     ///
     /// Sets the *update mask* query property to the given value.
@@ -4518,7 +4510,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
     /// The fully qualified resource name of the Project, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4858,7 +4850,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// <br>
 /// <br>Since a FirebaseProject is actually also a GCP `Project`, a
 /// `FirebaseProject` uses underlying GCP identifiers (most importantly,
-/// the `projectId`) as its own for easy interop with GCP APIs.
+/// the `PROJECT_NUMBER`) as its own for easy interop with GCP APIs.
 /// <br>
 /// <br>The result of this call is an [`Operation`](../../v1beta1/operations).
 /// Poll the `Operation` to track the provisioning process by calling
@@ -4876,8 +4868,11 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// <br>This method does not modify any billing account information on the
 /// underlying GCP `Project`.
 /// <br>
-/// <br>To call `AddFirebase`, a member must be an Editor or Owner for the
-/// existing GCP `Project`. Service accounts cannot call `AddFirebase`.
+/// <br>To call `AddFirebase`, a project member or service account must have
+/// the following permissions (the IAM roles of Editor and Owner contain these
+/// permissions):
+/// `firebase.projects.update`, `resourcemanager.projects.get`,
+/// `serviceusage.services.enable`, and `serviceusage.services.get`.
 ///
 /// A builder for the *addFirebase* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5091,10 +5086,10 @@ impl<'a, C, A> ProjectAddFirebaseCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
     /// The resource name of the GCP `Project` to which Firebase resources will be
     /// added, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     /// After calling `AddFirebase`, the
-    /// [`projectId`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
-    /// of the GCP `Project` is also the `projectId` of the FirebaseProject.
+    /// [`project_id`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
+    /// of the GCP `Project` is also the `project_id` of the FirebaseProject.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5364,7 +5359,7 @@ impl<'a, C, A> ProjectSearchAppCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
     /// The parent Project for which to list Apps, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5654,7 +5649,7 @@ impl<'a, C, A> ProjectIosAppListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
     /// The parent Project for which to list Apps, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5932,7 +5927,7 @@ impl<'a, C, A> ProjectGetAnalyticsDetailCall<'a, C, A> where C: BorrowMut<hyper:
 
 
     /// The fully qualified resource name, in the format:
-    /// <br><code>projects/<var>projectId</var>/analyticsDetails</code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/analyticsDetails</code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6502,7 +6497,7 @@ impl<'a, C, A> ProjectWebAppListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
     /// The parent Project for which to list Apps, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6860,7 +6855,7 @@ impl<'a, C, A> ProjectAddGoogleAnalyticCall<'a, C, A> where C: BorrowMut<hyper::
     }
     /// The parent `FirebaseProject` to link to an existing Google Analytics
     /// account, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7115,10 +7110,10 @@ impl<'a, C, A> ProjectIosAppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
     /// The fully qualified resource name of the App, in the format:
-    /// <code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var></code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/iosApps/<var>appId</var></code>
+    /// <br><code>projects/-/iosApps/<var>APP_ID</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7408,7 +7403,7 @@ impl<'a, C, A> ProjectWebAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// The parent Project in which to create an App, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7663,10 +7658,10 @@ impl<'a, C, A> ProjectWebAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
     /// The resource name of the App configuration to download, in the format:
-    /// <br><code>projects/<var>projectId</var>/webApps/<var>appId</var>/config</code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var>/config</code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/webApps/<var>appId</var></code>
+    /// <br><code>projects/-/webApps/<var>APP_ID</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7922,10 +7917,10 @@ impl<'a, C, A> ProjectAndroidAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper
 
 
     /// The resource name of the App configuration to download, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/config</code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/config</code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/androidApps/<var>appId</var></code>
+    /// <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8013,9 +8008,8 @@ impl<'a, C, A> ProjectAndroidAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper
 /// restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
 /// for the specified Project and, thus, might return a subset of all possible
 /// GCP resource locations. To list all GCP resource locations (regardless of
-/// any restrictions), call the endpoint without specifying a `projectId` (that
-/// is, `/v1beta1/{parent=projects/-}/listAvailableLocations`).
-/// <br>
+/// any restrictions), call the endpoint without specifying a `PROJECT_NUMBER`
+/// (that is, `/v1beta1/{parent=projects/-}/listAvailableLocations`). <br>
 /// <br>To call `ListAvailableLocations` with a specified project, a member
 /// must be at minimum a Viewer of the project. Calls without a specified
 /// project do not require any specific project permissions.
@@ -8210,7 +8204,7 @@ impl<'a, C, A> ProjectAvailableLocationListCall<'a, C, A> where C: BorrowMut<hyp
 
 
     /// The Project for which to list GCP resource locations, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     /// <br>If no project is specified (that is, `projects/-`), the returned list
     /// does not take into account org-specific or project-specific location
     /// restrictions.
@@ -8524,7 +8518,7 @@ impl<'a, C, A> ProjectIosAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// The parent Project in which to create an App, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8779,7 +8773,7 @@ impl<'a, C, A> ProjectAndroidAppShaDeleteCall<'a, C, A> where C: BorrowMut<hyper
 
 
     /// The fully qualified resource name of the `sha-key`, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/sha/<var>shaId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/sha/<var>SHA_ID</var></code>
     /// <br>You can obtain the full name from the response of
     /// [`ListShaCertificates`](../projects.androidApps.sha/list) or the original
     /// [`CreateShaCertificate`](../projects.androidApps.sha/create).
@@ -9037,10 +9031,10 @@ impl<'a, C, A> ProjectWebAppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
     /// The fully qualified resource name of the App, in the format:
-    /// <br><code>projects/<var>projectId</var>/webApps/<var>appId</var></code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var></code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/webApps/<var>appId</var></code>
+    /// <br><code>projects/-/webApps/<var>APP_ID</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9326,10 +9320,10 @@ impl<'a, C, A> ProjectAndroidAppShaCreateCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// The parent App to which a SHA certificate will be added, in the format:
-    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/androidApps/<var>appId</var></code>
+    /// <br><code>projects/-/androidApps/<var>APP_ID</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9924,7 +9918,7 @@ impl<'a, C, A> ProjectAndroidAppCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         self
     }
     /// The parent Project in which to create an App, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10183,7 +10177,7 @@ impl<'a, C, A> ProjectGetAdminSdkConfigCall<'a, C, A> where C: BorrowMut<hyper::
 
 
     /// The fully qualified resource name of the Project, in the format:
-    /// <br><code>projects/<var>projectId</var>/adminSdkConfig</code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/adminSdkConfig</code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10452,7 +10446,7 @@ impl<'a, C, A> ProjectAndroidAppListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
     /// The parent Project for which to list Apps, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10726,10 +10720,10 @@ impl<'a, C, A> ProjectIosAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
     /// The resource name of the App configuration to download, in the format:
-    /// <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var>/config</code>
-    /// <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+    /// <br><code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var>/config</code>
+    /// <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
     /// from Sub-Collection access pattern may be used here, in the format:
-    /// <br><code>projects/-/iosApps/<var>appId</var></code>
+    /// <br><code>projects/-/iosApps/<var>APP_ID</var></code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11032,7 +11026,7 @@ impl<'a, C, A> ProjectRemoveAnalyticCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
     /// The parent `FirebaseProject` to unlink from its Google Analytics account,
     /// in the format:
-    /// <br><code>projects/<var>projectId</var></code>
+    /// <br><code>projects/<var>PROJECT_NUMBER</var></code>
     ///
     /// Sets the *parent* path property to the given value.
     ///

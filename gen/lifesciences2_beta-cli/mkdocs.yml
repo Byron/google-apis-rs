@@ -1,0 +1,22 @@
+site_name: Cloud Life Sciences v1.0.14+20200625
+site_url: http://byron.github.io/google-apis-rs/google-lifesciences2_beta-cli
+site_description: A complete library to interact with Cloud Life Sciences (protocol v2beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/lifesciences2_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-pipelines-run.md', 'Projects', 'Locations Pipelines Run']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

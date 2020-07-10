@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pagespeed Insights* crate version *1.0.13+20200318*, where *20200318* is the exact revision of the *pagespeedonline:v5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Pagespeed Insights* crate version *1.0.14+20200625*, where *20200625* is the exact revision of the *pagespeedonline:v5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Pagespeed Insights* *v5* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v5/about).
@@ -331,7 +331,7 @@ impl<'a, C, A> PagespeedInsights<C, A>
         PagespeedInsights {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://pagespeedonline.googleapis.com/".to_string(),
             _root_url: "https://pagespeedonline.googleapis.com/".to_string(),
         }
@@ -342,7 +342,7 @@ impl<'a, C, A> PagespeedInsights<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -696,6 +696,8 @@ impl Part for AuditRefs {}
 pub struct PagespeedApiLoadingExperienceV5 {
     /// The map of <metrics, data>.
     pub metrics: Option<HashMap<String, UserPageLoadMetricV5>>,
+    /// True if the result is an origin fallback from a page, false otherwise.
+    pub origin_fallback: Option<bool>,
     /// The url, pattern or origin which the metrics are on.
     pub id: Option<String>,
     /// The human readable speed "category" of the id.

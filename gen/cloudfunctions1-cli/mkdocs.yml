@@ -1,4 +1,4 @@
-site_name: Cloud Functions v1.0.13+20200401
+site_name: Cloud Functions v1.0.14+20200629
 site_url: http://byron.github.io/google-apis-rs/google-cloudfunctions1-cli
 site_description: A complete library to interact with Cloud Functions (protocol v1)
 

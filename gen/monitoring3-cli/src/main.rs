@@ -2324,7 +2324,10 @@ impl<'n> Engine<'n> {
                     "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "monitored-resource.labels" => Some(("monitoredResource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "monitored-resource.type" => Some(("monitoredResource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.auth-info.password" => Some(("httpCheck.authInfo.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2334,7 +2337,7 @@ impl<'n> Engine<'n> {
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "request-method", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2590,7 +2593,10 @@ impl<'n> Engine<'n> {
                     "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "monitored-resource.labels" => Some(("monitoredResource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "monitored-resource.type" => Some(("monitoredResource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.auth-info.password" => Some(("httpCheck.authInfo.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2600,7 +2606,7 @@ impl<'n> Engine<'n> {
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "request-method", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3770,7 +3776,7 @@ fn main() {
                      None,
                      Some(r##"Required. The project in which to create the alerting policy. The format is:
         projects/[PROJECT_ID_OR_NUMBER]
-        Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container."##),
+        Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. |name| must be a host project of a workspace, otherwise INVALID_ARGUMENT error will return. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container."##),
                      Some(true),
                      Some(false)),
         
@@ -3841,7 +3847,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("alert-policies-list",
-                    Some(r##"Lists the existing alerting policies for the project."##),
+                    Some(r##"Lists the existing alerting policies for the workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_alert-policies-list",
                   vec![
                     (Some(r##"name"##),
@@ -4549,7 +4555,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("time-series-query",
-                    Some(r##"Queries time series using the time series query language. This method does not require a Workspace."##),
+                    Some(r##"Queries time series using Monitoring Query Language. This method does not require a Workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_time-series-query",
                   vec![
                     (Some(r##"name"##),
@@ -5004,7 +5010,7 @@ fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200329")
+           .version("1.0.14+20200708")
            .about("Manages your Cloud Monitoring data and configurations. Most projects must be associated with a Workspace, with a few exceptions as noted on the individual method pages. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the Cloud Monitoring documentation.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *drive* crate version *1.0.14+20200618*, where *20200618* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -451,7 +451,7 @@ impl<'a, C, A> DriveHub<C, A>
         DriveHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://www.googleapis.com/drive/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -501,7 +501,7 @@ impl<'a, C, A> DriveHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1654,6 +1654,7 @@ pub struct Permission {
     #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
     /// The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  
+    /// - They cannot be set on shared drive items 
     /// - They can only be set on user and group permissions 
     /// - The date must be in the future 
     /// - The date cannot be more than a year in the future 
@@ -1793,6 +1794,9 @@ pub struct FileCapabilities {
     /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
     #[serde(rename="canMoveTeamDriveItem")]
     pub can_move_team_drive_item: Option<bool>,
+    /// Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is false when the item is not a folder. Only populated for items in shared drives.
+    #[serde(rename="canAddFolderFromAnotherDrive")]
+    pub can_add_folder_from_another_drive: Option<bool>,
     /// Whether the current user can download this file.
     #[serde(rename="canDownload")]
     pub can_download: Option<bool>,
@@ -5064,7 +5068,7 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
@@ -5540,7 +5544,7 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
@@ -5568,7 +5572,7 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._ocr = Some(new_value);
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. Requests that specify more than one parent fail.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
@@ -5845,7 +5849,7 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileUntrashCall<'a, C, A> {
@@ -6104,7 +6108,7 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileDeleteCall<'a, C, A> {
@@ -6466,7 +6470,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
@@ -6494,7 +6498,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._ocr = Some(new_value);
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. Requests that specify more than one parent fail.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
@@ -6771,7 +6775,7 @@ impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileTrashCall<'a, C, A> {
@@ -7527,7 +7531,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileListCall<'a, C, A> {
@@ -7583,7 +7587,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._include_team_drive_items = Some(new_value);
         self
     }
-    /// Deprecated - Whether both My Drive and shared drive items should be included in results. This parameter will only be effective until June 1, 2020. Afterwards shared drive items will be included in the results.
+    /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
     pub fn include_items_from_all_drives(mut self, new_value: bool) -> FileListCall<'a, C, A> {
@@ -7874,7 +7878,7 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileTouchCall<'a, C, A> {
@@ -8818,7 +8822,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
@@ -8874,7 +8878,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._modified_date_behavior = Some(new_value.to_string());
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item is removed from all current folders and placed in the requested folder. Other requests that increase the number of parents fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
@@ -9287,7 +9291,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
@@ -9343,7 +9347,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._modified_date_behavior = Some(new_value.to_string());
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item is removed from all current folders and placed in the requested folder. Other requests that increase the number of parents fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
@@ -9675,7 +9679,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
@@ -15758,7 +15762,7 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._child_id = new_value.to_string();
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's last parent is removed, the item will be placed under its owner's root.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. If the item's last parent is removed, the item is placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> ChildrenDeleteCall<'a, C, A> {
@@ -16064,14 +16068,14 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ChildrenInsertCall<'a, C, A> {
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the child's owner makes the request, the child will be removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. If the child's owner makes the request, the child is removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> ChildrenInsertCall<'a, C, A> {
@@ -16809,7 +16813,7 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._parent_id = new_value.to_string();
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's last parent is removed, the item will be placed under its owner's root.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. If the item's last parent is removed, the item is placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> ParentDeleteCall<'a, C, A> {
@@ -17115,14 +17119,14 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ParentInsertCall<'a, C, A> {
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the child's owner makes the request, the child will be removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. If the child's owner makes the request, the child is removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> ParentInsertCall<'a, C, A> {
@@ -19638,7 +19642,7 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, C, A> {
@@ -19971,7 +19975,7 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
@@ -19985,14 +19989,14 @@ impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._send_notification_emails = Some(new_value);
         self
     }
-    /// This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. When set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, when enforceSingleParent=true, parents are not changed. If set to false, when enforceSingleParent=false, existing parents are not changed; however, the file will be added to the new owner's My Drive root folder, unless it is already in the new owner's My Drive.
+    /// This parameter only takes effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. When set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, when enforceSingleParent=true, parents are not changed. If set to false, when enforceSingleParent=false, existing parents are not changed; however, the file will be added to the new owner's My Drive root folder, unless it is already in the new owner's My Drive.
     ///
     /// Sets the *move to new owners root* query property to the given value.
     pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
         self._move_to_new_owners_root = Some(new_value);
         self
     }
-    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. See moveToNewOwnersRoot for details.
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter only takes effect if the item is not in a shared drive. See moveToNewOwnersRoot for details.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
@@ -20341,7 +20345,7 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
@@ -20640,7 +20644,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionListCall<'a, C, A> {
@@ -20996,7 +21000,7 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
@@ -21297,7 +21301,7 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionGetCall<'a, C, A> {
@@ -21797,14 +21801,14 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, C, A> {
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// The ID of the shared drive for which the starting pageToken for listing future changes from that shared drive will be returned.
+    /// The ID of the shared drive for which the starting pageToken for listing future changes from that shared drive is returned.
     ///
     /// Sets the *drive id* query property to the given value.
     pub fn drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, C, A> {
@@ -22103,7 +22107,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
@@ -22145,14 +22149,14 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._include_team_drive_items = Some(new_value);
         self
     }
-    /// Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the result.
+    /// Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive are omitted from the result.
     ///
     /// Sets the *include subscribed* query property to the given value.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
-    /// Deprecated - Whether both My Drive and shared drive items should be included in results. This parameter will only be effective until June 1, 2020. Afterwards shared drive items will be included in the results.
+    /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
     pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
@@ -22173,7 +22177,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._include_corpus_removals = Some(new_value);
         self
     }
-    /// The shared drive from which changes will be returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
+    /// The shared drive from which changes are returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
     ///
     /// Sets the *drive id* query property to the given value.
     pub fn drive_id(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
@@ -22460,14 +22464,14 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetCall<'a, C, A> {
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// The shared drive from which the change will be returned.
+    /// The shared drive from which the change is returned.
     ///
     /// Sets the *drive id* query property to the given value.
     pub fn drive_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
@@ -22797,7 +22801,7 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._supports_team_drives = Some(new_value);
         self
     }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
@@ -22839,14 +22843,14 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._include_team_drive_items = Some(new_value);
         self
     }
-    /// Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the result.
+    /// Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive are omitted from the result.
     ///
     /// Sets the *include subscribed* query property to the given value.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
-    /// Deprecated - Whether both My Drive and shared drive items should be included in results. This parameter will only be effective until June 1, 2020. Afterwards shared drive items will be included in the results.
+    /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
     pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
@@ -22867,7 +22871,7 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._include_corpus_removals = Some(new_value);
         self
     }
-    /// The shared drive from which changes will be returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
+    /// The shared drive from which changes are returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
     ///
     /// Sets the *drive id* query property to the given value.
     pub fn drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {

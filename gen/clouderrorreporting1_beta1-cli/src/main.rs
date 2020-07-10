@@ -741,13 +741,11 @@ fn main() {
                     (Some(r##"group-name"##),
                      None,
                      Some(r##"Required. The group resource name. Written as
-        <code>projects/<var>projectID</var>/groups/<var>group_name</var></code>.
-        Call
-        <a href="/error-reporting/reference/rest/v1beta1/projects.groupStats/list">
-        <code>groupStats.list</code></a> to return a list of groups belonging to
-        this project.
+        `projects/{projectID}/groups/{group_name}`. Call
+        [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list)
+        to return a list of groups belonging to this project.
         
-        Example: <code>projects/my-project-123/groups/my-group</code>"##),
+        Example: `projects/my-project-123/groups/my-group`"##),
                      Some(true),
                      Some(false)),
         
@@ -799,7 +797,7 @@ fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200610")
            .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")

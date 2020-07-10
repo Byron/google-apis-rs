@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Filestore* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *file:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Filestore* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *file:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Filestore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/filestore/).
@@ -334,7 +334,7 @@ impl<'a, C, A> CloudFilestore<C, A>
         CloudFilestore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://file.googleapis.com/".to_string(),
             _root_url: "https://file.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudFilestore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -473,7 +473,7 @@ pub struct Instance {
     /// Output only. Additional information about the instance state, if available.
     #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
-    /// Optional. The description of the instance (2048 characters or less).
+    /// The description of the instance (2048 characters or less).
     pub description: Option<String>,
 }
 
@@ -783,7 +783,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The instance resource name, in the format
+    /// * `name` - Required. The instance resource name, in the format
     ///            projects/{project_id}/locations/{location}/instances/{instance_id}
     pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a, C, A> {
         ProjectLocationInstanceDeleteCall {
@@ -850,7 +850,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The instance resource name, in the format
+    /// * `name` - Required. The instance resource name, in the format
     ///            projects/{project_id}/locations/{location}/instances/{instance_id}.
     pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a, C, A> {
         ProjectLocationInstanceGetCall {
@@ -926,7 +926,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The instance's project and location, in the format
+    /// * `parent` - Required. The instance's project and location, in the format
     ///              projects/{project_id}/locations/{location}. In Cloud Filestore,
     ///              locations map to GCP zones, for example **us-west1-b**.
     pub fn locations_instances_create(&self, request: Instance, parent: &str) -> ProjectLocationInstanceCreateCall<'a, C, A> {
@@ -948,7 +948,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The project and location for which to retrieve instance information,
+    /// * `parent` - Required. The project and location for which to retrieve instance information,
     ///              in the format projects/{project_id}/locations/{location}. In Cloud
     ///              Filestore, locations map to GCP zones, for example **us-west1-b**. To
     ///              retrieve instance information for all locations, use "-" for the {location}
@@ -1713,7 +1713,7 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The instance resource name, in the format
+    /// Required. The instance resource name, in the format
     /// projects/{project_id}/locations/{location}/instances/{instance_id}
     ///
     /// Sets the *name* path property to the given value.
@@ -2565,7 +2565,7 @@ impl<'a, C, A> ProjectLocationInstanceGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The instance resource name, in the format
+    /// Required. The instance resource name, in the format
     /// projects/{project_id}/locations/{location}/instances/{instance_id}.
     ///
     /// Sets the *name* path property to the given value.
@@ -3670,7 +3670,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The instance's project and location, in the format
+    /// Required. The instance's project and location, in the format
     /// projects/{project_id}/locations/{location}. In Cloud Filestore,
     /// locations map to GCP zones, for example **us-west1-b**.
     ///
@@ -3682,7 +3682,7 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
         self._parent = new_value.to_string();
         self
     }
-    /// The name of the instance to create.
+    /// Required. The name of the instance to create.
     /// The name must be unique for the specified project and location.
     ///
     /// Sets the *instance id* query property to the given value.
@@ -3955,7 +3955,7 @@ impl<'a, C, A> ProjectLocationInstanceListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The project and location for which to retrieve instance information,
+    /// Required. The project and location for which to retrieve instance information,
     /// in the format projects/{project_id}/locations/{location}. In Cloud
     /// Filestore, locations map to GCP zones, for example **us-west1-b**. To
     /// retrieve instance information for all locations, use "-" for the {location}

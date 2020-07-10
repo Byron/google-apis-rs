@@ -2,9 +2,9 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webfonts* crate version *1.0.13+20200302*, where *20200302* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Webfonts* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
-//! Everything else about the *webfonts* *v1* API can be found at the
+//! Everything else about the *Webfonts* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fonts/docs/developer_api).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/webfonts1).
 //! # Features
@@ -297,8 +297,8 @@ impl<'a, C, A> Webfonts<C, A>
         Webfonts {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/webfonts/v1/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -308,7 +308,7 @@ impl<'a, C, A> Webfonts<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -316,7 +316,7 @@ impl<'a, C, A> Webfonts<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/webfonts/v1/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -336,7 +336,7 @@ impl<'a, C, A> Webfonts<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// There is no detailed description.
+/// Metadata describing a family of fonts.
 /// 
 /// # Activities
 /// 
@@ -349,7 +349,8 @@ impl<'a, C, A> Webfonts<C, A>
 pub struct Webfont {
     /// The category of the font.
     pub category: Option<String>,
-    /// The font files (with all supported scripts) for each one of the available variants, as a key : value map.
+    /// The font files (with all supported scripts) for each one of the available
+    /// variants, as a key : value map.
     pub files: Option<HashMap<String, String>>,
     /// This kind represents a webfont object in the webfonts service.
     pub kind: Option<String>,
@@ -369,7 +370,8 @@ pub struct Webfont {
 impl Resource for Webfont {}
 
 
-/// There is no detailed description.
+/// Response containing the list of fonts currently served by the
+/// Google Fonts API.
 /// 
 /// # Activities
 /// 
@@ -435,7 +437,8 @@ impl<'a, C, A> WebfontMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of fonts currently served by the Google Fonts Developer API
+    /// Retrieves the list of fonts currently served by the Google Fonts Developer
+    /// API.
     pub fn list(&self) -> WebfontListCall<'a, C, A> {
         WebfontListCall {
             hub: self.hub,
@@ -454,7 +457,8 @@ impl<'a, C, A> WebfontMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Retrieves the list of fonts currently served by the Google Fonts Developer API
+/// Retrieves the list of fonts currently served by the Google Fonts Developer
+/// API.
 ///
 /// A builder for the *list* method supported by a *webfont* resource.
 /// It is not used directly, but through a `WebfontMethods` instance.
@@ -527,7 +531,7 @@ impl<'a, C, A> WebfontListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "webfonts";
+        let mut url = self.hub._base_url.clone() + "v1/webfonts";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -607,7 +611,7 @@ impl<'a, C, A> WebfontListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Enables sorting of the list
+    /// Enables sorting of the list.
     ///
     /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> WebfontListCall<'a, C, A> {
@@ -634,13 +638,17 @@ impl<'a, C, A> WebfontListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> WebfontListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

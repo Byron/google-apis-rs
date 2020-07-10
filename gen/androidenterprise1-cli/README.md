@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20200325*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Android Enterprise* API at revision *20200707*. The CLI is at version *1.0.14*.
 
 ```bash
 androidenterprise1 [options]
@@ -107,13 +107,11 @@ androidenterprise1 [options]
         users
                 delete <enterprise-id> <user-id> [-p <v>]...
                 generate-authentication-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
-                generate-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 get <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 get-available-product-set <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <enterprise-id> <email> [-p <v>]... [-o <out>]
                 revoke-device-access <enterprise-id> <user-id> [-p <v>]...
-                revoke-token <enterprise-id> <user-id> [-p <v>]...
                 set-available-product-set <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
         webapps

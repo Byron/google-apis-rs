@@ -246,7 +246,7 @@ fn main() {
     
     let mut app = App::new("pagespeedonline5")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200318")
+           .version("1.0.14+20200625")
            .about("The PageSpeed Insights API lets you analyze the performance of your website with a simple API.  It offers tailored suggestions for how you can optimize your site, and lets you easily integrate PageSpeed Insights analysis into your development tools and workflow.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pagespeedonline5_cli")

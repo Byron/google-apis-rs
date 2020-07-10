@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Configuration* crate version *1.0.13+20200402*, where *20200402* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Games Configuration* crate version *1.0.14+20200701*, where *20200701* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 //! [official documentation site](https://developers.google.com/games/).
@@ -333,7 +333,7 @@ impl<'a, C, A> GamesConfiguration<C, A>
         GamesConfiguration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -350,7 +350,7 @@ impl<'a, C, A> GamesConfiguration<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -410,7 +410,7 @@ impl Part for GamesNumberFormatConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedStringBundle {
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#localizedStringBundle</code>.
+    /// string `gamesConfiguration#localizedStringBundle`.
     pub kind: Option<String>,
     /// The locale strings.
     pub translations: Option<Vec<LocalizedString>>,
@@ -428,7 +428,7 @@ pub struct LocalizedString {
     /// The locale string.
     pub locale: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#localizedString</code>.
+    /// string `gamesConfiguration#localizedString`.
     pub kind: Option<String>,
     /// The string value.
     pub value: Option<String>,
@@ -454,8 +454,7 @@ pub struct AchievementConfigurationListResponse {
     /// The achievement configurations.
     pub items: Option<Vec<AchievementConfiguration>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string
-    /// <code>gamesConfiguration#achievementConfigurationListResponse</code>.
+    /// string `gamesConfiguration#achievementConfigurationListResponse`.
     pub kind: Option<String>,
 }
 
@@ -479,7 +478,7 @@ pub struct ImageConfiguration {
     #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#imageConfiguration</code>.
+    /// string `gamesConfiguration#imageConfiguration`.
     pub kind: Option<String>,
     /// The image type for the image.
     #[serde(rename="imageType")]
@@ -543,7 +542,7 @@ pub struct AchievementConfiguration {
     #[serde(rename="stepsToUnlock")]
     pub steps_to_unlock: Option<i32>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#achievementConfiguration</code>.
+    /// string `gamesConfiguration#achievementConfiguration`.
     pub kind: Option<String>,
     /// The initial state of the achievement.
     #[serde(rename="initialState")]
@@ -579,7 +578,7 @@ impl ResponseResult for AchievementConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardConfiguration {
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#leaderboardConfiguration</code>.
+    /// string `gamesConfiguration#leaderboardConfiguration`.
     pub kind: Option<String>,
     /// no description provided
     #[serde(rename="scoreOrder")]
@@ -623,7 +622,7 @@ pub struct LeaderboardConfigurationListResponse {
     pub items: Option<Vec<LeaderboardConfiguration>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
     /// string
-    /// <code>gamesConfiguration#leaderboardConfigurationListResponse</code>.
+    /// `gamesConfiguration#leaderboardConfigurationListResponse`.
     pub kind: Option<String>,
 }
 
@@ -640,7 +639,7 @@ pub struct AchievementConfigurationDetail {
     #[serde(rename="iconUrl")]
     pub icon_url: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#achievementConfigurationDetail</code>.
+    /// string `gamesConfiguration#achievementConfigurationDetail`.
     pub kind: Option<String>,
     /// Localized strings for the achievement name.
     pub name: Option<LocalizedStringBundle>,
@@ -670,7 +669,7 @@ pub struct LeaderboardConfigurationDetail {
     #[serde(rename="iconUrl")]
     pub icon_url: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed
-    /// string <code>gamesConfiguration#leaderboardConfigurationDetail</code>.
+    /// string `gamesConfiguration#leaderboardConfigurationDetail`.
     pub kind: Option<String>,
     /// Localized strings for the leaderboard name.
     pub name: Option<LocalizedStringBundle>,
@@ -1516,7 +1515,7 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// The maximum number of resource configurations to return in the response,
     /// used for paging. For any response, the actual number of resources returned
-    /// may be less than the specified <code>maxResults</code>.
+    /// may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a, C, A> {
@@ -3894,7 +3893,7 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// The maximum number of resource configurations to return in the response,
     /// used for paging. For any response, the actual number of resources returned
-    /// may be less than the specified <code>maxResults</code>.
+    /// may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a, C, A> {

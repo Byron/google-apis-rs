@@ -834,6 +834,65 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_agent_environments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().agent_environments_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_agent_environments_users_sessions_contexts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4252,6 +4311,9 @@ impl<'n> Engine<'n> {
                     ("agent-entity-types-patch", Some(opt)) => {
                         call_result = self._projects_agent_entity_types_patch(opt, dry_run, &mut err);
                     },
+                    ("agent-environments-list", Some(opt)) => {
+                        call_result = self._projects_agent_environments_list(opt, dry_run, &mut err);
+                    },
                     ("agent-environments-users-sessions-contexts-create", Some(opt)) => {
                         call_result = self._projects_agent_environments_users_sessions_contexts_create(opt, dry_run, &mut err);
                     },
@@ -4487,7 +4549,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'delete-agent', 'get-agent', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'operations-cancel', 'operations-get', 'operations-list' and 'set-agent'", vec![
+        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-list', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'delete-agent', 'get-agent', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'operations-cancel', 'operations-get', 'operations-list' and 'set-agent'", vec![
             ("agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent.
         
@@ -4763,6 +4825,29 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("agent-environments-list",
+                    Some(r##"Returns the list of all non-draft environments of the specified agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-environments-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to list all environments from.
+        Format: `projects/<Project ID>/agent`."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -5261,9 +5346,15 @@ fn main() {
         
         Uploads new intents and entity types without deleting the existing ones.
         Intents and entity types with the same name are replaced with the new
-        versions from ImportAgentRequest.
+        versions from ImportAgentRequest. After the import, the imported draft
+        agent will be trained automatically (unless disabled in agent settings).
+        However, once the import is done, training may not be completed yet. Please
+        call TrainAgent and wait for the operation it returns in order to train
+        explicitly.
         
-        Operation <response: google.protobuf.Empty>"##),
+        Operation <response: google.protobuf.Empty>
+        An operation which tracks when importing is complete. It only tracks
+        when the draft agent is updated not when it is done training."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-import",
                   vec![
                     (Some(r##"parent"##),
@@ -5487,9 +5578,15 @@ fn main() {
                     Some(r##"Restores the specified agent from a ZIP file.
         
         Replaces the current agent version with a new one. All the intents and
-        entity types in the older version are deleted.
+        entity types in the older version are deleted. After the restore, the
+        restored draft agent will be trained automatically (unless disabled in
+        agent settings). However, once the restore is done, training may not be
+        completed yet. Please call TrainAgent and wait for the operation it
+        returns in order to train explicitly.
         
-        Operation <response: google.protobuf.Empty>"##),
+        Operation <response: google.protobuf.Empty>
+        An operation which tracks when restoring is complete. It only tracks
+        when the draft agent is updated not when it is done training."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-restore",
                   vec![
                     (Some(r##"parent"##),
@@ -6261,7 +6358,7 @@ fn main() {
     
     let mut app = App::new("dialogflow2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200408")
+           .version("1.0.14+20200706")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_cli")
            .arg(Arg::with_name("url")

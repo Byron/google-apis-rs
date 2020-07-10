@@ -2,9 +2,9 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *blogger* crate version *1.0.12+20150422*, where *20150422* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Blogger* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
-//! Everything else about the *blogger* *v3* API can be found at the
+//! Everything else about the *Blogger* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/blogger/docs/3.0/getting_started).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3).
 //! # Features
@@ -187,7 +187,7 @@
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
+//! All structures provided by this library are made to be [encodable](trait.RequestValue.html) and 
 //! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 //! are valid.
 //! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
@@ -364,9 +364,9 @@ impl<'a, C, A> Blogger<C, A>
         Blogger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
-            _base_url: "https://www.googleapis.com/blogger/v3/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://blogger.googleapis.com/".to_string(),
+            _root_url: "https://blogger.googleapis.com/".to_string(),
         }
     }
 
@@ -396,7 +396,7 @@ impl<'a, C, A> Blogger<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -404,7 +404,7 @@ impl<'a, C, A> Blogger<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/blogger/v3/`.
+    /// It defaults to `https://blogger.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -412,7 +412,7 @@ impl<'a, C, A> Blogger<C, A>
     }
 
     /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
+    /// It defaults to `https://blogger.googleapis.com/`.
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
@@ -447,17 +447,18 @@ pub struct BlogPerUserInfo {
     /// True if the user has Admin level access to the blog.
     #[serde(rename="hasAdminAccess")]
     pub has_admin_access: Option<bool>,
-    /// The kind of this entity. Always blogger#blogPerUserInfo
+    /// The kind of this entity. Always blogger#blogPerUserInfo.
     pub kind: Option<String>,
-    /// Access permissions that the user has for the blog (ADMIN, AUTHOR, or READER).
+    /// Access permissions that the user has for the blog (ADMIN, AUTHOR, or
+    /// READER).
     pub role: Option<String>,
-    /// The Photo Album Key for the user when adding photos to the blog
+    /// The Photo Album Key for the user when adding photos to the blog.
     #[serde(rename="photosAlbumKey")]
     pub photos_album_key: Option<String>,
-    /// ID of the User
+    /// ID of the User.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
-    /// ID of the Blog resource
+    /// ID of the Blog resource.
     #[serde(rename="blogId")]
     pub blog_id: Option<String>,
 }
@@ -471,7 +472,7 @@ impl Part for BlogPerUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostPerUserInfo {
-    /// The kind of this entity. Always blogger#postPerUserInfo
+    /// The kind of this entity. Always blogger#postPerUserInfo.
     pub kind: Option<String>,
     /// ID of the Post resource.
     #[serde(rename="postId")]
@@ -505,13 +506,13 @@ impl Part for PostPerUserInfo {}
 pub struct Blog {
     /// The status of the blog.
     pub status: Option<String>,
-    /// The kind of this entry. Always blogger#blog
+    /// The kind of this entry. Always blogger#blog.
     pub kind: Option<String>,
     /// The description of this blog. This is displayed underneath the title.
     pub description: Option<String>,
     /// The locale this Blog is set to.
     pub locale: Option<BlogLocale>,
-    /// The JSON custom meta-data for the Blog
+    /// The JSON custom meta-data for the Blog.
     #[serde(rename="customMetaData")]
     pub custom_meta_data: Option<String>,
     /// The container of posts in this blog.
@@ -553,7 +554,7 @@ pub struct PostUserInfosList {
     pub next_page_token: Option<String>,
     /// The list of Posts with User information for the post, for this Blog.
     pub items: Option<Vec<PostUserInfo>>,
-    /// The kind of this entity. Always blogger#postList
+    /// The kind of this entity. Always blogger#postList.
     pub kind: Option<String>,
 }
 
@@ -573,7 +574,7 @@ impl ResponseResult for PostUserInfosList {}
 pub struct BlogUserInfo {
     /// The Blog resource.
     pub blog: Option<Blog>,
-    /// The kind of this entity. Always blogger#blogUserInfo
+    /// The kind of this entity. Always blogger#blogUserInfo.
     pub kind: Option<String>,
     /// Information about a User for the Blog.
     pub blog_user_info: Option<BlogPerUserInfo>,
@@ -603,14 +604,14 @@ impl Part for CommentInReplyTo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentAuthor {
-    /// The URL of the Comment creator's Profile page.
+    /// The URL of the creator's Profile page.
     pub url: Option<String>,
-    /// The comment creator's avatar.
+    /// The creator's avatar.
     pub image: Option<CommentAuthorImage>,
     /// The display name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The identifier of the Comment creator.
+    /// The identifier of the creator.
     pub id: Option<String>,
 }
 
@@ -618,13 +619,13 @@ impl NestedType for CommentAuthor {}
 impl Part for CommentAuthor {}
 
 
-/// The page author's avatar.
+/// The creator's avatar.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageAuthorImage {
-    /// The page author's avatar URL.
+    /// The creator's avatar URL.
     pub url: Option<String>,
 }
 
@@ -687,9 +688,9 @@ impl Part for PostReplies {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageviewsCounts {
-    /// Count of page views for the given time range
+    /// Count of page views for the given time range.
     pub count: Option<String>,
-    /// Time range the given count applies to
+    /// Time range the given count applies to.
     #[serde(rename="timeRange")]
     pub time_range: Option<String>,
 }
@@ -711,9 +712,9 @@ impl Part for PageviewsCounts {}
 pub struct BlogList {
     /// The list of Blogs this user has Authorship or Admin rights over.
     pub items: Option<Vec<Blog>>,
-    /// The kind of this entity. Always blogger#blogList
+    /// The kind of this entity. Always blogger#blogList.
     pub kind: Option<String>,
-    /// Admin level list of blog per-user information
+    /// Admin level list of blog per-user information.
     #[serde(rename="blogUserInfos")]
     pub blog_user_infos: Option<Vec<BlogUserInfo>>,
 }
@@ -743,7 +744,7 @@ pub struct User {
     pub locale: Option<UserLocale>,
     /// The container of blogs for this user.
     pub blogs: Option<UserBlogs>,
-    /// The kind of this entity. Always blogger#user
+    /// The kind of this entity. Always blogger#user.
     pub kind: Option<String>,
     /// The user's profile page.
     pub url: Option<String>,
@@ -758,13 +759,13 @@ impl Resource for User {}
 impl ResponseResult for User {}
 
 
-/// The Post author's avatar.
+/// The creator's avatar.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostAuthorImage {
-    /// The Post author's avatar URL.
+    /// The creator's avatar URL.
     pub url: Option<String>,
 }
 
@@ -792,7 +793,7 @@ impl Part for PostAuthorImage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Post {
-    /// Status of the post. Only set for admin-level requests
+    /// Status of the post. Only set for admin-level requests.
     pub status: Option<String>,
     /// RFC 3339 date-time when this Post was last updated.
     pub updated: Option<String>,
@@ -809,7 +810,7 @@ pub struct Post {
     pub id: Option<String>,
     /// Data about the blog containing this Post.
     pub blog: Option<PostBlog>,
-    /// The kind of this entity. Always blogger#post
+    /// The kind of this entity. Always blogger#post.
     pub kind: Option<String>,
     /// The title link URL, similar to atom's related link.
     #[serde(rename="titleLink")]
@@ -867,14 +868,14 @@ impl Part for PostLocation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostAuthor {
-    /// The URL of the Post creator's Profile page.
+    /// The URL of the creator's Profile page.
     pub url: Option<String>,
-    /// The Post author's avatar.
+    /// The creator's avatar.
     pub image: Option<PostAuthorImage>,
     /// The display name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The identifier of the Post creator.
+    /// The identifier of the creator.
     pub id: Option<String>,
 }
 
@@ -899,7 +900,7 @@ pub struct CommentList {
     pub next_page_token: Option<String>,
     /// The List of Comments for a Post.
     pub items: Option<Vec<Comment>>,
-    /// The kind of this entry. Always blogger#commentList
+    /// The kind of this entry. Always blogger#commentList.
     pub kind: Option<String>,
     /// Etag of the response.
     pub etag: Option<String>,
@@ -942,22 +943,25 @@ pub struct PostList {
     pub next_page_token: Option<String>,
     /// The list of Posts for this Blog.
     pub items: Option<Vec<Post>>,
-    /// The kind of this entity. Always blogger#postList
+    /// The kind of this entity. Always blogger#postList.
     pub kind: Option<String>,
     /// Etag of the response.
     pub etag: Option<String>,
+    /// Pagination token to fetch the previous page, if one exists.
+    #[serde(rename="prevPageToken")]
+    pub prev_page_token: Option<String>,
 }
 
 impl ResponseResult for PostList {}
 
 
-/// The comment creator's avatar.
+/// The creator's avatar.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentAuthorImage {
-    /// The comment creator's avatar URL.
+    /// The creator's avatar URL.
     pub url: Option<String>,
 }
 
@@ -1025,9 +1029,10 @@ pub struct Page {
     pub status: Option<String>,
     /// Data about the blog containing this Page.
     pub blog: Option<PageBlog>,
-    /// The kind of this entity. Always blogger#page
+    /// The kind of this entity. Always blogger#page.
     pub kind: Option<String>,
-    /// The title of this entity. This is the name displayed in the Admin user interface.
+    /// The title of this entity. This is the name displayed in the Admin user
+    /// interface.
     pub title: Option<String>,
     /// The URL that this Page is displayed at.
     pub url: Option<String>,
@@ -1070,12 +1075,12 @@ impl ResponseResult for Page {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Comment {
-    /// The status of the comment (only populated for admin users)
+    /// The status of the comment (only populated for admin users).
     pub status: Option<String>,
     /// Data about the comment this is in reply to.
     #[serde(rename="inReplyTo")]
     pub in_reply_to: Option<CommentInReplyTo>,
-    /// The kind of this entry. Always blogger#comment
+    /// The kind of this entry. Always blogger#comment.
     pub kind: Option<String>,
     /// The author of this Comment.
     pub author: Option<CommentAuthor>,
@@ -1112,7 +1117,7 @@ impl ResponseResult for Comment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostUserInfo {
-    /// The kind of this entity. Always blogger#postUserInfo
+    /// The kind of this entity. Always blogger#postUserInfo.
     pub kind: Option<String>,
     /// The Post resource.
     pub post: Option<Post>,
@@ -1137,10 +1142,10 @@ impl ResponseResult for PostUserInfo {}
 pub struct Pageviews {
     /// The container of posts in this blog.
     pub counts: Option<Vec<PageviewsCounts>>,
-    /// Blog Id
+    /// Blog Id.
     #[serde(rename="blogId")]
     pub blog_id: Option<String>,
-    /// The kind of this entry. Always blogger#page_views
+    /// The kind of this entry. Always blogger#page_views.
     pub kind: Option<String>,
 }
 
@@ -1153,14 +1158,14 @@ impl ResponseResult for Pageviews {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageAuthor {
-    /// The URL of the Page creator's Profile page.
+    /// The URL of the creator's Profile page.
     pub url: Option<String>,
-    /// The page author's avatar.
+    /// The creator's avatar.
     pub image: Option<PageAuthorImage>,
     /// The display name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The identifier of the Page creator.
+    /// The identifier of the creator.
     pub id: Option<String>,
 }
 
@@ -1184,7 +1189,7 @@ pub struct PageList {
     pub next_page_token: Option<String>,
     /// The list of Pages for a Blog.
     pub items: Option<Vec<Page>>,
-    /// The kind of this entity. Always blogger#pageList
+    /// The kind of this entity. Always blogger#pageList.
     pub kind: Option<String>,
     /// Etag of the response.
     pub etag: Option<String>,
@@ -1199,11 +1204,11 @@ impl ResponseResult for PageList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserLocale {
-    /// The user's country setting.
+    /// The country this blog's locale is set to.
     pub country: Option<String>,
-    /// The user's language variant setting.
+    /// The language variant this blog is authored in.
     pub variant: Option<String>,
-    /// The user's language setting.
+    /// The language this blog is authored in.
     pub language: Option<String>,
 }
 
@@ -1303,11 +1308,11 @@ impl<'a, C, A> PageViewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve pageview stats for a Blog.
+    /// Gets page views by blog id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the blog to get.
+    /// * `blogId` - No description provided.
     pub fn get(&self, blog_id: &str) -> PageViewGetCall<'a, C, A> {
         PageViewGetCall {
             hub: self.hub,
@@ -1363,11 +1368,11 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one user by ID.
+    /// Gets one user by user_id.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - The ID of the user to get.
+    /// * `userId` - No description provided.
     pub fn get(&self, user_id: &str) -> UserGetCall<'a, C, A> {
         UserGetCall {
             hub: self.hub,
@@ -1422,11 +1427,11 @@ impl<'a, C, A> BlogMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of blogs, possibly filtered.
+    /// Lists blogs by user.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    /// * `userId` - No description provided.
     pub fn list_by_user(&self, user_id: &str) -> BlogListByUserCall<'a, C, A> {
         BlogListByUserCall {
             hub: self.hub,
@@ -1443,11 +1448,11 @@ impl<'a, C, A> BlogMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one blog by ID.
+    /// Gets a blog by id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the blog to get.
+    /// * `blogId` - No description provided.
     pub fn get(&self, blog_id: &str) -> BlogGetCall<'a, C, A> {
         BlogGetCall {
             hub: self.hub,
@@ -1462,11 +1467,11 @@ impl<'a, C, A> BlogMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve a Blog by URL.
+    /// Gets a blog by url.
     /// 
     /// # Arguments
     ///
-    /// * `url` - The URL of the blog to retrieve.
+    /// * `url` - No description provided.
     pub fn get_by_url(&self, url: &str) -> BlogGetByUrlCall<'a, C, A> {
         BlogGetByUrlCall {
             hub: self.hub,
@@ -1522,13 +1527,13 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a post.
+    /// Updates a post by blog id and post id.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn update(&self, request: Post, blog_id: &str, post_id: &str) -> PostUpdateCall<'a, C, A> {
         PostUpdateCall {
             hub: self.hub,
@@ -1548,12 +1553,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve a Post by Path.
+    /// Gets a post by path.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch the post from.
-    /// * `path` - Path of the Post to retrieve.
+    /// * `blogId` - No description provided.
+    /// * `path` - No description provided.
     pub fn get_by_path(&self, blog_id: &str, path: &str) -> PostGetByPathCall<'a, C, A> {
         PostGetByPathCall {
             hub: self.hub,
@@ -1569,12 +1574,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a post by ID.
+    /// Gets a post by blog id and post id
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch the post from.
-    /// * `postId` - The ID of the post
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn get(&self, blog_id: &str, post_id: &str) -> PostGetCall<'a, C, A> {
         PostGetCall {
             hub: self.hub,
@@ -1592,12 +1597,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a post.
+    /// Inserts a post.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `blogId` - ID of the blog to add the post to.
+    /// * `blogId` - No description provided.
     pub fn insert(&self, request: Post, blog_id: &str) -> PostInsertCall<'a, C, A> {
         PostInsertCall {
             hub: self.hub,
@@ -1614,12 +1619,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publishes a draft post, optionally at the specific time of the given publishDate parameter.
+    /// Publishes a post.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn publish(&self, blog_id: &str, post_id: &str) -> PostPublishCall<'a, C, A> {
         PostPublishCall {
             hub: self.hub,
@@ -1634,12 +1639,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a post by ID.
+    /// Deletes a post by blog id and post id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn delete(&self, blog_id: &str, post_id: &str) -> PostDeleteCall<'a, C, A> {
         PostDeleteCall {
             hub: self.hub,
@@ -1653,12 +1658,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revert a published or scheduled post to draft state.
+    /// Reverts a published or scheduled post to draft state.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn revert(&self, blog_id: &str, post_id: &str) -> PostRevertCall<'a, C, A> {
         PostRevertCall {
             hub: self.hub,
@@ -1672,12 +1677,12 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Search for a post.
+    /// Searches for posts matching given query terms in the specified blog.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch the post from.
-    /// * `q` - Query terms to search this blog for matching posts.
+    /// * `blogId` - No description provided.
+    /// * `q` - No description provided.
     pub fn search(&self, blog_id: &str, q: &str) -> PostSearchCall<'a, C, A> {
         PostSearchCall {
             hub: self.hub,
@@ -1693,13 +1698,13 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a post. This method supports patch semantics.
+    /// Patches a post.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn patch(&self, request: Post, blog_id: &str, post_id: &str) -> PostPatchCall<'a, C, A> {
         PostPatchCall {
             hub: self.hub,
@@ -1719,11 +1724,11 @@ impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of posts, possibly filtered.
+    /// Lists posts.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch posts from.
+    /// * `blogId` - No description provided.
     pub fn list(&self, blog_id: &str) -> PostListCall<'a, C, A> {
         PostListCall {
             hub: self.hub,
@@ -1788,13 +1793,13 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one comment by ID.
+    /// Gets a comment by id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to containing the comment.
-    /// * `postId` - ID of the post to fetch posts from.
-    /// * `commentId` - The ID of the comment to get.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
+    /// * `commentId` - No description provided.
     pub fn get(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentGetCall<'a, C, A> {
         CommentGetCall {
             hub: self.hub,
@@ -1810,13 +1815,13 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the content of a comment.
+    /// Removes the content of a comment by blog id, post id and comment id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
-    /// * `commentId` - The ID of the comment to delete content from.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
+    /// * `commentId` - No description provided.
     pub fn remove_content(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentRemoveContentCall<'a, C, A> {
         CommentRemoveContentCall {
             hub: self.hub,
@@ -1831,11 +1836,11 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the comments for a blog, across all posts, possibly filtered.
+    /// Lists comments by blog.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch comments from.
+    /// * `blogId` - No description provided.
     pub fn list_by_blog(&self, blog_id: &str) -> CommentListByBlogCall<'a, C, A> {
         CommentListByBlogCall {
             hub: self.hub,
@@ -1854,13 +1859,13 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks a comment as spam.
+    /// Marks a comment as spam by blog id, post id and comment id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
-    /// * `commentId` - The ID of the comment to mark as spam.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
+    /// * `commentId` - No description provided.
     pub fn mark_as_spam(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         CommentMarkAsSpamCall {
             hub: self.hub,
@@ -1875,12 +1880,12 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the comments for a post, possibly filtered.
+    /// Lists comments.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch comments from.
-    /// * `postId` - ID of the post to fetch posts from.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn list(&self, blog_id: &str, post_id: &str) -> CommentListCall<'a, C, A> {
         CommentListCall {
             hub: self.hub,
@@ -1901,13 +1906,13 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks a comment as not spam.
+    /// Marks a comment as not spam by blog id, post id and comment id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
-    /// * `commentId` - The ID of the comment to mark as not spam.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
+    /// * `commentId` - No description provided.
     pub fn approve(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentApproveCall<'a, C, A> {
         CommentApproveCall {
             hub: self.hub,
@@ -1922,13 +1927,13 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a comment by ID.
+    /// Deletes a comment by blog id, post id and comment id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `postId` - The ID of the Post.
-    /// * `commentId` - The ID of the comment to delete.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
+    /// * `commentId` - No description provided.
     pub fn delete(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, A> {
         CommentDeleteCall {
             hub: self.hub,
@@ -1985,13 +1990,13 @@ impl<'a, C, A> PostUserInfoMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user.
+    /// Gets one post and user info pair, by post_id and user_id.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    /// * `blogId` - The ID of the blog.
-    /// * `postId` - The ID of the post to get.
+    /// * `userId` - No description provided.
+    /// * `blogId` - No description provided.
+    /// * `postId` - No description provided.
     pub fn get(&self, user_id: &str, blog_id: &str, post_id: &str) -> PostUserInfoGetCall<'a, C, A> {
         PostUserInfoGetCall {
             hub: self.hub,
@@ -2007,12 +2012,12 @@ impl<'a, C, A> PostUserInfoMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user.
+    /// Lists post and user info pairs.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    /// * `blogId` - ID of the blog to fetch posts from.
+    /// * `userId` - No description provided.
+    /// * `blogId` - No description provided.
     pub fn list(&self, user_id: &str, blog_id: &str) -> PostUserInfoListCall<'a, C, A> {
         PostUserInfoListCall {
             hub: self.hub,
@@ -2077,12 +2082,12 @@ impl<'a, C, A> BlogUserInfoMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one blog and user info pair by blogId and userId.
+    /// Gets one blog and user info pair by blog id and user id.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    /// * `blogId` - The ID of the blog to get.
+    /// * `userId` - No description provided.
+    /// * `blogId` - No description provided.
     pub fn get(&self, user_id: &str, blog_id: &str) -> BlogUserInfoGetCall<'a, C, A> {
         BlogUserInfoGetCall {
             hub: self.hub,
@@ -2139,12 +2144,12 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one blog page by ID.
+    /// Gets a page by blog id and page id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog containing the page.
-    /// * `pageId` - The ID of the page to get.
+    /// * `blogId` - No description provided.
+    /// * `pageId` - No description provided.
     pub fn get(&self, blog_id: &str, page_id: &str) -> PageGetCall<'a, C, A> {
         PageGetCall {
             hub: self.hub,
@@ -2159,11 +2164,11 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the pages for a blog, optionally including non-LIVE statuses.
+    /// Lists pages.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - ID of the blog to fetch Pages from.
+    /// * `blogId` - No description provided.
     pub fn list(&self, blog_id: &str) -> PageListCall<'a, C, A> {
         PageListCall {
             hub: self.hub,
@@ -2181,12 +2186,12 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revert a published or scheduled page to draft state.
+    /// Reverts a published or scheduled page to draft state.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the blog.
-    /// * `pageId` - The ID of the page.
+    /// * `blogId` - No description provided.
+    /// * `pageId` - No description provided.
     pub fn revert(&self, blog_id: &str, page_id: &str) -> PageRevertCall<'a, C, A> {
         PageRevertCall {
             hub: self.hub,
@@ -2200,12 +2205,12 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a page.
+    /// Inserts a page.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `blogId` - ID of the blog to add the page to.
+    /// * `blogId` - No description provided.
     pub fn insert(&self, request: Page, blog_id: &str) -> PageInsertCall<'a, C, A> {
         PageInsertCall {
             hub: self.hub,
@@ -2220,13 +2225,13 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a page. This method supports patch semantics.
+    /// Patches a page.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `blogId` - The ID of the Blog.
-    /// * `pageId` - The ID of the Page.
+    /// * `blogId` - No description provided.
+    /// * `pageId` - No description provided.
     pub fn patch(&self, request: Page, blog_id: &str, page_id: &str) -> PagePatchCall<'a, C, A> {
         PagePatchCall {
             hub: self.hub,
@@ -2243,12 +2248,12 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publishes a draft page.
+    /// Publishes a page.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the blog.
-    /// * `pageId` - The ID of the page.
+    /// * `blogId` - No description provided.
+    /// * `pageId` - No description provided.
     pub fn publish(&self, blog_id: &str, page_id: &str) -> PagePublishCall<'a, C, A> {
         PagePublishCall {
             hub: self.hub,
@@ -2262,13 +2267,13 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a page.
+    /// Updates a page by blog id and page id.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `blogId` - The ID of the Blog.
-    /// * `pageId` - The ID of the Page.
+    /// * `blogId` - No description provided.
+    /// * `pageId` - No description provided.
     pub fn update(&self, request: Page, blog_id: &str, page_id: &str) -> PageUpdateCall<'a, C, A> {
         PageUpdateCall {
             hub: self.hub,
@@ -2285,12 +2290,12 @@ impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a page by ID.
+    /// Deletes a page by blog id and page id.
     /// 
     /// # Arguments
     ///
-    /// * `blogId` - The ID of the Blog.
-    /// * `pageId` - The ID of the Page.
+    /// * `blogId` - No description provided.
+    /// * `pageId` - No description provided.
     pub fn delete(&self, blog_id: &str, page_id: &str) -> PageDeleteCall<'a, C, A> {
         PageDeleteCall {
             hub: self.hub,
@@ -2311,7 +2316,7 @@ impl<'a, C, A> PageMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Retrieve pageview stats for a Blog.
+/// Gets page views by blog id.
 ///
 /// A builder for the *get* method supported by a *pageView* resource.
 /// It is not used directly, but through a `PageViewMethods` instance.
@@ -2389,7 +2394,7 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pageviews";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pageviews";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -2457,9 +2462,15 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -2489,7 +2500,6 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The ID of the blog to get.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -2526,13 +2536,17 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageViewGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2565,7 +2579,7 @@ impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Gets one user by ID.
+/// Gets one user by user_id.
 ///
 /// A builder for the *get* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -2636,7 +2650,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}";
+        let mut url = self.hub._base_url.clone() + "v3/users/{userId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2704,9 +2718,15 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -2736,7 +2756,6 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// The ID of the user to get.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2766,13 +2785,17 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2805,7 +2828,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Retrieves a list of blogs, possibly filtered.
+/// Lists blogs by user.
 ///
 /// A builder for the *listByUser* method supported by a *blog* resource.
 /// It is not used directly, but through a `BlogMethods` instance.
@@ -2900,7 +2923,7 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/blogs";
+        let mut url = self.hub._base_url.clone() + "v3/users/{userId}/blogs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2968,9 +2991,15 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -3000,7 +3029,6 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -3010,14 +3038,13 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._user_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the blogs. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Blog statuses to include in the result (default: Live blogs only). Note that ADMIN access is required to view deleted blogs.
+    /// Default value of status is LIVE.
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -3025,7 +3052,6 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._status.push(new_value.to_string());
         self
     }
-    /// User access types for blogs to include in the results, e.g. AUTHOR will return blogs where the user has author level access. If no roles are specified, defaults to ADMIN and AUTHOR roles.
     ///
     /// Append the given value to the *role* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -3033,7 +3059,6 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._role.push(new_value.to_string());
         self
     }
-    /// Whether the response is a list of blogs with per-user information instead of just blogs.
     ///
     /// Sets the *fetch user info* query property to the given value.
     pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a, C, A> {
@@ -3060,13 +3085,17 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BlogListByUserCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3099,7 +3128,7 @@ impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Gets one blog by ID.
+/// Gets a blog by id.
 ///
 /// A builder for the *get* method supported by a *blog* resource.
 /// It is not used directly, but through a `BlogMethods` instance.
@@ -3180,7 +3209,7 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3248,9 +3277,15 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -3280,7 +3315,6 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// The ID of the blog to get.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -3290,14 +3324,12 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._blog_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the blog. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Maximum number of posts to pull back with the blog.
     ///
     /// Sets the *max posts* query property to the given value.
     pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a, C, A> {
@@ -3324,13 +3356,17 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BlogGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3363,7 +3399,7 @@ impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Retrieve a Blog by URL.
+/// Gets a blog by url.
 ///
 /// A builder for the *getByUrl* method supported by a *blog* resource.
 /// It is not used directly, but through a `BlogMethods` instance.
@@ -3439,7 +3475,7 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/byurl";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/byurl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -3486,9 +3522,15 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -3518,7 +3560,6 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// The URL of the blog to retrieve.
     ///
     /// Sets the *url* query property to the given value.
     ///
@@ -3528,7 +3569,6 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._url = new_value.to_string();
         self
     }
-    /// Access level with which to view the blog. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, A> {
@@ -3555,13 +3595,17 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BlogGetByUrlCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3594,7 +3638,7 @@ impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Update a post.
+/// Updates a post by blog id and post id.
 ///
 /// A builder for the *update* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -3699,7 +3743,7 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -3782,9 +3826,15 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -3823,7 +3873,6 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -3833,7 +3882,6 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -3843,35 +3891,30 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._post_id = new_value.to_string();
         self
     }
-    /// Whether a revert action should be performed when the post is updated (default: false).
     ///
     /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Whether a publish action should be performed when the post is updated (default: false).
     ///
     /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
-    /// Maximum number of comments to retrieve with the returned post.
     ///
     /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Whether image URL metadata for each post is included in the returned result (default: false).
     ///
     /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Whether the body content of the post is included with the result (default: true).
     ///
     /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
@@ -3898,13 +3941,17 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3937,7 +3984,7 @@ impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Retrieve a Post by Path.
+/// Gets a post by path.
 ///
 /// A builder for the *getByPath* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -4020,7 +4067,7 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/bypath";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/bypath";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4088,9 +4135,15 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4120,7 +4173,6 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// ID of the blog to fetch the post from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -4130,7 +4182,6 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._blog_id = new_value.to_string();
         self
     }
-    /// Path of the Post to retrieve.
     ///
     /// Sets the *path* query property to the given value.
     ///
@@ -4140,14 +4191,12 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._path = new_value.to_string();
         self
     }
-    /// Access level with which to view the returned result. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Maximum number of comments to pull back on a post.
     ///
     /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a, C, A> {
@@ -4174,13 +4223,17 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostGetByPathCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4213,7 +4266,7 @@ impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Get a post by ID.
+/// Gets a post by blog id and post id
 ///
 /// A builder for the *get* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -4306,7 +4359,7 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4374,9 +4427,15 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4406,7 +4465,6 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// ID of the blog to fetch the post from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -4416,7 +4474,6 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the post
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -4426,28 +4483,24 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._post_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the returned result. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Maximum number of comments to pull back on a post.
     ///
     /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Whether image URL metadata for each post is included (default: false).
     ///
     /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Whether the body content of the post is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
     ///
     /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a, C, A> {
@@ -4474,13 +4527,17 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4513,7 +4570,7 @@ impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Add a post.
+/// Inserts a post.
 ///
 /// A builder for the *insert* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -4606,7 +4663,7 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4689,9 +4746,15 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4730,7 +4793,6 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// ID of the blog to add the post to.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -4740,21 +4802,18 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// Whether to create the post as a draft (default: false).
     ///
     /// Sets the *is draft* query property to the given value.
     pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._is_draft = Some(new_value);
         self
     }
-    /// Whether image URL metadata for each post is included in the returned result (default: false).
     ///
     /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Whether the body content of the post is included with the result (default: true).
     ///
     /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
@@ -4781,13 +4840,17 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4820,7 +4883,7 @@ impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Publishes a draft post, optionally at the specific time of the given publishDate parameter.
+/// Publishes a post.
 ///
 /// A builder for the *publish* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -4898,7 +4961,7 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/publish";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/publish";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -4966,9 +5029,15 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4998,7 +5067,6 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -5008,7 +5076,6 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -5018,7 +5085,6 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._post_id = new_value.to_string();
         self
     }
-    /// Optional date and time to schedule the publishing of the Blog. If no publishDate parameter is given, the post is either published at the a previously saved schedule date (if present), or the current time. If a future date is given, the post will be scheduled to be published.
     ///
     /// Sets the *publish date* query property to the given value.
     pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
@@ -5045,13 +5111,17 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5084,7 +5154,7 @@ impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Delete a post by ID.
+/// Deletes a post by blog id and post id.
 ///
 /// A builder for the *delete* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -5156,7 +5226,7 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5224,9 +5294,15 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -5246,7 +5322,6 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -5256,7 +5331,6 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -5286,13 +5360,17 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5325,7 +5403,7 @@ impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Revert a published or scheduled post to draft state.
+/// Reverts a published or scheduled post to draft state.
 ///
 /// A builder for the *revert* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -5398,7 +5476,7 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/revert";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -5466,9 +5544,15 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -5498,7 +5582,6 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -5508,7 +5591,6 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -5538,13 +5620,17 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5577,7 +5663,7 @@ impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Search for a post.
+/// Searches for posts matching given query terms in the specified blog.
 ///
 /// A builder for the *search* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -5660,7 +5746,7 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/search";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5728,9 +5814,15 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -5760,7 +5852,6 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// ID of the blog to fetch the post from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -5770,7 +5861,6 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// Query terms to search this blog for matching posts.
     ///
     /// Sets the *q* query property to the given value.
     ///
@@ -5780,14 +5870,12 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._q = new_value.to_string();
         self
     }
-    /// Sort search results
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
     ///
     /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a, C, A> {
@@ -5814,13 +5902,17 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5853,7 +5945,7 @@ impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Update a post. This method supports patch semantics.
+/// Patches a post.
 ///
 /// A builder for the *patch* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -5958,7 +6050,7 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6041,9 +6133,15 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6082,7 +6180,6 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -6092,7 +6189,6 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -6102,35 +6198,30 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._post_id = new_value.to_string();
         self
     }
-    /// Whether a revert action should be performed when the post is updated (default: false).
     ///
     /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Whether a publish action should be performed when the post is updated (default: false).
     ///
     /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
-    /// Maximum number of comments to retrieve with the returned post.
     ///
     /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
-    /// Whether image URL metadata for each post is included in the returned result (default: false).
     ///
     /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Whether the body content of the post is included with the result (default: true).
     ///
     /// Sets the *fetch body* query property to the given value.
     pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
@@ -6157,13 +6248,17 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6196,7 +6291,7 @@ impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Retrieves a list of posts, possibly filtered.
+/// Lists posts.
 ///
 /// A builder for the *list* method supported by a *post* resource.
 /// It is not used directly, but through a `PostMethods` instance.
@@ -6319,7 +6414,7 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6387,9 +6482,15 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6419,7 +6520,6 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// ID of the blog to fetch posts from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -6429,14 +6529,12 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._blog_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the returned result. Note that some fields require escalated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
-    /// Statuses to include in the results.
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -6444,56 +6542,48 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._status.push(new_value.to_string());
         self
     }
-    /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Continuation token if the request is paged.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sort search results
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of posts to fetch.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PostListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Comma-separated list of labels to search for.
     ///
     /// Sets the *labels* query property to the given value.
     pub fn labels(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._labels = Some(new_value.to_string());
         self
     }
-    /// Whether image URL metadata for each post is included.
     ///
     /// Sets the *fetch images* query property to the given value.
     pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
-    /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
     ///
     /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Latest post date to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> PostListCall<'a, C, A> {
@@ -6520,13 +6610,17 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6559,7 +6653,7 @@ impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Gets one comment by ID.
+/// Gets a comment by id.
 ///
 /// A builder for the *get* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -6639,7 +6733,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/comments/{commentId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/comments/{commentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6707,9 +6801,15 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6739,7 +6839,6 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// ID of the blog to containing the comment.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -6749,7 +6848,6 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// ID of the post to fetch posts from.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -6759,7 +6857,6 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._post_id = new_value.to_string();
         self
     }
-    /// The ID of the comment to get.
     ///
     /// Sets the *comment id* path property to the given value.
     ///
@@ -6769,7 +6866,6 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._comment_id = new_value.to_string();
         self
     }
-    /// Access level for the requested comment (default: READER). Note that some comments will require elevated permissions, for example comments where the parent posts which is in a draft state, or comments that are pending moderation.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
@@ -6796,13 +6892,17 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6835,7 +6935,7 @@ impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Removes the content of a comment.
+/// Removes the content of a comment by blog id, post id and comment id.
 ///
 /// A builder for the *removeContent* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -6910,7 +7010,7 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/comments/{commentId}/removecontent";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/comments/{commentId}/removecontent";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -6978,9 +7078,15 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7010,7 +7116,6 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -7020,7 +7125,6 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -7030,7 +7134,6 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._post_id = new_value.to_string();
         self
     }
-    /// The ID of the comment to delete content from.
     ///
     /// Sets the *comment id* path property to the given value.
     ///
@@ -7060,13 +7163,17 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentRemoveContentCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7099,7 +7206,7 @@ impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Retrieves the comments for a blog, across all posts, possibly filtered.
+/// Lists comments by blog.
 ///
 /// A builder for the *listByBlog* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -7202,7 +7309,7 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/comments";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7270,9 +7377,15 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7302,7 +7415,6 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// ID of the blog to fetch comments from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -7319,35 +7431,30 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._status.push(new_value.to_string());
         self
     }
-    /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Continuation token if request is paged.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of comments to include in the result.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Whether the body content of the comments is included.
     ///
     /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
@@ -7374,13 +7481,17 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentListByBlogCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7413,7 +7524,7 @@ impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Marks a comment as spam.
+/// Marks a comment as spam by blog id, post id and comment id.
 ///
 /// A builder for the *markAsSpam* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -7488,7 +7599,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/comments/{commentId}/spam";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/comments/{commentId}/spam";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -7556,9 +7667,15 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7588,7 +7705,6 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -7598,7 +7714,6 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -7608,7 +7723,6 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._post_id = new_value.to_string();
         self
     }
-    /// The ID of the comment to mark as spam.
     ///
     /// Sets the *comment id* path property to the given value.
     ///
@@ -7638,13 +7752,17 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7677,7 +7795,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Retrieves the comments for a post, possibly filtered.
+/// Lists comments.
 ///
 /// A builder for the *list* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -7706,7 +7824,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("blogId", "postId")
 ///              .view("ipsum")
-///              .add_status("aliquyam")
+///              .status("aliquyam")
 ///              .start_date("dolores")
 ///              .page_token("sit")
 ///              .max_results(60)
@@ -7722,7 +7840,7 @@ pub struct CommentListCall<'a, C, A>
     _blog_id: String,
     _post_id: String,
     _view: Option<String>,
-    _status: Vec<String>,
+    _status: Option<String>,
     _start_date: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -7755,10 +7873,8 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._view {
             params.push(("view", value.to_string()));
         }
-        if self._status.len() > 0 {
-            for f in self._status.iter() {
-                params.push(("status", f.to_string()));
-            }
+        if let Some(value) = self._status {
+            params.push(("status", value.to_string()));
         }
         if let Some(value) = self._start_date {
             params.push(("startDate", value.to_string()));
@@ -7787,7 +7903,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/comments";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/comments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7855,9 +7971,15 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7887,7 +8009,6 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// ID of the blog to fetch comments from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -7897,7 +8018,6 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._blog_id = new_value.to_string();
         self
     }
-    /// ID of the post to fetch posts from.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -7907,7 +8027,6 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._post_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the returned result. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
@@ -7915,41 +8034,35 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self
     }
     ///
-    /// Append the given value to the *status* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
-        self._status.push(new_value.to_string());
+    /// Sets the *status* query property to the given value.
+    pub fn status(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
+        self._status = Some(new_value.to_string());
         self
     }
-    /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Continuation token if request is paged.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of comments to include in the result.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Whether the body content of the comments is included.
     ///
     /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
@@ -7976,13 +8089,17 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8015,7 +8132,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Marks a comment as not spam.
+/// Marks a comment as not spam by blog id, post id and comment id.
 ///
 /// A builder for the *approve* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -8090,7 +8207,7 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/comments/{commentId}/approve";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/comments/{commentId}/approve";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8158,9 +8275,15 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -8190,7 +8313,6 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -8200,7 +8322,6 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -8210,7 +8331,6 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._post_id = new_value.to_string();
         self
     }
-    /// The ID of the comment to mark as not spam.
     ///
     /// Sets the *comment id* path property to the given value.
     ///
@@ -8240,13 +8360,17 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentApproveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8279,7 +8403,7 @@ impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Delete a comment by ID.
+/// Deletes a comment by blog id, post id and comment id.
 ///
 /// A builder for the *delete* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -8353,7 +8477,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/posts/{postId}/comments/{commentId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/posts/{postId}/comments/{commentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8421,9 +8545,15 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -8443,7 +8573,6 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -8453,7 +8582,6 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Post.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -8463,7 +8591,6 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._post_id = new_value.to_string();
         self
     }
-    /// The ID of the comment to delete.
     ///
     /// Sets the *comment id* path property to the given value.
     ///
@@ -8493,13 +8620,17 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8532,7 +8663,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user.
+/// Gets one post and user info pair, by post_id and user_id.
 ///
 /// A builder for the *get* method supported by a *postUserInfo* resource.
 /// It is not used directly, but through a `PostUserInfoMethods` instance.
@@ -8612,7 +8743,7 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/blogs/{blogId}/posts/{postId}";
+        let mut url = self.hub._base_url.clone() + "v3/users/{userId}/blogs/{blogId}/posts/{postId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8680,9 +8811,15 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -8712,7 +8849,6 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -8722,7 +8858,6 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._user_id = new_value.to_string();
         self
     }
-    /// The ID of the blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -8732,7 +8867,6 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the post to get.
     ///
     /// Sets the *post id* path property to the given value.
     ///
@@ -8742,7 +8876,6 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._post_id = new_value.to_string();
         self
     }
-    /// Maximum number of comments to pull back on a post.
     ///
     /// Sets the *max comments* query property to the given value.
     pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a, C, A> {
@@ -8769,13 +8902,17 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8808,7 +8945,7 @@ impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user.
+/// Lists post and user info pairs.
 ///
 /// A builder for the *list* method supported by a *postUserInfo* resource.
 /// It is not used directly, but through a `PostUserInfoMethods` instance.
@@ -8928,7 +9065,7 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/blogs/{blogId}/posts";
+        let mut url = self.hub._base_url.clone() + "v3/users/{userId}/blogs/{blogId}/posts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8996,9 +9133,15 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9028,7 +9171,6 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -9038,7 +9180,6 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._user_id = new_value.to_string();
         self
     }
-    /// ID of the blog to fetch posts from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -9048,7 +9189,6 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._blog_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the returned result. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
@@ -9062,49 +9202,42 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._status.push(new_value.to_string());
         self
     }
-    /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *start date* query property to the given value.
     pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
-    /// Continuation token if the request is paged.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Sort order applied to search results. Default is published.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of posts to fetch.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Comma-separated list of labels to search for.
     ///
     /// Sets the *labels* query property to the given value.
     pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._labels = Some(new_value.to_string());
         self
     }
-    /// Whether the body content of posts is included. Default is false.
     ///
     /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
-    /// Latest post date to fetch, a date-time with RFC 3339 formatting.
     ///
     /// Sets the *end date* query property to the given value.
     pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
@@ -9131,13 +9264,17 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9170,7 +9307,7 @@ impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Gets one blog and user info pair by blogId and userId.
+/// Gets one blog and user info pair by blog id and user id.
 ///
 /// A builder for the *get* method supported by a *blogUserInfo* resource.
 /// It is not used directly, but through a `BlogUserInfoMethods` instance.
@@ -9248,7 +9385,7 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "users/{userId}/blogs/{blogId}";
+        let mut url = self.hub._base_url.clone() + "v3/users/{userId}/blogs/{blogId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9316,9 +9453,15 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9348,7 +9491,6 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -9358,7 +9500,6 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._user_id = new_value.to_string();
         self
     }
-    /// The ID of the blog to get.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -9368,7 +9509,6 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._blog_id = new_value.to_string();
         self
     }
-    /// Maximum number of posts to pull back with the blog.
     ///
     /// Sets the *max posts* query property to the given value.
     pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a, C, A> {
@@ -9395,13 +9535,17 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> BlogUserInfoGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9434,7 +9578,7 @@ impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Gets one blog page by ID.
+/// Gets a page by blog id and page id.
 ///
 /// A builder for the *get* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -9512,7 +9656,7 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9580,9 +9724,15 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9612,7 +9762,6 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// ID of the blog containing the page.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -9622,7 +9771,6 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the page to get.
     ///
     /// Sets the *page id* path property to the given value.
     ///
@@ -9658,13 +9806,17 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9697,7 +9849,7 @@ impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Retrieves the pages for a blog, optionally including non-LIVE statuses.
+/// Lists pages.
 ///
 /// A builder for the *list* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -9795,7 +9947,7 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9863,9 +10015,15 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9895,7 +10053,6 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// ID of the blog to fetch Pages from.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -9905,7 +10062,6 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._blog_id = new_value.to_string();
         self
     }
-    /// Access level with which to view the returned result. Note that some fields require elevated access.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> PageListCall<'a, C, A> {
@@ -9919,21 +10075,18 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._status.push(new_value.to_string());
         self
     }
-    /// Continuation token if the request is paged.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of Pages to fetch.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> PageListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Whether to retrieve the Page bodies.
     ///
     /// Sets the *fetch bodies* query property to the given value.
     pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a, C, A> {
@@ -9960,13 +10113,17 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9999,7 +10156,7 @@ impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Revert a published or scheduled page to draft state.
+/// Reverts a published or scheduled page to draft state.
 ///
 /// A builder for the *revert* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -10072,7 +10229,7 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages/{pageId}/revert";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages/{pageId}/revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10140,9 +10297,15 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -10172,7 +10335,6 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -10182,7 +10344,6 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the page.
     ///
     /// Sets the *page id* path property to the given value.
     ///
@@ -10212,13 +10373,17 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10251,7 +10416,7 @@ impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Add a page.
+/// Inserts a page.
 ///
 /// A builder for the *insert* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -10334,7 +10499,7 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10417,9 +10582,15 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -10458,7 +10629,6 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// ID of the blog to add the page to.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -10468,7 +10638,6 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// Whether to create the page as a draft (default: false).
     ///
     /// Sets the *is draft* query property to the given value.
     pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a, C, A> {
@@ -10495,13 +10664,17 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10534,7 +10707,7 @@ impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Update a page. This method supports patch semantics.
+/// Patches a page.
 ///
 /// A builder for the *patch* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -10624,7 +10797,7 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10707,9 +10880,15 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -10748,7 +10927,6 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -10758,7 +10936,6 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Page.
     ///
     /// Sets the *page id* path property to the given value.
     ///
@@ -10768,14 +10945,12 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._page_id = new_value.to_string();
         self
     }
-    /// Whether a revert action should be performed when the page is updated (default: false).
     ///
     /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Whether a publish action should be performed when the page is updated (default: false).
     ///
     /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a, C, A> {
@@ -10802,13 +10977,17 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PagePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10841,7 +11020,7 @@ impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Publishes a draft page.
+/// Publishes a page.
 ///
 /// A builder for the *publish* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -10914,7 +11093,7 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages/{pageId}/publish";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages/{pageId}/publish";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -10982,9 +11161,15 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11014,7 +11199,6 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The ID of the blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -11024,7 +11208,6 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the page.
     ///
     /// Sets the *page id* path property to the given value.
     ///
@@ -11054,13 +11237,17 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PagePublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11093,7 +11280,7 @@ impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Update a page.
+/// Updates a page by blog id and page id.
 ///
 /// A builder for the *update* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -11183,7 +11370,7 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11266,9 +11453,15 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11307,7 +11500,6 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -11317,7 +11509,6 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Page.
     ///
     /// Sets the *page id* path property to the given value.
     ///
@@ -11327,14 +11518,12 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._page_id = new_value.to_string();
         self
     }
-    /// Whether a revert action should be performed when the page is updated (default: false).
     ///
     /// Sets the *revert* query property to the given value.
     pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
-    /// Whether a publish action should be performed when the page is updated (default: false).
     ///
     /// Sets the *publish* query property to the given value.
     pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a, C, A> {
@@ -11361,13 +11550,17 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11400,7 +11593,7 @@ impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Delete a page by ID.
+/// Deletes a page by blog id and page id.
 ///
 /// A builder for the *delete* method supported by a *page* resource.
 /// It is not used directly, but through a `PageMethods` instance.
@@ -11472,7 +11665,7 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         }
 
 
-        let mut url = self.hub._base_url.clone() + "blogs/{blogId}/pages/{pageId}";
+        let mut url = self.hub._base_url.clone() + "v3/blogs/{blogId}/pages/{pageId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -11540,9 +11733,15 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11562,7 +11761,6 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the Blog.
     ///
     /// Sets the *blog id* path property to the given value.
     ///
@@ -11572,7 +11770,6 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._blog_id = new_value.to_string();
         self
     }
-    /// The ID of the Page.
     ///
     /// Sets the *page id* path property to the given value.
     ///
@@ -11602,13 +11799,17 @@ impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

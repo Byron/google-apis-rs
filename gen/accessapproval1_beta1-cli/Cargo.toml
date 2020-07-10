@@ -4,7 +4,7 @@
 [package]
 
 name = "google-accessapproval1_beta1-cli"
-version = "1.0.13+20200409"
+version = "1.0.14+20200708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Access Approval (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/accessapproval1_beta1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-accessapproval1_beta1]
 path = "../accessapproval1_beta1"
-version = "1.0.13+20200409"
+version = "1.0.14+20200708"

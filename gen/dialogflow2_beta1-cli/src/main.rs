@@ -834,6 +834,65 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_agent_environments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().agent_environments_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_agent_environments_users_sessions_contexts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2690,10 +2749,14 @@ impl<'n> Engine<'n> {
                     "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "latest-reload-status.status.message" => Some(("latestReloadStatus.status.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-reload-status.status.code" => Some(("latestReloadStatus.status.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-reload-status.time" => Some(("latestReloadStatus.time", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-auto-reload" => Some(("enableAutoReload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "content-uri", "display-name", "enable-auto-reload", "knowledge-types", "latest-reload-status", "message", "mime-type", "name", "raw-content", "status", "time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2944,10 +3007,14 @@ impl<'n> Engine<'n> {
                     "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "latest-reload-status.status.message" => Some(("latestReloadStatus.status.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-reload-status.status.code" => Some(("latestReloadStatus.status.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-reload-status.time" => Some(("latestReloadStatus.time", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-auto-reload" => Some(("enableAutoReload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "content-uri", "display-name", "enable-auto-reload", "knowledge-types", "latest-reload-status", "message", "mime-type", "name", "raw-content", "status", "time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4741,10 +4808,14 @@ impl<'n> Engine<'n> {
                     "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "latest-reload-status.status.message" => Some(("latestReloadStatus.status.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-reload-status.status.code" => Some(("latestReloadStatus.status.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-reload-status.time" => Some(("latestReloadStatus.time", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-auto-reload" => Some(("enableAutoReload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "content-uri", "display-name", "enable-auto-reload", "knowledge-types", "latest-reload-status", "message", "mime-type", "name", "raw-content", "status", "time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4995,10 +5066,14 @@ impl<'n> Engine<'n> {
                     "content-uri" => Some(("contentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-types" => Some(("knowledgeTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "latest-reload-status.status.message" => Some(("latestReloadStatus.status.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-reload-status.status.code" => Some(("latestReloadStatus.status.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-reload-status.time" => Some(("latestReloadStatus.time", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "raw-content" => Some(("rawContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-auto-reload" => Some(("enableAutoReload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "content-uri", "display-name", "knowledge-types", "mime-type", "name", "raw-content"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "content-uri", "display-name", "enable-auto-reload", "knowledge-types", "latest-reload-status", "message", "mime-type", "name", "raw-content", "status", "time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6137,6 +6212,65 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_agent_environments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agent_environments_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_agent_environments_users_sessions_contexts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -7065,102 +7199,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_agent_fulfillment(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "generic-web-service.is-cloud-function" => Some(("genericWebService.isCloudFunction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "generic-web-service.request-headers" => Some(("genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "generic-web-service.username" => Some(("genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "generic-web-service.password" => Some(("genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "generic-web-service.uri" => Some(("genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "enabled", "generic-web-service", "is-cloud-function", "name", "password", "request-headers", "uri", "username"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleCloudDialogflowV2beta1Fulfillment = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_agent_fulfillment(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _projects_locations_agent_get_fulfillment(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_agent_get_fulfillment(opt.value_of("name").unwrap_or(""));
@@ -7915,6 +7953,65 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_agent_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agent_search(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -8875,6 +8972,102 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_agent_update_fulfillment(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.is-cloud-function" => Some(("genericWebService.isCloudFunction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "generic-web-service.request-headers" => Some(("genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "generic-web-service.username" => Some(("genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.password" => Some(("genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.uri" => Some(("genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "enabled", "generic-web-service", "is-cloud-function", "name", "password", "request-headers", "uri", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1Fulfillment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agent_update_fulfillment(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_delete_agent(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_delete_agent(opt.value_of("parent").unwrap_or(""));
@@ -9548,6 +9741,9 @@ impl<'n> Engine<'n> {
                     ("agent-entity-types-patch", Some(opt)) => {
                         call_result = self._projects_agent_entity_types_patch(opt, dry_run, &mut err);
                     },
+                    ("agent-environments-list", Some(opt)) => {
+                        call_result = self._projects_agent_environments_list(opt, dry_run, &mut err);
+                    },
                     ("agent-environments-users-sessions-contexts-create", Some(opt)) => {
                         call_result = self._projects_agent_environments_users_sessions_contexts_create(opt, dry_run, &mut err);
                     },
@@ -9767,6 +9963,9 @@ impl<'n> Engine<'n> {
                     ("locations-agent-entity-types-patch", Some(opt)) => {
                         call_result = self._projects_locations_agent_entity_types_patch(opt, dry_run, &mut err);
                     },
+                    ("locations-agent-environments-list", Some(opt)) => {
+                        call_result = self._projects_locations_agent_environments_list(opt, dry_run, &mut err);
+                    },
                     ("locations-agent-environments-users-sessions-contexts-create", Some(opt)) => {
                         call_result = self._projects_locations_agent_environments_users_sessions_contexts_create(opt, dry_run, &mut err);
                     },
@@ -9806,9 +10005,6 @@ impl<'n> Engine<'n> {
                     ("locations-agent-export", Some(opt)) => {
                         call_result = self._projects_locations_agent_export(opt, dry_run, &mut err);
                     },
-                    ("locations-agent-fulfillment", Some(opt)) => {
-                        call_result = self._projects_locations_agent_fulfillment(opt, dry_run, &mut err);
-                    },
                     ("locations-agent-get-fulfillment", Some(opt)) => {
                         call_result = self._projects_locations_agent_get_fulfillment(opt, dry_run, &mut err);
                     },
@@ -9838,6 +10034,9 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-agent-restore", Some(opt)) => {
                         call_result = self._projects_locations_agent_restore(opt, dry_run, &mut err);
+                    },
+                    ("locations-agent-search", Some(opt)) => {
+                        call_result = self._projects_locations_agent_search(opt, dry_run, &mut err);
                     },
                     ("locations-agent-sessions-contexts-create", Some(opt)) => {
                         call_result = self._projects_locations_agent_sessions_contexts_create(opt, dry_run, &mut err);
@@ -9877,6 +10076,9 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-agent-train", Some(opt)) => {
                         call_result = self._projects_locations_agent_train(opt, dry_run, &mut err);
+                    },
+                    ("locations-agent-update-fulfillment", Some(opt)) => {
+                        call_result = self._projects_locations_agent_update_fulfillment(opt, dry_run, &mut err);
                     },
                     ("locations-delete-agent", Some(opt)) => {
                         call_result = self._projects_locations_delete_agent(opt, dry_run, &mut err);
@@ -9999,10 +10201,9 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'delete-agent', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-get', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch', 'locations-agent-entity-types-batch-delete', 'locations-agent-entity-types-batch-update', 'locations-agent-entity-types-create', 'locations-agent-entity-types-delete', 'locations-agent-entity-types-entities-batch-create', 'locations-agent-entity-types-entities-batch-delete', 'locations-agent-entity-types-entities-batch-update', 'locations-agent-entity-types-get', 'locations-agent-entity-types-list', 'locations-agent-entity-types-patch', 'locations-agent-environments-users-sessions-contexts-create', 'locations-agent-environments-users-sessions-contexts-delete', 'locations-agent-environments-users-sessions-contexts-get', 'locations-agent-environments-users-sessions-contexts-list', 'locations-agent-environments-users-sessions-contexts-patch', 'locations-agent-environments-users-sessions-delete-contexts', 'locations-agent-environments-users-sessions-detect-intent', 'locations-agent-environments-users-sessions-entity-types-create', 'locations-agent-environments-users-sessions-entity-types-delete', 'locations-agent-environments-users-sessions-entity-types-get', 'locations-agent-environments-users-sessions-entity-types-list', 'locations-agent-environments-users-sessions-entity-types-patch', 'locations-agent-export', 'locations-agent-fulfillment', 'locations-agent-get-fulfillment', 'locations-agent-import', 'locations-agent-intents-batch-delete', 'locations-agent-intents-batch-update', 'locations-agent-intents-create', 'locations-agent-intents-delete', 'locations-agent-intents-get', 'locations-agent-intents-list', 'locations-agent-intents-patch', 'locations-agent-restore', 'locations-agent-sessions-contexts-create', 'locations-agent-sessions-contexts-delete', 'locations-agent-sessions-contexts-get', 'locations-agent-sessions-contexts-list', 'locations-agent-sessions-contexts-patch', 'locations-agent-sessions-delete-contexts', 'locations-agent-sessions-detect-intent', 'locations-agent-sessions-entity-types-create', 'locations-agent-sessions-entity-types-delete', 'locations-agent-sessions-entity-types-get', 'locations-agent-sessions-entity-types-list', 'locations-agent-sessions-entity-types-patch', 'locations-agent-train', 'locations-delete-agent', 'locations-get-agent', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-set-agent', 'operations-cancel', 'operations-get', 'operations-list' and 'set-agent'", vec![
+        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-list', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'delete-agent', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-get', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch', 'locations-agent-entity-types-batch-delete', 'locations-agent-entity-types-batch-update', 'locations-agent-entity-types-create', 'locations-agent-entity-types-delete', 'locations-agent-entity-types-entities-batch-create', 'locations-agent-entity-types-entities-batch-delete', 'locations-agent-entity-types-entities-batch-update', 'locations-agent-entity-types-get', 'locations-agent-entity-types-list', 'locations-agent-entity-types-patch', 'locations-agent-environments-list', 'locations-agent-environments-users-sessions-contexts-create', 'locations-agent-environments-users-sessions-contexts-delete', 'locations-agent-environments-users-sessions-contexts-get', 'locations-agent-environments-users-sessions-contexts-list', 'locations-agent-environments-users-sessions-contexts-patch', 'locations-agent-environments-users-sessions-delete-contexts', 'locations-agent-environments-users-sessions-detect-intent', 'locations-agent-environments-users-sessions-entity-types-create', 'locations-agent-environments-users-sessions-entity-types-delete', 'locations-agent-environments-users-sessions-entity-types-get', 'locations-agent-environments-users-sessions-entity-types-list', 'locations-agent-environments-users-sessions-entity-types-patch', 'locations-agent-export', 'locations-agent-get-fulfillment', 'locations-agent-import', 'locations-agent-intents-batch-delete', 'locations-agent-intents-batch-update', 'locations-agent-intents-create', 'locations-agent-intents-delete', 'locations-agent-intents-get', 'locations-agent-intents-list', 'locations-agent-intents-patch', 'locations-agent-restore', 'locations-agent-search', 'locations-agent-sessions-contexts-create', 'locations-agent-sessions-contexts-delete', 'locations-agent-sessions-contexts-get', 'locations-agent-sessions-contexts-list', 'locations-agent-sessions-contexts-patch', 'locations-agent-sessions-delete-contexts', 'locations-agent-sessions-detect-intent', 'locations-agent-sessions-entity-types-create', 'locations-agent-sessions-entity-types-delete', 'locations-agent-sessions-entity-types-get', 'locations-agent-sessions-entity-types-list', 'locations-agent-sessions-entity-types-patch', 'locations-agent-train', 'locations-agent-update-fulfillment', 'locations-delete-agent', 'locations-get-agent', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-set-agent', 'operations-cancel', 'operations-get', 'operations-list' and 'set-agent'", vec![
             ("agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent.
-        
         Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-batch-delete",
                   vec![
@@ -10033,7 +10234,6 @@ fn main() {
                   ]),
             ("agent-entity-types-batch-update",
                     Some(r##"Updates/Creates multiple entity types in the specified agent.
-        
         Operation <response: BatchUpdateEntityTypesResponse>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-batch-update",
                   vec![
@@ -10273,6 +10473,32 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("agent-environments-list",
+                    Some(r##"Returns the list of all non-draft environments of the specified agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-environments-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to list all environments from.
+        Format:
+        - `projects/<Project Number / ID>/agent`
+        - `projects/<Project Number / ID>/locations/<Location
+        ID>/agent"##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -10769,10 +10995,16 @@ fn main() {
         
         Uploads new intents and entity types without deleting the existing ones.
         Intents and entity types with the same name are replaced with the new
-        versions from ImportAgentRequest.
+        versions from ImportAgentRequest. After the import, the imported draft
+        agent will be trained automatically (unless disabled in agent settings).
+        However, once the import is done, training may not be completed yet. Please
+        call TrainAgent and wait for the operation it returns in order to train
+        explicitly.
         
         
-        Operation <response: google.protobuf.Empty>"##),
+        Operation <response: google.protobuf.Empty>
+        An operation which tracks when importing is complete. It only tracks
+        when the draft agent is updated not when it is done training."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-import",
                   vec![
                     (Some(r##"parent"##),
@@ -10968,7 +11200,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique identifier of this intent.
+                     Some(r##"Optional. The unique identifier of this intent.
         Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
         methods.
         Format: `projects/<Project ID>/agent/intents/<Intent ID>`."##),
@@ -11092,7 +11324,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the document to delete.
+                     Some(r##"Required. The name of the document to delete.
         Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
         ID>/documents/<Document ID>`."##),
                      Some(true),
@@ -11172,7 +11404,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The document resource name.
+                     Some(r##"Optional. The document resource name.
         The name must be empty when creating a document.
         Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
         ID>/documents/<Document ID>`."##),
@@ -11209,7 +11441,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the document to reload.
+                     Some(r##"Required. The name of the document to reload.
         Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
         ID>/documents/<Document ID>`"##),
                      Some(true),
@@ -11322,10 +11554,16 @@ fn main() {
                     Some(r##"Restores the specified agent from a ZIP file.
         
         Replaces the current agent version with a new one. All the intents and
-        entity types in the older version are deleted.
+        entity types in the older version are deleted. After the restore, the
+        restored draft agent will be trained automatically (unless disabled in
+        agent settings). However, once the restore is done, training may not be
+        completed yet. Please call TrainAgent and wait for the operation it
+        returns in order to train explicitly.
         
         
-        Operation <response: google.protobuf.Empty>"##),
+        Operation <response: google.protobuf.Empty>
+        An operation which tracks when restoring is complete. It only tracks
+        when the draft agent is updated not when it is done training."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-restore",
                   vec![
                     (Some(r##"parent"##),
@@ -11355,7 +11593,6 @@ fn main() {
                   ]),
             ("agent-search",
                     Some(r##"Returns the list of agents.
-        
         Since there is at most one conversational agent per project, this method is
         useful primarily for listing all agents across projects the caller has
         access to. One can achieve that with a wildcard project collection id "-".
@@ -11987,7 +12224,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the document to delete.
+                     Some(r##"Required. The name of the document to delete.
         Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
         ID>/documents/<Document ID>`."##),
                      Some(true),
@@ -12067,7 +12304,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The document resource name.
+                     Some(r##"Optional. The document resource name.
         The name must be empty when creating a document.
         Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
         ID>/documents/<Document ID>`."##),
@@ -12104,7 +12341,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the document to reload.
+                     Some(r##"Required. The name of the document to reload.
         Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
         ID>/documents/<Document ID>`"##),
                      Some(true),
@@ -12215,7 +12452,6 @@ fn main() {
                   ]),
             ("locations-agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent.
-        
         Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-entity-types-batch-delete",
                   vec![
@@ -12246,7 +12482,6 @@ fn main() {
                   ]),
             ("locations-agent-entity-types-batch-update",
                     Some(r##"Updates/Creates multiple entity types in the specified agent.
-        
         Operation <response: BatchUpdateEntityTypesResponse>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-entity-types-batch-update",
                   vec![
@@ -12486,6 +12721,32 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agent-environments-list",
+                    Some(r##"Returns the list of all non-draft environments of the specified agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-environments-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to list all environments from.
+        Format:
+        - `projects/<Project Number / ID>/agent`
+        - `projects/<Project Number / ID>/locations/<Location
+        ID>/agent"##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -12930,35 +13191,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-agent-fulfillment",
-                    Some(r##"Updates the fulfillment."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-fulfillment",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. The unique identifier of the fulfillment.
-        Format: `projects/<Project ID>/agent/fulfillment`."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-agent-get-fulfillment",
                     Some(r##"Retrieves the fulfillment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-get-fulfillment",
@@ -12987,10 +13219,16 @@ fn main() {
         
         Uploads new intents and entity types without deleting the existing ones.
         Intents and entity types with the same name are replaced with the new
-        versions from ImportAgentRequest.
+        versions from ImportAgentRequest. After the import, the imported draft
+        agent will be trained automatically (unless disabled in agent settings).
+        However, once the import is done, training may not be completed yet. Please
+        call TrainAgent and wait for the operation it returns in order to train
+        explicitly.
         
         
-        Operation <response: google.protobuf.Empty>"##),
+        Operation <response: google.protobuf.Empty>
+        An operation which tracks when importing is complete. It only tracks
+        when the draft agent is updated not when it is done training."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-import",
                   vec![
                     (Some(r##"parent"##),
@@ -13186,7 +13424,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique identifier of this intent.
+                     Some(r##"Optional. The unique identifier of this intent.
         Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
         methods.
         Format: `projects/<Project ID>/agent/intents/<Intent ID>`."##),
@@ -13215,10 +13453,16 @@ fn main() {
                     Some(r##"Restores the specified agent from a ZIP file.
         
         Replaces the current agent version with a new one. All the intents and
-        entity types in the older version are deleted.
+        entity types in the older version are deleted. After the restore, the
+        restored draft agent will be trained automatically (unless disabled in
+        agent settings). However, once the restore is done, training may not be
+        completed yet. Please call TrainAgent and wait for the operation it
+        returns in order to train explicitly.
         
         
-        Operation <response: google.protobuf.Empty>"##),
+        Operation <response: google.protobuf.Empty>
+        An operation which tracks when restoring is complete. It only tracks
+        when the draft agent is updated not when it is done training."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-restore",
                   vec![
                     (Some(r##"parent"##),
@@ -13233,6 +13477,34 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agent-search",
+                    Some(r##"Returns the list of agents.
+        Since there is at most one conversational agent per project, this method is
+        useful primarily for listing all agents across projects the caller has
+        access to. One can achieve that with a wildcard project collection id "-".
+        Refer to [List
+        Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-search",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project to list agents from.
+        Format: `projects/<Project ID or '-'>`."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -13677,6 +13949,35 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-agent-update-fulfillment",
+                    Some(r##"Updates the fulfillment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-agent-update-fulfillment",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The unique identifier of the fulfillment.
+        Format: `projects/<Project ID>/agent/fulfillment`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-delete-agent",
                     Some(r##"Deletes the specified agent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-delete-agent",
@@ -13959,7 +14260,7 @@ fn main() {
     
     let mut app = App::new("dialogflow2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200408")
+           .version("1.0.14+20200706")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli")
            .arg(Arg::with_name("url")

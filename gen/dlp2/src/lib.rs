@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DLP* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *DLP* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *DLP* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/dlp/docs/).
@@ -353,7 +353,7 @@ impl<'a, C, A> DLP<C, A>
         DLP {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://dlp.googleapis.com/".to_string(),
             _root_url: "https://dlp.googleapis.com/".to_string(),
         }
@@ -373,7 +373,7 @@ impl<'a, C, A> DLP<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -445,8 +445,7 @@ pub struct GooglePrivacyDlpV2CreateDlpJobRequest {
     /// Set to control what and how to inspect.
     #[serde(rename="inspectJob")]
     pub inspect_job: Option<GooglePrivacyDlpV2InspectJobConfig>,
-    /// The geographic location to store and process the job. Reserved for
-    /// future extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// The job id can contain uppercase and lowercase letters,
@@ -476,9 +475,7 @@ pub struct GooglePrivacyDlpV2RedactImageRequest {
     /// The content must be PNG, JPEG, SVG or BMP.
     #[serde(rename="byteItem")]
     pub byte_item: Option<GooglePrivacyDlpV2ByteContentItem>,
-    /// The geographic location to process the request. Reserved for future
-    /// extensions.
-    /// Location is restricted to 'global', 'us', 'asia', and 'europe'.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Configuration for the inspector.
@@ -667,7 +664,7 @@ pub struct GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig {
     /// 
     /// This annotation identifies the surrogate when inspecting content using the
     /// custom infoType
-    /// [`SurrogateType`](/dlp/docs/reference/rest/v2/InspectConfig#surrogatetype).
+    /// [`SurrogateType`](https://cloud.google.com/dlp/docs/reference/rest/v2/InspectConfig#surrogatetype).
     /// This facilitates reversal of the surrogate when it occurs in free text.
     /// 
     /// In order for inspection to work properly, the name of this infoType must
@@ -1018,7 +1015,7 @@ impl RequestValue for GooglePrivacyDlpV2ActivateJobTriggerRequest {}
 /// Publish a message into given Pub/Sub topic when DlpJob has completed. The
 /// message contains a single field, `DlpJobName`, which is equal to the
 /// finished job's
-/// [`DlpJob.name`](/dlp/docs/reference/rest/v2/projects.dlpJobs#DlpJob).
+/// [`DlpJob.name`](https://cloud.google.com/dlp/docs/reference/rest/v2/projects.dlpJobs#DlpJob).
 /// Compatible with: Inspect, Risk
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1389,7 +1386,12 @@ impl Part for GooglePrivacyDlpV2QuasiIdField {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2TableLocation {
-    /// The zero-based index of the row where the finding is located.
+    /// The zero-based index of the row where the finding is located. Only
+    /// populated for resources that have a natural ordering, not BigQuery. In
+    /// BigQuery, to identify the row a finding came from, populate
+    /// BigQueryOptions.identifying_fields with your primary key column names and
+    /// when you store the findings the value of those columns will be stored
+    /// inside of Finding.
     #[serde(rename="rowIndex")]
     pub row_index: Option<String>,
 }
@@ -1420,12 +1422,12 @@ impl Part for GooglePrivacyDlpV2TableLocation {}
 pub struct GooglePrivacyDlpV2FixedSizeBucketingConfig {
     /// Required. Lower bound value of buckets. All values less than `lower_bound` are
     /// grouped together into a single bucket; for example if `lower_bound` = 10,
-    /// then all values less than 10 are replaced with the value “-10”.
+    /// then all values less than 10 are replaced with the value "-10".
     #[serde(rename="lowerBound")]
     pub lower_bound: Option<GooglePrivacyDlpV2Value>,
     /// Required. Upper bound value of buckets. All values greater than upper_bound are
     /// grouped together into a single bucket; for example if `upper_bound` = 89,
-    /// then all values greater than 89 are replaced with the value “89+”.
+    /// then all values greater than 89 are replaced with the value "89+".
     #[serde(rename="upperBound")]
     pub upper_bound: Option<GooglePrivacyDlpV2Value>,
     /// Required. Size of each bucket (except for minimum and maximum buckets). So if
@@ -1512,8 +1514,7 @@ pub struct GooglePrivacyDlpV2DeidentifyContentRequest {
     /// deidentify_template_name argument.
     #[serde(rename="deidentifyConfig")]
     pub deidentify_config: Option<GooglePrivacyDlpV2DeidentifyConfig>,
-    /// The geographic location to process de-identification. Reserved for future
-    /// extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Template to use. Any configuration directly specified in
@@ -2290,8 +2291,7 @@ impl Part for GooglePrivacyDlpV2DetectionRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2CreateInspectTemplateRequest {
-    /// The geographic location to store the inspection template. Reserved for
-    /// future extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Required. The InspectTemplate to create.
@@ -2852,8 +2852,7 @@ pub struct GooglePrivacyDlpV2CreateJobTriggerRequest {
     /// characters. Can be empty to allow the system to generate one.
     #[serde(rename="triggerId")]
     pub trigger_id: Option<String>,
-    /// The geographic location to store the job trigger. Reserved for
-    /// future extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Required. The JobTrigger to create.
@@ -2958,8 +2957,7 @@ pub struct GooglePrivacyDlpV2Bucket {
     /// Lower bound of the range, inclusive. Type should be the same as max if
     /// used.
     pub min: Option<GooglePrivacyDlpV2Value>,
-    /// Replacement value for this bucket. If not provided
-    /// the default behavior will be to hyphenate the min-max range.
+    /// Required. Replacement value for this bucket.
     #[serde(rename="replacementValue")]
     pub replacement_value: Option<GooglePrivacyDlpV2Value>,
 }
@@ -3080,7 +3078,7 @@ impl Part for GooglePrivacyDlpV2FileSet {}
 
 /// Message for detecting output from deidentification transformations
 /// such as
-/// [`CryptoReplaceFfxFpeConfig`](/dlp/docs/reference/rest/v2/organizations.deidentifyTemplates#cryptoreplaceffxfpeconfig).
+/// [`CryptoReplaceFfxFpeConfig`](https://cloud.google.com/dlp/docs/reference/rest/v2/organizations.deidentifyTemplates#cryptoreplaceffxfpeconfig).
 /// These types of transformations are
 /// those that perform pseudonymization, thereby producing a "surrogate" as
 /// output. This should be used in conjunction with a field on the
@@ -3810,8 +3808,7 @@ pub struct GooglePrivacyDlpV2ReidentifyContentRequest {
     /// are recursively merged.
     #[serde(rename="reidentifyTemplateName")]
     pub reidentify_template_name: Option<String>,
-    /// The geographic location to process content reidentification.  Reserved for
-    /// future extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Configuration for the re-identification of the content item.
@@ -4181,8 +4178,7 @@ pub struct GooglePrivacyDlpV2CreateDeidentifyTemplateRequest {
     /// Required. The DeidentifyTemplate to create.
     #[serde(rename="deidentifyTemplate")]
     pub deidentify_template: Option<GooglePrivacyDlpV2DeidentifyTemplate>,
-    /// The geographic location to store the deidentification template. Reserved
-    /// for future extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// The template id can contain uppercase and lowercase letters,
@@ -4218,8 +4214,7 @@ pub struct GooglePrivacyDlpV2CreateStoredInfoTypeRequest {
     /// characters. Can be empty to allow the system to generate one.
     #[serde(rename="storedInfoTypeId")]
     pub stored_info_type_id: Option<String>,
-    /// The geographic location to store the stored infoType. Reserved for
-    /// future extensions.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
 }
@@ -5189,10 +5184,7 @@ pub struct GooglePrivacyDlpV2InspectContentRequest {
     /// the template referenced by the inspect_template_name argument.
     #[serde(rename="inspectConfig")]
     pub inspect_config: Option<GooglePrivacyDlpV2InspectConfig>,
-    /// The geographic location to process content inspection. Reserved for future
-    /// extensions.
-    /// When inspecting images location is restricted to 'global', 'us', 'asia',
-    /// and 'europe'.
+    /// Deprecated. This field has no effect.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
 }
@@ -5293,18 +5285,19 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location where stored infoTypes will be retrieved from.
-    ///                  Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_stored_info_types_list(&self, parent: &str, location_id: &str) -> OrganizationLocationStoredInfoTypeListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_stored_info_types_list(&self, parent: &str) -> OrganizationLocationStoredInfoTypeListCall<'a, C, A> {
         OrganizationLocationStoredInfoTypeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5320,8 +5313,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn stored_info_types_create(&self, request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest, parent: &str) -> OrganizationStoredInfoTypeCreateCall<'a, C, A> {
         OrganizationStoredInfoTypeCreateCall {
             hub: self.hub,
@@ -5364,16 +5360,16 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location to store the deidentification template. Reserved
-    ///                  for future extensions.
-    pub fn locations_deidentify_templates_create(&self, request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest, parent: &str, location_id: &str) -> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_deidentify_templates_create(&self, request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest, parent: &str) -> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> {
         OrganizationLocationDeidentifyTemplateCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5388,8 +5384,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn stored_info_types_list(&self, parent: &str) -> OrganizationStoredInfoTypeListCall<'a, C, A> {
         OrganizationStoredInfoTypeListCall {
             hub: self.hub,
@@ -5434,16 +5433,16 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location to store the stored infoType. Reserved for
-    ///                  future extensions.
-    pub fn locations_stored_info_types_create(&self, request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest, parent: &str, location_id: &str) -> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_stored_info_types_create(&self, request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest, parent: &str) -> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> {
         OrganizationLocationStoredInfoTypeCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5522,8 +5521,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn inspect_templates_list(&self, parent: &str) -> OrganizationInspectTemplateListCall<'a, C, A> {
         OrganizationInspectTemplateListCall {
             hub: self.hub,
@@ -5546,8 +5548,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn deidentify_templates_list(&self, parent: &str) -> OrganizationDeidentifyTemplateListCall<'a, C, A> {
         OrganizationDeidentifyTemplateListCall {
             hub: self.hub,
@@ -5596,8 +5601,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn deidentify_templates_create(&self, request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest, parent: &str) -> OrganizationDeidentifyTemplateCreateCall<'a, C, A> {
         OrganizationDeidentifyTemplateCreateCall {
             hub: self.hub,
@@ -5638,16 +5646,16 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location to store the inspection template. Reserved for
-    ///                  future extensions.
-    pub fn locations_inspect_templates_create(&self, request: GooglePrivacyDlpV2CreateInspectTemplateRequest, parent: &str, location_id: &str) -> OrganizationLocationInspectTemplateCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_inspect_templates_create(&self, request: GooglePrivacyDlpV2CreateInspectTemplateRequest, parent: &str) -> OrganizationLocationInspectTemplateCreateCall<'a, C, A> {
         OrganizationLocationInspectTemplateCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5706,18 +5714,19 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location where deidentifications templates will be retrieved
-    ///                  from. Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_deidentify_templates_list(&self, parent: &str, location_id: &str) -> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_deidentify_templates_list(&self, parent: &str) -> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> {
         OrganizationLocationDeidentifyTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5862,8 +5871,11 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn inspect_templates_create(&self, request: GooglePrivacyDlpV2CreateInspectTemplateRequest, parent: &str) -> OrganizationInspectTemplateCreateCall<'a, C, A> {
         OrganizationInspectTemplateCreateCall {
             hub: self.hub,
@@ -5882,18 +5894,19 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location where inspection templates will be retrieved from.
-    ///                  Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_inspect_templates_list(&self, parent: &str, location_id: &str) -> OrganizationLocationInspectTemplateListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_inspect_templates_list(&self, parent: &str) -> OrganizationLocationInspectTemplateListCall<'a, C, A> {
         OrganizationLocationInspectTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5971,6 +5984,7 @@ impl<'a, C, A> InfoTypeMethods<'a, C, A> {
     pub fn list(&self) -> InfoTypeListCall<'a, C, A> {
         InfoTypeListCall {
             hub: self.hub,
+            _parent: Default::default(),
             _location_id: Default::default(),
             _language_code: Default::default(),
             _filter: Default::default(),
@@ -6118,14 +6132,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name.
-    /// * `locationId` - The geographic location to process content reidentification.  Reserved for
-    ///                  future extensions.
-    pub fn locations_content_reidentify(&self, request: GooglePrivacyDlpV2ReidentifyContentRequest, parent: &str, location_id: &str) -> ProjectLocationContentReidentifyCall<'a, C, A> {
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_content_reidentify(&self, request: GooglePrivacyDlpV2ReidentifyContentRequest, parent: &str) -> ProjectLocationContentReidentifyCall<'a, C, A> {
         ProjectLocationContentReidentifyCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6159,18 +6172,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id.
-    /// * `locationId` - The geographic location where jobs will be retrieved from.
-    ///                  Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_dlp_jobs_list(&self, parent: &str, location_id: &str) -> ProjectLocationDlpJobListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_dlp_jobs_list(&self, parent: &str) -> ProjectLocationDlpJobListCall<'a, C, A> {
         ProjectLocationDlpJobListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _type_: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -6212,8 +6225,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn inspect_templates_create(&self, request: GooglePrivacyDlpV2CreateInspectTemplateRequest, parent: &str) -> ProjectInspectTemplateCreateCall<'a, C, A> {
         ProjectInspectTemplateCreateCall {
             hub: self.hub,
@@ -6232,18 +6248,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location where inspection templates will be retrieved from.
-    ///                  Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_inspect_templates_list(&self, parent: &str, location_id: &str) -> ProjectLocationInspectTemplateListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_inspect_templates_list(&self, parent: &str) -> ProjectLocationInspectTemplateListCall<'a, C, A> {
         ProjectLocationInspectTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6299,8 +6316,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn inspect_templates_list(&self, parent: &str) -> ProjectInspectTemplateListCall<'a, C, A> {
         ProjectInspectTemplateListCall {
             hub: self.hub,
@@ -6324,15 +6344,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id.
-    /// * `locationId` - The geographic location to store the job trigger. Reserved for
-    ///                  future extensions.
-    pub fn locations_job_triggers_create(&self, request: GooglePrivacyDlpV2CreateJobTriggerRequest, parent: &str, location_id: &str) -> ProjectLocationJobTriggerCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_job_triggers_create(&self, request: GooglePrivacyDlpV2CreateJobTriggerRequest, parent: &str) -> ProjectLocationJobTriggerCreateCall<'a, C, A> {
         ProjectLocationJobTriggerCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6369,8 +6388,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn stored_info_types_create(&self, request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest, parent: &str) -> ProjectStoredInfoTypeCreateCall<'a, C, A> {
         ProjectStoredInfoTypeCreateCall {
             hub: self.hub,
@@ -6505,15 +6527,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name, for example projects/my-project-id.
-    /// * `locationId` - The geographic location to process de-identification. Reserved for future
-    ///                  extensions.
-    pub fn locations_content_deidentify(&self, request: GooglePrivacyDlpV2DeidentifyContentRequest, parent: &str, location_id: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
+    /// * `parent` - Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_content_deidentify(&self, request: GooglePrivacyDlpV2DeidentifyContentRequest, parent: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
         ProjectLocationContentDeidentifyCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6527,17 +6548,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example `projects/my-project-id`.
-    /// * `locationId` - The geographic location where job triggers will be retrieved from.
-    ///                  Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_job_triggers_list(&self, parent: &str, location_id: &str) -> ProjectLocationJobTriggerListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_job_triggers_list(&self, parent: &str) -> ProjectLocationJobTriggerListCall<'a, C, A> {
         ProjectLocationJobTriggerListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -6558,7 +6579,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn dlp_jobs_create(&self, request: GooglePrivacyDlpV2CreateDlpJobRequest, parent: &str) -> ProjectDlpJobCreateCall<'a, C, A> {
         ProjectDlpJobCreateCall {
             hub: self.hub,
@@ -6689,16 +6712,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location to store the stored infoType. Reserved for
-    ///                  future extensions.
-    pub fn locations_stored_info_types_create(&self, request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest, parent: &str, location_id: &str) -> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_stored_info_types_create(&self, request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest, parent: &str) -> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> {
         ProjectLocationStoredInfoTypeCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6737,6 +6760,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn content_reidentify(&self, request: GooglePrivacyDlpV2ReidentifyContentRequest, parent: &str) -> ProjectContentReidentifyCall<'a, C, A> {
         ProjectContentReidentifyCall {
             hub: self.hub,
@@ -6763,17 +6788,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name, for example projects/my-project-id.
-    /// * `locationId` - The geographic location to process content inspection. Reserved for future
-    ///                  extensions.
-    ///                  When inspecting images location is restricted to 'global', 'us', 'asia',
-    ///                  and 'europe'.
-    pub fn locations_content_inspect(&self, request: GooglePrivacyDlpV2InspectContentRequest, parent: &str, location_id: &str) -> ProjectLocationContentInspectCall<'a, C, A> {
+    /// * `parent` - Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_content_inspect(&self, request: GooglePrivacyDlpV2InspectContentRequest, parent: &str) -> ProjectLocationContentInspectCall<'a, C, A> {
         ProjectLocationContentInspectCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6857,7 +6879,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name, for example projects/my-project-id.
+    /// * `parent` - Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn content_inspect(&self, request: GooglePrivacyDlpV2InspectContentRequest, parent: &str) -> ProjectContentInspectCall<'a, C, A> {
         ProjectContentInspectCall {
             hub: self.hub,
@@ -6903,16 +6927,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name, for example projects/my-project-id.
-    /// * `locationId` - The geographic location to process the request. Reserved for future
-    ///                  extensions.
-    ///                  Location is restricted to 'global', 'us', 'asia', and 'europe'.
-    pub fn locations_image_redact(&self, request: GooglePrivacyDlpV2RedactImageRequest, parent: &str, location_id: &str) -> ProjectLocationImageRedactCall<'a, C, A> {
+    /// * `parent` - The parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_image_redact(&self, request: GooglePrivacyDlpV2RedactImageRequest, parent: &str) -> ProjectLocationImageRedactCall<'a, C, A> {
         ProjectLocationImageRedactCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6994,16 +7016,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location to store the deidentification template. Reserved
-    ///                  for future extensions.
-    pub fn locations_deidentify_templates_create(&self, request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest, parent: &str, location_id: &str) -> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_deidentify_templates_create(&self, request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest, parent: &str) -> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> {
         ProjectLocationDeidentifyTemplateCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7019,16 +7041,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location to store the inspection template. Reserved for
-    ///                  future extensions.
-    pub fn locations_inspect_templates_create(&self, request: GooglePrivacyDlpV2CreateInspectTemplateRequest, parent: &str, location_id: &str) -> ProjectLocationInspectTemplateCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_inspect_templates_create(&self, request: GooglePrivacyDlpV2CreateInspectTemplateRequest, parent: &str) -> ProjectLocationInspectTemplateCreateCall<'a, C, A> {
         ProjectLocationInspectTemplateCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7048,15 +7070,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id.
-    /// * `locationId` - The geographic location to store and process the job. Reserved for
-    ///                  future extensions.
-    pub fn locations_dlp_jobs_create(&self, request: GooglePrivacyDlpV2CreateDlpJobRequest, parent: &str, location_id: &str) -> ProjectLocationDlpJobCreateCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    pub fn locations_dlp_jobs_create(&self, request: GooglePrivacyDlpV2CreateDlpJobRequest, parent: &str) -> ProjectLocationDlpJobCreateCall<'a, C, A> {
         ProjectLocationDlpJobCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7111,8 +7132,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn stored_info_types_list(&self, parent: &str) -> ProjectStoredInfoTypeListCall<'a, C, A> {
         ProjectStoredInfoTypeListCall {
             hub: self.hub,
@@ -7176,18 +7200,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location where stored infoTypes will be retrieved from.
-    ///                  Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_stored_info_types_list(&self, parent: &str, location_id: &str) -> ProjectLocationStoredInfoTypeListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_stored_info_types_list(&self, parent: &str) -> ProjectLocationStoredInfoTypeListCall<'a, C, A> {
         ProjectLocationStoredInfoTypeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7225,7 +7250,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn dlp_jobs_list(&self, parent: &str) -> ProjectDlpJobListCall<'a, C, A> {
         ProjectDlpJobListCall {
             hub: self.hub,
@@ -7251,7 +7278,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn job_triggers_create(&self, request: GooglePrivacyDlpV2CreateJobTriggerRequest, parent: &str) -> ProjectJobTriggerCreateCall<'a, C, A> {
         ProjectJobTriggerCreateCall {
             hub: self.hub,
@@ -7273,8 +7302,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn deidentify_templates_create(&self, request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest, parent: &str) -> ProjectDeidentifyTemplateCreateCall<'a, C, A> {
         ProjectDeidentifyTemplateCreateCall {
             hub: self.hub,
@@ -7315,8 +7347,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     pub fn deidentify_templates_list(&self, parent: &str) -> ProjectDeidentifyTemplateListCall<'a, C, A> {
         ProjectDeidentifyTemplateListCall {
             hub: self.hub,
@@ -7345,7 +7380,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name, for example projects/my-project-id.
+    /// * `parent` - Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn content_deidentify(&self, request: GooglePrivacyDlpV2DeidentifyContentRequest, parent: &str) -> ProjectContentDeidentifyCall<'a, C, A> {
         ProjectContentDeidentifyCall {
             hub: self.hub,
@@ -7406,18 +7443,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example projects/my-project-id or
-    ///              organizations/my-org-id.
-    /// * `locationId` - The geographic location where deidentifications templates will be retrieved
-    ///                  from. Use `-` for all locations. Reserved for future extensions.
-    pub fn locations_deidentify_templates_list(&self, parent: &str, location_id: &str) -> ProjectLocationDeidentifyTemplateListCall<'a, C, A> {
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    ///              - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
+    pub fn locations_deidentify_templates_list(&self, parent: &str) -> ProjectLocationDeidentifyTemplateListCall<'a, C, A> {
         ProjectLocationDeidentifyTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _location_id: location_id.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _location_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7431,7 +7469,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent resource name, for example `projects/my-project-id`.
+    /// * `parent` - Required. Parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn job_triggers_list(&self, parent: &str) -> ProjectJobTriggerListCall<'a, C, A> {
         ProjectJobTriggerListCall {
             hub: self.hub,
@@ -7461,7 +7501,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name, for example projects/my-project-id.
+    /// * `parent` - The parent resource name.
+    ///              - Format:projects/[PROJECT-ID]
+    ///              - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     pub fn image_redact(&self, request: GooglePrivacyDlpV2RedactImageRequest, parent: &str) -> ProjectImageRedactCall<'a, C, A> {
         ProjectImageRedactCall {
             hub: self.hub,
@@ -7523,12 +7565,13 @@ impl<'a, C, A> LocationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `locationId` - The geographic location to list info types. Reserved for future
-    ///                  extensions.
-    pub fn info_types_list(&self, location_id: &str) -> LocationInfoTypeListCall<'a, C, A> {
+    /// * `parent` - The parent resource name.
+    ///              - Format:locations/[LOCATION-ID]
+    pub fn info_types_list(&self, parent: &str) -> LocationInfoTypeListCall<'a, C, A> {
         LocationInfoTypeListCall {
             hub: self.hub,
-            _location_id: location_id.to_string(),
+            _parent: parent.to_string(),
+            _location_id: Default::default(),
             _language_code: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
@@ -8090,10 +8133,11 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeDeleteCall<'a, C, A> where C: B
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_stored_info_types_list("parent", "locationId")
-///              .page_token("accusam")
-///              .page_size(-8)
-///              .order_by("justo")
+/// let result = hub.organizations().locations_stored_info_types_list("parent")
+///              .page_token("kasd")
+///              .page_size(-22)
+///              .order_by("takimata")
+///              .location_id("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -8102,10 +8146,10 @@ pub struct OrganizationLocationStoredInfoTypeListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8130,7 +8174,6 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -8140,7 +8183,10 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8152,12 +8198,12 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/storedInfoTypes";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/storedInfoTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8171,8 +8217,8 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8261,8 +8307,11 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8270,17 +8319,6 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> OrganizationLocationStoredInfoTypeListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where stored infoTypes will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationStoredInfoTypeListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -8317,6 +8355,13 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeListCall<'a, C, A> where C: Bor
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> OrganizationLocationStoredInfoTypeListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationStoredInfoTypeListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8596,8 +8641,11 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8964,7 +9012,7 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateGetCall<'a, C, A> where C: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_deidentify_templates_create(req, "parent", "locationId")
+/// let result = hub.organizations().locations_deidentify_templates_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -8974,7 +9022,6 @@ pub struct OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8997,10 +9044,9 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> where 
         };
         dlg.begin(MethodInfo { id: "dlp.organizations.locations.deidentifyTemplates.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9012,12 +9058,12 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> where 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/deidentifyTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/deidentifyTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -9031,8 +9077,8 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> where 
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -9145,8 +9191,11 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> where 
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9154,17 +9203,6 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> where 
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the deidentification template. Reserved
-    /// for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9260,10 +9298,10 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateCreateCall<'a, C, A> where 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().stored_info_types_list("parent")
-///              .page_token("dolores")
-///              .page_size(-61)
-///              .order_by("sadipscing")
-///              .location_id("aliquyam")
+///              .page_token("nonumy")
+///              .page_size(-19)
+///              .order_by("gubergren")
+///              .location_id("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -9433,8 +9471,11 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9480,8 +9521,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where stored infoTypes will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> OrganizationStoredInfoTypeListCall<'a, C, A> {
@@ -9844,7 +9884,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_stored_info_types_create(req, "parent", "locationId")
+/// let result = hub.organizations().locations_stored_info_types_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -9854,7 +9894,6 @@ pub struct OrganizationLocationStoredInfoTypeCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9877,10 +9916,9 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> where C: B
         };
         dlg.begin(MethodInfo { id: "dlp.organizations.locations.storedInfoTypes.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9892,12 +9930,12 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> where C: B
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/storedInfoTypes";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/storedInfoTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -9911,8 +9949,8 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> where C: B
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -10025,8 +10063,11 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> where C: B
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10034,17 +10075,6 @@ impl<'a, C, A> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> where C: B
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the stored infoType. Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationStoredInfoTypeCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10973,10 +11003,10 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().inspect_templates_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-5)
-///              .order_by("et")
-///              .location_id("duo")
+///              .page_token("et")
+///              .page_size(-41)
+///              .order_by("ipsum")
+///              .location_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -11146,8 +11176,11 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11192,8 +11225,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where inspection templates will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> OrganizationInspectTemplateListCall<'a, C, A> {
@@ -11293,10 +11325,10 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().deidentify_templates_list("parent")
-///              .page_token("sea")
-///              .page_size(-55)
-///              .order_by("eos")
-///              .location_id("erat")
+///              .page_token("duo")
+///              .page_size(-32)
+///              .order_by("sea")
+///              .location_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -11466,8 +11498,11 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11512,8 +11547,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where deidentifications templates will be retrieved
-    /// from. Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> OrganizationDeidentifyTemplateListCall<'a, C, A> {
@@ -12088,8 +12122,11 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12454,7 +12491,7 @@ impl<'a, C, A> OrganizationLocationInspectTemplateGetCall<'a, C, A> where C: Bor
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_inspect_templates_create(req, "parent", "locationId")
+/// let result = hub.organizations().locations_inspect_templates_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -12464,7 +12501,6 @@ pub struct OrganizationLocationInspectTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateInspectTemplateRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12487,10 +12523,9 @@ impl<'a, C, A> OrganizationLocationInspectTemplateCreateCall<'a, C, A> where C: 
         };
         dlg.begin(MethodInfo { id: "dlp.organizations.locations.inspectTemplates.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12502,12 +12537,12 @@ impl<'a, C, A> OrganizationLocationInspectTemplateCreateCall<'a, C, A> where C: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/inspectTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/inspectTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -12521,8 +12556,8 @@ impl<'a, C, A> OrganizationLocationInspectTemplateCreateCall<'a, C, A> where C: 
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -12635,8 +12670,11 @@ impl<'a, C, A> OrganizationLocationInspectTemplateCreateCall<'a, C, A> where C: 
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12644,17 +12682,6 @@ impl<'a, C, A> OrganizationLocationInspectTemplateCreateCall<'a, C, A> where C: 
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> OrganizationLocationInspectTemplateCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the inspection template. Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationInspectTemplateCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13296,10 +13323,11 @@ impl<'a, C, A> OrganizationLocationInspectTemplateDeleteCall<'a, C, A> where C: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_deidentify_templates_list("parent", "locationId")
-///              .page_token("invidunt")
-///              .page_size(-82)
-///              .order_by("accusam")
+/// let result = hub.organizations().locations_deidentify_templates_list("parent")
+///              .page_token("no")
+///              .page_size(-36)
+///              .order_by("eirmod")
+///              .location_id("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -13308,10 +13336,10 @@ pub struct OrganizationLocationDeidentifyTemplateListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13336,7 +13364,6 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -13346,7 +13373,10 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13358,12 +13388,12 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/deidentifyTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/deidentifyTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -13377,8 +13407,8 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -13467,8 +13497,11 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13476,17 +13509,6 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where deidentifications templates will be retrieved
-    /// from. Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -13522,6 +13544,13 @@ impl<'a, C, A> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> where C:
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationDeidentifyTemplateListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15410,8 +15439,11 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15512,10 +15544,11 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_inspect_templates_list("parent", "locationId")
-///              .page_token("et")
-///              .page_size(-45)
-///              .order_by("ut")
+/// let result = hub.organizations().locations_inspect_templates_list("parent")
+///              .page_token("eirmod")
+///              .page_size(-58)
+///              .order_by("et")
+///              .location_id("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -15524,10 +15557,10 @@ pub struct OrganizationLocationInspectTemplateListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15552,7 +15585,6 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -15562,7 +15594,10 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15574,12 +15609,12 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/inspectTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/inspectTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -15593,8 +15628,8 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -15683,8 +15718,11 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15692,17 +15730,6 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> OrganizationLocationInspectTemplateListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where inspection templates will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationInspectTemplateListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -15738,6 +15765,13 @@ impl<'a, C, A> OrganizationLocationInspectTemplateListCall<'a, C, A> where C: Bo
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> OrganizationLocationInspectTemplateListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> OrganizationLocationInspectTemplateListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -16091,9 +16125,10 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.info_types().list()
-///              .location_id("sed")
-///              .language_code("dolor")
-///              .filter("dolor")
+///              .parent("consetetur")
+///              .location_id("ut")
+///              .language_code("ea")
+///              .filter("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -16101,6 +16136,7 @@ pub struct InfoTypeListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DLP<C, A>,
+    _parent: Option<String>,
     _location_id: Option<String>,
     _language_code: Option<String>,
     _filter: Option<String>,
@@ -16125,7 +16161,10 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "dlp.infoTypes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        if let Some(value) = self._parent {
+            params.push(("parent", value.to_string()));
+        }
         if let Some(value) = self._location_id {
             params.push(("locationId", value.to_string()));
         }
@@ -16135,7 +16174,7 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._filter {
             params.push(("filter", value.to_string()));
         }
-        for &field in ["alt", "locationId", "languageCode", "filter"].iter() {
+        for &field in ["alt", "parent", "locationId", "languageCode", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16232,8 +16271,15 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// The geographic location to list info types. Reserved for future
-    /// extensions.
+    /// The parent resource name.
+    /// - Format:locations/[LOCATION-ID]
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(mut self, new_value: &str) -> InfoTypeListCall<'a, C, A> {
+        self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> InfoTypeListCall<'a, C, A> {
@@ -17418,7 +17464,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_content_reidentify(req, "parent", "locationId")
+/// let result = hub.projects().locations_content_reidentify(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -17428,7 +17474,6 @@ pub struct ProjectLocationContentReidentifyCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2ReidentifyContentRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17451,10 +17496,9 @@ impl<'a, C, A> ProjectLocationContentReidentifyCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.content.reidentify",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17466,12 +17510,12 @@ impl<'a, C, A> ProjectLocationContentReidentifyCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/content:reidentify";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/content:reidentify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -17485,8 +17529,8 @@ impl<'a, C, A> ProjectLocationContentReidentifyCall<'a, C, A> where C: BorrowMut
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -17600,6 +17644,8 @@ impl<'a, C, A> ProjectLocationContentReidentifyCall<'a, C, A> where C: BorrowMut
         self
     }
     /// Required. The parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -17607,17 +17653,6 @@ impl<'a, C, A> ProjectLocationContentReidentifyCall<'a, C, A> where C: BorrowMut
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationContentReidentifyCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to process content reidentification.  Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationContentReidentifyCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -17968,12 +18003,13 @@ impl<'a, C, A> ProjectLocationJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_dlp_jobs_list("parent", "locationId")
-///              .type_("vero")
-///              .page_token("diam")
-///              .page_size(-66)
-///              .order_by("consetetur")
-///              .filter("sadipscing")
+/// let result = hub.projects().locations_dlp_jobs_list("parent")
+///              .type_("Lorem")
+///              .page_token("gubergren")
+///              .page_size(-20)
+///              .order_by("sit")
+///              .location_id("vero")
+///              .filter("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -17982,11 +18018,11 @@ pub struct ProjectLocationDlpJobListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _type_: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -18012,7 +18048,6 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._type_ {
             params.push(("type", value.to_string()));
         }
@@ -18025,10 +18060,13 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
         if let Some(value) = self._filter {
             params.push(("filter", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "type", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+        for &field in ["alt", "parent", "type", "pageToken", "pageSize", "orderBy", "locationId", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18040,12 +18078,12 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/dlpJobs";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/dlpJobs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -18059,8 +18097,8 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -18149,7 +18187,9 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18157,17 +18197,6 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationDlpJobListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where jobs will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationDlpJobListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The type of job. Defaults to `DlpJobType.INSPECT`
@@ -18208,6 +18237,13 @@ impl<'a, C, A> ProjectLocationDlpJobListCall<'a, C, A> where C: BorrowMut<hyper:
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationDlpJobListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> ProjectLocationDlpJobListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// Allows filtering.
@@ -18812,8 +18848,11 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18914,10 +18953,11 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_inspect_templates_list("parent", "locationId")
-///              .page_token("dolore")
-///              .page_size(-19)
-///              .order_by("aliquyam")
+/// let result = hub.projects().locations_inspect_templates_list("parent")
+///              .page_token("vero")
+///              .page_size(-95)
+///              .order_by("invidunt")
+///              .location_id("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -18926,10 +18966,10 @@ pub struct ProjectLocationInspectTemplateListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -18954,7 +18994,6 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -18964,7 +19003,10 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18976,12 +19018,12 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/inspectTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/inspectTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -18995,8 +19037,8 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -19085,8 +19127,11 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -19094,17 +19139,6 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationInspectTemplateListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where inspection templates will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationInspectTemplateListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -19140,6 +19174,13 @@ impl<'a, C, A> ProjectLocationInspectTemplateListCall<'a, C, A> where C: BorrowM
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationInspectTemplateListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> ProjectLocationInspectTemplateListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -19779,10 +19820,10 @@ impl<'a, C, A> ProjectLocationJobTriggerActivateCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().inspect_templates_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-58)
-///              .order_by("nonumy")
-///              .location_id("kasd")
+///              .page_token("Lorem")
+///              .page_size(-17)
+///              .order_by("clita")
+///              .location_id("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -19952,8 +19993,11 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -19998,8 +20042,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where inspection templates will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> ProjectInspectTemplateListCall<'a, C, A> {
@@ -20104,7 +20147,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_job_triggers_create(req, "parent", "locationId")
+/// let result = hub.projects().locations_job_triggers_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -20114,7 +20157,6 @@ pub struct ProjectLocationJobTriggerCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateJobTriggerRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -20137,10 +20179,9 @@ impl<'a, C, A> ProjectLocationJobTriggerCreateCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.jobTriggers.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -20152,12 +20193,12 @@ impl<'a, C, A> ProjectLocationJobTriggerCreateCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/jobTriggers";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/jobTriggers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -20171,8 +20212,8 @@ impl<'a, C, A> ProjectLocationJobTriggerCreateCall<'a, C, A> where C: BorrowMut<
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -20285,7 +20326,9 @@ impl<'a, C, A> ProjectLocationJobTriggerCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -20293,17 +20336,6 @@ impl<'a, C, A> ProjectLocationJobTriggerCreateCall<'a, C, A> where C: BorrowMut<
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationJobTriggerCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the job trigger. Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationJobTriggerCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20841,8 +20873,11 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22336,7 +22371,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_content_deidentify(req, "parent", "locationId")
+/// let result = hub.projects().locations_content_deidentify(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -22346,7 +22381,6 @@ pub struct ProjectLocationContentDeidentifyCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2DeidentifyContentRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -22369,10 +22403,9 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.content.deidentify",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -22384,12 +22417,12 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/content:deidentify";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/content:deidentify";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -22403,8 +22436,8 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -22517,7 +22550,9 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
         self._request = new_value;
         self
     }
-    /// The parent resource name, for example projects/my-project-id.
+    /// Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22525,17 +22560,6 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to process de-identification. Reserved for future
-    /// extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationContentDeidentifyCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -22629,11 +22653,12 @@ impl<'a, C, A> ProjectLocationContentDeidentifyCall<'a, C, A> where C: BorrowMut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_job_triggers_list("parent", "locationId")
-///              .page_token("eirmod")
-///              .page_size(-46)
-///              .order_by("labore")
-///              .filter("sed")
+/// let result = hub.projects().locations_job_triggers_list("parent")
+///              .page_token("rebum.")
+///              .page_size(-33)
+///              .order_by("nonumy")
+///              .location_id("sed")
+///              .filter("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -22642,10 +22667,10 @@ pub struct ProjectLocationJobTriggerListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -22671,7 +22696,6 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -22681,10 +22705,13 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
         if let Some(value) = self._filter {
             params.push(("filter", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -22696,12 +22723,12 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/jobTriggers";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/jobTriggers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -22715,8 +22742,8 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -22805,7 +22832,9 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// Required. The parent resource name, for example `projects/my-project-id`.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22813,17 +22842,6 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationJobTriggerListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where job triggers will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationJobTriggerListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -22861,6 +22879,13 @@ impl<'a, C, A> ProjectLocationJobTriggerListCall<'a, C, A> where C: BorrowMut<hy
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationJobTriggerListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> ProjectLocationJobTriggerListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// Allows filtering.
@@ -23174,7 +23199,9 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -24693,7 +24720,7 @@ impl<'a, C, A> ProjectLocationJobTriggerPatchCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_stored_info_types_create(req, "parent", "locationId")
+/// let result = hub.projects().locations_stored_info_types_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -24703,7 +24730,6 @@ pub struct ProjectLocationStoredInfoTypeCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateStoredInfoTypeRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -24726,10 +24752,9 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.storedInfoTypes.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -24741,12 +24766,12 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/storedInfoTypes";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/storedInfoTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -24760,8 +24785,8 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> where C: Borrow
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -24874,8 +24899,11 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -24883,17 +24911,6 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> where C: Borrow
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the stored infoType. Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationStoredInfoTypeCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -25433,6 +25450,8 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// Required. The parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -25546,7 +25565,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_content_inspect(req, "parent", "locationId")
+/// let result = hub.projects().locations_content_inspect(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -25556,7 +25575,6 @@ pub struct ProjectLocationContentInspectCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2InspectContentRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -25579,10 +25597,9 @@ impl<'a, C, A> ProjectLocationContentInspectCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.content.inspect",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -25594,12 +25611,12 @@ impl<'a, C, A> ProjectLocationContentInspectCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/content:inspect";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/content:inspect";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -25613,8 +25630,8 @@ impl<'a, C, A> ProjectLocationContentInspectCall<'a, C, A> where C: BorrowMut<hy
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -25727,7 +25744,9 @@ impl<'a, C, A> ProjectLocationContentInspectCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The parent resource name, for example projects/my-project-id.
+    /// Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -25735,19 +25754,6 @@ impl<'a, C, A> ProjectLocationContentInspectCall<'a, C, A> where C: BorrowMut<hy
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationContentInspectCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to process content inspection. Reserved for future
-    /// extensions.
-    /// When inspecting images location is restricted to 'global', 'us', 'asia',
-    /// and 'europe'.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationContentInspectCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -26806,7 +26812,9 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// The parent resource name, for example projects/my-project-id.
+    /// Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -27176,7 +27184,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_image_redact(req, "parent", "locationId")
+/// let result = hub.projects().locations_image_redact(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -27186,7 +27194,6 @@ pub struct ProjectLocationImageRedactCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2RedactImageRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -27209,10 +27216,9 @@ impl<'a, C, A> ProjectLocationImageRedactCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.image.redact",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -27224,12 +27230,12 @@ impl<'a, C, A> ProjectLocationImageRedactCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/image:redact";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/image:redact";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -27243,8 +27249,8 @@ impl<'a, C, A> ProjectLocationImageRedactCall<'a, C, A> where C: BorrowMut<hyper
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -27357,7 +27363,9 @@ impl<'a, C, A> ProjectLocationImageRedactCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// The parent resource name, for example projects/my-project-id.
+    /// The parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -27365,18 +27373,6 @@ impl<'a, C, A> ProjectLocationImageRedactCall<'a, C, A> where C: BorrowMut<hyper
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationImageRedactCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to process the request. Reserved for future
-    /// extensions.
-    /// Location is restricted to 'global', 'us', 'asia', and 'europe'.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationImageRedactCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -28312,7 +28308,7 @@ impl<'a, C, A> ProjectLocationStoredInfoTypePatchCall<'a, C, A> where C: BorrowM
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_deidentify_templates_create(req, "parent", "locationId")
+/// let result = hub.projects().locations_deidentify_templates_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -28322,7 +28318,6 @@ pub struct ProjectLocationDeidentifyTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateDeidentifyTemplateRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -28345,10 +28340,9 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.deidentifyTemplates.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -28360,12 +28354,12 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/deidentifyTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/deidentifyTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -28379,8 +28373,8 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> where C: Bo
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -28493,8 +28487,11 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28502,17 +28499,6 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> where C: Bo
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the deidentification template. Reserved
-    /// for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -28613,7 +28599,7 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateCreateCall<'a, C, A> where C: Bo
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_inspect_templates_create(req, "parent", "locationId")
+/// let result = hub.projects().locations_inspect_templates_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -28623,7 +28609,6 @@ pub struct ProjectLocationInspectTemplateCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateInspectTemplateRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -28646,10 +28631,9 @@ impl<'a, C, A> ProjectLocationInspectTemplateCreateCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.inspectTemplates.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -28661,12 +28645,12 @@ impl<'a, C, A> ProjectLocationInspectTemplateCreateCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/inspectTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/inspectTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -28680,8 +28664,8 @@ impl<'a, C, A> ProjectLocationInspectTemplateCreateCall<'a, C, A> where C: Borro
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -28794,8 +28778,11 @@ impl<'a, C, A> ProjectLocationInspectTemplateCreateCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28803,17 +28790,6 @@ impl<'a, C, A> ProjectLocationInspectTemplateCreateCall<'a, C, A> where C: Borro
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationInspectTemplateCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store the inspection template. Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationInspectTemplateCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -28918,7 +28894,7 @@ impl<'a, C, A> ProjectLocationInspectTemplateCreateCall<'a, C, A> where C: Borro
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_dlp_jobs_create(req, "parent", "locationId")
+/// let result = hub.projects().locations_dlp_jobs_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
@@ -28928,7 +28904,6 @@ pub struct ProjectLocationDlpJobCreateCall<'a, C, A>
     hub: &'a DLP<C, A>,
     _request: GooglePrivacyDlpV2CreateDlpJobRequest,
     _parent: String,
-    _location_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -28951,10 +28926,9 @@ impl<'a, C, A> ProjectLocationDlpJobCreateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "dlp.projects.locations.dlpJobs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
-        for &field in ["alt", "parent", "locationId"].iter() {
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -28966,12 +28940,12 @@ impl<'a, C, A> ProjectLocationDlpJobCreateCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/dlpJobs";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/dlpJobs";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -28985,8 +28959,8 @@ impl<'a, C, A> ProjectLocationDlpJobCreateCall<'a, C, A> where C: BorrowMut<hype
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -29099,7 +29073,9 @@ impl<'a, C, A> ProjectLocationDlpJobCreateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -29107,17 +29083,6 @@ impl<'a, C, A> ProjectLocationDlpJobCreateCall<'a, C, A> where C: BorrowMut<hype
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationDlpJobCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location to store and process the job. Reserved for
-    /// future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationDlpJobCreateCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -29756,10 +29721,10 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().stored_info_types_list("parent")
-///              .page_token("ea")
-///              .page_size(-74)
-///              .order_by("dolor")
-///              .location_id("diam")
+///              .page_token("est")
+///              .page_size(-63)
+///              .order_by("invidunt")
+///              .location_id("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -29929,8 +29894,11 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -29976,8 +29944,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where stored infoTypes will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> ProjectStoredInfoTypeListCall<'a, C, A> {
@@ -30591,10 +30558,11 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_stored_info_types_list("parent", "locationId")
-///              .page_token("clita")
-///              .page_size(-37)
-///              .order_by("eirmod")
+/// let result = hub.projects().locations_stored_info_types_list("parent")
+///              .page_token("duo")
+///              .page_size(-93)
+///              .order_by("aliquyam")
+///              .location_id("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -30603,10 +30571,10 @@ pub struct ProjectLocationStoredInfoTypeListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -30631,7 +30599,6 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -30641,7 +30608,10 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -30653,12 +30623,12 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/storedInfoTypes";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/storedInfoTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -30672,8 +30642,8 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -30762,8 +30732,11 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -30771,17 +30744,6 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationStoredInfoTypeListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where stored infoTypes will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationStoredInfoTypeListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -30818,6 +30780,13 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeListCall<'a, C, A> where C: BorrowMu
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationStoredInfoTypeListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> ProjectLocationStoredInfoTypeListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -31202,12 +31171,12 @@ impl<'a, C, A> ProjectLocationDlpJobCancelCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().dlp_jobs_list("parent")
-///              .type_("et")
-///              .page_token("sed")
-///              .page_size(-47)
-///              .order_by("takimata")
-///              .location_id("elitr")
-///              .filter("nonumy")
+///              .type_("dolor")
+///              .page_token("diam")
+///              .page_size(-62)
+///              .order_by("invidunt")
+///              .location_id("rebum.")
+///              .filter("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -31385,7 +31354,9 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -31435,8 +31406,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where jobs will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> ProjectDlpJobListCall<'a, C, A> {
@@ -31754,7 +31724,9 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -32042,8 +32014,11 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -32404,10 +32379,10 @@ impl<'a, C, A> ProjectLocationStoredInfoTypeDeleteCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().deidentify_templates_list("parent")
-///              .page_token("ut")
-///              .page_size(-37)
-///              .order_by("amet.")
-///              .location_id("ipsum")
+///              .page_token("consetetur")
+///              .page_size(-22)
+///              .order_by("sed")
+///              .location_id("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -32577,8 +32552,11 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -32623,8 +32601,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where deidentifications templates will be retrieved
-    /// from. Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> ProjectDeidentifyTemplateListCall<'a, C, A> {
@@ -32913,7 +32890,9 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// The parent resource name, for example projects/my-project-id.
+    /// Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -33559,10 +33538,11 @@ impl<'a, C, A> ProjectLocationInspectTemplatePatchCall<'a, C, A> where C: Borrow
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_deidentify_templates_list("parent", "locationId")
-///              .page_token("sanctus")
-///              .page_size(-27)
-///              .order_by("dolor")
+/// let result = hub.projects().locations_deidentify_templates_list("parent")
+///              .page_token("Lorem")
+///              .page_size(-50)
+///              .order_by("diam")
+///              .location_id("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -33571,10 +33551,10 @@ pub struct ProjectLocationDeidentifyTemplateListCall<'a, C, A>
 
     hub: &'a DLP<C, A>,
     _parent: String,
-    _location_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _location_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -33599,7 +33579,6 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        params.push(("locationId", self._location_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -33609,7 +33588,10 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "locationId", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "locationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -33621,12 +33603,12 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/locations/{locationId}/deidentifyTemplates";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/deidentifyTemplates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{locationId}", "locationId")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -33640,8 +33622,8 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
             url = url.replace(find_this, &replace_with);
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationId", "parent"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -33730,8 +33712,11 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
     }
 
 
-    /// Required. The parent resource name, for example projects/my-project-id or
-    /// organizations/my-org-id.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
+    /// - Format:organizations/[ORGANIZATION-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -33739,17 +33724,6 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationDeidentifyTemplateListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// The geographic location where deidentifications templates will be retrieved
-    /// from. Use `-` for all locations. Reserved for future extensions.
-    ///
-    /// Sets the *location id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn location_id(mut self, new_value: &str) -> ProjectLocationDeidentifyTemplateListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
         self
     }
     /// Page token to continue retrieval. Comes from previous call
@@ -33785,6 +33759,13 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationDeidentifyTemplateListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
+    pub fn location_id(mut self, new_value: &str) -> ProjectLocationDeidentifyTemplateListCall<'a, C, A> {
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -33879,11 +33860,11 @@ impl<'a, C, A> ProjectLocationDeidentifyTemplateListCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().job_triggers_list("parent")
-///              .page_token("et")
-///              .page_size(-26)
+///              .page_token("amet.")
+///              .page_size(-100)
 ///              .order_by("ut")
-///              .location_id("sed")
-///              .filter("et")
+///              .location_id("dolor")
+///              .filter("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -34057,7 +34038,9 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Required. The parent resource name, for example `projects/my-project-id`.
+    /// Required. Parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -34104,8 +34087,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// The geographic location where job triggers will be retrieved from.
-    /// Use `-` for all locations. Reserved for future extensions.
+    /// Deprecated. This field has no effect.
     ///
     /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> ProjectJobTriggerListCall<'a, C, A> {
@@ -34424,7 +34406,9 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// The parent resource name, for example projects/my-project-id.
+    /// The parent resource name.
+    /// - Format:projects/[PROJECT-ID]
+    /// - Format:projects/[PROJECT-ID]/locations/[LOCATION-ID]
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -34526,9 +34510,10 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.locations().info_types_list("locationId")
-///              .language_code("dolore")
-///              .filter("vero")
+/// let result = hub.locations().info_types_list("parent")
+///              .location_id("sanctus")
+///              .language_code("voluptua.")
+///              .filter("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -34536,7 +34521,8 @@ pub struct LocationInfoTypeListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DLP<C, A>,
-    _location_id: String,
+    _parent: String,
+    _location_id: Option<String>,
     _language_code: Option<String>,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
@@ -34551,6 +34537,7 @@ impl<'a, C, A> LocationInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, GooglePrivacyDlpV2ListInfoTypesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -34560,15 +34547,18 @@ impl<'a, C, A> LocationInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "dlp.locations.infoTypes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("locationId", self._location_id.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._location_id {
+            params.push(("locationId", value.to_string()));
+        }
         if let Some(value) = self._language_code {
             params.push(("languageCode", value.to_string()));
         }
         if let Some(value) = self._filter {
             params.push(("filter", value.to_string()));
         }
-        for &field in ["alt", "locationId", "languageCode", "filter"].iter() {
+        for &field in ["alt", "parent", "locationId", "languageCode", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -34580,24 +34570,27 @@ impl<'a, C, A> LocationInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/locations/{locationId}/infoTypes";
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/infoTypes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{locationId}", "locationId")].iter() {
-            let mut replace_with: Option<&str> = None;
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
-                    replace_with = Some(value);
+                    replace_with = value.to_string();
                     break;
                 }
             }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["locationId"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -34686,15 +34679,22 @@ impl<'a, C, A> LocationInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The geographic location to list info types. Reserved for future
-    /// extensions.
+    /// The parent resource name.
+    /// - Format:locations/[LOCATION-ID]
     ///
-    /// Sets the *location id* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> LocationInfoTypeListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Deprecated. This field has no effect.
+    ///
+    /// Sets the *location id* query property to the given value.
     pub fn location_id(mut self, new_value: &str) -> LocationInfoTypeListCall<'a, C, A> {
-        self._location_id = new_value.to_string();
+        self._location_id = Some(new_value.to_string());
         self
     }
     /// BCP-47 language code for localized infoType friendly

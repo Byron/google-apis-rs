@@ -7964,7 +7964,7 @@ fn main() {
     
     let mut app = App::new("tagmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200408")
+           .version("1.0.14+20200708")
            .about("This API allows clients to access and modify container and tag
                 configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager2_cli")

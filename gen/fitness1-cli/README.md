@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *fitness* API can be found at the
-[official documentation site](https://developers.google.com/fit/rest/).
+[official documentation site](https://developers.google.com/fit/rest/v1/get-started).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *fitness* API at revision *20200407*. The CLI is at version *1.0.13*.
+This documentation was generated from the *fitness* API at revision *20200707*. The CLI is at version *1.0.14*.
 
 ```bash
 fitness1 [options]

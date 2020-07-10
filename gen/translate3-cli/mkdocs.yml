@@ -1,0 +1,34 @@
+site_name: Translate v1.0.14+20200629
+site_url: http://byron.github.io/google-apis-rs/google-translate3-cli
+site_description: A complete library to interact with Translate (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/translate3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_detect-language.md', 'Projects', 'Detect Language']
+- ['projects_get-supported-languages.md', 'Projects', 'Get Supported Languages']
+- ['projects_locations-batch-translate-text.md', 'Projects', 'Locations Batch Translate Text']
+- ['projects_locations-detect-language.md', 'Projects', 'Locations Detect Language']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-get-supported-languages.md', 'Projects', 'Locations Get Supported Languages']
+- ['projects_locations-glossaries-create.md', 'Projects', 'Locations Glossaries Create']
+- ['projects_locations-glossaries-delete.md', 'Projects', 'Locations Glossaries Delete']
+- ['projects_locations-glossaries-get.md', 'Projects', 'Locations Glossaries Get']
+- ['projects_locations-glossaries-list.md', 'Projects', 'Locations Glossaries List']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-operations-wait.md', 'Projects', 'Locations Operations Wait']
+- ['projects_locations-translate-text.md', 'Projects', 'Locations Translate Text']
+- ['projects_translate-text.md', 'Projects', 'Translate Text']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

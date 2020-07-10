@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *1.0.13+20200323*, where *20200323* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Build* crate version *1.0.14+20200704*, where *20200704* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-build/docs/).
@@ -12,9 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudBuild.html) ... 
 //! 
 //! * [operations](struct.Operation.html)
-//!  * [*cancel*](struct.OperationCancelCall.html), [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
+//!  * [*cancel*](struct.OperationCancelCall.html) and [*get*](struct.OperationGetCall.html)
 //! * projects
-//!  * [*builds cancel*](struct.ProjectBuildCancelCall.html), [*builds create*](struct.ProjectBuildCreateCall.html), [*builds get*](struct.ProjectBuildGetCall.html), [*builds list*](struct.ProjectBuildListCall.html), [*builds retry*](struct.ProjectBuildRetryCall.html), [*triggers create*](struct.ProjectTriggerCreateCall.html), [*triggers delete*](struct.ProjectTriggerDeleteCall.html), [*triggers get*](struct.ProjectTriggerGetCall.html), [*triggers list*](struct.ProjectTriggerListCall.html), [*triggers patch*](struct.ProjectTriggerPatchCall.html) and [*triggers run*](struct.ProjectTriggerRunCall.html)
+//!  * [*builds cancel*](struct.ProjectBuildCancelCall.html), [*builds create*](struct.ProjectBuildCreateCall.html), [*builds get*](struct.ProjectBuildGetCall.html), [*builds list*](struct.ProjectBuildListCall.html), [*builds retry*](struct.ProjectBuildRetryCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*triggers create*](struct.ProjectTriggerCreateCall.html), [*triggers delete*](struct.ProjectTriggerDeleteCall.html), [*triggers get*](struct.ProjectTriggerGetCall.html), [*triggers list*](struct.ProjectTriggerListCall.html), [*triggers patch*](struct.ProjectTriggerPatchCall.html) and [*triggers run*](struct.ProjectTriggerRunCall.html)
 //! 
 //! 
 //! 
@@ -52,7 +52,7 @@
 //! let r = hub.operations().cancel(...).doit()
 //! let r = hub.projects().triggers_run(...).doit()
 //! let r = hub.projects().builds_create(...).doit()
-//! let r = hub.operations().list(...).doit()
+//! let r = hub.projects().locations_operations_get(...).doit()
 //! let r = hub.operations().get(...).doit()
 //! let r = hub.projects().builds_retry(...).doit()
 //! ```
@@ -88,6 +88,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_cloudbuild1 as cloudbuild1;
+//! use cloudbuild1::RepoSource;
 //! use cloudbuild1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -106,13 +107,15 @@
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = RepoSource::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.operations().list("name")
-//!              .page_token("dolores")
-//!              .page_size(-63)
-//!              .filter("accusam")
+//! let result = hub.projects().triggers_run(req, "projectId", "triggerId")
 //!              .doit();
 //! 
 //! match result {
@@ -268,6 +271,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_cloudbuild1 as cloudbuild1;
+/// use cloudbuild1::RepoSource;
 /// use cloudbuild1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -286,13 +290,15 @@ impl Default for Scope {
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RepoSource::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().list("name")
-///              .page_token("justo")
-///              .page_size(-1)
-///              .filter("erat")
+/// let result = hub.projects().triggers_run(req, "projectId", "triggerId")
 ///              .doit();
 /// 
 /// match result {
@@ -330,7 +336,7 @@ impl<'a, C, A> CloudBuild<C, A>
         CloudBuild {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://cloudbuild.googleapis.com/".to_string(),
             _root_url: "https://cloudbuild.googleapis.com/".to_string(),
         }
@@ -344,7 +350,7 @@ impl<'a, C, A> CloudBuild<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -372,21 +378,6 @@ impl<'a, C, A> CloudBuild<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The request message for Operations.CancelOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel operations](struct.OperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelOperationRequest {}
-
-
 /// Start and end times for a build execution phase.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -436,77 +427,6 @@ pub struct Artifacts {
 }
 
 impl Part for Artifacts {}
-
-
-/// Location of the source in a Google Cloud Source Repository.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [triggers run projects](struct.ProjectTriggerRunCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepoSource {
-    /// ID of the project that owns the Cloud Source Repository. If omitted, the
-    /// project ID requesting the build is assumed.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Only trigger a build if the revision regex does NOT match the revision
-    /// regex.
-    #[serde(rename="invertRegex")]
-    pub invert_regex: Option<bool>,
-    /// Explicit commit SHA to build.
-    #[serde(rename="commitSha")]
-    pub commit_sha: Option<String>,
-    /// Substitutions to use in a triggered build.
-    /// Should only be used with RunBuildTrigger
-    pub substitutions: Option<HashMap<String, String>>,
-    /// Required. Name of the Cloud Source Repository.
-    #[serde(rename="repoName")]
-    pub repo_name: Option<String>,
-    /// Regex matching tags to build.
-    /// 
-    /// The syntax of the regular expressions accepted is the syntax accepted by
-    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
-    #[serde(rename="tagName")]
-    pub tag_name: Option<String>,
-    /// Regex matching branches to build.
-    /// 
-    /// The syntax of the regular expressions accepted is the syntax accepted by
-    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
-    #[serde(rename="branchName")]
-    pub branch_name: Option<String>,
-    /// Directory, relative to the source root, in which to run the build.
-    /// 
-    /// This must be a relative path. If a step's `dir` is specified and is an
-    /// absolute path, this value is ignored for that step's execution.
-    pub dir: Option<String>,
-}
-
-impl RequestValue for RepoSource {}
-
-
-/// The response message for Operations.ListOperations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list operations](struct.OperationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
-}
-
-impl ResponseResult for ListOperationsResponse {}
 
 
 /// Specifies a build to retry.
@@ -673,6 +593,8 @@ pub struct Build {
     /// granularity. If this amount of time elapses, work on the build will cease
     /// and the build status will be `TIMEOUT`.
     /// 
+    /// `timeout` starts ticking from `startTime`.
+    /// 
     /// Default time is ten minutes.
     pub timeout: Option<String>,
     /// Output only. ID of the project.
@@ -708,29 +630,11 @@ impl ResponseResult for Build {}
 /// 
 /// * [triggers delete projects](struct.ProjectTriggerDeleteCall.html) (response)
 /// * [cancel operations](struct.OperationCancelCall.html) (response)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
-
-
-/// An image built by the pipeline.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuiltImage {
-    /// Output only. Stores timing information for pushing the specified image.
-    #[serde(rename="pushTiming")]
-    pub push_timing: Option<TimeSpan>,
-    /// Name used to push the container image to Google Container Registry, as
-    /// presented to `docker push`.
-    pub name: Option<String>,
-    /// Docker Registry 2.0 digest.
-    pub digest: Option<String>,
-}
-
-impl Part for BuiltImage {}
 
 
 /// The `Status` type defines a logical error model that is suitable for
@@ -757,27 +661,6 @@ pub struct Status {
 }
 
 impl Part for Status {}
-
-
-/// Response containing existing `BuildTriggers`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [triggers list projects](struct.ProjectTriggerListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBuildTriggersResponse {
-    /// Token to receive the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// `BuildTriggers` for the project, sorted by `create_time` descending.
-    pub triggers: Option<Vec<BuildTrigger>>,
-}
-
-impl ResponseResult for ListBuildTriggersResponse {}
 
 
 /// Container message for hash values.
@@ -819,74 +702,6 @@ pub struct ArtifactObjects {
 impl Part for ArtifactObjects {}
 
 
-/// Optional arguments to enable specific features of builds.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildOptions {
-    /// Option to specify behavior when there is an error in the substitution
-    /// checks.
-    #[serde(rename="substitutionOption")]
-    pub substitution_option: Option<String>,
-    /// Compute Engine machine type on which to run the build.
-    #[serde(rename="machineType")]
-    pub machine_type: Option<String>,
-    /// A list of global environment variable definitions that will exist for all
-    /// build steps in this build. If a variable is defined in both globally and in
-    /// a build step, the variable will use the build step value.
-    /// 
-    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
-    /// being given the value "VALUE".
-    pub env: Option<Vec<String>>,
-    /// Requested hash for SourceProvenance.
-    #[serde(rename="sourceProvenanceHash")]
-    pub source_provenance_hash: Option<Vec<String>>,
-    /// Option to define build log streaming behavior to Google Cloud
-    /// Storage.
-    #[serde(rename="logStreamingOption")]
-    pub log_streaming_option: Option<String>,
-    /// A list of global environment variables, which are encrypted using a Cloud
-    /// Key Management Service crypto key. These values must be specified in the
-    /// build's `Secret`. These variables will be available to all build steps
-    /// in this build.
-    #[serde(rename="secretEnv")]
-    pub secret_env: Option<Vec<String>>,
-    /// Requested disk size for the VM that runs the build. Note that this is *NOT*
-    /// "disk free"; some of the space will be used by the operating system and
-    /// build utilities. Also note that this is the minimum disk size that will be
-    /// allocated for the build -- the build may run with a larger disk than
-    /// requested. At present, the maximum disk size is 1000GB; builds that request
-    /// more than the maximum are rejected with an error.
-    #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: Option<String>,
-    /// Option to specify the logging mode, which determines where the logs are
-    /// stored.
-    pub logging: Option<String>,
-    /// Global list of volumes to mount for ALL build steps
-    /// 
-    /// Each volume is created as an empty volume prior to starting the build
-    /// process. Upon completion of the build, volumes and their contents are
-    /// discarded. Global volume names and paths cannot conflict with the volumes
-    /// defined a build step.
-    /// 
-    /// Using a global volume in a build with only one step is not valid as
-    /// it is indicative of a build request with an incorrect configuration.
-    pub volumes: Option<Vec<Volume>>,
-    /// Requested verifiability options.
-    #[serde(rename="requestedVerifyOption")]
-    pub requested_verify_option: Option<String>,
-    /// Option to specify a `WorkerPool` for the build.
-    /// Format: projects/{project}/workerPools/{workerPool}
-    /// 
-    /// This field is experimental.
-    #[serde(rename="workerPool")]
-    pub worker_pool: Option<String>,
-}
-
-impl Part for BuildOptions {}
-
-
 /// PullRequestFilter contains filter properties for matching GitHub Pull
 /// Requests.
 /// 
@@ -897,8 +712,8 @@ pub struct PullRequestFilter {
     /// If true, branches that do NOT match the git_ref will trigger a build.
     #[serde(rename="invertRegex")]
     pub invert_regex: Option<bool>,
-    /// Whether to block builds on a "/gcbrun" comment from a repository admin or
-    /// collaborator.
+    /// Configure builds to run whether a repository owner or collaborator need to
+    /// comment `/gcbrun`.
     #[serde(rename="commentControl")]
     pub comment_control: Option<String>,
     /// Regex of branches to match.
@@ -991,55 +806,6 @@ pub struct BuildTrigger {
 
 impl RequestValue for BuildTrigger {}
 impl ResponseResult for BuildTrigger {}
-
-
-/// Request to cancel an ongoing build.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [builds cancel projects](struct.ProjectBuildCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelBuildRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelBuildRequest {}
-
-
-/// Artifacts created by the build pipeline.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Results {
-    /// List of build step outputs, produced by builder images, in the order
-    /// corresponding to build step indices.
-    /// 
-    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
-    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
-    /// Only the first 4KB of data is stored.
-    #[serde(rename="buildStepOutputs")]
-    pub build_step_outputs: Option<Vec<String>>,
-    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
-    #[serde(rename="artifactManifest")]
-    pub artifact_manifest: Option<String>,
-    /// Time to push all non-container artifacts.
-    #[serde(rename="artifactTiming")]
-    pub artifact_timing: Option<TimeSpan>,
-    /// Container images that were built as a part of the build.
-    pub images: Option<Vec<BuiltImage>>,
-    /// List of build step digests, in the order corresponding to build step
-    /// indices.
-    #[serde(rename="buildStepImages")]
-    pub build_step_images: Option<Vec<String>>,
-    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
-    #[serde(rename="numArtifacts")]
-    pub num_artifacts: Option<String>,
-}
-
-impl Part for Results {}
 
 
 /// A step in the build pipeline.
@@ -1157,31 +923,6 @@ pub struct Volume {
 impl Part for Volume {}
 
 
-/// Push contains filter properties for matching GitHub git pushes.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PushFilter {
-    /// When true, only trigger a build if the revision regex does NOT match the
-    /// git_ref regex.
-    #[serde(rename="invertRegex")]
-    pub invert_regex: Option<bool>,
-    /// Regexes matching tags to build.
-    /// 
-    /// The syntax of the regular expressions accepted is the syntax accepted by
-    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
-    pub tag: Option<String>,
-    /// Regexes matching branches to build.
-    /// 
-    /// The syntax of the regular expressions accepted is the syntax accepted by
-    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
-    pub branch: Option<String>,
-}
-
-impl Part for PushFilter {}
-
-
 /// Container message for hashes of byte content of files, used in
 /// SourceProvenance messages to verify integrity of source input to the build.
 /// 
@@ -1229,6 +970,102 @@ pub struct SourceProvenance {
 impl Part for SourceProvenance {}
 
 
+/// Location of the source in a Google Cloud Source Repository.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [triggers run projects](struct.ProjectTriggerRunCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RepoSource {
+    /// ID of the project that owns the Cloud Source Repository. If omitted, the
+    /// project ID requesting the build is assumed.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Only trigger a build if the revision regex does NOT match the revision
+    /// regex.
+    #[serde(rename="invertRegex")]
+    pub invert_regex: Option<bool>,
+    /// Explicit commit SHA to build.
+    #[serde(rename="commitSha")]
+    pub commit_sha: Option<String>,
+    /// Substitutions to use in a triggered build.
+    /// Should only be used with RunBuildTrigger
+    pub substitutions: Option<HashMap<String, String>>,
+    /// Required. Name of the Cloud Source Repository.
+    #[serde(rename="repoName")]
+    pub repo_name: Option<String>,
+    /// Regex matching tags to build.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    #[serde(rename="tagName")]
+    pub tag_name: Option<String>,
+    /// Regex matching branches to build.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    #[serde(rename="branchName")]
+    pub branch_name: Option<String>,
+    /// Directory, relative to the source root, in which to run the build.
+    /// 
+    /// This must be a relative path. If a step's `dir` is specified and is an
+    /// absolute path, this value is ignored for that step's execution.
+    pub dir: Option<String>,
+}
+
+impl RequestValue for RepoSource {}
+
+
+/// Response including listed builds.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [builds list projects](struct.ProjectBuildListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBuildsResponse {
+    /// Token to receive the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Builds will be sorted by `create_time`, descending.
+    pub builds: Option<Vec<Build>>,
+}
+
+impl ResponseResult for ListBuildsResponse {}
+
+
+/// Push contains filter properties for matching GitHub git pushes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PushFilter {
+    /// When true, only trigger a build if the revision regex does NOT match the
+    /// git_ref regex.
+    #[serde(rename="invertRegex")]
+    pub invert_regex: Option<bool>,
+    /// Regexes matching tags to build.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub tag: Option<String>,
+    /// Regexes matching branches to build.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    pub branch: Option<String>,
+}
+
+impl Part for PushFilter {}
+
+
 /// Location of the source in an archive file in Google Cloud Storage.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1252,6 +1089,189 @@ pub struct StorageSource {
 impl Part for StorageSource {}
 
 
+/// Response containing existing `BuildTriggers`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [triggers list projects](struct.ProjectTriggerListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBuildTriggersResponse {
+    /// Token to receive the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// `BuildTriggers` for the project, sorted by `create_time` descending.
+    pub triggers: Option<Vec<BuildTrigger>>,
+}
+
+impl ResponseResult for ListBuildTriggersResponse {}
+
+
+/// An image built by the pipeline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuiltImage {
+    /// Output only. Stores timing information for pushing the specified image.
+    #[serde(rename="pushTiming")]
+    pub push_timing: Option<TimeSpan>,
+    /// Name used to push the container image to Google Container Registry, as
+    /// presented to `docker push`.
+    pub name: Option<String>,
+    /// Docker Registry 2.0 digest.
+    pub digest: Option<String>,
+}
+
+impl Part for BuiltImage {}
+
+
+/// Optional arguments to enable specific features of builds.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildOptions {
+    /// Option to specify behavior when there is an error in the substitution
+    /// checks.
+    /// 
+    /// NOTE: this is always set to ALLOW_LOOSE for triggered builds and cannot
+    /// be overridden in the build configuration file.
+    #[serde(rename="substitutionOption")]
+    pub substitution_option: Option<String>,
+    /// Compute Engine machine type on which to run the build.
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
+    /// A list of global environment variable definitions that will exist for all
+    /// build steps in this build. If a variable is defined in both globally and in
+    /// a build step, the variable will use the build step value.
+    /// 
+    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
+    /// being given the value "VALUE".
+    pub env: Option<Vec<String>>,
+    /// Requested hash for SourceProvenance.
+    #[serde(rename="sourceProvenanceHash")]
+    pub source_provenance_hash: Option<Vec<String>>,
+    /// Option to define build log streaming behavior to Google Cloud
+    /// Storage.
+    #[serde(rename="logStreamingOption")]
+    pub log_streaming_option: Option<String>,
+    /// A list of global environment variables, which are encrypted using a Cloud
+    /// Key Management Service crypto key. These values must be specified in the
+    /// build's `Secret`. These variables will be available to all build steps
+    /// in this build.
+    #[serde(rename="secretEnv")]
+    pub secret_env: Option<Vec<String>>,
+    /// Requested disk size for the VM that runs the build. Note that this is *NOT*
+    /// "disk free"; some of the space will be used by the operating system and
+    /// build utilities. Also note that this is the minimum disk size that will be
+    /// allocated for the build -- the build may run with a larger disk than
+    /// requested. At present, the maximum disk size is 1000GB; builds that request
+    /// more than the maximum are rejected with an error.
+    #[serde(rename="diskSizeGb")]
+    pub disk_size_gb: Option<String>,
+    /// Option to specify whether or not to apply bash style string
+    /// operations to the substitutions.
+    /// 
+    /// NOTE: this is always enabled for triggered builds and cannot be
+    /// overridden in the build configuration file.
+    #[serde(rename="dynamicSubstitutions")]
+    pub dynamic_substitutions: Option<bool>,
+    /// Option to specify the logging mode, which determines if and where build
+    /// logs are stored.
+    pub logging: Option<String>,
+    /// Global list of volumes to mount for ALL build steps
+    /// 
+    /// Each volume is created as an empty volume prior to starting the build
+    /// process. Upon completion of the build, volumes and their contents are
+    /// discarded. Global volume names and paths cannot conflict with the volumes
+    /// defined a build step.
+    /// 
+    /// Using a global volume in a build with only one step is not valid as
+    /// it is indicative of a build request with an incorrect configuration.
+    pub volumes: Option<Vec<Volume>>,
+    /// Requested verifiability options.
+    #[serde(rename="requestedVerifyOption")]
+    pub requested_verify_option: Option<String>,
+    /// Option to specify a `WorkerPool` for the build.
+    /// Format: projects/{project}/workerPools/{workerPool}
+    /// 
+    /// This field is experimental.
+    #[serde(rename="workerPool")]
+    pub worker_pool: Option<String>,
+}
+
+impl Part for BuildOptions {}
+
+
+/// Request to cancel an ongoing build.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [builds cancel projects](struct.ProjectBuildCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelBuildRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelBuildRequest {}
+
+
+/// Artifacts created by the build pipeline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Results {
+    /// List of build step outputs, produced by builder images, in the order
+    /// corresponding to build step indices.
+    /// 
+    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
+    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
+    /// Only the first 4KB of data is stored.
+    #[serde(rename="buildStepOutputs")]
+    pub build_step_outputs: Option<Vec<String>>,
+    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
+    #[serde(rename="artifactManifest")]
+    pub artifact_manifest: Option<String>,
+    /// Time to push all non-container artifacts.
+    #[serde(rename="artifactTiming")]
+    pub artifact_timing: Option<TimeSpan>,
+    /// Container images that were built as a part of the build.
+    pub images: Option<Vec<BuiltImage>>,
+    /// List of build step digests, in the order corresponding to build step
+    /// indices.
+    #[serde(rename="buildStepImages")]
+    pub build_step_images: Option<Vec<String>>,
+    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
+    #[serde(rename="numArtifacts")]
+    pub num_artifacts: Option<String>,
+}
+
+impl Part for Results {}
+
+
+/// The request message for Operations.CancelOperation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel operations](struct.OperationCancelCall.html) (request)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelOperationRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelOperationRequest {}
+
+
 /// This resource represents a long-running operation that is the result of a
 /// network API call.
 /// 
@@ -1263,7 +1283,7 @@ impl Part for StorageSource {}
 /// * [cancel operations](struct.OperationCancelCall.html) (none)
 /// * [triggers run projects](struct.ProjectTriggerRunCall.html) (response)
 /// * [builds create projects](struct.ProjectBuildCreateCall.html) (response)
-/// * [list operations](struct.OperationListCall.html) (none)
+/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
 /// * [get operations](struct.OperationGetCall.html) (response)
 /// * [builds retry projects](struct.ProjectBuildRetryCall.html) (response)
 /// 
@@ -1297,27 +1317,6 @@ pub struct Operation {
 
 impl Resource for Operation {}
 impl ResponseResult for Operation {}
-
-
-/// Response including listed builds.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [builds list projects](struct.ProjectBuildListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListBuildsResponse {
-    /// Token to receive the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Builds will be sorted by `create_time`, descending.
-    pub builds: Option<Vec<Build>>,
-}
-
-impl ResponseResult for ListBuildsResponse {}
 
 
 /// GitHubEventsConfig describes the configuration of a trigger that creates a
@@ -1378,7 +1377,7 @@ impl Part for GitHubEventsConfig {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `cancel(...)`, `get(...)` and `list(...)`
+/// // like `cancel(...)` and `get(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
@@ -1415,35 +1414,6 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists operations that match the specified filter in the request. If the
-    /// server doesn't support this method, it returns `UNIMPLEMENTED`.
-    /// 
-    /// NOTE: the `name` binding allows API services to override the binding
-    /// to use different resource name schemes, such as `users/*/operations`. To
-    /// override the binding, API services can add a binding such as
-    /// `"/v1/{name=users/*}/operations"` to their service configuration.
-    /// For backwards compatibility, the default name includes the operations
-    /// collection id, however overriding users must ensure the name binding
-    /// is the parent resource, without the operations collection id.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the operation's parent resource.
-    pub fn list(&self, name: &str) -> OperationListCall<'a, C, A> {
-        OperationListCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1496,7 +1466,7 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `builds_cancel(...)`, `builds_create(...)`, `builds_get(...)`, `builds_list(...)`, `builds_retry(...)`, `triggers_create(...)`, `triggers_delete(...)`, `triggers_get(...)`, `triggers_list(...)`, `triggers_patch(...)` and `triggers_run(...)`
+/// // like `builds_cancel(...)`, `builds_create(...)`, `builds_get(...)`, `builds_list(...)`, `builds_retry(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `triggers_create(...)`, `triggers_delete(...)`, `triggers_get(...)`, `triggers_list(...)`, `triggers_patch(...)` and `triggers_run(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1568,6 +1538,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _trigger_id: trigger_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Starts asynchronous cancellation on a long-running operation.  The server
+    /// makes a best effort to cancel the operation, but success is not
+    /// guaranteed.  If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+    /// Operations.GetOperation or
+    /// other methods to check whether the cancellation succeeded or whether the
+    /// operation completed despite cancellation. On successful cancellation,
+    /// the operation is not deleted; instead, it becomes an operation with
+    /// an Operation.error value with a google.rpc.Status.code of 1,
+    /// corresponding to `Code.CANCELLED`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the operation resource to be cancelled.
+    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        ProjectLocationOperationCancelCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1657,6 +1655,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, C, A> {
+        ProjectLocationOperationGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2067,305 +2084,6 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OperationCancelCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists operations that match the specified filter in the request. If the
-/// server doesn't support this method, it returns `UNIMPLEMENTED`.
-/// 
-/// NOTE: the `name` binding allows API services to override the binding
-/// to use different resource name schemes, such as `users/*/operations`. To
-/// override the binding, API services can add a binding such as
-/// `"/v1/{name=users/*}/operations"` to their service configuration.
-/// For backwards compatibility, the default name includes the operations
-/// collection id, however overriding users must ensure the name binding
-/// is the parent resource, without the operations collection id.
-///
-/// A builder for the *list* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_cloudbuild1 as cloudbuild1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudbuild1::CloudBuild;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().list("name")
-///              .page_token("nonumy")
-///              .page_size(-19)
-///              .filter("gubergren")
-///              .doit();
-/// # }
-/// ```
-pub struct OperationListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudBuild<C, A>,
-    _name: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _filter: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OperationListCall<'a, C, A> {}
-
-impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListOperationsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "cloudbuild.operations.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation's parent resource.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The standard list page token.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The standard list page size.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The standard list filter.
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OperationListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2927,8 +2645,8 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().triggers_list("projectId")
-///              .page_token("justo")
-///              .page_size(-21)
+///              .page_token("erat")
+///              .page_size(-35)
 ///              .doit();
 /// # }
 /// ```
@@ -3426,6 +3144,300 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTriggerDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Starts asynchronous cancellation on a long-running operation.  The server
+/// makes a best effort to cancel the operation, but success is not
+/// guaranteed.  If the server doesn't support this method, it returns
+/// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+/// Operations.GetOperation or
+/// other methods to check whether the cancellation succeeded or whether the
+/// operation completed despite cancellation. On successful cancellation,
+/// the operation is not deleted; instead, it becomes an operation with
+/// an Operation.error value with a google.rpc.Status.code of 1,
+/// corresponding to `Code.CANCELLED`.
+///
+/// A builder for the *locations.operations.cancel* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudbuild1 as cloudbuild1;
+/// use cloudbuild1::CancelOperationRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudbuild1::CloudBuild;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CancelOperationRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_operations_cancel(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationOperationCancelCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudBuild<C, A>,
+    _request: CancelOperationRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationOperationCancelCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudbuild.projects.locations.operations.cancel",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the operation resource to be cancelled.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4311,9 +4323,9 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().builds_list("projectId")
-///              .page_token("sea")
-///              .page_size(-55)
-///              .filter("eos")
+///              .page_token("justo")
+///              .page_size(-34)
+///              .filter("et")
 ///              .doit();
 /// # }
 /// ```
@@ -4558,6 +4570,262 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBuildListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *locations.operations.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudbuild1 as cloudbuild1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudbuild1::CloudBuild;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudBuild::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_operations_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudBuild<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudbuild.projects.locations.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

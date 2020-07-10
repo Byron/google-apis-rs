@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Security Command Center* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Security Command Center* crate version *1.0.14+20200703*, where *20200703* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Security Command Center* *v1* API can be found at the
 //! [official documentation site](https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview).
@@ -333,7 +333,7 @@ impl<'a, C, A> SecurityCommandCenter<C, A>
         SecurityCommandCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://securitycenter.googleapis.com/".to_string(),
             _root_url: "https://securitycenter.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> SecurityCommandCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -407,8 +407,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -472,10 +472,6 @@ impl Part for StreamingConfig {}
 /// notification, analysis, policy testing, and enforcement. For example, a
 /// cross-site scripting (XSS) vulnerability in an App Engine application is a
 /// finding.
-/// 
-/// When adding a new field hidden behind a visibility label, ensure it is also
-/// hidden from Notifications:
-/// http://google3/java/com/google/cloud/security/riskdashboard/notification/actions/streaming/FindingTranslator.java?l=26
 /// 
 /// # Activities
 /// 
@@ -643,8 +639,8 @@ pub struct GroupFindingsRequest {
     ///   
     ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
     ///   Examples:
-    ///   "event_time = "2019-06-10T16:07:18-07:00""
-    ///   "event_time = 1560208038000"
+    ///   `event_time = "2019-06-10T16:07:18-07:00"`
+    ///   `event_time = 1560208038000`
     /// 
     /// * security_marks.marks: `=`, `:`
     /// 
@@ -653,10 +649,10 @@ pub struct GroupFindingsRequest {
     /// For example, `source_properties.size = 100` is a valid filter string.
     /// 
     /// Use a partial match on the empty string to filter based on a property
-    /// existing: "source_properties.my_property : """
+    /// existing: `source_properties.my_property : ""`
     /// 
     /// Use a negated partial match on the empty string to filter based on a
-    /// property not existing: "-source_properties.my_property : """
+    /// property not existing: `-source_properties.my_property : ""`
     pub filter: Option<String>,
     /// The value returned by the last `GroupFindingsResponse`; indicates
     /// that this is a continuation of a prior `GroupFindings` call, and
@@ -737,10 +733,12 @@ impl RequestValue for GroupFindingsRequest {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -758,7 +756,9 @@ impl RequestValue for GroupFindingsRequest {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -845,6 +845,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -1179,7 +1182,7 @@ impl ResponseResult for SecurityMarks {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1216,7 +1219,7 @@ impl Part for AuditLogConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
     /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
-    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    /// `GetIamPolicy`.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -1410,15 +1413,15 @@ pub struct GroupAssetsRequest {
     ///   
     ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
     ///   Examples:
-    ///   "update_time = "2019-06-10T16:07:18-07:00""
-    ///   "update_time = 1560208038000"
+    ///   `update_time = "2019-06-10T16:07:18-07:00"`
+    ///   `update_time = 1560208038000`
     /// 
     /// * create_time: `=`, `>`, `<`, `>=`, `<=`
     ///   
     ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
     ///   Examples:
-    ///   "create_time = "2019-06-10T16:07:18-07:00""
-    ///   "create_time = 1560208038000"
+    ///   `create_time = "2019-06-10T16:07:18-07:00"`
+    ///   `create_time = 1560208038000`
     /// 
     /// * iam_policy.policy_blob: `=`, `:`
     /// 
@@ -1445,10 +1448,10 @@ pub struct GroupAssetsRequest {
     /// For example, `resource_properties.size = 100` is a valid filter string.
     /// 
     /// Use a partial match on the empty string to filter based on a property
-    /// existing: "resource_properties.my_property : """
+    /// existing: `resource_properties.my_property : ""`
     /// 
     /// Use a negated partial match on the empty string to filter based on a
-    /// property not existing: "-resource_properties.my_property : """
+    /// property not existing: `-resource_properties.my_property : ""`
     pub filter: Option<String>,
     /// The value returned by the last `GroupAssetsResponse`; indicates
     /// that this is a continuation of a prior `GroupAssets` call, and that the
@@ -1589,48 +1592,6 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// Security Command Center finding source. A finding source
-/// is an entity or a mechanism that can produce a finding. A source is like a
-/// container of findings that come from the same scanner, logger, monitor, and
-/// other tools.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [sources patch organizations](struct.OrganizationSourcePatchCall.html) (request|response)
-/// * [sources create organizations](struct.OrganizationSourceCreateCall.html) (request|response)
-/// * [sources get organizations](struct.OrganizationSourceGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Source {
-    /// The source's display name.
-    /// A source's display name must be unique amongst its siblings, for example,
-    /// two sources with the same parent can't share the same display name.
-    /// The display name must have a length between 1 and 64 characters
-    /// (inclusive).
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The description of the source (max of 1024 characters).
-    /// Example:
-    /// "Web Security Scanner is a web security scanner for common
-    /// vulnerabilities in App Engine applications. It can automatically
-    /// scan and detect four common vulnerabilities, including cross-site-scripting
-    /// (XSS), Flash injection, mixed content (HTTP in HTTPS), and
-    /// outdated or insecure libraries."
-    pub description: Option<String>,
-    /// The relative resource name of this source. See:
-    /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
-    /// Example:
-    /// "organizations/{organization_id}/sources/{source_id}"
-    pub name: Option<String>,
-}
-
-impl RequestValue for Source {}
-impl ResponseResult for Source {}
-
-
 /// Encapsulates settings provided to GetIamPolicy.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1645,6 +1606,10 @@ pub struct GetPolicyOptions {
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -1662,9 +1627,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1716,6 +1689,48 @@ pub struct Binding {
 impl Part for Binding {}
 
 
+/// Security Command Center finding source. A finding source
+/// is an entity or a mechanism that can produce a finding. A source is like a
+/// container of findings that come from the same scanner, logger, monitor, and
+/// other tools.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sources patch organizations](struct.OrganizationSourcePatchCall.html) (request|response)
+/// * [sources create organizations](struct.OrganizationSourceCreateCall.html) (request|response)
+/// * [sources get organizations](struct.OrganizationSourceGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Source {
+    /// The source's display name.
+    /// A source's display name must be unique amongst its siblings, for example,
+    /// two sources with the same parent can't share the same display name.
+    /// The display name must have a length between 1 and 64 characters
+    /// (inclusive).
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The description of the source (max of 1024 characters).
+    /// Example:
+    /// "Web Security Scanner is a web security scanner for common
+    /// vulnerabilities in App Engine applications. It can automatically
+    /// scan and detect four common vulnerabilities, including cross-site-scripting
+    /// (XSS), Flash injection, mixed content (HTTP in HTTPS), and
+    /// outdated or insecure libraries."
+    pub description: Option<String>,
+    /// The relative resource name of this source. See:
+    /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
+    /// Example:
+    /// "organizations/{organization_id}/sources/{source_id}"
+    pub name: Option<String>,
+}
+
+impl RequestValue for Source {}
+impl ResponseResult for Source {}
+
+
 /// Response message for listing notification configs.
 /// 
 /// # Activities
@@ -1755,7 +1770,7 @@ impl ResponseResult for ListNotificationConfigsResponse {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1764,18 +1779,18 @@ impl ResponseResult for ListNotificationConfigsResponse {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -2125,7 +2140,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// 
-    /// Updates a notification config.
+    /// Updates a notification config. The following update
+    /// fields are allowed: description, pubsub_topic, streaming_config.filter
     /// 
     /// # Arguments
     ///
@@ -3899,7 +3915,7 @@ impl<'a, C, A> OrganizationUpdateOrganizationSettingCall<'a, C, A> where C: Borr
     }
     /// The FieldMask to use when updating the settings resource.
     /// 
-    ///  If empty all mutable fields will be updated.
+    /// If empty all mutable fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> OrganizationUpdateOrganizationSettingCall<'a, C, A> {
@@ -4833,7 +4849,8 @@ impl<'a, C, A> OrganizationSourceGetIamPolicyCall<'a, C, A> where C: BorrowMut<h
 
 
 /// 
-/// Updates a notification config.
+/// Updates a notification config. The following update
+/// fields are allowed: description, pubsub_topic, streaming_config.filter
 ///
 /// A builder for the *notificationConfigs.patch* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -6287,8 +6304,8 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// 
     /// Usage: This should be milliseconds since epoch or an RFC3339 string.
     /// Examples:
-    /// "event_time = "2019-06-10T16:07:18-07:00""
-    /// "event_time = 1560208038000"
+    /// `event_time = "2019-06-10T16:07:18-07:00"`
+    /// `event_time = 1560208038000`
     /// 
     /// security_marks.marks: `=`, `:`
     /// source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
@@ -6296,17 +6313,17 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// For example, `source_properties.size = 100` is a valid filter string.
     /// 
     /// Use a partial match on the empty string to filter based on a property
-    /// existing: "source_properties.my_property : """
+    /// existing: `source_properties.my_property : ""`
     /// 
     /// Use a negated partial match on the empty string to filter based on a
-    /// property not existing: "-source_properties.my_property : """
+    /// property not existing: `-source_properties.my_property : ""`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OrganizationSourceFindingListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Optional. A field mask to specify the Finding fields to be listed in the response.
+    /// A field mask to specify the Finding fields to be listed in the response.
     /// An empty field mask will list all fields.
     ///
     /// Sets the *field mask* query property to the given value.
@@ -7943,15 +7960,15 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///   
     ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
     ///   Examples:
-    ///   "update_time = "2019-06-10T16:07:18-07:00""
-    ///   "update_time = 1560208038000"
+    ///   `update_time = "2019-06-10T16:07:18-07:00"`
+    ///   `update_time = 1560208038000`
     /// 
     /// * create_time: `=`, `>`, `<`, `>=`, `<=`
     ///   
     ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
     ///   Examples:
-    ///   "create_time = "2019-06-10T16:07:18-07:00""
-    ///   "create_time = 1560208038000"
+    ///   `create_time = "2019-06-10T16:07:18-07:00"`
+    ///   `create_time = 1560208038000`
     /// 
     /// * iam_policy.policy_blob: `=`, `:`
     /// 
@@ -7978,17 +7995,17 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// For example, `resource_properties.size = 100` is a valid filter string.
     /// 
     /// Use a partial match on the empty string to filter based on a property
-    /// existing: "resource_properties.my_property : """
+    /// existing: `resource_properties.my_property : ""`
     /// 
     /// Use a negated partial match on the empty string to filter based on a
-    /// property not existing: "-resource_properties.my_property : """
+    /// property not existing: `-resource_properties.my_property : ""`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OrganizationAssetListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Optional. A field mask to specify the ListAssetsResult fields to be listed in the
+    /// A field mask to specify the ListAssetsResult fields to be listed in the
     /// response.
     /// An empty field mask will list all fields.
     ///

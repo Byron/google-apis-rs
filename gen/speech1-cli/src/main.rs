@@ -794,7 +794,7 @@ fn main() {
     
     let mut app = App::new("speech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200406")
+           .version("1.0.14+20200625")
            .about("Converts audio to text by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_speech1_cli")
            .arg(Arg::with_name("url")

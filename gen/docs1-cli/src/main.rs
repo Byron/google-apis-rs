@@ -163,10 +163,15 @@ impl<'n> Engine<'n> {
                     "document-style.page-size.width.unit" => Some(("documentStyle.pageSize.width.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.page-size.height.magnitude" => Some(("documentStyle.pageSize.height.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "document-style.page-size.height.unit" => Some(("documentStyle.pageSize.height.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "document-style.default-header-id" => Some(("documentStyle.defaultHeaderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.margin-bottom.magnitude" => Some(("documentStyle.marginBottom.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "document-style.margin-bottom.unit" => Some(("documentStyle.marginBottom.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-style.default-header-id" => Some(("documentStyle.defaultHeaderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-style.margin-header.magnitude" => Some(("documentStyle.marginHeader.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "document-style.margin-header.unit" => Some(("documentStyle.marginHeader.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-style.use-custom-header-footer-margins" => Some(("documentStyle.useCustomHeaderFooterMargins", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "document-style.first-page-header-id" => Some(("documentStyle.firstPageHeaderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-style.margin-footer.magnitude" => Some(("documentStyle.marginFooter.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "document-style.margin-footer.unit" => Some(("documentStyle.marginFooter.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.even-page-header-id" => Some(("documentStyle.evenPageHeaderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-style.use-first-page-header-footer" => Some(("documentStyle.useFirstPageHeaderFooter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "document-style.margin-left.magnitude" => Some(("documentStyle.marginLeft.magnitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -184,7 +189,7 @@ impl<'n> Engine<'n> {
                     "document-id" => Some(("documentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "blue", "color", "default-footer-id", "default-header-id", "document-id", "document-style", "even-page-footer-id", "even-page-header-id", "first-page-footer-id", "first-page-header-id", "green", "height", "magnitude", "margin-bottom", "margin-left", "margin-right", "margin-top", "page-number-start", "page-size", "red", "revision-id", "rgb-color", "suggestions-view-mode", "title", "unit", "use-even-page-header-footer", "use-first-page-header-footer", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "blue", "color", "default-footer-id", "default-header-id", "document-id", "document-style", "even-page-footer-id", "even-page-header-id", "first-page-footer-id", "first-page-header-id", "green", "height", "magnitude", "margin-bottom", "margin-footer", "margin-header", "margin-left", "margin-right", "margin-top", "page-number-start", "page-size", "red", "revision-id", "rgb-color", "suggestions-view-mode", "title", "unit", "use-custom-header-footer-margins", "use-even-page-header-footer", "use-first-page-header-footer", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -509,7 +514,7 @@ fn main() {
     
     let mut app = App::new("docs1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.10+20190627")
+           .version("1.0.14+20200706")
            .about("Reads and writes Google Docs documents.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_docs1_cli")
            .arg(Arg::with_name("url")

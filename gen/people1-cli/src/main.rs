@@ -551,6 +551,161 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _other_contacts_copy_other_contact_to_my_contacts_group(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "copy-mask" => Some(("copyMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-mask" => Some(("readMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["copy-mask", "read-mask", "sources"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CopyOtherContactToMyContactsGroupRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.other_contacts().copy_other_contact_to_my_contacts_group(request, opt.value_of("resource-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _other_contacts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.other_contacts().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "sync-token" => {
+                    call = call.sync_token(value.unwrap_or(""));
+                },
+                "request-sync-token" => {
+                    call = call.request_sync_token(arg_from_str(value.unwrap_or("false"), err, "request-sync-token", "boolean"));
+                },
+                "read-mask" => {
+                    call = call.read_mask(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sync-token", "read-mask", "page-size", "page-token", "request-sync-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _people_connections_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().connections_list(opt.value_of("resource-name").unwrap_or(""));
@@ -559,6 +714,9 @@ impl<'n> Engine<'n> {
             match key {
                 "sync-token" => {
                     call = call.sync_token(value.unwrap_or(""));
+                },
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
                 },
                 "sort-order" => {
                     call = call.sort_order(value.unwrap_or(""));
@@ -591,7 +749,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sync-token", "page-size", "request-mask-include-field", "page-token", "sort-order", "person-fields", "request-sync-token"].iter().map(|v|*v));
+                                                                           v.extend(["sync-token", "page-size", "page-token", "request-mask-include-field", "sources", "sort-order", "person-fields", "request-sync-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -670,6 +828,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
+                "person-fields" => {
+                    call = call.person_fields(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -683,6 +847,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "sources"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -774,6 +939,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
                 "person-fields" => {
                     call = call.person_fields(value.unwrap_or(""));
                 },
@@ -790,7 +958,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["person-fields"].iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "sources"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -830,6 +998,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
                 "request-mask-include-field" => {
                     call = call.request_mask_include_field(value.unwrap_or(""));
                 },
@@ -849,7 +1020,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["person-fields", "request-mask-include-field"].iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "sources", "request-mask-include-field"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -889,6 +1060,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
                 "resource-names" => {
                     call = call.add_resource_names(value.unwrap_or(""));
                 },
@@ -911,7 +1085,152 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["person-fields", "resource-names", "request-mask-include-field"].iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "sources", "request-mask-include-field", "resource-names"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _people_list_directory_people(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.people().list_directory_people();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "sync-token" => {
+                    call = call.sync_token(value.unwrap_or(""));
+                },
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
+                "request-sync-token" => {
+                    call = call.request_sync_token(arg_from_str(value.unwrap_or("false"), err, "request-sync-token", "boolean"));
+                },
+                "read-mask" => {
+                    call = call.read_mask(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "merge-sources" => {
+                    call = call.add_merge_sources(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sync-token", "page-size", "sources", "page-token", "read-mask", "merge-sources", "request-sync-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _people_search_directory_people(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.people().search_directory_people();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
+                "read-mask" => {
+                    call = call.read_mask(value.unwrap_or(""));
+                },
+                "query" => {
+                    call = call.query(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "merge-sources" => {
+                    call = call.add_merge_sources(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "sources", "read-mask", "merge-sources", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -993,6 +1312,12 @@ impl<'n> Engine<'n> {
                 "update-person-fields" => {
                     call = call.update_person_fields(value.unwrap_or(""));
                 },
+                "sources" => {
+                    call = call.add_sources(value.unwrap_or(""));
+                },
+                "person-fields" => {
+                    call = call.person_fields(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1006,7 +1331,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-person-fields"].iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "update-person-fields", "sources"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1064,9 +1389,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "person-fields" => Some(("personFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "photo-bytes" => Some(("photoBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["person-fields", "photo-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["person-fields", "photo-bytes", "sources"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1160,6 +1486,20 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("other-contacts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("copy-other-contact-to-my-contacts-group", Some(opt)) => {
+                        call_result = self._other_contacts_copy_other_contact_to_my_contacts_group(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._other_contacts_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("other-contacts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("people", Some(opt)) => {
                 match opt.subcommand() {
                     ("connections-list", Some(opt)) => {
@@ -1179,6 +1519,12 @@ impl<'n> Engine<'n> {
                     },
                     ("get-batch-get", Some(opt)) => {
                         call_result = self._people_get_batch_get(opt, dry_run, &mut err);
+                    },
+                    ("list-directory-people", Some(opt)) => {
+                        call_result = self._people_list_directory_people(opt, dry_run, &mut err);
+                    },
+                    ("search-directory-people", Some(opt)) => {
+                        call_result = self._people_search_directory_people(opt, dry_run, &mut err);
                     },
                     ("update-contact", Some(opt)) => {
                         call_result = self._people_update_contact(opt, dry_run, &mut err);
@@ -1444,10 +1790,58 @@ fn main() {
                   ]),
             ]),
         
-        ("people", "methods: 'connections-list', 'create-contact', 'delete-contact', 'delete-contact-photo', 'get', 'get-batch-get', 'update-contact' and 'update-contact-photo'", vec![
+        ("other-contacts", "methods: 'copy-other-contact-to-my-contacts-group' and 'list'", vec![
+            ("copy-other-contact-to-my-contacts-group",
+                    Some(r##"Copies an "Other contact" to a new contact in the user's "myContacts" group"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/other-contacts_copy-other-contact-to-my-contacts-group",
+                  vec![
+                    (Some(r##"resource-name"##),
+                     None,
+                     Some(r##"Required. The resource name of the "Other contact" to copy."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"List all "Other contacts", that is contacts that are not in a contact
+        group. "Other contacts" are typically auto created contacts from
+        interactions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/other-contacts_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("people", "methods: 'connections-list', 'create-contact', 'delete-contact', 'delete-contact-photo', 'get', 'get-batch-get', 'list-directory-people', 'search-directory-people', 'update-contact' and 'update-contact-photo'", vec![
             ("connections-list",
-                    Some(r##"Provides a list of the authenticated user's contacts merged with any
-        connected profiles.
+                    Some(r##"Provides a list of the authenticated user's contacts.
         
         The request throws a 400 error if 'personFields' is not specified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_connections-list",
@@ -1588,6 +1982,40 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("list-directory-people",
+                    Some(r##"Provides a list of domain profiles and domain contacts in the authenticated
+        user's domain directory."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_list-directory-people",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("search-directory-people",
+                    Some(r##"Provides a list of domain profiles and domain contacts in the authenticated
+        user's domain directory that match the search query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_search-directory-people",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("update-contact",
                     Some(r##"Update contact data for an existing contact person. Any non-contact data
         will not be modified.
@@ -1664,7 +2092,7 @@ fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200407")
+           .version("1.0.14+20200708")
            .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")

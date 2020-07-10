@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudbuild1-cli"
-version = "1.0.13+20200323"
+version = "1.0.14+20200704"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Build (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbuild1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-cloudbuild1]
 path = "../cloudbuild1"
-version = "1.0.13+20200323"
+version = "1.0.14+20200704"

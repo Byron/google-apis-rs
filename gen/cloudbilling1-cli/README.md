@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloudbilling* API at revision *20200401*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Cloudbilling* API at revision *20200623*. The CLI is at version *1.0.14*.
 
 ```bash
 cloudbilling1 [options]

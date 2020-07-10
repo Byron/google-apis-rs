@@ -1,4 +1,4 @@
-site_name: Cloud Machine Learning Engine v1.0.13+20200328
+site_name: Cloud Machine Learning Engine v1.0.14+20200703
 site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
 site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
 

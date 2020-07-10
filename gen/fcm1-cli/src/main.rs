@@ -324,7 +324,7 @@ fn main() {
     
     let mut app = App::new("fcm1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200406")
+           .version("1.0.14+20200706")
            .about("FCM send API that provides a cross-platform messaging solution to reliably deliver messages at no cost.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fcm1_cli")
            .arg(Arg::with_name("url")

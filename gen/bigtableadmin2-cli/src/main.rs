@@ -3325,9 +3325,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"(`OutputOnly`)
-        The unique name of the app profile. Values are of the form
-        `projects/<project>/instances/<instance>/appProfiles/_a-zA-Z0-9*`."##),
+                     Some(r##"The unique name of the app profile. Values are of the form
+        `projects/{project}/instances/{instance}/appProfiles/_a-zA-Z0-9*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3350,7 +3349,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-clusters-backups-get-iam-policy",
-                    Some(r##"Gets the access control policy for a Table or Backup resource.
+                    Some(r##"Gets the access control policy for a Table resource.
         Returns an empty policy if the resource exists but does not have a policy
         set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-get-iam-policy",
@@ -3381,7 +3380,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-clusters-backups-set-iam-policy",
-                    Some(r##"Sets the access control policy on a Table or Backup resource.
+                    Some(r##"Sets the access control policy on a Table resource.
         Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-set-iam-policy",
                   vec![
@@ -3546,8 +3545,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. (`OutputOnly`)
-        The unique name of the cluster. Values are of the form
+                     Some(r##"The unique name of the cluster. Values are of the form
         `projects/{project}/instances/{instance}/clusters/a-z*`."##),
                      Some(true),
                      Some(false)),
@@ -3705,8 +3703,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. (`OutputOnly`)
-        The unique name of the instance. Values are of the form
+                     Some(r##"The unique name of the instance. Values are of the form
         `projects/{project}/instances/a-z+[a-z0-9]`."##),
                      Some(true),
                      Some(false)),
@@ -3936,7 +3933,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-get-iam-policy",
-                    Some(r##"Gets the access control policy for a Table or Backup resource.
+                    Some(r##"Gets the access control policy for a Table resource.
         Returns an empty policy if the resource exists but does not have a policy
         set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-get-iam-policy",
@@ -4023,7 +4020,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-set-iam-policy",
-                    Some(r##"Sets the access control policy on a Table or Backup resource.
+                    Some(r##"Sets the access control policy on a Table resource.
         Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-set-iam-policy",
                   vec![
@@ -4118,8 +4115,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. (`OutputOnly`)
-        The unique name of the instance. Values are of the form
+                     Some(r##"The unique name of the instance. Values are of the form
         `projects/{project}/instances/a-z+[a-z0-9]`."##),
                      Some(true),
                      Some(false)),
@@ -4192,7 +4188,7 @@ fn main() {
     
     let mut app = App::new("bigtableadmin2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200211")
+           .version("1.0.14+20200609")
            .about("Administer your Cloud Bigtable tables and instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli")
            .arg(Arg::with_name("url")

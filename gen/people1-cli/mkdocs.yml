@@ -1,4 +1,4 @@
-site_name: People Service v1.0.13+20200407
+site_name: People Service v1.0.14+20200708
 site_url: http://byron.github.io/google-apis-rs/google-people1-cli
 site_description: A complete library to interact with People Service (protocol v1)
 
@@ -16,12 +16,16 @@ pages:
 - ['contact-groups_list.md', 'Contact Groups', 'List']
 - ['contact-groups_members-modify.md', 'Contact Groups', 'Members Modify']
 - ['contact-groups_update.md', 'Contact Groups', 'Update']
+- ['other-contacts_copy-other-contact-to-my-contacts-group.md', 'Other Contacts', 'Copy Other Contact To My Contacts Group']
+- ['other-contacts_list.md', 'Other Contacts', 'List']
 - ['people_connections-list.md', 'People', 'Connections List']
 - ['people_create-contact.md', 'People', 'Create Contact']
 - ['people_delete-contact.md', 'People', 'Delete Contact']
 - ['people_delete-contact-photo.md', 'People', 'Delete Contact Photo']
 - ['people_get.md', 'People', 'Get']
 - ['people_get-batch-get.md', 'People', 'Get Batch Get']
+- ['people_list-directory-people.md', 'People', 'List Directory People']
+- ['people_search-directory-people.md', 'People', 'Search Directory People']
 - ['people_update-contact.md', 'People', 'Update Contact']
 - ['people_update-contact-photo.md', 'People', 'Update Contact Photo']
 

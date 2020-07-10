@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *YouTube* API can be found at the
-[official documentation site](https://developers.google.com/youtube/v3).
+[official documentation site](https://developers.google.com/youtube/).
 
 # Installation and Source Code
 
@@ -25,53 +25,54 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20200402*. The CLI is at version *1.0.13*.
+This documentation was generated from the *YouTube* API at revision *20200709*. The CLI is at version *1.0.14*.
 
 ```bash
 youtube3 [options]
-        activities
+        abuse-reports
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+        activities
+                list <part>... [-p <v>]... [-o <out>]
         captions
                 delete <id> [-p <v>]...
                 download <id> [-p <v>]... [-o <out>]
-                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
-                list <part> <video-id> [-p <v>]... [-o <out>]
-                update (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list <video-id> <part>... [-p <v>]... [-o <out>]
+                update (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         channel-banners
-                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         channel-sections
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         channels
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         comment-threads
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         comments
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
-                mark-as-spam <id> [-p <v>]...
-                set-moderation-status <id> <moderation-status> [-p <v>]...
+                list <part>... [-p <v>]... [-o <out>]
+                mark-as-spam <id>... [-p <v>]...
+                set-moderation-status <id>... <moderation-status> [-p <v>]...
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         guide-categories
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         i18n-languages
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         i18n-regions
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         live-broadcasts
-                bind <id> <part> [-p <v>]... [-o <out>]
-                control <id> <part> [-p <v>]... [-o <out>]
+                bind <id> <part>... [-p <v>]... [-o <out>]
+                control <id> <part>... [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
-                transition <broadcast-status> <id> <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
+                transition <id> <broadcast-status> <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         live-chat-bans
                 delete <id> [-p <v>]...
@@ -79,57 +80,66 @@ youtube3 [options]
         live-chat-messages
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <live-chat-id> <part> [-p <v>]... [-o <out>]
+                list <live-chat-id> <part>... [-p <v>]... [-o <out>]
         live-chat-moderators
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <live-chat-id> <part> [-p <v>]... [-o <out>]
+                list <live-chat-id> <part>... [-p <v>]... [-o <out>]
         live-streams
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         members
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         memberships-levels
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         playlist-items
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         playlists
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         search
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         sponsors
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         subscriptions
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         super-chat-events
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
+        third-party-links
+                delete <linking-token> <type> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
         thumbnails
-                set <video-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                set <video-id> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         video-abuse-report-reasons
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         video-categories
-                list <part> [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
         videos
                 delete <id> [-p <v>]...
-                get-rating <id> [-p <v>]... [-o <out>]
-                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
-                list <part> [-p <v>]... [-o <out>]
+                get-rating <id>... [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list <part>... [-p <v>]... [-o <out>]
                 rate <id> <rating> [-p <v>]...
                 report-abuse (-r <kv>)... [-p <v>]...
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         watermarks
-                set <channel-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]...
+                set <channel-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]...
                 unset <channel-id> [-p <v>]...
+        youtube
+                v3-infocards (-r <kv>)... [-p <v>]... [-o <out>]
+                v3-infocards-list <part>... [-p <v>]... [-o <out>]
+                v3-tests-create (-r <kv>)... [-p <v>]... [-o <out>]
   youtube3 --help
 
 Configuration:

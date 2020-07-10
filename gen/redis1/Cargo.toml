@@ -4,12 +4,12 @@
 [package]
 
 name = "google-redis1"
-version = "1.0.13+20200402"
+version = "1.0.14+20200623"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Redis (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/redis1"
 homepage = "https://cloud.google.com/memorystore/docs/redis/"
-documentation = "https://docs.rs/google-redis1/1.0.13+20200402"
+documentation = "https://docs.rs/google-redis1/1.0.14+20200623"
 license = "MIT"
 keywords = ["redis", "google", "protocol", "web", "api"]
 autobins = false

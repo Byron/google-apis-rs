@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudmonitoring2_beta2-cli"
-version = "1.0.13+20170501"
+version = "1.0.14+20170501"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-cloudmonitoring2_beta2]
 path = "../cloudmonitoring2_beta2"
-version = "1.0.13+20170501"
+version = "1.0.14+20170501"

@@ -269,10 +269,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-state" => Some(("accountState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-state", "kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -361,11 +360,10 @@ impl<'n> Engine<'n> {
                     "policy.device-report-policy" => Some(("policy.deviceReportPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.product-availability-policy" => Some(("policy.productAvailabilityPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "report.last-updated-timestamp-millis" => Some(("report.lastUpdatedTimestampMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "android-id" => Some(("androidId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "device-report-policy", "duration-ms", "kind", "last-updated-timestamp-millis", "maintenance-window", "management-type", "policy", "product-availability-policy", "report", "start-time-after-midnight-ms"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "device-report-policy", "duration-ms", "last-updated-timestamp-millis", "maintenance-window", "management-type", "policy", "product-availability-policy", "report", "start-time-after-midnight-ms"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -560,7 +558,6 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "store-builder.enabled" => Some(("storeBuilder.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "play-search.approve-apps" => Some(("playSearch.approveApps", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "play-search.enabled" => Some(("playSearch.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -569,7 +566,7 @@ impl<'n> Engine<'n> {
                     "web-apps.enabled" => Some(("webApps.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "managed-configurations.enabled" => Some(("managedConfigurations.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["approve-apps", "enabled", "kind", "managed-configurations", "parent", "permission", "play-search", "private-apps", "store-builder", "web-apps"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["approve-apps", "enabled", "managed-configurations", "parent", "permission", "play-search", "private-apps", "store-builder", "web-apps"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -652,12 +649,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-domain" => Some(("primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "name", "primary-domain"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "name", "primary-domain"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1116,10 +1112,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-email" => Some(("accountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-email", "kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1203,10 +1198,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "homepage-id" => Some(("homepageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "store-layout-type" => Some(("storeLayoutType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["homepage-id", "kind", "store-layout-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["homepage-id", "store-layout-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1481,11 +1475,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "product-id", "reason"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["product-id", "reason"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1878,10 +1871,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "install-state" => Some(("installState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["install-state", "kind", "product-id", "version-code"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["install-state", "product-id", "version-code"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2113,7 +2105,6 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration-variables.kind" => Some(("configurationVariables.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-variables.mcm-id" => Some(("configurationVariables.mcmId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -2349,7 +2340,6 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration-variables.kind" => Some(("configurationVariables.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-variables.mcm-id" => Some(("configurationVariables.mcmId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -2545,10 +2535,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "approved-permissions" => Some(("approvedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "approval-url-info.kind" => Some(("approvalUrlInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "approval-url-info.approval-url" => Some(("approvalUrlInfo.approvalUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["approval-url", "approval-url-info", "approved-permissions", "kind"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["approval-url", "approval-url-info", "approved-permissions"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3000,12 +2989,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "public-data" => Some(("publicData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "id", "kind", "public-data", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "id", "public-data", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3236,12 +3224,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "order-in-page" => Some(("orderInPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "order-in-page" => Some(("orderInPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "order-in-page", "product-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "order-in-page", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3376,12 +3363,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "order-in-page" => Some(("orderInPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "order-in-page" => Some(("orderInPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "order-in-page", "product-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "order-in-page", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3560,11 +3546,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3699,11 +3684,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3810,58 +3794,6 @@ impl<'n> Engine<'n> {
     fn _users_generate_authentication_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().generate_authentication_token(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _users_generate_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.users().generate_token(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4038,15 +3970,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-identifier" => Some(("accountIdentifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-type" => Some(("accountType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "account-type", "display-name", "id", "kind", "management-type", "primary-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "account-type", "display-name", "id", "management-type", "primary-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4202,50 +4133,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_revoke_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.users().revoke_token(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _users_set_available_product_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4269,11 +4156,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-set-behavior" => Some(("productSetBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "product-id", "product-set-behavior"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["product-id", "product-set-behavior"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4356,15 +4242,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-identifier" => Some(("accountIdentifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-type" => Some(("accountType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "account-type", "display-name", "id", "kind", "management-type", "primary-email"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "account-type", "display-name", "id", "management-type", "primary-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5060,9 +4945,6 @@ impl<'n> Engine<'n> {
                     ("generate-authentication-token", Some(opt)) => {
                         call_result = self._users_generate_authentication_token(opt, dry_run, &mut err);
                     },
-                    ("generate-token", Some(opt)) => {
-                        call_result = self._users_generate_token(opt, dry_run, &mut err);
-                    },
                     ("get", Some(opt)) => {
                         call_result = self._users_get(opt, dry_run, &mut err);
                     },
@@ -5077,9 +4959,6 @@ impl<'n> Engine<'n> {
                     },
                     ("revoke-device-access", Some(opt)) => {
                         call_result = self._users_revoke_device_access(opt, dry_run, &mut err);
-                    },
-                    ("revoke-token", Some(opt)) => {
-                        call_result = self._users_revoke_token(opt, dry_run, &mut err);
                     },
                     ("set-available-product-set", Some(opt)) => {
                         call_result = self._users_set_available_product_set(opt, dry_run, &mut err);
@@ -5171,12 +5050,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::AndroidEnterprise::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -5200,7 +5082,11 @@ fn main() {
     let arg_data = [
         ("devices", "methods: 'force-report-upload', 'get', 'get-state', 'list', 'set-state' and 'update'", vec![
             ("force-report-upload",
-                    Some(r##"Uploads a report containing any changes in app states on the device since the last report was generated. You can call this method up to 3 times every 24 hours for a given device."##),
+                    Some(r##"Uploads a report containing any changes in app states on the device since
+        the last report was generated. You can call this method up to 3 times every
+        24 hours for a given device.
+        If you exceed the quota, then the Google Play EMM API returns <code>HTTP
+        429 Too Many Requests</code>."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_force-report-upload",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5262,7 +5148,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-state",
-                    Some(r##"Retrieves whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users."##),
+                    Some(r##"Retrieves whether a device's access to Google services is enabled or
+        disabled.
+        The device state takes effect only if enforcing EMM policies on Android
+        devices is enabled in the Google Admin Console.
+        Otherwise, the device state is ignored and all devices are allowed access
+        to Google services.
+        This is only supported for Google-managed users."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_get-state",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5324,7 +5216,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-state",
-                    Some(r##"Sets whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users."##),
+                    Some(r##"Sets whether a device's access to Google services is enabled or disabled.
+        The device state takes effect only if enforcing EMM policies on Android
+        devices is enabled in the Google Admin Console.
+        Otherwise, the device state is ignored and all devices are allowed access
+        to Google services.
+        This is only supported for Google-managed users."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_set-state",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5407,7 +5304,9 @@ fn main() {
         
         ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
             ("acknowledge-notification-set",
-                    Some(r##"Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications."##),
+                    Some(r##"Acknowledges notifications that were received from
+        Enterprises.PullNotificationSet to prevent subsequent calls from returning
+        the same notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_acknowledge-notification-set",
                   vec![
                     (Some(r##"v"##),
@@ -5417,7 +5316,10 @@ fn main() {
                      Some(true)),
                   ]),
             ("complete-signup",
-                    Some(r##"Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token."##),
+                    Some(r##"Completes the signup flow, by specifying the Completion token and
+        Enterprise token.
+        This request must not be called multiple times for a given Enterprise
+        Token."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_complete-signup",
                   vec![
                     (Some(r##"v"##),
@@ -5433,7 +5335,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("create-web-token",
-                    Some(r##"Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the managed Google Play javascript API. Each token may only be used to start one UI session. See the javascript API documentation for further information."##),
+                    Some(r##"Returns a unique token to access an embeddable UI. To generate a
+        web UI, pass the generated token into the managed Google Play javascript
+        API. Each token may only be used to start one UI session. See the
+        javascript API documentation for further information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_create-web-token",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5466,7 +5371,7 @@ fn main() {
                   vec![
                     (Some(r##"token"##),
                      None,
-                     Some(r##"The token provided by the enterprise to register the EMM."##),
+                     Some(r##"Required. The token provided by the enterprise to register the EMM."##),
                      Some(true),
                      Some(false)),
         
@@ -5527,13 +5432,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-service-account",
-                    Some(r##"Returns a service account and credentials. The service account can be bound to the enterprise by calling setAccount. The service account is unique to this enterprise and EMM, and will be deleted if the enterprise is unbound. The credentials contain private key data and are not stored server-side.
-        
-        This method can only be called after calling Enterprises.Enroll or Enterprises.CompleteSignup, and before Enterprises.SetAccount; at other times it will return an error.
-        
-        Subsequent calls after the first will generate a new, unique set of credentials, and invalidate the previously generated credentials.
-        
-        Once the service account is bound to the enterprise, it can be managed using the serviceAccountKeys resource."##),
+                    Some(r##"Returns a service account and credentials. The service account
+        can be bound to the enterprise by calling setAccount. The service account
+        is unique to this enterprise and EMM, and will be deleted if the enterprise
+        is unbound. The credentials contain private key data and are not stored
+        server-side.
+        <br> <br>
+        This method can only be called after calling
+        Enterprises.Enroll or Enterprises.CompleteSignup, and before
+        Enterprises.SetAccount; at other times it will return an error.
+        <br> <br>
+        Subsequent calls after the first will generate a new, unique set of
+        credentials, and invalidate the previously generated credentials.
+        <br> <br>
+        Once the service account is bound to the enterprise, it can be managed
+        using the serviceAccountKeys resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_get-service-account",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5555,7 +5468,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-store-layout",
-                    Some(r##"Returns the store layout for the enterprise. If the store layout has not been set, returns "basic" as the store layout type and no homepage."##),
+                    Some(r##"Returns the store layout for the enterprise. If the store layout
+        has not been set, returns "basic" as the store layout type and no
+        homepage."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_get-store-layout",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5577,12 +5492,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Looks up an enterprise by domain name. This is only supported for enterprises created via the Google-initiated creation flow. Lookup of the id is not needed for enterprises created via the EMM-initiated flow since the EMM learns the enterprise ID in the callback specified in the Enterprises.generateSignupUrl call."##),
+                    Some(r##"Looks up an enterprise by domain name.
+        This is only supported for enterprises created via the Google-initiated
+        creation flow.  Lookup of the id is not needed for enterprises created via
+        the EMM-initiated flow since the EMM learns the enterprise ID in the
+        callback specified in the Enterprises.generateSignupUrl call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_list",
                   vec![
                     (Some(r##"domain"##),
                      None,
-                     Some(r##"The exact primary domain name of the enterprise to look up."##),
+                     Some(r##"Required. The exact primary domain name of the enterprise to look up."##),
                      Some(true),
                      Some(false)),
         
@@ -5599,11 +5518,26 @@ fn main() {
                      Some(false)),
                   ]),
             ("pull-notification-set",
-                    Some(r##"Pulls and returns a notification set for the enterprises associated with the service account authenticated for the request. The notification set may be empty if no notification are pending.
-        A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises.AcknowledgeNotificationSet, unless the notification set is empty.
-        Notifications that are not acknowledged within the 20 seconds will eventually be included again in the response to another PullNotificationSet request, and those that are never acknowledged will ultimately be deleted according to the Google Cloud Platform Pub/Sub system policy.
-        Multiple requests might be performed concurrently to retrieve notifications, in which case the pending notifications (if any) will be split among each caller, if any are pending.
-        If no notifications are present, an empty notification list is returned. Subsequent requests may return more notifications once they become available."##),
+                    Some(r##"Pulls and returns a notification set for the enterprises associated with
+        the service account authenticated for the request. The notification set may
+        be empty if no notification are pending.
+        <br>
+        A notification set returned needs to be acknowledged within 20 seconds
+        by calling Enterprises.AcknowledgeNotificationSet, unless the
+        notification set is empty.
+        <br>
+        Notifications that are not acknowledged within the 20 seconds will
+        eventually be included again in the response to another PullNotificationSet
+        request, and those that are never acknowledged will ultimately be deleted
+        according to the Google Cloud Platform Pub/Sub system policy.
+        <br>
+        Multiple requests might be performed concurrently to retrieve
+        notifications, in which case the pending notifications (if any) will be
+        split among each caller, if any are pending.
+        <br>
+        If no notifications are present, an empty notification list is returned.
+        Subsequent requests may return more notifications once they become
+        available."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_pull-notification-set",
                   vec![
                     (Some(r##"v"##),
@@ -5619,7 +5553,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("send-test-push-notification",
-                    Some(r##"Sends a test notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise."##),
+                    Some(r##"Sends a test notification to validate the EMM integration with
+        the Google Cloud Pub/Sub service for this enterprise."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_send-test-push-notification",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5641,7 +5576,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-account",
-                    Some(r##"Sets the account that will be used to authenticate to the API as the enterprise."##),
+                    Some(r##"Sets the account that will be used to authenticate to the API as the
+        enterprise."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_set-account",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5669,7 +5605,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-store-layout",
-                    Some(r##"Sets the store layout for the enterprise. By default, storeLayoutType is set to "basic" and the basic store layout is enabled. The basic layout only contains apps approved by the admin, and that have been added to the available product set for a user (using the  setAvailableProductSet call). Apps on the page are sorted in order of their product ID value. If you create a custom store layout (by setting storeLayoutType = "custom" and setting a homepage), the basic store layout is disabled."##),
+                    Some(r##"Sets the store layout for the enterprise. By default, storeLayoutType
+        is set to "basic" and the basic store layout is enabled. The basic
+        layout only contains apps approved by the admin, and that have
+        been added to the available product set for a user (using the
+        <a href="/android/work/play/emm-api/v1/users/setAvailableProductSet">
+        setAvailableProductSet</a> call). Apps on the page are sorted in order of
+        their product ID value. If you create a custom store layout (by setting
+        storeLayoutType = "custom" and setting a homepage), the basic store
+        layout is disabled."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_set-store-layout",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5860,7 +5804,8 @@ fn main() {
         
                     (Some(r##"group-license-id"##),
                      None,
-                     Some(r##"The ID of the product the group license is for, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product the group license is for, e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5902,7 +5847,8 @@ fn main() {
         
         ("grouplicenseusers", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Retrieves the IDs of the users who have been granted entitlements under the license."##),
+                    Some(r##"Retrieves the IDs of the users who have been granted entitlements
+        under the license."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/grouplicenseusers_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5913,7 +5859,8 @@ fn main() {
         
                     (Some(r##"group-license-id"##),
                      None,
-                     Some(r##"The ID of the product the group license is for, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product the group license is for, e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5933,7 +5880,9 @@ fn main() {
         
         ("installs", "methods: 'delete', 'get', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed."##),
+                    Some(r##"Requests to remove an app from a device. A call to <code>get</code> or
+        <code>list</code> will still show the app as installed on the device until
+        it is actually removed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/installs_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5956,7 +5905,8 @@ fn main() {
         
                     (Some(r##"install-id"##),
                      None,
-                     Some(r##"The ID of the product represented by the install, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product represented by the install, e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5990,7 +5940,8 @@ fn main() {
         
                     (Some(r##"install-id"##),
                      None,
-                     Some(r##"The ID of the product represented by the install, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product represented by the install, e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6041,7 +5992,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Requests to install the latest version of an app to a device. If the app is already installed, then it is updated to the latest version if necessary."##),
+                    Some(r##"Requests to install the latest version of an app to a device. If the app
+        is already installed, then it is updated to the latest version if
+        necessary."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/installs_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6064,7 +6017,8 @@ fn main() {
         
                     (Some(r##"install-id"##),
                      None,
-                     Some(r##"The ID of the product represented by the install, e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product represented by the install, e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6090,7 +6044,8 @@ fn main() {
         
         ("managedconfigurationsfordevice", "methods: 'delete', 'get', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Removes a per-device managed configuration for an app for the specified device."##),
+                    Some(r##"Removes a per-device managed configuration for an app for the specified
+        device."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsfordevice_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6113,7 +6068,8 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-device-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6147,7 +6103,8 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-device-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6164,7 +6121,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all the per-device managed configurations for the specified device. Only the ID is set."##),
+                    Some(r##"Lists all the per-device managed configurations for the specified device.
+        Only the ID is set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsfordevice_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6198,7 +6156,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Adds or updates a per-device managed configuration for an app for the specified device."##),
+                    Some(r##"Adds or updates a per-device managed configuration for an app for the
+        specified device."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsfordevice_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6221,7 +6180,8 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-device-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6264,7 +6224,8 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-user-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6275,7 +6236,8 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves details of a per-user managed configuration for an app for the specified user."##),
+                    Some(r##"Retrieves details of a per-user managed configuration for an app for the
+        specified user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsforuser_get",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6292,7 +6254,8 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-user-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6309,7 +6272,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all the per-user managed configurations for the specified user. Only the ID is set."##),
+                    Some(r##"Lists all the per-user managed configurations for the specified user. Only
+        the ID is set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsforuser_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6337,7 +6301,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties."##),
+                    Some(r##"Adds or updates the managed configuration settings for an app for the
+        specified user.
+        If you support the <a
+        href="https://developers.google.com/android/work/play/emm-api/managed-configurations-iframe">Managed
+        configurations iframe</a>,
+        you can apply managed configurations to a user by specifying an
+        <code>mcmId</code>
+        and its associated configuration variables (if any) in the request.
+        Alternatively,
+        all EMMs can apply managed configurations by passing a list of managed
+        properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsforuser_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6354,7 +6328,8 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-user-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g.
+        "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6391,7 +6366,8 @@ fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"The ID of the product for which the managed configurations settings applies to."##),
+                     Some(r##"The ID of the product for which the managed configurations settings applies
+        to."##),
                      Some(true),
                      Some(false)),
         
@@ -6411,7 +6387,8 @@ fn main() {
         
         ("permissions", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Retrieves details of an Android app permission for display to an enterprise admin."##),
+                    Some(r##"Retrieves details of an Android app permission for display to an enterprise
+        admin."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/permissions_get",
                   vec![
                     (Some(r##"permission-id"##),
@@ -6436,9 +6413,13 @@ fn main() {
         
         ("products", "methods: 'approve', 'generate-approval-url', 'get', 'get-app-restrictions-schema', 'get-permissions', 'list' and 'unapprove'", vec![
             ("approve",
-                    Some(r##"Approves the specified product and the relevant app permissions, if any. The maximum number of products that you can approve per enterprise customer is 1,000.
-        
-        To learn how to use managed Google Play to design and create a store layout to display approved products to your users, see Store Layout Design."##),
+                    Some(r##"<p>Approves the specified product and the relevant app permissions, if any.
+        The maximum number of products that you can approve per enterprise customer
+        is 1,000.</p>
+        <p>To learn how to use managed Google Play to design and create a store
+        layout to display approved products to your users,
+        see <a href="/android/work/play/emm-api/store-layout">Store Layout
+        Design</a>.</p>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_approve",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6466,9 +6447,16 @@ fn main() {
                      Some(true)),
                   ]),
             ("generate-approval-url",
-                    Some(r##"Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
-        
-        Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day."##),
+                    Some(r##"Generates a URL that can be rendered in an iframe to display the
+        permissions (if any) of a product. An enterprise admin must view these
+        permissions and accept them on behalf of their organization in order to
+        approve that product. <br><br>
+        Admins should accept the displayed permissions by
+        interacting with a separate UI element in the EMM console, which in turn
+        should trigger the use of this URL as the
+        <code>approvalUrlInfo.approvalUrl</code> property in a
+        <code>Products.approve</code> call to approve the product.
+        This URL can only be used to display permissions for up to 1 day."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_generate-approval-url",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6524,7 +6512,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-app-restrictions-schema",
-                    Some(r##"Retrieves the schema that defines the configurable properties for this product. All products have a schema, but this schema may be empty if no managed configurations have been defined. This schema can be used to populate a UI that allows an admin to configure the product. To apply a managed configuration based on the schema obtained using this API, see Managed Configurations through Play."##),
+                    Some(r##"Retrieves the schema that defines the configurable properties for this
+        product. All products have a schema, but this schema may be empty if no
+        managed configurations have been defined. This schema can be used to
+        populate a UI that allows an admin to configure the product.
+        To apply a managed configuration based on the schema obtained using this
+        API, see
+        <a href="/android/work/play/emm-api/managed-configurations">Managed
+        Configurations through Play</a>."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_get-app-restrictions-schema",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6580,7 +6575,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Finds approved products that match a query, or all approved products if there is no query."##),
+                    Some(r##"Finds approved products that match a query, or all approved products
+        if there is no query."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6627,7 +6623,10 @@ fn main() {
         
         ("serviceaccountkeys", "methods: 'delete', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Removes and invalidates the specified credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount."##),
+                    Some(r##"Removes and invalidates the specified credentials for the service account
+        associated with this enterprise. The calling service account must have been
+        retrieved by calling Enterprises.GetServiceAccount and must have been set
+        as the enterprise service account by calling Enterprises.SetAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/serviceaccountkeys_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6649,9 +6648,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Generates new credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount.
-        
-        Only the type of the key should be populated in the resource to be inserted."##),
+                    Some(r##"Generates new credentials for the service account associated with this
+        enterprise. The calling service account must have been retrieved by calling
+        Enterprises.GetServiceAccount and must have been set as the enterprise
+        service account by calling Enterprises.SetAccount. <br><br>
+        Only the type of the key should be populated in the resource to be
+        inserted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/serviceaccountkeys_insert",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6679,7 +6681,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all active credentials for the service account associated with this enterprise. Only the ID and key type are returned. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount."##),
+                    Some(r##"Lists all active credentials for the service account associated with this
+        enterprise. Only the ID and key type are returned. The calling service
+        account must have been retrieved by calling Enterprises.GetServiceAccount
+        and must have been set as the enterprise service account by calling
+        Enterprises.SetAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/serviceaccountkeys_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7006,7 +7012,7 @@ fn main() {
                   ]),
             ]),
         
-        ("users", "methods: 'delete', 'generate-authentication-token', 'generate-token', 'get', 'get-available-product-set', 'insert', 'list', 'revoke-device-access', 'revoke-token', 'set-available-product-set' and 'update'", vec![
+        ("users", "methods: 'delete', 'generate-authentication-token', 'get', 'get-available-product-set', 'insert', 'list', 'revoke-device-access', 'set-available-product-set' and 'update'", vec![
             ("delete",
                     Some(r##"Deleted an EMM-managed user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_delete",
@@ -7030,42 +7036,14 @@ fn main() {
                      Some(true)),
                   ]),
             ("generate-authentication-token",
-                    Some(r##"Generates an authentication token which the device policy client can use to provision the given EMM-managed user account on a device. The generated token is single-use and expires after a few minutes.
+                    Some(r##"Generates an authentication token which the device policy client can use to
+        provision the given EMM-managed user account on a device.
+        The generated token is single-use and expires after a few minutes.
         
         You can provision a maximum of 10 devices per user.
         
         This call only works with EMM-managed accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_generate-authentication-token",
-                  vec![
-                    (Some(r##"enterprise-id"##),
-                     None,
-                     Some(r##"The ID of the enterprise."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"user-id"##),
-                     None,
-                     Some(r##"The ID of the user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("generate-token",
-                    Some(r##"Generates a token (activation code) to allow this user to configure their managed account in the Android Setup Wizard. Revokes any previously generated token.
-        
-        This call only works with Google managed accounts."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_generate-token",
                   vec![
                     (Some(r##"enterprise-id"##),
                      None,
@@ -7150,8 +7128,12 @@ fn main() {
             ("insert",
                     Some(r##"Creates a new EMM-managed user.
         
-        The Users resource passed in the body of the request should include an accountIdentifier and an accountType.
-        If a corresponding user already exists with the same account identifier, the user will be updated with the resource. In this case only the displayName field can be changed."##),
+        The <a href="/android/work/play/emm-api/v1/users.html">Users</a> resource
+        passed in the body of the request should include an
+        <code>accountIdentifier</code> and an <code>accountType</code>.
+        <p>If a corresponding user already exists with the same account identifier,
+        the user will be updated with the resource. In this case only the
+        <code>displayName</code> field can be changed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_insert",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7179,7 +7161,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Looks up a user by primary email address. This is only supported for Google-managed users. Lookup of the id is not needed for EMM-managed users because the id is already returned in the result of the Users.insert call."##),
+                    Some(r##"Looks up a user by primary email address.
+        This is only supported for Google-managed users.  Lookup of the id is not
+        needed for EMM-managed users because the id is already returned in the
+        result of the Users.insert call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7190,7 +7175,7 @@ fn main() {
         
                     (Some(r##"email"##),
                      None,
-                     Some(r##"The exact primary email address of the user to look up."##),
+                     Some(r##"Required. The exact primary email address of the user to look up."##),
                      Some(true),
                      Some(false)),
         
@@ -7207,7 +7192,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("revoke-device-access",
-                    Some(r##"Revokes access to all devices currently provisioned to the user. The user will no longer be able to use the managed Play store on any of their managed devices.
+                    Some(r##"Revokes access to all devices currently provisioned to the user. The user
+        will no longer be able to use the managed Play store on any of their
+        managed devices.
         
         This call only works with EMM-managed accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_revoke-device-access",
@@ -7230,30 +7217,12 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
-            ("revoke-token",
-                    Some(r##"Revokes a previously generated token (activation code) for the user."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_revoke-token",
-                  vec![
-                    (Some(r##"enterprise-id"##),
-                     None,
-                     Some(r##"The ID of the enterprise."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"user-id"##),
-                     None,
-                     Some(r##"The ID of the user."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
             ("set-available-product-set",
-                    Some(r##"Modifies the set of products that a user is entitled to access (referred to as whitelisted products). Only products that are approved or products that were previously approved (products with revoked approval) can be whitelisted."##),
+                    Some(r##"Modifies the set of products that a user is entitled to access (referred to
+        as <em>whitelisted</em> products). Only products that are
+        <a href="/android/work/play/emm-api/v1/products/approve">approved</a>
+        or products that were previously approved (products with revoked approval)
+        can be whitelisted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_set-available-product-set",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7289,7 +7258,12 @@ fn main() {
             ("update",
                     Some(r##"Updates the details of an EMM-managed user.
         
-        Can be used with EMM-managed users only (not Google managed users). Pass the new details in the Users resource in the request body. Only the displayName field can be changed. Other fields must either be unset or have the currently active value."##),
+        Can be used with EMM-managed users only (not Google managed users).
+        Pass the new details in the
+        <a href="/android/work/play/emm-api/v1/users.html">Users</a>
+        resource in the request body. Only the <code>displayName</code> field
+        can be changed. Other fields must either be unset or have the
+        currently active value."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7465,8 +7439,8 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200325")
-           .about("Manages the deployment of apps to Android for Work users.")
+           .version("1.0.14+20200707")
+           .about("Manages the deployment of apps to Android Enterprise devices.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

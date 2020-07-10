@@ -341,9 +341,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "builtin-game-id" => {
-                    call = call.builtin_game_id(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -357,7 +354,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["builtin-game-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -430,9 +426,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "builtin-game-id" => {
-                    call = call.builtin_game_id(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -446,7 +439,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["builtin-game-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -545,9 +537,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "builtin-game-id" => {
-                    call = call.builtin_game_id(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -561,7 +550,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["builtin-game-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1204,167 +1192,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _pushtokens_remove(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ios.apns-device-token" => Some(("ios.apns_device_token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ios.apns-environment" => Some(("ios.apns_environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["apns-device-token", "apns-environment", "ios", "kind"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::PushTokenId = json::value::from_value(object).unwrap();
-        let mut call = self.hub.pushtokens().remove(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _pushtokens_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-revision" => Some(("clientRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id.kind" => Some(("id.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id.ios.apns-device-token" => Some(("id.ios.apns_device_token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id.ios.apns-environment" => Some(("id.ios.apns_environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["apns-device-token", "apns-environment", "client-revision", "id", "ios", "kind", "language"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::PushToken = json::value::from_value(object).unwrap();
-        let mut call = self.hub.pushtokens().update(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _revisions_check(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.revisions().check(opt.value_of("client-revision").unwrap_or(""));
@@ -1384,615 +1211,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.kind" => Some(("autoMatchingCriteria.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.min-auto-matching-players" => Some(("autoMatchingCriteria.minAutoMatchingPlayers", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.exclusive-bitmask" => Some(("autoMatchingCriteria.exclusiveBitmask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.max-auto-matching-players" => Some(("autoMatchingCriteria.maxAutoMatchingPlayers", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "invited-player-ids" => Some(("invitedPlayerIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "variant" => Some(("variant", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "capabilities" => Some(("capabilities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "network-diagnostics.kind" => Some(("networkDiagnostics.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network-diagnostics.ios-network-type" => Some(("networkDiagnostics.iosNetworkType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "network-diagnostics.network-operator-code" => Some(("networkDiagnostics.networkOperatorCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network-diagnostics.android-network-subtype" => Some(("networkDiagnostics.androidNetworkSubtype", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "network-diagnostics.network-operator-name" => Some(("networkDiagnostics.networkOperatorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network-diagnostics.registration-latency-millis" => Some(("networkDiagnostics.registrationLatencyMillis", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "network-diagnostics.android-network-type" => Some(("networkDiagnostics.androidNetworkType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "client-address.kind" => Some(("clientAddress.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-address.xmpp-address" => Some(("clientAddress.xmppAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-network-subtype", "android-network-type", "auto-matching-criteria", "capabilities", "client-address", "exclusive-bitmask", "invited-player-ids", "ios-network-type", "kind", "max-auto-matching-players", "min-auto-matching-players", "network-diagnostics", "network-operator-code", "network-operator-name", "registration-latency-millis", "request-id", "variant", "xmpp-address"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::RoomCreateRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.rooms().create(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_decline(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.rooms().decline(opt.value_of("room-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_dismiss(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.rooms().dismiss(opt.value_of("room-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.rooms().get(opt.value_of("room-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_join(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "network-diagnostics.kind" => Some(("networkDiagnostics.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network-diagnostics.ios-network-type" => Some(("networkDiagnostics.iosNetworkType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "network-diagnostics.network-operator-code" => Some(("networkDiagnostics.networkOperatorCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network-diagnostics.android-network-subtype" => Some(("networkDiagnostics.androidNetworkSubtype", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "network-diagnostics.network-operator-name" => Some(("networkDiagnostics.networkOperatorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network-diagnostics.registration-latency-millis" => Some(("networkDiagnostics.registrationLatencyMillis", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "network-diagnostics.android-network-type" => Some(("networkDiagnostics.androidNetworkType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "client-address.kind" => Some(("clientAddress.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-address.xmpp-address" => Some(("clientAddress.xmppAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "capabilities" => Some(("capabilities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-network-subtype", "android-network-type", "capabilities", "client-address", "ios-network-type", "kind", "network-diagnostics", "network-operator-code", "network-operator-name", "registration-latency-millis", "xmpp-address"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::RoomJoinRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.rooms().join(request, opt.value_of("room-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_leave(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.kind" => Some(("leaveDiagnostics.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.sockets-used" => Some(("leaveDiagnostics.socketsUsed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.ios-network-type" => Some(("leaveDiagnostics.iosNetworkType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.network-operator-code" => Some(("leaveDiagnostics.networkOperatorCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.android-network-subtype" => Some(("leaveDiagnostics.androidNetworkSubtype", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.network-operator-name" => Some(("leaveDiagnostics.networkOperatorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "leave-diagnostics.android-network-type" => Some(("leaveDiagnostics.androidNetworkType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-network-subtype", "android-network-type", "ios-network-type", "kind", "leave-diagnostics", "network-operator-code", "network-operator-name", "reason", "sockets-used"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::RoomLeaveRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.rooms().leave(request, opt.value_of("room-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.rooms().list();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_report_status(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::RoomP2PStatuses = json::value::from_value(object).unwrap();
-        let mut call = self.hub.rooms().report_status(request, opt.value_of("room-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2487,9 +1705,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _turn_based_matches_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _stats_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().cancel(opt.value_of("match-id").unwrap_or(""));
+        let mut call = self.hub.stats().get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2506,805 +1724,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "invited-player-ids" => Some(("invitedPlayerIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.kind" => Some(("autoMatchingCriteria.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.min-auto-matching-players" => Some(("autoMatchingCriteria.minAutoMatchingPlayers", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.exclusive-bitmask" => Some(("autoMatchingCriteria.exclusiveBitmask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-matching-criteria.max-auto-matching-players" => Some(("autoMatchingCriteria.maxAutoMatchingPlayers", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "variant" => Some(("variant", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-matching-criteria", "exclusive-bitmask", "invited-player-ids", "kind", "max-auto-matching-players", "min-auto-matching-players", "request-id", "variant"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::TurnBasedMatchCreateRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.turn_based_matches().create(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_decline(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().decline(opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_dismiss(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().dismiss(opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_finish(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data.kind" => Some(("data.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data.data" => Some(("data.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "match-version" => Some(("matchVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "kind", "match-version"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::TurnBasedMatchResults = json::value::from_value(object).unwrap();
-        let mut call = self.hub.turn_based_matches().finish(request, opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().get(opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                "include-match-data" => {
-                    call = call.include_match_data(arg_from_str(value.unwrap_or("false"), err, "include-match-data", "boolean"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language", "include-match-data"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_join(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().join(opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_leave(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().leave(opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_leave_turn(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let match_version: i32 = arg_from_str(&opt.value_of("match-version").unwrap_or(""), err, "<match-version>", "integer");
-        let mut call = self.hub.turn_based_matches().leave_turn(opt.value_of("match-id").unwrap_or(""), match_version);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "pending-participant-id" => {
-                    call = call.pending_participant_id(value.unwrap_or(""));
-                },
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language", "pending-participant-id"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().list();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                "max-completed-matches" => {
-                    call = call.max_completed_matches(arg_from_str(value.unwrap_or("-0"), err, "max-completed-matches", "integer"));
-                },
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                "include-match-data" => {
-                    call = call.include_match_data(arg_from_str(value.unwrap_or("false"), err, "include-match-data", "boolean"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-completed-matches", "language", "max-results", "include-match-data"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_rematch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().rematch(opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "request-id" => {
-                    call = call.request_id(value.unwrap_or(""));
-                },
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["request-id", "language"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_sync(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().sync();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                "max-completed-matches" => {
-                    call = call.max_completed_matches(arg_from_str(value.unwrap_or("-0"), err, "max-completed-matches", "integer"));
-                },
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                "include-match-data" => {
-                    call = call.include_match_data(arg_from_str(value.unwrap_or("false"), err, "include-match-data", "boolean"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-completed-matches", "language", "max-results", "include-match-data"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_take_turn(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data.kind" => Some(("data.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data.data" => Some(("data.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "match-version" => Some(("matchVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "pending-participant-id" => Some(("pendingParticipantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "kind", "match-version", "pending-participant-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::TurnBasedMatchTurn = json::value::from_value(object).unwrap();
-        let mut call = self.hub.turn_based_matches().take_turn(request, opt.value_of("match-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3456,20 +1875,6 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("pushtokens", Some(opt)) => {
-                match opt.subcommand() {
-                    ("remove", Some(opt)) => {
-                        call_result = self._pushtokens_remove(opt, dry_run, &mut err);
-                    },
-                    ("update", Some(opt)) => {
-                        call_result = self._pushtokens_update(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("pushtokens".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("revisions", Some(opt)) => {
                 match opt.subcommand() {
                     ("check", Some(opt)) => {
@@ -3477,38 +1882,6 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("revisions".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
-            ("rooms", Some(opt)) => {
-                match opt.subcommand() {
-                    ("create", Some(opt)) => {
-                        call_result = self._rooms_create(opt, dry_run, &mut err);
-                    },
-                    ("decline", Some(opt)) => {
-                        call_result = self._rooms_decline(opt, dry_run, &mut err);
-                    },
-                    ("dismiss", Some(opt)) => {
-                        call_result = self._rooms_dismiss(opt, dry_run, &mut err);
-                    },
-                    ("get", Some(opt)) => {
-                        call_result = self._rooms_get(opt, dry_run, &mut err);
-                    },
-                    ("join", Some(opt)) => {
-                        call_result = self._rooms_join(opt, dry_run, &mut err);
-                    },
-                    ("leave", Some(opt)) => {
-                        call_result = self._rooms_leave(opt, dry_run, &mut err);
-                    },
-                    ("list", Some(opt)) => {
-                        call_result = self._rooms_list(opt, dry_run, &mut err);
-                    },
-                    ("report-status", Some(opt)) => {
-                        call_result = self._rooms_report_status(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("rooms".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -3550,49 +1923,13 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("turn-based-matches", Some(opt)) => {
+            ("stats", Some(opt)) => {
                 match opt.subcommand() {
-                    ("cancel", Some(opt)) => {
-                        call_result = self._turn_based_matches_cancel(opt, dry_run, &mut err);
-                    },
-                    ("create", Some(opt)) => {
-                        call_result = self._turn_based_matches_create(opt, dry_run, &mut err);
-                    },
-                    ("decline", Some(opt)) => {
-                        call_result = self._turn_based_matches_decline(opt, dry_run, &mut err);
-                    },
-                    ("dismiss", Some(opt)) => {
-                        call_result = self._turn_based_matches_dismiss(opt, dry_run, &mut err);
-                    },
-                    ("finish", Some(opt)) => {
-                        call_result = self._turn_based_matches_finish(opt, dry_run, &mut err);
-                    },
                     ("get", Some(opt)) => {
-                        call_result = self._turn_based_matches_get(opt, dry_run, &mut err);
-                    },
-                    ("join", Some(opt)) => {
-                        call_result = self._turn_based_matches_join(opt, dry_run, &mut err);
-                    },
-                    ("leave", Some(opt)) => {
-                        call_result = self._turn_based_matches_leave(opt, dry_run, &mut err);
-                    },
-                    ("leave-turn", Some(opt)) => {
-                        call_result = self._turn_based_matches_leave_turn(opt, dry_run, &mut err);
-                    },
-                    ("list", Some(opt)) => {
-                        call_result = self._turn_based_matches_list(opt, dry_run, &mut err);
-                    },
-                    ("rematch", Some(opt)) => {
-                        call_result = self._turn_based_matches_rematch(opt, dry_run, &mut err);
-                    },
-                    ("sync", Some(opt)) => {
-                        call_result = self._turn_based_matches_sync(opt, dry_run, &mut err);
-                    },
-                    ("take-turn", Some(opt)) => {
-                        call_result = self._turn_based_matches_take_turn(opt, dry_run, &mut err);
+                        call_result = self._stats_get(opt, dry_run, &mut err);
                     },
                     _ => {
-                        err.issues.push(CLIError::MissingMethodError("turn-based-matches".to_string()));
+                        err.issues.push(CLIError::MissingMethodError("stats".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -3652,12 +1989,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Games::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -3700,7 +2040,8 @@ fn main() {
         
         ("achievements", "methods: 'increment', 'list', 'reveal', 'set-steps-at-least', 'unlock' and 'update-multiple'", vec![
             ("increment",
-                    Some(r##"Increments the steps of the achievement with the given ID for the currently authenticated player."##),
+                    Some(r##"Increments the steps of the achievement with the given ID for the currently
+        authenticated player."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/achievements_increment",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -3728,12 +2069,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists the progress for all your application's achievements for the currently authenticated player."##),
+                    Some(r##"Lists the progress for all your application's achievements for the
+        currently authenticated player."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/achievements_list",
                   vec![
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the
+        authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -3750,7 +2093,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("reveal",
-                    Some(r##"Sets the state of the achievement with the given ID to REVEALED for the currently authenticated player."##),
+                    Some(r##"Sets the state of the achievement with the given ID to
+        `REVEALED` for the currently authenticated player."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/achievements_reveal",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -3772,7 +2116,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-steps-at-least",
-                    Some(r##"Sets the steps for the currently authenticated player towards unlocking an achievement. If the steps parameter is less than the current number of steps that the player already gained for the achievement, the achievement is not modified."##),
+                    Some(r##"Sets the steps for the currently authenticated player towards unlocking an
+        achievement. If the steps parameter is less than the current number of
+        steps that the player already gained for the achievement, the achievement
+        is not modified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/achievements_set-steps-at-least",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -3847,7 +2194,10 @@ fn main() {
         
         ("applications", "methods: 'get', 'played' and 'verify'", vec![
             ("get",
-                    Some(r##"Retrieves the metadata of the application with the given ID. If the requested application is not available for the specified platformType, the returned response will not include any instance data."##),
+                    Some(r##"Retrieves the metadata of the application with the given ID. If the
+        requested application is not available for the specified
+        `platformType`, the returned response will not include any
+        instance data."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/applications_get",
                   vec![
                     (Some(r##"application-id"##),
@@ -3869,7 +2219,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("played",
-                    Some(r##"Indicate that the the currently authenticated user is playing your application."##),
+                    Some(r##"Indicate that the currently authenticated user is playing your
+        application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/applications_played",
                   vec![
                     (Some(r##"v"##),
@@ -3879,7 +2230,8 @@ fn main() {
                      Some(true)),
                   ]),
             ("verify",
-                    Some(r##"Verifies the auth token provided with this request is for the application with the specified ID, and returns the ID of the player it was granted for."##),
+                    Some(r##"Verifies the auth token provided with this request is for the application
+        with the specified ID, and returns the ID of the player it was granted for."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/applications_verify",
                   vec![
                     (Some(r##"application-id"##),
@@ -3904,7 +2256,8 @@ fn main() {
         
         ("events", "methods: 'list-by-player', 'list-definitions' and 'record'", vec![
             ("list-by-player",
-                    Some(r##"Returns a list showing the current progress on events in this application for the currently authenticated user."##),
+                    Some(r##"Returns a list showing the current progress on events in this application
+        for the currently authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/events_list-by-player",
                   vec![
                     (Some(r##"v"##),
@@ -3936,7 +2289,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("record",
-                    Some(r##"Records a batch of changes to the number of times events have occurred for the currently authenticated user of this application."##),
+                    Some(r##"Records a batch of changes to the number of times events have occurred for
+        the currently authenticated user of this application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/events_record",
                   vec![
                     (Some(r##"kv"##),
@@ -4018,12 +2372,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-categories-by-player",
-                    Some(r##"List play data aggregated per category for the player corresponding to playerId."##),
+                    Some(r##"List play data aggregated per category for the player corresponding to
+        `playerId`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/metagame_list-categories-by-player",
                   vec![
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the
+        authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -4049,12 +2405,14 @@ fn main() {
         
         ("players", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Retrieves the Player resource with the given ID. To retrieve the player for the currently authenticated user, set playerId to me."##),
+                    Some(r##"Retrieves the Player resource with the given ID.  To retrieve the player
+        for the currently authenticated user, set `playerId` to `me`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/players_get",
                   vec![
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the
+        authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -4094,41 +2452,6 @@ fn main() {
                   ]),
             ]),
         
-        ("pushtokens", "methods: 'remove' and 'update'", vec![
-            ("remove",
-                    Some(r##"Removes a push token for the current user and application. Removing a non-existent push token will report success."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/pushtokens_remove",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("update",
-                    Some(r##"Registers a push token for the current user and application."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/pushtokens_update",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ]),
-        
         ("revisions", "methods: 'check'", vec![
             ("check",
                     Some(r##"Checks whether the games client is out of date."##),
@@ -4137,198 +2460,12 @@ fn main() {
                     (Some(r##"client-revision"##),
                      None,
                      Some(r##"The revision of the client SDK used by your application. Format:
-        [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
-         
-        - "ANDROID" - Client is running the Android SDK. 
-        - "IOS" - Client is running the iOS SDK. 
-        - "WEB_APP" - Client is running as a Web App."##),
+        `[PLATFORM_TYPE]:[VERSION_NUMBER]`. Possible values of `PLATFORM_TYPE` are:
+        * `ANDROID` - Client is running the Android SDK.
+        * `IOS` - Client is running the iOS SDK.
+        * `WEB_APP` - Client is running as a Web App."##),
                      Some(true),
                      Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
-        ("rooms", "methods: 'create', 'decline', 'dismiss', 'get', 'join', 'leave', 'list' and 'report-status'", vec![
-            ("create",
-                    Some(r##"Create a room. For internal use by the Games SDK only. Calling this method directly is unsupported."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_create",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("decline",
-                    Some(r##"Decline an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_decline",
-                  vec![
-                    (Some(r##"room-id"##),
-                     None,
-                     Some(r##"The ID of the room."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("dismiss",
-                    Some(r##"Dismiss an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_dismiss",
-                  vec![
-                    (Some(r##"room-id"##),
-                     None,
-                     Some(r##"The ID of the room."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("get",
-                    Some(r##"Get the data for a room."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_get",
-                  vec![
-                    (Some(r##"room-id"##),
-                     None,
-                     Some(r##"The ID of the room."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("join",
-                    Some(r##"Join a room. For internal use by the Games SDK only. Calling this method directly is unsupported."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_join",
-                  vec![
-                    (Some(r##"room-id"##),
-                     None,
-                     Some(r##"The ID of the room."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("leave",
-                    Some(r##"Leave a room. For internal use by the Games SDK only. Calling this method directly is unsupported."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_leave",
-                  vec![
-                    (Some(r##"room-id"##),
-                     None,
-                     Some(r##"The ID of the room."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("list",
-                    Some(r##"Returns invitations to join rooms."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_list",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("report-status",
-                    Some(r##"Updates sent by a client reporting the status of peers in a room. For internal use by the Games SDK only. Calling this method directly is unsupported."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/rooms_report-status",
-                  vec![
-                    (Some(r##"room-id"##),
-                     None,
-                     Some(r##"The ID of the room."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4346,19 +2483,25 @@ fn main() {
         
         ("scores", "methods: 'get', 'list', 'list-window', 'submit' and 'submit-multiple'", vec![
             ("get",
-                    Some(r##"Get high scores, and optionally ranks, in leaderboards for the currently authenticated player. For a specific time span, leaderboardId can be set to ALL to retrieve data for all leaderboards in a given time span.
-        NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'."##),
+                    Some(r##"Get high scores, and optionally ranks, in leaderboards for the currently
+        authenticated player.  For a specific time span, `leaderboardId`
+        can be set to `ALL` to retrieve data for all leaderboards in a
+        given time span.  `NOTE: You cannot ask for 'ALL' leaderboards and
+        'ALL' timeSpans in the same request; only one parameter may be set to
+        'ALL'."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/scores_get",
                   vec![
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the
+        authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"leaderboard-id"##),
                      None,
-                     Some(r##"The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application."##),
+                     Some(r##"The ID of the leaderboard.  Can be set to 'ALL' to retrieve data for all
+        leaderboards for this application."##),
                      Some(true),
                      Some(false)),
         
@@ -4460,7 +2603,12 @@ fn main() {
         
                     (Some(r##"score"##),
                      None,
-                     Some(r##"The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units."##),
+                     Some(r##"The score you're submitting. The submitted score is ignored if it is worse
+        than a previously submitted score, where worse depends on the leaderboard
+        sort order. The meaning of the score value depends on the leaderboard
+        format type. For fixed-point, the score represents the raw value.  For
+        time, the score represents elapsed time in milliseconds.  For currency, the
+        score represents a value in micro units."##),
                      Some(true),
                      Some(false)),
         
@@ -4524,12 +2672,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of snapshots created by your application for the player corresponding to the player ID."##),
+                    Some(r##"Retrieves a list of snapshots created by your application for the player
+        corresponding to the player ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/snapshots_list",
                   vec![
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the authenticated
+        player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -4547,275 +2697,12 @@ fn main() {
                   ]),
             ]),
         
-        ("turn-based-matches", "methods: 'cancel', 'create', 'decline', 'dismiss', 'finish', 'get', 'join', 'leave', 'leave-turn', 'list', 'rematch', 'sync' and 'take-turn'", vec![
-            ("cancel",
-                    Some(r##"Cancel a turn-based match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_cancel",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("create",
-                    Some(r##"Create a turn-based match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_create",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("decline",
-                    Some(r##"Decline an invitation to play a turn-based match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_decline",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("dismiss",
-                    Some(r##"Dismiss a turn-based match from the match list. The match will no longer show up in the list and will not generate notifications."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_dismiss",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("finish",
-                    Some(r##"Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_finish",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
+        ("stats", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Get the data for a turn-based match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_get",
+                    Some(r##"Returns engagement and spend statistics in this application for the
+        currently authenticated user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/stats_get",
                   vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("join",
-                    Some(r##"Join a turn-based match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_join",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("leave",
-                    Some(r##"Leave a turn-based match when it is not the current player's turn, without canceling the match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_leave",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("leave-turn",
-                    Some(r##"Leave a turn-based match during the current player's turn, without canceling the match."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_leave-turn",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"match-version"##),
-                     None,
-                     Some(r##"The version of the match being updated."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("list",
-                    Some(r##"Returns turn-based matches the player is or was involved in."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_list",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("rematch",
-                    Some(r##"Create a rematch of a match that was previously completed, with the same participants. This can be called by only one player on a match still in their list; the player must have called Finish first. Returns the newly created match; it will be the caller's turn."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_rematch",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("sync",
-                    Some(r##"Returns turn-based matches the player is or was involved in that changed since the last sync call, with the least recent changes coming first. Matches that should be removed from the local cache will have a status of MATCH_DELETED."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_sync",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("take-turn",
-                    Some(r##"Commit the results of a player turn."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/turn-based-matches_take-turn",
-                  vec![
-                    (Some(r##"match-id"##),
-                     None,
-                     Some(r##"The ID of the match."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4834,8 +2721,9 @@ fn main() {
     
     let mut app = App::new("games1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200402")
-           .about("The API for Google Play Game Services.")
+           .version("1.0.14+20200701")
+           .about("The Google Play games service allows developers to enhance games with social leaderboards,
+               achievements, game state, sign-in with Google, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_games1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

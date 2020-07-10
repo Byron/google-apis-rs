@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *fitness* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/fit/rest/).
+//! [official documentation site](https://developers.google.com/fit/rest/v1/get-started).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/fitness1).
 //! # Features
 //! 
@@ -400,8 +400,8 @@ impl<'a, C, A> Fitness<C, A>
         Fitness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/fitness/v1/users/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -411,7 +411,7 @@ impl<'a, C, A> Fitness<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -419,7 +419,7 @@ impl<'a, C, A> Fitness<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/fitness/v1/users/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -445,10 +445,21 @@ impl<'a, C, A> Fitness<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateBy {
-    /// A data source ID to aggregate. Only data from the specified data source ID will be included in the aggregation. If specified, this data source must exist; the OAuth scopes in the supplied credentials must grant read access to this data type. The dataset in the response will have the same data source ID. Note: Data can be aggregated by either the dataTypeName or the dataSourceId, not both.
+    /// A data source ID to aggregate. Only data from the specified data source ID
+    /// will be included in the aggregation. If specified, this data source must
+    /// exist; the OAuth scopes in the supplied credentials must grant read access
+    /// to this data type. The dataset in the response will have the same data
+    /// source ID. Note: Data can be aggregated by either the dataTypeName or the
+    /// dataSourceId, not both.
     #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// The data type to aggregate. All data sources providing this data type will contribute data to the aggregation. The response will contain a single dataset for this data type name. The dataset will have a data source ID of derived::com.google.android.gms:aggregated. If the user has no data for this data type, an empty data set will be returned. Note: Data can be aggregated by either the dataTypeName or the dataSourceId, not both.
+    /// The data type to aggregate. All data sources providing this data type will
+    /// contribute data to the aggregation. The response will contain a single
+    /// dataset for this data type name. The dataset will have a data source ID of
+    /// derived:<output data type name>:com.google.android.gms:aggregated.
+    /// If the user has no data for this data type, an empty data set will be
+    /// returned. Note: Data can be aggregated by either the dataTypeName or the
+    /// dataSourceId, not both.
     #[serde(rename="dataTypeName")]
     pub data_type_name: Option<String>,
 }
@@ -467,16 +478,22 @@ impl Part for AggregateBy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListSessionsResponse {
-    /// Flag to indicate server has more data to transfer
+    /// Flag to indicate server has more data to transfer.
+    /// DO NOT USE THIS FIELD. It is never populated in responses from the server.
     #[serde(rename="hasMoreData")]
     pub has_more_data: Option<bool>,
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    /// The sync token which is used to sync further changes. This will only be
+    /// provided if both <var>startTime</var> and <var>endTime</var> are omitted
+    /// from the request.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
+    /// If <code>includeDeleted</code> is set to true in the request, and
+    /// <var>startTime</var> and <var>endTime</var> are omitted, this will include
+    /// sessions which were deleted since the last sync.
     #[serde(rename="deletedSession")]
     pub deleted_session: Option<Vec<Session>>,
-    /// Sessions with an end time that is between startTime and endTime of the request.
+    /// Sessions with an end time that is between <var>startTime</var> and
+    /// <var>endTime</var> of the request.
     pub session: Option<Vec<Session>>,
 }
 
@@ -502,18 +519,25 @@ pub struct ListDataSourcesResponse {
 impl ResponseResult for ListDataSourcesResponse {}
 
 
-/// 
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
-    /// Package name for this application. This is used as a unique identifier when created by Android applications, but cannot be specified by REST clients. REST clients will have their developer project number reflected into the Data Source data stream IDs, instead of the packageName.
+    /// Package name for this application. This is used as a unique
+    /// identifier when created by Android applications, but cannot be specified
+    /// by REST clients. REST clients will have their developer project number
+    /// reflected into the Data Source data stream IDs, instead of the packageName.
     #[serde(rename="packageName")]
     pub package_name: Option<String>,
-    /// Version of the application. You should update this field whenever the application changes in a way that affects the computation of the data.
+    /// Version of the application. You should update this field whenever the
+    /// application changes in a way that affects the computation of the data.
     pub version: Option<String>,
-    /// The name of this application. This is required for REST clients, but we do not enforce uniqueness of this name. It is provided as a matter of convenience for other developers who would like to identify which REST created an Application or Data Source.
+    /// The name of this application. This is required for REST clients, but we
+    /// do not enforce uniqueness of this name. It is provided as a matter of
+    /// convenience for other developers who would like to identify which REST
+    /// created an Application or Data Source.
     pub name: Option<String>,
     /// An optional URI that can be used to link back to the application.
     #[serde(rename="detailsUrl")]
@@ -523,9 +547,15 @@ pub struct Application {
 impl Part for Application {}
 
 
-/// Represents a single data point, generated by a particular data source. A data point holds a value for each field, an end timestamp and an optional start time. The exact semantics of each of these attributes are specified in the documentation for the particular data type.
+/// Represents a single data point, generated by a particular data source.  A
+/// data point holds a value for each field, an end timestamp and an optional
+/// start time.  The exact semantics of each of these attributes are specified in
+/// the documentation for the particular data type.
 /// 
-/// A data point can represent an instantaneous measurement, reading or input observation, as well as averages or aggregates over a time interval. Check the data type documentation to determine which is the case for a particular data type.
+/// A data point can represent an instantaneous measurement, reading or input
+/// observation, as well as averages or aggregates over a time interval.  Check
+/// the data type documentation to determine which is the case for a particular
+/// data type.
 /// 
 /// Data points always contain one value for each field of the data type.
 /// 
@@ -536,25 +566,36 @@ pub struct DataPoint {
     /// DO NOT USE THIS FIELD. It is ignored, and not stored.
     #[serde(rename="computationTimeMillis")]
     pub computation_time_millis: Option<String>,
-    /// Indicates the last time this data point was modified. Useful only in contexts where we are listing the data changes, rather than representing the current state of the data.
+    /// Indicates the last time this data point was modified. Useful only in
+    /// contexts where we are listing the data changes, rather than representing
+    /// the current state of the data.
     #[serde(rename="modifiedTimeMillis")]
     pub modified_time_millis: Option<String>,
-    /// The start time of the interval represented by this data point, in nanoseconds since epoch.
+    /// The start time of the interval represented by this data point, in
+    /// nanoseconds since epoch.
     #[serde(rename="startTimeNanos")]
     pub start_time_nanos: Option<String>,
     /// The data type defining the format of the values in this data point.
     #[serde(rename="dataTypeName")]
     pub data_type_name: Option<String>,
-    /// Values of each data type field for the data point. It is expected that each value corresponding to a data type field will occur in the same order that the field is listed with in the data type specified in a data source.
+    /// Values of each data type field for the data point. It is expected that each
+    /// value corresponding to a data type field will occur in the same order that
+    /// the field is listed with in the data type specified in a data source.
     /// 
-    /// Only one of integer and floating point fields will be populated, depending on the format enum value within data source's type field.
+    /// Only one of integer and floating point fields will be populated, depending
+    /// on the format enum value within data source's type field.
     pub value: Option<Vec<Value>>,
-    /// The end time of the interval represented by this data point, in nanoseconds since epoch.
+    /// The end time of the interval represented by this data point, in
+    /// nanoseconds since epoch.
     #[serde(rename="endTimeNanos")]
     pub end_time_nanos: Option<String>,
-    /// If the data point is contained in a dataset for a derived data source, this field will be populated with the data source stream ID that created the data point originally.
+    /// If the data point is contained in a dataset for a derived data source,
+    /// this field will be populated with the data source stream ID that created
+    /// the data point originally.
     /// 
-    /// WARNING: do not rely on this field for anything other than debugging. The value of this field, if it is set at all, is an implementation detail and is not guaranteed to remain consistent.
+    /// WARNING: do not rely on this field for anything other than debugging. The
+    /// value of this field, if it is set at all, is an implementation detail and
+    /// is not guaranteed to remain consistent.
     #[serde(rename="originDataSourceId")]
     pub origin_data_source_id: Option<String>,
     /// The raw timestamp from the original SensorEvent.
@@ -567,13 +608,17 @@ impl Part for DataPoint {}
 
 /// Holder object for the value of a single field in a data point.
 /// 
-/// A field value has a particular format and is only ever set to one of an integer or a floating point value.
+/// A field value has a particular format and is only ever set to one of an
+/// integer or a floating point value.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Value {
-    /// Map value. The valid key space and units for the corresponding value of each entry should be documented as part of the data type definition. Keys should be kept small whenever possible. Data streams with large keys and high data frequency may be down sampled.
+    /// Map value.  The valid key space and units for the corresponding value
+    /// of each entry should be documented as part of the data type definition.
+    /// Keys should be kept small whenever possible. Data streams with large keys
+    /// and high data frequency may be down sampled.
     #[serde(rename="mapVal")]
     pub map_val: Option<Vec<ValueMapValEntry>>,
     /// Floating point value. When this is set, other values must not be set.
@@ -582,7 +627,9 @@ pub struct Value {
     /// Integer value. When this is set, other values must not be set.
     #[serde(rename="intVal")]
     pub int_val: Option<i32>,
-    /// String value. When this is set, other values must not be set. Strings should be kept small whenever possible. Data streams with large string values and high data frequency may be down sampled.
+    /// String value.  When this is set, other values must not be set.
+    /// Strings should be kept small whenever possible.  Data streams with large
+    /// string values and high data frequency may be down sampled.
     #[serde(rename="stringVal")]
     pub string_val: Option<String>,
 }
@@ -598,15 +645,18 @@ impl Part for Value {}
 pub struct AggregateBucket {
     /// Available for Bucket.Type.SESSION
     pub session: Option<Session>,
-    /// The end time for the aggregated data, in milliseconds since epoch, inclusive.
+    /// The end time for the aggregated data, in milliseconds since epoch,
+    /// inclusive.
     #[serde(rename="endTimeMillis")]
     pub end_time_millis: Option<String>,
     /// Available for Bucket.Type.ACTIVITY_TYPE, Bucket.Type.ACTIVITY_SEGMENT
     pub activity: Option<i32>,
-    /// The start time for the aggregated data, in milliseconds since epoch, inclusive.
+    /// The start time for the aggregated data, in milliseconds since epoch,
+    /// inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
-    /// The type of a bucket signifies how the data aggregation is performed in the bucket.
+    /// The type of a bucket signifies how the data aggregation is performed in the
+    /// bucket.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// There will be one dataset per AggregateBy in the request.
@@ -622,10 +672,13 @@ impl Part for AggregateBucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketByActivity {
-    /// The default activity stream will be used if a specific activityDataSourceId is not specified.
+    /// The default activity stream will be used if a specific activityDataSourceId
+    /// is not specified.
     #[serde(rename="activityDataSourceId")]
     pub activity_data_source_id: Option<String>,
-    /// Specifies that only activity segments of duration longer than minDurationMillis are considered and used as a container for aggregated data.
+    /// Specifies that only activity segments of duration longer than
+    /// minDurationMillis are considered and used as a container for aggregated
+    /// data.
     #[serde(rename="minDurationMillis")]
     pub min_duration_millis: Option<String>,
 }
@@ -644,28 +697,46 @@ impl Part for BucketByActivity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateRequest {
-    /// The specification of data to be aggregated. At least one aggregateBy spec must be provided. All data that is specified will be aggregated using the same bucketing criteria. There will be one dataset in the response for every aggregateBy spec.
+    /// The specification of data to be aggregated. At least one aggregateBy spec
+    /// must be provided. All data that is specified will be aggregated using the
+    /// same bucketing criteria. There will be one dataset in the response for
+    /// every aggregateBy spec.
     #[serde(rename="aggregateBy")]
     pub aggregate_by: Option<Vec<AggregateBy>>,
-    /// Specifies that data be aggregated each activity segment recored for a user. Similar to bucketByActivitySegment, but bucketing is done for each activity segment rather than all segments of the same type. Mutually exclusive of other bucketing specifications.
+    /// Specifies that data be aggregated each activity segment recored for a user.
+    /// Similar to bucketByActivitySegment, but bucketing is done for each activity
+    /// segment rather than all segments of the same type. Mutually exclusive of
+    /// other bucketing specifications.
     #[serde(rename="bucketByActivitySegment")]
     pub bucket_by_activity_segment: Option<BucketByActivity>,
-    /// The end of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.
+    /// The end of a window of time. Data that intersects with this time
+    /// window will be aggregated. The time is in milliseconds since epoch,
+    /// inclusive.
     #[serde(rename="endTimeMillis")]
     pub end_time_millis: Option<String>,
-    /// Specifies that data be aggregated by user sessions. Data that does not fall within the time range of a session will not be included in the response. Mutually exclusive of other bucketing specifications.
+    /// Specifies that data be aggregated by user sessions. Data that does not fall
+    /// within the time range of a session will not be included in the response.
+    /// Mutually exclusive of other bucketing specifications.
     #[serde(rename="bucketBySession")]
     pub bucket_by_session: Option<BucketBySession>,
-    /// Specifies that data be aggregated by the type of activity being performed when the data was recorded. All data that was recorded during a certain activity type (for the given time range) will be aggregated into the same bucket. Data that was recorded while the user was not active will not be included in the response. Mutually exclusive of other bucketing specifications.
+    /// Specifies that data be aggregated by the type of activity being performed
+    /// when the data was recorded. All data that was recorded during a certain
+    /// activity type (.for the given time range) will be aggregated into the same
+    /// bucket. Data that was recorded while the user was not active will not be
+    /// included in the response. Mutually exclusive of other bucketing
+    /// specifications.
     #[serde(rename="bucketByActivityType")]
     pub bucket_by_activity_type: Option<BucketByActivity>,
-    /// The start of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.
+    /// The start of a window of time. Data that intersects with this time
+    /// window will be aggregated. The time is in milliseconds since epoch,
+    /// inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
     /// DO NOT POPULATE THIS FIELD. It is ignored.
     #[serde(rename="filteredDataQualityStandard")]
     pub filtered_data_quality_standard: Option<Vec<String>>,
-    /// Specifies that data be aggregated by a single time interval. Mutually exclusive of other bucketing specifications.
+    /// Specifies that data be aggregated by a single time interval. Mutually
+    /// exclusive of other bucketing specifications.
     #[serde(rename="bucketByTime")]
     pub bucket_by_time: Option<BucketByTime>,
 }
@@ -706,7 +777,9 @@ pub struct ValueMapValEntry {
 impl Part for ValueMapValEntry {}
 
 
-/// A dataset represents a projection container for data points. They do not carry any info of their own. Datasets represent a set of data points from a particular data source. A data point can be found in more than one dataset.
+/// A dataset represents a projection container for data points. They do not
+/// carry any info of their own. Datasets represent a set of data points from a
+/// particular data source. A data point can be found in more than one dataset.
 /// 
 /// # Activities
 /// 
@@ -718,19 +791,30 @@ impl Part for ValueMapValEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
-    /// The smallest start time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.
+    /// The smallest start time of all data points in this possibly partial
+    /// representation of the dataset. Time is in nanoseconds from epoch. This
+    /// should also match the first part of the dataset identifier.
     #[serde(rename="minStartTimeNs")]
     pub min_start_time_ns: Option<String>,
-    /// This token will be set when a dataset is received in response to a GET request and the dataset is too large to be included in a single response. Provide this value in a subsequent GET request to return the next page of data points within this dataset.
+    /// This token will be set when a dataset is received in response to a GET
+    /// request and the dataset is too large to be included in a single response.
+    /// Provide this value in a subsequent GET request to return the next page of
+    /// data points within this dataset.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The largest end time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the second part of the dataset identifier.
+    /// The largest end time of all data points in this possibly partial
+    /// representation of the dataset. Time is in nanoseconds from epoch. This
+    /// should also match the second part of the dataset identifier.
     #[serde(rename="maxEndTimeNs")]
     pub max_end_time_ns: Option<String>,
-    /// The data stream ID of the data source that created the points in this dataset.
+    /// The data stream ID of the data source that created the points in this
+    /// dataset.
     #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// A partial list of data points contained in the dataset, ordered by largest endTimeNanos first. This list is considered complete when retrieving a small dataset and partial when patching a dataset or retrieving a dataset that is too large to include in a single response.
+    /// A partial list of data points contained in the dataset, ordered by largest
+    /// endTimeNanos first. This list is considered complete when retrieving a
+    /// small dataset and partial when patching a dataset or retrieving a dataset
+    /// that is too large to include in a single response.
     pub point: Option<Vec<DataPoint>>,
 }
 
@@ -738,7 +822,7 @@ impl RequestValue for Dataset {}
 impl ResponseResult for Dataset {}
 
 
-/// 
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -746,14 +830,16 @@ impl ResponseResult for Dataset {}
 pub struct DataType {
     /// A field represents one dimension of a data type.
     pub field: Option<Vec<DataTypeField>>,
-    /// Each data type has a unique, namespaced, name. All data types in the com.google namespace are shared as part of the platform.
+    /// Each data type has a unique, namespaced, name. All data types in the
+    /// com.google namespace are shared as part of the platform.
     pub name: Option<String>,
 }
 
 impl Part for DataType {}
 
 
-/// Sessions contain metadata, such as a user-friendly name and time interval information.
+/// Sessions contain metadata, such as a user-friendly name and time interval
+/// information.
 /// 
 /// # Activities
 /// 
@@ -780,10 +866,16 @@ pub struct Session {
     /// A start time, in milliseconds since epoch, inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
-    /// Session active time. While start_time_millis and end_time_millis define the full session time, the active time can be shorter and specified by active_time_millis. If the inactive time during the session is known, it should also be inserted via a com.google.activity.segment data point with a STILL activity value
+    /// Session active time. While start_time_millis and end_time_millis define
+    /// the full session time, the active time can be shorter and specified by
+    /// active_time_millis.
+    /// If the inactive time during the session is known, it should also be
+    /// inserted via a com.google.activity.segment data point with a STILL
+    /// activity value
     #[serde(rename="activeTimeMillis")]
     pub active_time_millis: Option<String>,
-    /// A client-generated identifier that is unique across all sessions owned by this particular user.
+    /// A client-generated identifier that is unique across all sessions owned by
+    /// this particular user.
     pub id: Option<String>,
     /// A human readable name of the session.
     pub name: Option<String>,
@@ -799,7 +891,8 @@ impl ResponseResult for Session {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketBySession {
-    /// Specifies that only sessions of duration longer than minDurationMillis are considered and used as a container for aggregated data.
+    /// Specifies that only sessions of duration longer than minDurationMillis are
+    /// considered and used as a container for aggregated data.
     #[serde(rename="minDurationMillis")]
     pub min_duration_millis: Option<String>,
 }
@@ -842,16 +935,24 @@ pub struct BucketByTimePeriod {
 impl Part for BucketByTimePeriod {}
 
 
-/// Representation of an integrated device (such as a phone or a wearable) that can hold sensors. Each sensor is exposed as a data source.
+/// Representation of an integrated device (such as a phone or a wearable) that
+/// can hold sensors. Each sensor is exposed as a data source.
 /// 
-/// The main purpose of the device information contained in this class is to identify the hardware of a particular data source. This can be useful in different ways, including:  
-/// - Distinguishing two similar sensors on different devices (the step counter on two nexus 5 phones, for instance)
-/// - Display the source of data to the user (by using the device make / model)
-/// - Treat data differently depending on sensor type (accelerometers on a watch may give different patterns than those on a phone)
-/// - Build different analysis models for each device/version.
+/// The main purpose of the device information contained in this class is to
+/// identify the hardware of a particular data source.  This can be useful in
+/// different ways, including:
+/// 
+/// <ul>
+///   <li>Distinguishing two similar sensors on different devices (the step
+///       counter on two nexus 5 phones, for instance)
+///   <li>Display the source of data to the user (by using the device make /
+///       model)
+///   <li>Treat data differently depending on sensor type (accelerometers on a
+///       watch may give different patterns than those on a phone)
+///   <li>Build different analysis models for each device/version.
+/// </ul>
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
     /// End-user visible model name for the device.
@@ -861,9 +962,13 @@ pub struct Device {
     /// A constant representing the type of the device.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
+    /// The serial number or other unique ID for the hardware. This field is
+    /// obfuscated when read by any REST or Android client that did not create
+    /// the data source. Only the data source creator will see the uid field in
+    /// clear and normal form.
     /// 
-    /// The obfuscation preserves equality; that is, given two IDs, if id1 == id2, obfuscated(id1) == obfuscated(id2).
+    /// The obfuscation preserves equality; that is, given two IDs, if id1 == id2,
+    /// obfuscated(id1) == obfuscated(id2).
     pub uid: Option<String>,
     /// Manufacturer of the product/hardware.
     pub manufacturer: Option<String>,
@@ -872,9 +977,13 @@ pub struct Device {
 impl Part for Device {}
 
 
-/// In case of multi-dimensional data (such as an accelerometer with x, y, and z axes) each field represents one dimension. Each data type field has a unique name which identifies it. The field also defines the format of the data (int, float, etc.).
+/// In case of multi-dimensional data (such as an accelerometer with x, y, and z
+/// axes) each field represents one dimension. Each data type field has a unique
+/// name which identifies it. The field also defines the format of the data (int,
+/// float, etc.).
 /// 
-/// This message is only instantiated in code and not used for wire comms or stored in any way.
+/// This message is only instantiated in code and not used for wire comms or
+/// stored in any way.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -882,7 +991,8 @@ impl Part for Device {}
 pub struct DataTypeField {
     /// no description provided
     pub optional: Option<bool>,
-    /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.
+    /// Defines the name and format of data. Unlike data type names, field names
+    /// are not namespaced, and only need to be unique within the data type.
     pub name: Option<String>,
     /// The different supported formats for each field in a data type.
     pub format: Option<String>,
@@ -902,10 +1012,13 @@ impl Part for DataTypeField {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDataPointChangesResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    /// The continuation token, which is used to page through large result sets.
+    /// Provide this value in a subsequent request to return the next page of
+    /// results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Deleted data points for the user. Note, for modifications this should be parsed before handling insertions.
+    /// Deleted data points for the user. Note, for modifications this should be
+    /// parsed before handling insertions.
     #[serde(rename="deletedDataPoint")]
     pub deleted_data_point: Option<Vec<DataPoint>>,
     /// The data stream ID of the data source with data point changes.
@@ -925,7 +1038,9 @@ impl ResponseResult for ListDataPointChangesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketByTime {
-    /// Specifies that result buckets aggregate data by exactly durationMillis time frames. Time frames that contain no data will be included in the response with an empty dataset.
+    /// Specifies that result buckets aggregate data by exactly durationMillis time
+    /// frames. Time frames that contain no data will be included in the response
+    /// with an empty dataset.
     #[serde(rename="durationMillis")]
     pub duration_millis: Option<String>,
     /// no description provided
@@ -935,11 +1050,22 @@ pub struct BucketByTime {
 impl Part for BucketByTime {}
 
 
-/// Definition of a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point inserted into or read from this service has an associated data source.
+/// Definition of a unique source of sensor data.  Data sources can expose raw
+/// data coming from hardware sensors on local or companion devices. They can
+/// also expose derived data, created by transforming or merging other data
+/// sources. Multiple data sources can exist for the same data type. Every data
+/// point inserted into or read from this service has an associated data
+/// source.
 /// 
-/// The data source contains enough information to uniquely identify its data, including the hardware device and the application that collected and/or transformed the data. It also holds useful metadata, such as the hardware and application versions, and the device type.
+/// The data source contains enough information to uniquely identify its data,
+/// including the hardware device and the application that collected and/or
+/// transformed the data. It also holds useful metadata, such as the hardware and
+/// application versions, and the device type.
 /// 
-/// Each data source produces a unique stream of data, with a unique identifier. Not all changes to data source affect the stream identifier, so that data collected by updated versions of the same application/device can still be considered to belong to the same data stream.
+/// Each data source produces a unique stream of data, with a unique identifier.
+/// Not all changes to data source affect the stream identifier, so that data
+/// collected by updated versions of the same application/device can still be
+/// considered to belong to the same data stream.
 /// 
 /// # Activities
 /// 
@@ -955,37 +1081,66 @@ impl Part for BucketByTime {}
 pub struct DataSource {
     /// An end-user visible name for this data source.
     pub name: Option<String>,
-    /// DO NOT POPULATE THIS FIELD. It is never populated in responses from the platform, and is ignored in queries. It will be removed in a future version entirely.
+    /// DO NOT POPULATE THIS FIELD. It is never populated in responses from the
+    /// platform, and is ignored in queries. It will be removed in a future version
+    /// entirely.
     #[serde(rename="dataQualityStandard")]
     pub data_quality_standard: Option<Vec<String>>,
-    /// The data type defines the schema for a stream of data being collected by, inserted into, or queried from the Fitness API.
+    /// The data type defines the schema for a stream of data being collected by,
+    /// inserted into, or queried from the Fitness API.
     #[serde(rename="dataType")]
     pub data_type: Option<DataType>,
-    /// The stream name uniquely identifies this particular data source among other data sources of the same type from the same underlying producer. Setting the stream name is optional, but should be done whenever an application exposes two streams for the same data type, or when a device has two equivalent sensors.
+    /// The stream name uniquely identifies this particular data source among
+    /// other data sources of the same type from the same underlying producer.
+    /// Setting the stream name is optional, but should be done whenever an
+    /// application exposes two streams for the same data type, or when a device
+    /// has two equivalent sensors.
     #[serde(rename="dataStreamName")]
     pub data_stream_name: Option<String>,
     /// Information about an application which feeds sensor data into the platform.
     pub application: Option<Application>,
-    /// Representation of an integrated device (such as a phone or a wearable) that can hold sensors.
+    /// Representation of an integrated device (such as a phone or a wearable) that
+    /// can hold sensors.
     pub device: Option<Device>,
-    /// A unique identifier for the data stream produced by this data source. The identifier includes:
+    /// A unique identifier for the data stream produced by this data source. The
+    /// identifier includes:<br/><br/>
+    /// <ul>
+    /// <li>The physical device's manufacturer, model, and serial number
+    /// (UID).</li>
+    /// <li>The application's package name or name. Package name is used when the
+    /// data source was created by an Android application. The developer project
+    /// number is used when the data source was created by a REST client.</li>
+    /// <li>The data source's type.</li>
+    /// <li>The data source's stream name.</li>
+    /// </ul>
+    /// Note that not all attributes of the data source are used as part of the
+    /// stream identifier. In particular, the version of the hardware/the
+    /// application isn't used. This allows us to preserve the same stream through
+    /// version updates. This also means that two DataSource objects may represent
+    /// the same data stream even if they're not equal.
     /// 
-    ///  
-    /// - The physical device's manufacturer, model, and serial number (UID). 
-    /// - The application's package name or name. Package name is used when the data source was created by an Android application. The developer project number is used when the data source was created by a REST client. 
-    /// - The data source's type. 
-    /// - The data source's stream name.  Note that not all attributes of the data source are used as part of the stream identifier. In particular, the version of the hardware/the application isn't used. This allows us to preserve the same stream through version updates. This also means that two DataSource objects may represent the same data stream even if they're not equal.
+    /// The exact format of the data stream ID created by an Android application
+    /// is:
+    /// <var>type:dataType.name<wbr/>:application.packageName<wbr/>:device.manufacturer<wbr/>:device.model<wbr/>:device.uid<wbr/>:dataStreamName</var>
     /// 
-    /// The exact format of the data stream ID created by an Android application is: type:dataType.name:application.packageName:device.manufacturer:device.model:device.uid:dataStreamName 
+    /// The exact format of the data stream ID created by a REST client is:
+    /// <var>type:dataType.name<wbr/>:developer project
+    /// number<wbr/>:device.manufacturer<wbr/>:device.model:device.uid<wbr/>:dataStreamName</var>
     /// 
-    /// The exact format of the data stream ID created by a REST client is: type:dataType.name:developer project number:device.manufacturer:device.model:device.uid:dataStreamName 
+    /// When any of the optional fields that make up the data stream ID are absent,
+    /// they will be omitted from the data stream ID. The minimum viable data
+    /// stream ID would be:
+    /// type:dataType.name:developer project number
     /// 
-    /// When any of the optional fields that make up the data stream ID are absent, they will be omitted from the data stream ID. The minimum viable data stream ID would be: type:dataType.name:developer project number
-    /// 
-    /// Finally, the developer project number and device UID are obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form. This means a client will see a different set of data_stream_ids than another client with different credentials.
+    /// Finally, the developer project number and device UID are obfuscated when
+    /// read by any REST or Android client that did not create the data source.
+    /// Only the data source creator will see the developer project number in clear
+    /// and normal form. This means a client will see a different set of
+    /// data_stream_ids than another client with different credentials.
     #[serde(rename="dataStreamId")]
     pub data_stream_id: Option<String>,
-    /// A constant describing the type of this data source. Indicates whether this data source produces raw or derived data.
+    /// A constant describing the type of this data source. Indicates whether this
+    /// data source produces raw or derived data.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1040,12 +1195,15 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggregated into exactly one bucket type per request.
+    /// Aggregates data of a certain type or stream into buckets divided by a given
+    /// type of boundary. Multiple data sets of multiple types and from multiple
+    /// sources can be aggregated into exactly one bucket type per request.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userId` - Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Aggregate data for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     pub fn dataset_aggregate(&self, request: AggregateRequest, user_id: &str) -> UserDatasetAggregateCall<'a, C, A> {
         UserDatasetAggregateCall {
             hub: self.hub,
@@ -1059,11 +1217,14 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified data source. The request will fail if the data source contains any data points.
+    /// Deletes the specified data source. The request will fail if the data
+    /// source contains any data points.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Retrieve a data source for the person identified. Use <code>me</code> to
+    ///              indicate the authenticated user. Only <code>me</code> is supported at this
+    ///              time.
     /// * `dataSourceId` - The data stream ID of the data source to delete.
     pub fn data_sources_delete(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDeleteCall<'a, C, A> {
         UserDataSourceDeleteCall {
@@ -1078,13 +1239,22 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a dataset containing all data points whose start and end times overlap with the specified range of the dataset minimum start time and maximum end time. Specifically, any data point whose start time is less than or equal to the dataset end time and whose end time is greater than or equal to the dataset start time.
+    /// Returns a dataset containing all data points whose start and end times
+    /// overlap with the specified range of the dataset minimum start time and
+    /// maximum end time. Specifically, any data point whose start time is less
+    /// than or equal to the dataset end time and whose end time is greater than or
+    /// equal to the dataset start time.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Retrieve a dataset for the person identified. Use <code>me</code> to
+    ///              indicate the authenticated user. Only <code>me</code> is supported at this
+    ///              time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
-    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time
+    ///                 and maximum data point end time represented as nanoseconds from the epoch.
+    ///                 The ID is formatted like: "<var>startTime</var>-<var>endTime</var>"
+    ///                 where <var>startTime</var> and <var>endTime</var> are 64 bit integers.
     pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         UserDataSourceDatasetGetCall {
             hub: self.hub,
@@ -1101,22 +1271,48 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new data source that is unique across all data sources belonging to this user.
+    /// Creates a new data source that is unique across all data sources belonging
+    /// to this user.
     /// 
-    /// A data source is a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point in every dataset inserted into or read from the Fitness API has an associated data source.
+    /// A data source is a unique source of sensor data. Data sources can expose
+    /// raw data coming from hardware sensors on local or companion devices. They
+    /// can also expose derived data, created by transforming or merging other data
+    /// sources. Multiple data sources can exist for the same data type. Every data
+    /// point in every dataset inserted into or read from the Fitness API has an
+    /// associated data source.
     /// 
-    /// Each data source produces a unique stream of dataset updates, with a unique data source identifier. Not all changes to data source affect the data stream ID, so that data collected by updated versions of the same application/device can still be considered to belong to the same data source.
+    /// Each data source produces a unique stream of dataset updates, with a
+    /// unique data source identifier. Not all changes to data source affect the
+    /// data stream ID, so that data collected by updated versions of the same
+    /// application/device can still be considered to belong to the same data
+    /// source.
     /// 
-    /// Data sources are identified using a string generated by the server, based on the contents of the source being created. The dataStreamId field should not be set when invoking this method. It will be automatically generated by the server with the correct format. If a dataStreamId is set, it must match the format that the server would generate. This format is a combination of some fields from the data source, and has a specific order. If it doesn't match, the request will fail with an error.
+    /// Data sources are identified using a string generated by the server, based
+    /// on the contents of the source being created. The <code>dataStreamId</code>
+    /// field should not be set when invoking this method. It
+    /// will be automatically generated by the server with the correct format. If
+    /// a <code>dataStreamId</code> is set, it must match the format that the
+    /// server would generate. This format is a combination of some fields from the
+    /// data source, and has a specific order. If it doesn't match, the request
+    /// will fail with an error.
     /// 
-    /// Specifying a DataType which is not a known type (beginning with "com.google.") will create a DataSource with a custom data type. Custom data types are only readable by the application that created them. Custom data types are deprecated; use standard data types instead.
+    /// Specifying a DataType which is not a known type (beginning with
+    /// "com.google.") will create a DataSource with a <em>custom data type</em>.
+    /// Custom data types are only readable by the application that created them.
+    /// Custom data types are <strong>deprecated</strong>; use standard data types
+    /// instead.
     /// 
-    /// In addition to the data source fields included in the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
+    /// In addition to the data source fields included in the data source ID, the
+    /// developer project number that is authenticated when creating the data
+    /// source is included. This developer project number is obfuscated when read
+    /// by any other developer reading public data types.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userId` - Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Create the data source for the person identified. Use <code>me</code> to
+    ///              indicate the authenticated user. Only <code>me</code> is supported at this
+    ///              time.
     pub fn data_sources_create(&self, request: DataSource, user_id: &str) -> UserDataSourceCreateCall<'a, C, A> {
         UserDataSourceCreateCall {
             hub: self.hub,
@@ -1130,13 +1326,23 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Performs an inclusive delete of all data points whose start and end times have any overlap with the time range specified by the dataset ID. For most data types, the entire data point will be deleted. For data types where the time span represents a consistent value (such as com.google.activity.segment), and a data point straddles either end point of the dataset, only the overlapping portion of the data point will be deleted.
+    /// Performs an inclusive delete of all data points whose start and end times
+    /// have any overlap with the time range specified by the dataset ID. For most
+    /// data types, the entire data point will be deleted. For data types where the
+    /// time span represents a consistent value (such as
+    /// <code>com.google.activity.segment</code>), and a data point straddles
+    /// either end point of the dataset, only the overlapping portion of the data
+    /// point will be deleted.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Delete a dataset for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
-    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time
+    ///                 and maximum data point end time represented as nanoseconds from the epoch.
+    ///                 The ID is formatted like: "<var>startTime</var>-<var>endTime</var>"
+    ///                 where <var>startTime</var> and <var>endTime</var> are 64 bit integers.
     pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         UserDataSourceDatasetDeleteCall {
             hub: self.hub,
@@ -1153,14 +1359,21 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds data points to a dataset. The dataset need not be previously created. All points within the given dataset will be returned with subsquent calls to retrieve this dataset. Data points can belong to more than one dataset. This method does not use patch semantics.
+    /// Adds data points to a dataset. The dataset need not be previously created.
+    /// All points within the given dataset will be returned with subsquent calls
+    /// to retrieve this dataset. Data points can belong to more than one dataset.
+    /// This method does not use patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userId` - Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Patch a dataset for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
-    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time
+    ///                 and maximum data point end time represented as nanoseconds from the epoch.
+    ///                 The ID is formatted like: "<var>startTime</var>-<var>endTime</var>"
+    ///                 where <var>startTime</var> and <var>endTime</var> are 64 bit integers.
     pub fn data_sources_datasets_patch(&self, request: Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         UserDataSourceDatasetPatchCall {
             hub: self.hub,
@@ -1181,7 +1394,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userId` - Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Delete a session for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     /// * `sessionId` - The ID of the session to be deleted.
     pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a, C, A> {
         UserSessionDeleteCall {
@@ -1201,7 +1415,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Retrieve a data source for the person identified. Use <code>me</code> to
+    ///              indicate the authenticated user. Only <code>me</code> is supported at this
+    ///              time.
     /// * `dataSourceId` - The data stream ID of the data source to retrieve.
     pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a, C, A> {
         UserDataSourceGetCall {
@@ -1216,14 +1432,19 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
+    /// Updates the specified data source. The <code>dataStreamId</code>,
+    /// <code>dataType</code>, <code>type</code>, <code>dataStreamName</code>, and
+    /// <code>device</code> properties with the exception of <code>version</code>,
+    /// cannot be modified.
     /// 
-    /// Data sources are identified by their dataStreamId.
+    /// Data sources are identified by their <code>dataStreamId</code>.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Update the data source for the person identified. Use <code>me</code> to
+    ///              indicate the authenticated user. Only <code>me</code> is supported at this
+    ///              time.
     /// * `dataSourceId` - The data stream ID of the data source to update.
     pub fn data_sources_update(&self, request: DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a, C, A> {
         UserDataSourceUpdateCall {
@@ -1243,7 +1464,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userId` - List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - List sessions for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a, C, A> {
         UserSessionListCall {
             hub: self.hub,
@@ -1266,7 +1488,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userId` - Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - Create sessions for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     /// * `sessionId` - The ID of the session to be created.
     pub fn sessions_update(&self, request: Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a, C, A> {
         UserSessionUpdateCall {
@@ -1287,7 +1510,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userId` - List data points for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - List data points for the person identified. Use <code>me</code> to indicate
+    ///              the authenticated user. Only <code>me</code> is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
         UserDataSourceDataPointChangeListCall {
@@ -1304,11 +1528,16 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive; the user may have private data sources that are only visible to other developers, or calls using other scopes.
+    /// Lists all data sources that are visible to the developer, using the OAuth
+    /// scopes provided. The list is not exhaustive; the user may have private
+    /// data sources that are only visible to other developers, or calls using
+    /// other scopes.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `userId` - List data sources for the person identified. Use <code>me</code> to
+    ///              indicate the authenticated user. Only <code>me</code> is supported at this
+    ///              time.
     pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a, C, A> {
         UserDataSourceListCall {
             hub: self.hub,
@@ -1329,7 +1558,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggregated into exactly one bucket type per request.
+/// Aggregates data of a certain type or stream into buckets divided by a given
+/// type of boundary. Multiple data sets of multiple types and from multiple
+/// sources can be aggregated into exactly one bucket type per request.
 ///
 /// A builder for the *dataset.aggregate* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -1407,7 +1638,7 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataset:aggregate";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataset:aggregate";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
         }
@@ -1537,7 +1768,8 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Aggregate data for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -1567,13 +1799,17 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDatasetAggregateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1606,7 +1842,8 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Deletes the specified data source. The request will fail if the data source contains any data points.
+/// Deletes the specified data source. The request will fail if the data
+/// source contains any data points.
 ///
 /// A builder for the *dataSources.delete* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -1679,7 +1916,7 @@ impl<'a, C, A> UserDataSourceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -1785,7 +2022,9 @@ impl<'a, C, A> UserDataSourceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Retrieve a data source for the person identified. Use <code>me</code> to
+    /// indicate the authenticated user. Only <code>me</code> is supported at this
+    /// time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -1825,13 +2064,17 @@ impl<'a, C, A> UserDataSourceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1864,7 +2107,11 @@ impl<'a, C, A> UserDataSourceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns a dataset containing all data points whose start and end times overlap with the specified range of the dataset minimum start time and maximum end time. Specifically, any data point whose start time is less than or equal to the dataset end time and whose end time is greater than or equal to the dataset start time.
+/// Returns a dataset containing all data points whose start and end times
+/// overlap with the specified range of the dataset minimum start time and
+/// maximum end time. Specifically, any data point whose start time is less
+/// than or equal to the dataset end time and whose end time is greater than or
+/// equal to the dataset start time.
 ///
 /// A builder for the *dataSources.datasets.get* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -1949,7 +2196,7 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}/datasets/{datasetId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
         }
@@ -2055,7 +2302,9 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Retrieve a dataset for the person identified. Use <code>me</code> to
+    /// indicate the authenticated user. Only <code>me</code> is supported at this
+    /// time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2075,7 +2324,10 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
         self._data_source_id = new_value.to_string();
         self
     }
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    /// Dataset identifier that is a composite of the minimum data point start time
+    /// and maximum data point end time represented as nanoseconds from the epoch.
+    /// The ID is formatted like: "<var>startTime</var>-<var>endTime</var>"
+    /// where <var>startTime</var> and <var>endTime</var> are 64 bit integers.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -2085,14 +2337,20 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
         self._dataset_id = new_value.to_string();
         self
     }
-    /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.
+    /// The continuation token, which is used to page through large datasets.
+    /// To get the next page of a dataset, set this parameter to the value of
+    /// <code>nextPageToken</code> from the previous response. Each subsequent
+    /// call will yield a partial dataset with data point end timestamps that are
+    /// strictly smaller than those in the previous partial response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// If specified, no more than this many data points will be included in the dataset. If there are more data points in the dataset, nextPageToken will be set in the dataset response.
+    /// If specified, no more than this many data points will be included in the
+    /// dataset. If there are more data points in the dataset, nextPageToken
+    /// will be set in the dataset response.
     ///
     /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C, A> {
@@ -2119,13 +2377,17 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2158,17 +2420,41 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Creates a new data source that is unique across all data sources belonging to this user.
+/// Creates a new data source that is unique across all data sources belonging
+/// to this user.
 /// 
-/// A data source is a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point in every dataset inserted into or read from the Fitness API has an associated data source.
+/// A data source is a unique source of sensor data. Data sources can expose
+/// raw data coming from hardware sensors on local or companion devices. They
+/// can also expose derived data, created by transforming or merging other data
+/// sources. Multiple data sources can exist for the same data type. Every data
+/// point in every dataset inserted into or read from the Fitness API has an
+/// associated data source.
 /// 
-/// Each data source produces a unique stream of dataset updates, with a unique data source identifier. Not all changes to data source affect the data stream ID, so that data collected by updated versions of the same application/device can still be considered to belong to the same data source.
+/// Each data source produces a unique stream of dataset updates, with a
+/// unique data source identifier. Not all changes to data source affect the
+/// data stream ID, so that data collected by updated versions of the same
+/// application/device can still be considered to belong to the same data
+/// source.
 /// 
-/// Data sources are identified using a string generated by the server, based on the contents of the source being created. The dataStreamId field should not be set when invoking this method. It will be automatically generated by the server with the correct format. If a dataStreamId is set, it must match the format that the server would generate. This format is a combination of some fields from the data source, and has a specific order. If it doesn't match, the request will fail with an error.
+/// Data sources are identified using a string generated by the server, based
+/// on the contents of the source being created. The <code>dataStreamId</code>
+/// field should not be set when invoking this method. It
+/// will be automatically generated by the server with the correct format. If
+/// a <code>dataStreamId</code> is set, it must match the format that the
+/// server would generate. This format is a combination of some fields from the
+/// data source, and has a specific order. If it doesn't match, the request
+/// will fail with an error.
 /// 
-/// Specifying a DataType which is not a known type (beginning with "com.google.") will create a DataSource with a custom data type. Custom data types are only readable by the application that created them. Custom data types are deprecated; use standard data types instead.
+/// Specifying a DataType which is not a known type (beginning with
+/// "com.google.") will create a DataSource with a <em>custom data type</em>.
+/// Custom data types are only readable by the application that created them.
+/// Custom data types are <strong>deprecated</strong>; use standard data types
+/// instead.
 /// 
-/// In addition to the data source fields included in the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
+/// In addition to the data source fields included in the data source ID, the
+/// developer project number that is authenticated when creating the data
+/// source is included. This developer project number is obfuscated when read
+/// by any other developer reading public data types.
 ///
 /// A builder for the *dataSources.create* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -2246,7 +2532,7 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -2376,7 +2662,9 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Create the data source for the person identified. Use <code>me</code> to
+    /// indicate the authenticated user. Only <code>me</code> is supported at this
+    /// time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2406,13 +2694,17 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2445,7 +2737,13 @@ impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Performs an inclusive delete of all data points whose start and end times have any overlap with the time range specified by the dataset ID. For most data types, the entire data point will be deleted. For data types where the time span represents a consistent value (such as com.google.activity.segment), and a data point straddles either end point of the dataset, only the overlapping portion of the data point will be deleted.
+/// Performs an inclusive delete of all data points whose start and end times
+/// have any overlap with the time range specified by the dataset ID. For most
+/// data types, the entire data point will be deleted. For data types where the
+/// time span represents a consistent value (such as
+/// <code>com.google.activity.segment</code>), and a data point straddles
+/// either end point of the dataset, only the overlapping portion of the data
+/// point will be deleted.
 ///
 /// A builder for the *dataSources.datasets.delete* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -2529,7 +2827,7 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}/datasets/{datasetId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -2625,7 +2923,8 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Delete a dataset for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2645,7 +2944,10 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
         self._data_source_id = new_value.to_string();
         self
     }
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    /// Dataset identifier that is a composite of the minimum data point start time
+    /// and maximum data point end time represented as nanoseconds from the epoch.
+    /// The ID is formatted like: "<var>startTime</var>-<var>endTime</var>"
+    /// where <var>startTime</var> and <var>endTime</var> are 64 bit integers.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -2689,13 +2991,17 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2728,7 +3034,10 @@ impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Adds data points to a dataset. The dataset need not be previously created. All points within the given dataset will be returned with subsquent calls to retrieve this dataset. Data points can belong to more than one dataset. This method does not use patch semantics.
+/// Adds data points to a dataset. The dataset need not be previously created.
+/// All points within the given dataset will be returned with subsquent calls
+/// to retrieve this dataset. Data points can belong to more than one dataset.
+/// This method does not use patch semantics.
 ///
 /// A builder for the *dataSources.datasets.patch* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -2815,7 +3124,7 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}/datasets/{datasetId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -2945,7 +3254,8 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Patch a dataset for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2965,7 +3275,10 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
         self._data_source_id = new_value.to_string();
         self
     }
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
+    /// Dataset identifier that is a composite of the minimum data point start time
+    /// and maximum data point end time represented as nanoseconds from the epoch.
+    /// The ID is formatted like: "<var>startTime</var>-<var>endTime</var>"
+    /// where <var>startTime</var> and <var>endTime</var> are 64 bit integers.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -2975,7 +3288,9 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
         self._dataset_id = new_value.to_string();
         self
     }
-    /// The client's current time in milliseconds since epoch. Note that the minStartTimeNs and maxEndTimeNs properties in the request body are in nanoseconds instead of milliseconds.
+    /// The client's current time in milliseconds since epoch. Note that the
+    /// <code>minStartTimeNs</code> and <code>maxEndTimeNs</code> properties in
+    /// the request body are in nanoseconds instead of milliseconds.
     ///
     /// Sets the *current time millis* query property to the given value.
     pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
@@ -3002,13 +3317,17 @@ impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3118,7 +3437,7 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{userId}/sessions/{sessionId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/sessions/{sessionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -3214,7 +3533,8 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Delete a session for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -3261,13 +3581,17 @@ impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3373,7 +3697,7 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
         }
@@ -3479,7 +3803,9 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Retrieve a data source for the person identified. Use <code>me</code> to
+    /// indicate the authenticated user. Only <code>me</code> is supported at this
+    /// time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -3519,13 +3845,17 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3558,9 +3888,12 @@ impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.
+/// Updates the specified data source. The <code>dataStreamId</code>,
+/// <code>dataType</code>, <code>type</code>, <code>dataStreamName</code>, and
+/// <code>device</code> properties with the exception of <code>version</code>,
+/// cannot be modified.
 /// 
-/// Data sources are identified by their dataStreamId.
+/// Data sources are identified by their <code>dataStreamId</code>.
 ///
 /// A builder for the *dataSources.update* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -3640,7 +3973,7 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -3770,7 +4103,9 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Update the data source for the person identified. Use <code>me</code> to
+    /// indicate the authenticated user. Only <code>me</code> is supported at this
+    /// time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -3810,13 +4145,17 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3947,7 +4286,7 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/sessions";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/sessions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
         }
@@ -4053,7 +4392,8 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// List sessions for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -4063,28 +4403,42 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._user_id = new_value.to_string();
         self
     }
-    /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
+    /// An <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> timestamp.
+    /// Only sessions ending between the start and end times will be included in
+    /// the response. If this time is omitted but <var>endTime</var> is specified,
+    /// all sessions from the start of time up to <var>endTime</var> will be
+    /// returned.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// The continuation token, which is used for incremental syncing. To get the next batch of changes, set this parameter to the value of nextPageToken from the previous response. This token is treated as a timestamp (in millis since epoch). If specified, the API returns sessions modified since this time. The page token is ignored if either start or end time is specified. If none of start time, end time, and the page token is specified, sessions modified in the last 30 days are returned.
+    /// The continuation token, which is used for incremental syncing.
+    /// To get the next batch of changes, set this parameter to the value of
+    /// <code>nextPageToken</code> from the previous response. The page token is
+    /// ignored if either start or end time is specified. If none of start time,
+    /// end time, and the page token is specified, sessions modified in the last
+    /// 30 days are returned.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// If true, deleted sessions will be returned. When set to true, sessions returned in this response will only have an ID and will not have any other fields.
+    /// If true, and if both <var>startTime</var> and <var>endTime</var> are
+    /// omitted, session deletions will be returned.
     ///
     /// Sets the *include deleted* query property to the given value.
     pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
-    /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
+    /// An <a href="https://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> timestamp.
+    /// Only sessions ending between the start and end times will be included in
+    /// the response. If this time is omitted but <var>startTime</var> is
+    /// specified, all sessions from <var>startTime</var> to the end of time will
+    /// be returned.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
@@ -4119,13 +4473,17 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4243,7 +4601,7 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/sessions/{sessionId}";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/sessions/{sessionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
@@ -4373,7 +4731,8 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// Create sessions for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -4420,13 +4779,17 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4542,7 +4905,7 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources/{dataSourceId}/dataPointChanges";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources/{dataSourceId}/dataPointChanges";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
         }
@@ -4648,7 +5011,8 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// List data points for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// List data points for the person identified. Use <code>me</code> to indicate
+    /// the authenticated user. Only <code>me</code> is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -4668,14 +5032,17 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
         self._data_source_id = new_value.to_string();
         self
     }
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
+    /// The continuation token, which is used to page through large result sets.
+    /// To get the next page of results, set this parameter to the value of
+    /// <code>nextPageToken</code> from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// If specified, no more than this many data point changes will be included in the response.
+    /// If specified, no more than this many data point changes will be included
+    /// in the response.
     ///
     /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
@@ -4702,13 +5069,17 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDataPointChangeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4741,7 +5112,10 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive; the user may have private data sources that are only visible to other developers, or calls using other scopes.
+/// Lists all data sources that are visible to the developer, using the OAuth
+/// scopes provided. The list is not exhaustive; the user may have private
+/// data sources that are only visible to other developers, or calls using
+/// other scopes.
 ///
 /// A builder for the *dataSources.list* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -4819,7 +5193,7 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{userId}/dataSources";
+        let mut url = self.hub._base_url.clone() + "fitness/v1/users/{userId}/dataSources";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ActivityRead.as_ref().to_string(), ());
         }
@@ -4925,7 +5299,9 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// List data sources for the person identified. Use <code>me</code> to
+    /// indicate the authenticated user. Only <code>me</code> is supported at this
+    /// time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -4935,7 +5311,8 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._user_id = new_value.to_string();
         self
     }
-    /// The names of data types to include in the list. If not specified, all data sources will be returned.
+    /// The names of data types to include in the list. If not specified, all
+    /// data sources will be returned.
     ///
     /// Append the given value to the *data type name* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -4963,13 +5340,17 @@ impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

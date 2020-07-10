@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Tasks* crate version *1.0.14+20200615*, where *20200615* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudTasks<C, A>
         CloudTasks {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://cloudtasks.googleapis.com/".to_string(),
             _root_url: "https://cloudtasks.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> CloudTasks<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -444,10 +444,10 @@ impl Part for PullMessage {}
 /// delivered to can be set at the queue-level or task-level:
 /// 
 /// * If set,
-///    app_engine_routing_override
-///    is used for all tasks in the queue, no matter what the setting
-///    is for the
-///    task-level app_engine_routing.
+///   app_engine_routing_override
+///   is used for all tasks in the queue, no matter what the setting
+///   is for the
+///   task-level app_engine_routing.
 /// 
 /// 
 /// The `url` that the task will be sent to is:
@@ -550,14 +550,11 @@ pub struct AppEngineHttpRequest {
     /// The HTTP method to use for the request. The default is POST.
     /// 
     /// The app's request handler for the task's target URL must be able to handle
-    /// HTTP requests with this http_method, otherwise the task attempt will fail
-    /// with error code 405 (Method Not Allowed). See
-    /// [Writing a push task request
+    /// HTTP requests with this http_method, otherwise the task attempt fails with
+    /// error code 405 (Method Not Allowed). See [Writing a push task request
     /// handler](https://cloud.google.com/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler)
-    /// and the documentation for the request handlers in the language your app is
-    /// written in e.g.
-    /// [Python Request
-    /// Handler](https://cloud.google.com/appengine/docs/python/tools/webapp/requesthandlerclass).
+    /// and the App Engine documentation for your runtime on [How Requests are
+    /// Handled](https://cloud.google.com/appengine/docs/standard/python3/how-requests-are-handled).
     #[serde(rename="httpMethod")]
     pub http_method: Option<String>,
 }
@@ -825,10 +822,12 @@ impl ResponseResult for Location {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -846,7 +845,9 @@ impl ResponseResult for Location {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -930,6 +931,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -1537,7 +1541,7 @@ impl RequestValue for CancelLeaseRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
     /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
-    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    /// `GetIamPolicy`.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -1709,6 +1713,10 @@ pub struct GetPolicyOptions {
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -1757,9 +1765,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -2006,7 +2022,7 @@ pub struct RetryConfig {
     /// A task's retry interval starts at
     /// min_backoff, then doubles
     /// `max_doublings` times, then increases linearly, and finally
-    /// retries retries at intervals of
+    /// retries at intervals of
     /// max_backoff up to
     /// max_attempts times.
     /// 

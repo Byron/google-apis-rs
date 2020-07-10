@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *playcustomapp* crate version *1.0.13+20170622*, where *20170622* is the exact revision of the *playcustomapp:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *playcustomapp* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *playcustomapp:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *playcustomapp* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/android/work/play/custom-app-api).
+//! [official documentation site](https://developers.google.com/android/work/play/custom-app-api/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/playcustomapp1).
 //! # Features
 //! 
@@ -111,10 +111,10 @@
 //! let mut req = CustomApp::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
-//! // execute the final call using `upload_resumable(...)`.
+//! // execute the final call using `upload(...)`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.accounts().custom_apps_create(req, "account")
-//!              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+//!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 //! 
 //! match result {
 //!     Err(e) => match e {
@@ -295,10 +295,10 @@ impl Default for Scope {
 /// let mut req = CustomApp::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().custom_apps_create(req, "account")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// 
 /// match result {
 ///     Err(e) => match e {
@@ -335,8 +335,8 @@ impl<'a, C, A> Playcustomapp<C, A>
         Playcustomapp {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/playcustomapp/v1/accounts/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -346,7 +346,7 @@ impl<'a, C, A> Playcustomapp<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -354,7 +354,7 @@ impl<'a, C, A> Playcustomapp<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/playcustomapp/v1/accounts/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -388,6 +388,10 @@ pub struct CustomApp {
     /// Default listing language in BCP 47 format.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
+    /// Output only. Package name of the created Android app.
+    /// Only present in the API response.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
     /// Title for the Android app.
     pub title: Option<String>,
 }
@@ -442,7 +446,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create and publish a new custom app.
+    /// Creates a new custom app.
     /// 
     /// # Arguments
     ///
@@ -468,7 +472,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Create and publish a new custom app.
+/// Creates a new custom app.
 ///
 /// A builder for the *customApps.create* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -500,10 +504,10 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
 /// let mut req = CustomApp::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().custom_apps_create(req, "account")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
 pub struct AccountCustomAppCreateCall<'a, C, A>
@@ -551,8 +555,6 @@ impl<'a, C, A> AccountCustomAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/playcustomapp/v1/accounts/{account}/customApps", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/playcustomapp/v1/accounts/{account}/customApps", "resumable")
             } else {
                 unreachable!()
             };
@@ -597,9 +599,6 @@ impl<'a, C, A> AccountCustomAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -617,46 +616,31 @@ impl<'a, C, A> AccountCustomAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut mp_reader: MultiPartReader = Default::default();
-                    let (mut body_reader, content_type) = match protocol {
-                        "simple" => {
-                            mp_reader.reserve_exact(2);
-                            let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 104857600 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 104857600))
-                        }
-                            mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                                     .add_part(&mut reader, size, reader_mime_type.clone());
-                            let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
-                        },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
-                    };
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone())
-                        .header(content_type)
-                        .body(&mut body_reader);
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                let mut mp_reader: MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    "simple" => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    if size > 10737418240 {
+                    	return Err(Error::UploadSizeLimitExceeded(size, 10737418240))
                     }
-    
-                    dlg.pre_request();
-                    req.send()
-                }
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        let mime_type = mp_reader.mime_type();
+                        (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
+                    },
+                    _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
+                };
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(content_type)
+                    .body(&mut body_reader);
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -690,51 +674,6 @@ impl<'a, C, A> AccountCustomAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 104857600 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 104857600))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -757,28 +696,12 @@ impl<'a, C, A> AccountCustomAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 100MB
+    /// * *max size*: 10737418240
     /// * *multipart*: yes
     /// * *valid mime types*: '*/*'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, CustomApp)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
-    }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 100MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: '*/*'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, CustomApp)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     ///
@@ -820,13 +743,17 @@ impl<'a, C, A> AccountCustomAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountCustomAppCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

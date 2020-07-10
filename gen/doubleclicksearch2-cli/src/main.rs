@@ -1136,7 +1136,7 @@ fn main() {
     
     let mut app = App::new("doubleclicksearch2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200331")
            .about("Reports and modifies your advertising data in DoubleClick Search (for example, campaigns, ad groups, keywords, and conversions).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli")
            .arg(Arg::with_name("url")

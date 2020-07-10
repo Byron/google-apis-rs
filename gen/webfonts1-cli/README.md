@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `webfonts1` command-line interface *(CLI)* allows to use most features of the *Google webfonts* service from the comfort of your terminal.
+The `webfonts1` command-line interface *(CLI)* allows to use most features of the *Google Webfonts* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *webfonts* API can be found at the
+Everything else about the *Webfonts* API can be found at the
 [official documentation site](https://developers.google.com/fonts/docs/developer_api).
 
 # Installation and Source Code
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *webfonts* API at revision *20200302*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Webfonts* API at revision *20200706*. The CLI is at version *1.0.14*.
 
 ```bash
 webfonts1 [options]

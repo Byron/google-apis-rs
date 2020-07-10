@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dialogflow* API at revision *20200408*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Dialogflow* API at revision *20200706*. The CLI is at version *1.0.14*.
 
 ```bash
 dialogflow2 [options]
@@ -40,6 +40,7 @@ dialogflow2 [options]
                 agent-entity-types-get <name> [-p <v>]... [-o <out>]
                 agent-entity-types-list <parent> [-p <v>]... [-o <out>]
                 agent-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-list <parent> [-p <v>]... [-o <out>]
                 agent-environments-users-sessions-contexts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-environments-users-sessions-contexts-delete <name> [-p <v>]... [-o <out>]
                 agent-environments-users-sessions-contexts-get <name> [-p <v>]... [-o <out>]

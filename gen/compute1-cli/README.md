@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20200311*. The CLI is at version *1.0.13*.
+This documentation was generated from the *compute* API at revision *20200612*. The CLI is at version *1.0.14*.
 
 ```bash
 compute1 [options]
@@ -372,12 +372,20 @@ compute1 [options]
                 create-snapshot <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <region> <disk> [-p <v>]... [-o <out>]
                 get <project> <region> <disk> [-p <v>]... [-o <out>]
+                get-iam-policy <project> <region> <resource> [-p <v>]... [-o <out>]
                 insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
                 remove-resource-policies <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
                 resize <project> <region> <disk> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-labels <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        region-health-check-services
+                delete <project> <region> <health-check-service> [-p <v>]... [-o <out>]
+                get <project> <region> <health-check-service> [-p <v>]... [-o <out>]
+                insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <region> [-p <v>]... [-o <out>]
+                patch <project> <region> <health-check-service> (-r <kv>)... [-p <v>]... [-o <out>]
         region-health-checks
                 delete <project> <region> <health-check> [-p <v>]... [-o <out>]
                 get <project> <region> <health-check> [-p <v>]... [-o <out>]
@@ -406,6 +414,11 @@ compute1 [options]
                 list <project> <region> [-p <v>]... [-o <out>]
                 list-instances <project> <region> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-named-ports <project> <region> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
+        region-notification-endpoints
+                delete <project> <region> <notification-endpoint> [-p <v>]... [-o <out>]
+                get <project> <region> <notification-endpoint> [-p <v>]... [-o <out>]
+                insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <region> [-p <v>]... [-o <out>]
         region-operations
                 delete <project> <region> <operation> [-p <v>]...
                 get <project> <region> <operation> [-p <v>]... [-o <out>]

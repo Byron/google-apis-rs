@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *bigquery* API at revision *20200330*. The CLI is at version *1.0.13*.
+This documentation was generated from the *bigquery* API at revision *20200625*. The CLI is at version *1.0.14*.
 
 ```bash
 bigquery2 [options]
@@ -63,9 +63,12 @@ bigquery2 [options]
         tables
                 delete <project-id> <dataset-id> <table-id> [-p <v>]...
                 get <project-id> <dataset-id> <table-id> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 insert <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project-id> <dataset-id> [-p <v>]... [-o <out>]
                 patch <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
   bigquery2 --help
 

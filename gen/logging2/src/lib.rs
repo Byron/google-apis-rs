@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Logging* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Logging* crate version *1.0.14+20200624*, where *20200624* is the exact revision of the *logging:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Logging* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).
@@ -389,7 +389,7 @@ impl<'a, C, A> Logging<C, A>
         Logging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://logging.googleapis.com/".to_string(),
             _root_url: "https://logging.googleapis.com/".to_string(),
         }
@@ -430,7 +430,7 @@ impl<'a, C, A> Logging<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -672,7 +672,7 @@ pub struct LogSink {
     /// "storage.googleapis.com/[GCS_BUCKET]"
     /// "bigquery.googleapis.com/projects/[PROJECT_ID]/datasets/[DATASET]"
     /// "pubsub.googleapis.com/projects/[PROJECT_ID]/topics/[TOPIC_ID]"
-    /// The sink's writer_identity, set when the sink is created, must have permission to write to the destination or else the log entries are not exported. For more information, see Exporting Logs with Sinks.
+    /// The sink's writer_identity, set when the sink is created, must have permission to write to the destination or else the log entries are not exported. For more information, see Exporting Logs with Sinks (https://cloud.google.com/logging/docs/api/tasks/exporting-logs).
     pub destination: Option<String>,
     /// Optional. A description of this sink. The maximum length of the description is 8000 characters.
     pub description: Option<String>,
@@ -682,14 +682,14 @@ pub struct LogSink {
     /// Output only. The creation timestamp of the sink.This field may not be present for older sinks.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Optional. An advanced logs filter. The only exported log entries are those that are in the resource owning the sink and that match the filter. For example:
+    /// Optional. An advanced logs filter (https://cloud.google.com/logging/docs/view/advanced-queries). The only exported log entries are those that are in the resource owning the sink and that match the filter. For example:
     /// logName="projects/[PROJECT_ID]/logs/[LOG_ID]" AND severity>=ERROR
     /// 
     pub filter: Option<String>,
-    /// Deprecated. The log entry format to use for this sink's exported log entries. The v2 format is used by default and cannot be changed.
+    /// Deprecated. This field is unused.
     #[serde(rename="outputVersionFormat")]
     pub output_version_format: Option<String>,
-    /// Output only. An IAM identity&mdash;a service account or group&mdash;under which Logging writes the exported log entries to the sink's destination. This field is set by sinks.create and sinks.update based on the value of unique_writer_identity in those methods.Until you grant this identity write-access to the destination, log entry exports from this sink will fail. For more information, see Granting Access for a Resource. Consult the destination service's documentation to determine the appropriate IAM roles to assign to the identity.
+    /// Output only. An IAM identity&mdash;a service account or group&mdash;under which Logging writes the exported log entries to the sink's destination. This field is set by sinks.create and sinks.update based on the value of unique_writer_identity in those methods.Until you grant this identity write-access to the destination, log entry exports from this sink will fail. For more information, see Granting Access for a Resource (https://cloud.google.com/iam/docs/granting-roles-to-service-accounts#granting_access_to_a_service_account_for_a_resource). Consult the destination service's documentation to determine the appropriate IAM roles to assign to the identity.
     #[serde(rename="writerIdentity")]
     pub writer_identity: Option<String>,
     /// Optional. This field applies only to sinks owned by organizations and folders. If the field is false, the default, only the logs owned by the sink's parent resource are available for export. If the field is true, then logs from all the projects, folders, and billing accounts contained in the sink's parent resource are also available for export. Whether a particular log entry from the children is exported depends on the sink's filter expression. For example, if this field is true, then the filter resource.type=gce_instance would export all Compute Engine VM instance log entries from all projects in the sink's parent. To only export entries from certain child projects, filter on the project part of the log name:
@@ -811,7 +811,10 @@ pub struct Linear {
 impl Part for Linear {}
 
 
-/// Defines a metric type and its schema. Once a metric descriptor is created, deleting or altering it stops data collection and makes the metric type's existing data unusable.
+/// Defines a metric type and its schema. Once a metric descriptor is created, deleting or altering it stops data collection and makes the metric type's existing data unusable.The following are specific rules for service defined Monitoring metric descriptors:
+/// type, metric_kind, value_type, description, display_name,  launch_stage fields are all required. The unit field must be specified  if the value_type is any of DOUBLE, INT64, DISTRIBUTION.
+/// Maximum of default 500 metric descriptors per service is allowed.
+/// Maximum of default 10 labels per metric descriptor is allowed.The default maximum limit can be overridden. Please follow https://cloud.google.com/monitoring/quotas
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -828,7 +831,10 @@ pub struct MetricDescriptor {
     /// Whether the measurement is an integer, a floating-point number, etc. Some combinations of metric_kind and value_type might not be supported.
     #[serde(rename="valueType")]
     pub value_type: Option<String>,
-    /// The set of labels that can be used to describe a specific instance of this metric type. For example, the appengine.googleapis.com/http/server/response_latencies metric type has a label for the HTTP response code, response_code, so you can look at latencies for successful responses or just for responses that failed.
+    /// The set of labels that can be used to describe a specific instance of this metric type.The label key name must follow:
+    /// Only upper and lower-case letters, digits and underscores (_) are  allowed.
+    /// Label name must start with a letter or digit.
+    /// The maximum length of a label name is 100 characters.For example, the appengine.googleapis.com/http/server/response_latencies metric type has a label for the HTTP response code, response_code, so you can look at latencies for successful responses or just for responses that failed.
     pub labels: Option<Vec<LabelDescriptor>>,
     /// Optional. The launch stage of the metric definition.
     #[serde(rename="launchStage")]
@@ -838,7 +844,9 @@ pub struct MetricDescriptor {
     pub monitored_resource_types: Option<Vec<String>>,
     /// Optional. Metadata which can be used to guide usage of the metric.
     pub metadata: Option<MetricDescriptorMetadata>,
-    /// The metric type, including its DNS name prefix. The type is not URL-encoded. All user-defined metric types have the DNS name custom.googleapis.com or external.googleapis.com. Metric types should use a natural hierarchical grouping. For example:
+    /// The metric type, including its DNS name prefix. The type is not URL-encoded.All service defined metrics must be prefixed with the service name, in the format of {service name}/{relative metric name}, such as cloudsql.googleapis.com/database/cpu/utilization. The relative metric name must follow:
+    /// Only upper and lower-case letters, digits, '/' and underscores '_' are  allowed.
+    /// The maximum number of characters allowed for the relative_metric_name is  100.All user-defined metric types have the DNS name custom.googleapis.com, external.googleapis.com, or logging.googleapis.com/user/.Metric types should use a natural hierarchical grouping. For example:
     /// "custom.googleapis.com/invoice/paid/amount"
     /// "external.googleapis.com/prometheus/up"
     /// "appengine.googleapis.com/http/server/response_latencies"
@@ -851,7 +859,8 @@ pub struct MetricDescriptor {
     /// s second
     /// min minute
     /// h hour
-    /// d dayPrefixes (PREFIX)
+    /// d day
+    /// 1 dimensionlessPrefixes (PREFIX)
     /// k kilo (10^3)
     /// M mega (10^6)
     /// G giga (10^9)
@@ -932,7 +941,7 @@ pub struct WriteLogEntriesRequest {
     /// Optional. If true, the request should expect normal response, but the entries won't be persisted nor exported. Useful for checking whether the logging API endpoints are working properly before sending valuable data.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
-    /// Required. The log entries to send to Logging. The order of log entries in this list does not matter. Values supplied in this method's log_name, resource, and labels fields are copied into those log entries in this list that do not include values for their corresponding fields. For more information, see the LogEntry type.If the timestamp or insert_id fields are missing in log entries, then this method supplies the current time or a unique identifier, respectively. The supplied values are chosen so that, among the log entries that did not supply their own values, the entries earlier in the list will sort before the entries later in the list. See the entries.list method.Log entries with timestamps that are more than the logs retention period in the past or more than 24 hours in the future will not be available when calling entries.list. However, those log entries can still be exported with LogSinks.To improve throughput and to avoid exceeding the quota limit for calls to entries.write, you should try to include several log entries in this list, rather than calling this method for each individual log entry.
+    /// Required. The log entries to send to Logging. The order of log entries in this list does not matter. Values supplied in this method's log_name, resource, and labels fields are copied into those log entries in this list that do not include values for their corresponding fields. For more information, see the LogEntry type.If the timestamp or insert_id fields are missing in log entries, then this method supplies the current time or a unique identifier, respectively. The supplied values are chosen so that, among the log entries that did not supply their own values, the entries earlier in the list will sort before the entries later in the list. See the entries.list method.Log entries with timestamps that are more than the logs retention period (https://cloud.google.com/logging/quota-policy) in the past or more than 24 hours in the future will not be available when calling entries.list. However, those log entries can still be exported with LogSinks (https://cloud.google.com/logging/docs/api/tasks/exporting-logs).To improve throughput and to avoid exceeding the quota limit (https://cloud.google.com/logging/quota-policy) for calls to entries.write, you should try to include several log entries in this list, rather than calling this method for each individual log entry.
     pub entries: Option<Vec<LogEntry>>,
     /// Optional. A default log resource name that is assigned to all log entries in entries that do not specify a value for log_name:
     /// "projects/[PROJECT_ID]/logs/[LOG_ID]"
@@ -955,7 +964,7 @@ pub struct WriteLogEntriesRequest {
 impl RequestValue for WriteLogEntriesRequest {}
 
 
-/// Describes the customer-managed encryption key (CMEK) settings associated with a project, folder, organization, billing account, or flexible resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+/// Describes the customer-managed encryption key (CMEK) settings associated with a project, folder, organization, billing account, or flexible resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
 /// 
 /// # Activities
 /// 
@@ -969,12 +978,12 @@ impl RequestValue for WriteLogEntriesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CmekSettings {
-    /// Output only. The service account that will be used by the Logs Router to access your Cloud KMS key.Before enabling CMEK for Logs Router, you must first assign the role roles/cloudkms.cryptoKeyEncrypterDecrypter to the service account that the Logs Router will use to access your Cloud KMS key. Use GetCmekSettings to obtain the service account ID.See Enabling CMEK for Logs Router for more information.
+    /// Output only. The service account that will be used by the Logs Router to access your Cloud KMS key.Before enabling CMEK for Logs Router, you must first assign the role roles/cloudkms.cryptoKeyEncrypterDecrypter to the service account that the Logs Router will use to access your Cloud KMS key. Use GetCmekSettings to obtain the service account ID.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
     #[serde(rename="serviceAccountId")]
     pub service_account_id: Option<String>,
     /// Output only. The resource name of the CMEK settings.
     pub name: Option<String>,
-    /// The resource name for the configured Cloud KMS key.KMS key name format:  "projects/PROJECT_ID/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY"For example:  "projects/my-project-id/locations/my-region/keyRings/key-ring-name/cryptoKeys/key-name"To enable CMEK for the Logs Router, set this field to a valid kms_key_name for which the associated service account has the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key.The Cloud KMS key used by the Log Router can be updated by changing the kms_key_name to a new valid key name. Encryption operations that are in progress will be completed with the key that was in use when they started. Decryption operations will be completed using the key that was used at the time of encryption unless access to that key has been revoked.To disable CMEK for the Logs Router, set this field to an empty string.See Enabling CMEK for Logs Router for more information.
+    /// The resource name for the configured Cloud KMS key.KMS key name format:  "projects/PROJECT_ID/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY"For example:  "projects/my-project-id/locations/my-region/keyRings/key-ring-name/cryptoKeys/key-name"To enable CMEK for the Logs Router, set this field to a valid kms_key_name for which the associated service account has the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key.The Cloud KMS key used by the Log Router can be updated by changing the kms_key_name to a new valid key name. Encryption operations that are in progress will be completed with the key that was in use when they started. Decryption operations will be completed using the key that was used at the time of encryption unless access to that key has been revoked.To disable CMEK for the Logs Router, set this field to an empty string.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
     #[serde(rename="kmsKeyName")]
     pub kms_key_name: Option<String>,
 }
@@ -994,7 +1003,7 @@ pub struct LogEntry {
     pub http_request: Option<HttpRequest>,
     /// Optional. Resource name of the trace associated with the log entry, if any. If it contains a relative resource name, the name is assumed to be relative to //tracing.googleapis.com. Example: projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824
     pub trace: Option<String>,
-    /// Optional. The time the event described by the log entry occurred. This time is used to compute the log entry's age and to enforce the logs retention period. If this field is omitted in a new log entry, then Logging assigns it the current time. Timestamps have nanosecond accuracy, but trailing zeros in the fractional seconds might be omitted when the timestamp is displayed.Incoming log entries must have timestamps that don't exceed the logs retention period in the past, and that don't exceed 24 hours in the future. Log entries outside those time boundaries aren't ingested by Logging.
+    /// Optional. The time the event described by the log entry occurred. This time is used to compute the log entry's age and to enforce the logs retention period. If this field is omitted in a new log entry, then Logging assigns it the current time. Timestamps have nanosecond accuracy, but trailing zeros in the fractional seconds might be omitted when the timestamp is displayed.Incoming log entries must have timestamps that don't exceed the logs retention period (https://cloud.google.com/logging/quotas#logs_retention_periods) in the past, and that don't exceed 24 hours in the future. Log entries outside those time boundaries aren't ingested by Logging.
     pub timestamp: Option<String>,
     /// Optional. A set of user-defined (key, value) data that provides additional information about the log entry.
     pub labels: Option<HashMap<String, String>>,
@@ -1036,7 +1045,7 @@ pub struct LogEntry {
     /// Optional. The sampling decision of the trace associated with the log entry.True means that the trace resource name in the trace field was sampled for storage in a trace backend. False means that the trace was not sampled for storage when this log entry was written, or the sampling decision was unknown at the time. A non-sampled trace value is still useful as a request correlation identifier. The default is False.
     #[serde(rename="traceSampled")]
     pub trace_sampled: Option<bool>,
-    /// Output only. Deprecated. Additional metadata about the monitored resource.Only k8s_container, k8s_pod, and k8s_node MonitoredResources have this field populated for GKE versions older than 1.12.6. For GKE versions 1.12.6 and above, the metadata field has been deprecated. The Kubernetes pod labels that used to be in metadata.userLabels will now be present in the labels field with a key prefix of k8s-pod/. The Stackdriver system labels that were present in the metadata.systemLabels field will no longer be available in the LogEntry.
+    /// Output only. Deprecated. Additional metadata about the monitored resource.Only k8s_container, k8s_pod, and k8s_node MonitoredResources have this field populated for GKE versions older than 1.12.6. For GKE versions 1.12.6 and above, the metadata field has been deprecated. The Kubernetes pod labels that used to be in metadata.userLabels will now be present in the labels field with a key prefix of k8s-pod/. The system labels that were present in the metadata.systemLabels field will no longer be available in the LogEntry.
     pub metadata: Option<MonitoredResourceMetadata>,
 }
 
@@ -1070,7 +1079,7 @@ pub struct LogMetric {
     /// Optional. A map from a label key string to an extractor expression which is used to extract data from a log entry field and assign as the label value. Each label key specified in the LabelDescriptor must have an associated extractor expression in this map. The syntax of the extractor expression is the same as for the value_extractor field.The extracted value is converted to the type defined in the label descriptor. If the either the extraction or the type conversion fails, the label will have a default value. The default value for a string label is an empty string, for an integer label its 0, and for a boolean label its false.Note that there are upper bounds on the maximum number of labels and the number of active time series that are allowed in a project.
     #[serde(rename="labelExtractors")]
     pub label_extractors: Option<HashMap<String, String>>,
-    /// Required. An advanced logs filter which is used to match log entries. Example:
+    /// Required. An advanced logs filter (https://cloud.google.com/logging/docs/view/advanced_filters) which is used to match log entries. Example:
     /// "resource.type=gae_app AND severity>=ERROR"
     /// The maximum length of the filter is 20000 characters.
     pub filter: Option<String>,
@@ -1199,7 +1208,7 @@ impl Part for Exponential {}
 pub struct LogExclusion {
     /// Optional. If set to True, then this exclusion is disabled and it does not exclude any log entries. You can update an exclusion to change the value of this field.
     pub disabled: Option<bool>,
-    /// Required. An advanced logs filter that matches the log entries to be excluded. By using the sample function, you can exclude less than 100% of the matching log entries. For example, the following query matches 99% of low-severity log entries from Google Cloud Storage buckets:"resource.type=gcs_bucket severity<ERROR sample(insertId, 0.99)"
+    /// Required. An advanced logs filter (https://cloud.google.com/logging/docs/view/advanced-queries) that matches the log entries to be excluded. By using the sample function (https://cloud.google.com/logging/docs/view/advanced-queries#sample), you can exclude less than 100% of the matching log entries. For example, the following query matches 99% of low-severity log entries from Google Cloud Storage buckets:"resource.type=gcs_bucket severity<ERROR sample(insertId, 0.99)"
     pub filter: Option<String>,
     /// Output only. The last update timestamp of the exclusion.This field may not be present for older exclusions.
     #[serde(rename="updateTime")]
@@ -1289,7 +1298,7 @@ pub struct ListLogEntriesRequest {
     /// Projects listed in the project_ids field are added to this list.
     #[serde(rename="resourceNames")]
     pub resource_names: Option<Vec<String>>,
-    /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of next_page_token in the response indicates that more results might be available.
+    /// Optional. The maximum number of results to return from this request. Default is 50. If the value is negative or exceeds 1000, the request is rejected. The presence of next_page_token in the response indicates that more results might be available.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. page_token must be the value of next_page_token from the previous response. The values of other method parameters should be identical to those in the previous call.
@@ -1298,7 +1307,7 @@ pub struct ListLogEntriesRequest {
     /// Optional. Deprecated. Use resource_names instead. One or more project identifiers or project numbers from which to retrieve log entries. Example: "my-project-1A".
     #[serde(rename="projectIds")]
     pub project_ids: Option<Vec<String>>,
-    /// Optional. A filter that chooses which log entries to return. See Advanced Logs Queries. Only log entries that match the filter are returned. An empty filter matches all log entries in the resources listed in resource_names. Referencing a parent resource that is not listed in resource_names will cause the filter to return no results. The maximum length of the filter is 20000 characters.
+    /// Optional. A filter that chooses which log entries to return. See Advanced Logs Queries (https://cloud.google.com/logging/docs/view/advanced-queries). Only log entries that match the filter are returned. An empty filter matches all log entries in the resources listed in resource_names. Referencing a parent resource that is not listed in resource_names will cause the filter to return no results. The maximum length of the filter is 20000 characters.
     pub filter: Option<String>,
 }
 
@@ -1311,7 +1320,7 @@ impl RequestValue for ListLogEntriesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BigQueryOptions {
-    /// Optional. Whether to use BigQuery's partition tables. By default, Logging creates dated tables based on the log entries' timestamps, e.g. syslog_20170523. With partitioned tables the date suffix is no longer present and special query syntax has to be used instead. In both cases, tables are sharded based on UTC timezone.
+    /// Optional. Whether to use BigQuery's partition tables (https://cloud.google.com/bigquery/docs/partitioned-tables). By default, Logging creates dated tables based on the log entries' timestamps, e.g. syslog_20170523. With partitioned tables the date suffix is no longer present and special query syntax (https://cloud.google.com/bigquery/docs/querying-partitioned-tables) has to be used instead. In both cases, tables are sharded based on UTC timezone.
     #[serde(rename="usePartitionedTables")]
     pub use_partitioned_tables: Option<bool>,
     /// Output only. True if new timestamp column based partitioning is in use, false if legacy ingestion-time partitioning is in use. All new sinks will have this field set true and will use timestamp column based partitioning. If use_partitioned_tables is false, this value has no meaning and will be false. Legacy sinks using partitioned tables will have this field set to false.
@@ -1347,7 +1356,12 @@ pub struct ListSinksResponse {
 impl ResponseResult for ListSinksResponse {}
 
 
-/// An object that describes the schema of a MonitoredResource object using a type name and a set of labels. For example, the monitored resource descriptor for Google Compute Engine VM instances has a type of "gce_instance" and specifies the use of the labels "instance_id" and "zone" to identify particular VM instances.Different APIs can support different monitored resource types. APIs generally provide a list method that returns the monitored resource descriptors used by the API.
+/// An object that describes the schema of a MonitoredResource object using a type name and a set of labels. For example, the monitored resource descriptor for Google Compute Engine VM instances has a type of "gce_instance" and specifies the use of the labels "instance_id" and "zone" to identify particular VM instances.Different services can support different monitored resource types.The following are specific rules to service defined monitored resources for Monitoring and Logging:
+/// The type, display_name, description, labels and launch_stage  fields are all required.
+/// The first label of the monitored resource descriptor must be  resource_container. There are legacy monitored resource descritptors  start with project_id.
+/// It must include a location label.
+/// Maximum of default 5 service defined monitored resource descriptors  is allowed per service.
+/// Maximum of default 10 labels per monitored resource is allowed.The default maximum limit can be overridden. Please follow https://cloud.google.com/monitoring/quotas
 /// 
 /// # Activities
 /// 
@@ -1363,9 +1377,15 @@ pub struct MonitoredResourceDescriptor {
     pub display_name: Option<String>,
     /// Optional. A detailed description of the monitored resource type that might be used in documentation.
     pub description: Option<String>,
-    /// Required. A set of labels used to describe instances of this monitored resource type. For example, an individual Google Cloud SQL database is identified by values for the labels "database_id" and "zone".
+    /// Required. A set of labels used to describe instances of this monitored resource type. The label key name must follow:
+    /// Only upper and lower-case letters, digits and underscores (_) are  allowed.
+    /// Label name must start with a letter or digit.
+    /// The maximum length of a label name is 100 characters.For example, an individual Google Cloud SQL database is identified by values for the labels database_id and location.
     pub labels: Option<Vec<LabelDescriptor>>,
-    /// Required. The monitored resource type. For example, the type "cloudsql_database" represents databases in Google Cloud SQL. The maximum length of this value is 256 characters.
+    /// Required. The monitored resource type. For example, the type cloudsql_database represents databases in Google Cloud SQL.All service defined monitored resource types must be prefixed with the service name, in the format of {service name}/{relative resource name}. The relative resource name must follow:
+    /// Only upper and lower-case letters and digits are allowed.
+    /// It must start with upper case character and is recommended to use Upper  Camel Case style.
+    /// The maximum number of characters allowed for the relative_resource_name  is 100.Note there are legacy service monitored resources not following this rule.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Optional. The launch stage of the monitored resource definition.
@@ -1930,7 +1950,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information.
+    /// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
     /// 
     /// # Arguments
     ///
@@ -2189,7 +2209,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+    /// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
     /// 
     /// # Arguments
     ///
@@ -2787,7 +2807,7 @@ impl<'a, C, A> EntryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists log entries. Use this method to retrieve log entries that originated from a project/folder/organization/billing account. For ways to export log entries, see Exporting Logs.
+    /// Lists log entries. Use this method to retrieve log entries that originated from a project/folder/organization/billing account. For ways to export log entries, see Exporting Logs (https://cloud.google.com/logging/docs/export).
     /// 
     /// # Arguments
     ///
@@ -3948,7 +3968,7 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+    /// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
     /// 
     /// # Arguments
     ///
@@ -3970,7 +3990,7 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information.
+    /// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
     /// 
     /// # Arguments
     ///
@@ -9060,7 +9080,7 @@ impl<'a, C, A> OrganizationLogListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information.
+/// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
 ///
 /// A builder for the *updateCmekSettings* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -12141,7 +12161,7 @@ impl<'a, C, A> OrganizationLocationBucketPatchCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+/// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
 ///
 /// A builder for the *getCmekSettings* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -16890,7 +16910,7 @@ impl<'a, C, A> EntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Lists log entries. Use this method to retrieve log entries that originated from a project/folder/organization/billing account. For ways to export log entries, see Exporting Logs.
+/// Lists log entries. Use this method to retrieve log entries that originated from a project/folder/organization/billing account. For ways to export log entries, see Exporting Logs (https://cloud.google.com/logging/docs/export).
 ///
 /// A builder for the *list* method supported by a *entry* resource.
 /// It is not used directly, but through a `EntryMethods` instance.
@@ -28929,7 +28949,7 @@ impl<'a, C, A> ProjectExclusionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information.
+/// Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
 ///
 /// A builder for the *getCmekSettings* method.
 /// It is not used directly, but through a `MethodMethods` instance.
@@ -29188,7 +29208,7 @@ impl<'a, C, A> MethodGetCmekSettingCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information.
+/// Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information.
 ///
 /// A builder for the *updateCmekSettings* method.
 /// It is not used directly, but through a `MethodMethods` instance.

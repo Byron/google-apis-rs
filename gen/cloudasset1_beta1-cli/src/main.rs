@@ -742,7 +742,10 @@ fn main() {
                     Some(r##"Exports assets with time and resource types to a given Cloud Storage
         location. The output format is newline-delimited JSON.
         This API implements the google.longrunning.Operation API allowing you
-        to keep track of the export."##),
+        to keep track of the export. We recommend intervals of at least 2 seconds
+        with exponential retry to poll the export operation result. For
+        regular-size resource parent, the export operation usually finishes within
+        5 minutes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/folders_export-assets",
                   vec![
                     (Some(r##"parent"##),
@@ -801,10 +804,10 @@ fn main() {
         ("organizations", "methods: 'batch-get-assets-history', 'export-assets' and 'operations-get'", vec![
             ("batch-get-assets-history",
                     Some(r##"Batch gets the update history of assets that overlap a time window.
-        For RESOURCE content, this API outputs history with asset in both
-        non-delete or deleted status.
         For IAM_POLICY content, this API outputs history when the asset and its
         attached IAM POLICY both exist. This can create gaps in the output history.
+        Otherwise, this API outputs history with asset in both non-delete or
+        deleted status.
         If a specified asset does not exist, this API returns an INVALID_ARGUMENT
         error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/organizations_batch-get-assets-history",
@@ -833,7 +836,10 @@ fn main() {
                     Some(r##"Exports assets with time and resource types to a given Cloud Storage
         location. The output format is newline-delimited JSON.
         This API implements the google.longrunning.Operation API allowing you
-        to keep track of the export."##),
+        to keep track of the export. We recommend intervals of at least 2 seconds
+        with exponential retry to poll the export operation result. For
+        regular-size resource parent, the export operation usually finishes within
+        5 minutes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/organizations_export-assets",
                   vec![
                     (Some(r##"parent"##),
@@ -892,10 +898,10 @@ fn main() {
         ("projects", "methods: 'batch-get-assets-history', 'export-assets' and 'operations-get'", vec![
             ("batch-get-assets-history",
                     Some(r##"Batch gets the update history of assets that overlap a time window.
-        For RESOURCE content, this API outputs history with asset in both
-        non-delete or deleted status.
         For IAM_POLICY content, this API outputs history when the asset and its
         attached IAM POLICY both exist. This can create gaps in the output history.
+        Otherwise, this API outputs history with asset in both non-delete or
+        deleted status.
         If a specified asset does not exist, this API returns an INVALID_ARGUMENT
         error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/projects_batch-get-assets-history",
@@ -924,7 +930,10 @@ fn main() {
                     Some(r##"Exports assets with time and resource types to a given Cloud Storage
         location. The output format is newline-delimited JSON.
         This API implements the google.longrunning.Operation API allowing you
-        to keep track of the export."##),
+        to keep track of the export. We recommend intervals of at least 2 seconds
+        with exponential retry to poll the export operation result. For
+        regular-size resource parent, the export operation usually finishes within
+        5 minutes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli/projects_export-assets",
                   vec![
                     (Some(r##"parent"##),
@@ -984,7 +993,7 @@ fn main() {
     
     let mut app = App::new("cloudasset1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200403")
+           .version("1.0.14+20200613")
            .about("The cloud asset API manages the history and inventory of cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudasset1_beta1_cli")
            .arg(Arg::with_name("url")

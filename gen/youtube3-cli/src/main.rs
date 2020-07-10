@@ -46,7 +46,7 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
-    fn _activities_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _abuse_reports_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,91 +69,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.group-id" => Some(("snippet.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.comment.resource-id.kind" => Some(("contentDetails.comment.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.comment.resource-id.channel-id" => Some(("contentDetails.comment.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.comment.resource-id.playlist-id" => Some(("contentDetails.comment.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.comment.resource-id.video-id" => Some(("contentDetails.comment.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.playlist-item.resource-id.kind" => Some(("contentDetails.playlistItem.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.playlist-item.resource-id.channel-id" => Some(("contentDetails.playlistItem.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.playlist-item.resource-id.playlist-id" => Some(("contentDetails.playlistItem.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.playlist-item.resource-id.video-id" => Some(("contentDetails.playlistItem.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.playlist-item.playlist-id" => Some(("contentDetails.playlistItem.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.playlist-item.playlist-item-id" => Some(("contentDetails.playlistItem.playlistItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.like.resource-id.kind" => Some(("contentDetails.like.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.like.resource-id.channel-id" => Some(("contentDetails.like.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.like.resource-id.playlist-id" => Some(("contentDetails.like.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.like.resource-id.video-id" => Some(("contentDetails.like.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.cta-type" => Some(("contentDetails.promotedItem.ctaType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.ad-tag" => Some(("contentDetails.promotedItem.adTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.destination-url" => Some(("contentDetails.promotedItem.destinationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.forecasting-url" => Some(("contentDetails.promotedItem.forecastingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "content-details.promoted-item.impression-url" => Some(("contentDetails.promotedItem.impressionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "content-details.promoted-item.creative-view-url" => Some(("contentDetails.promotedItem.creativeViewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.video-id" => Some(("contentDetails.promotedItem.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.description-text" => Some(("contentDetails.promotedItem.descriptionText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.custom-cta-button-text" => Some(("contentDetails.promotedItem.customCtaButtonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.promoted-item.click-tracking-url" => Some(("contentDetails.promotedItem.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.resource-id.kind" => Some(("contentDetails.social.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.resource-id.channel-id" => Some(("contentDetails.social.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.resource-id.playlist-id" => Some(("contentDetails.social.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.resource-id.video-id" => Some(("contentDetails.social.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.image-url" => Some(("contentDetails.social.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.type" => Some(("contentDetails.social.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.reference-url" => Some(("contentDetails.social.referenceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.social.author" => Some(("contentDetails.social.author", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.favorite.resource-id.kind" => Some(("contentDetails.favorite.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.favorite.resource-id.channel-id" => Some(("contentDetails.favorite.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.favorite.resource-id.playlist-id" => Some(("contentDetails.favorite.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.favorite.resource-id.video-id" => Some(("contentDetails.favorite.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.upload.video-id" => Some(("contentDetails.upload.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.resource-id.kind" => Some(("contentDetails.recommendation.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.resource-id.channel-id" => Some(("contentDetails.recommendation.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.resource-id.playlist-id" => Some(("contentDetails.recommendation.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.resource-id.video-id" => Some(("contentDetails.recommendation.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.reason" => Some(("contentDetails.recommendation.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.seed-resource-id.kind" => Some(("contentDetails.recommendation.seedResourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.seed-resource-id.channel-id" => Some(("contentDetails.recommendation.seedResourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.seed-resource-id.playlist-id" => Some(("contentDetails.recommendation.seedResourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.recommendation.seed-resource-id.video-id" => Some(("contentDetails.recommendation.seedResourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.subscription.resource-id.kind" => Some(("contentDetails.subscription.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.subscription.resource-id.channel-id" => Some(("contentDetails.subscription.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.subscription.resource-id.playlist-id" => Some(("contentDetails.subscription.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.subscription.resource-id.video-id" => Some(("contentDetails.subscription.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.bulletin.resource-id.kind" => Some(("contentDetails.bulletin.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.bulletin.resource-id.channel-id" => Some(("contentDetails.bulletin.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.bulletin.resource-id.playlist-id" => Some(("contentDetails.bulletin.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.bulletin.resource-id.video-id" => Some(("contentDetails.bulletin.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.channel-item.resource-id.kind" => Some(("contentDetails.channelItem.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.channel-item.resource-id.channel-id" => Some(("contentDetails.channelItem.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.channel-item.resource-id.playlist-id" => Some(("contentDetails.channelItem.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.channel-item.resource-id.video-id" => Some(("contentDetails.channelItem.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subject.url" => Some(("subject.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subject.type-id" => Some(("subject.typeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subject.id" => Some(("subject.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-tag", "author", "bulletin", "channel-id", "channel-item", "channel-title", "click-tracking-url", "comment", "content-details", "creative-view-url", "cta-type", "custom-cta-button-text", "default", "description", "description-text", "destination-url", "etag", "favorite", "forecasting-url", "group-id", "height", "high", "id", "image-url", "impression-url", "kind", "like", "maxres", "medium", "playlist-id", "playlist-item", "playlist-item-id", "promoted-item", "published-at", "reason", "recommendation", "reference-url", "resource-id", "seed-resource-id", "snippet", "social", "standard", "subscription", "thumbnails", "title", "type", "upload", "url", "video-id", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "id", "subject", "type-id", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -162,8 +83,8 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::Activity = json::value::from_value(object).unwrap();
-        let mut call = self.hub.activities().insert(request);
+        let mut request: api::AbuseReport = json::value::from_value(object).unwrap();
+        let mut call = self.hub.abuse_reports().insert(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -215,7 +136,7 @@ impl<'n> Engine<'n> {
 
     fn _activities_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.activities().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.activities().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -494,7 +415,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -510,7 +431,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -527,7 +447,7 @@ impl<'n> Engine<'n> {
 
     fn _captions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.captions().list(opt.value_of("part").unwrap_or(""), opt.value_of("video-id").unwrap_or(""));
+        let mut call = self.hub.captions().list(opt.value_of("video-id").unwrap_or(""), &opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -538,7 +458,7 @@ impl<'n> Engine<'n> {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -670,7 +590,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -686,7 +606,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -742,6 +661,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "on-behalf-of-content-owner-channel" => {
+                    call = call.on_behalf_of_content_owner_channel(value.unwrap_or(""));
+                },
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
@@ -761,14 +683,14 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "channel-id"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "channel-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -784,7 +706,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -955,7 +876,7 @@ impl<'n> Engine<'n> {
 
     fn _channel_sections_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.channel_sections().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.channel_sections().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -966,7 +887,7 @@ impl<'n> Engine<'n> {
                     call = call.mine(arg_from_str(value.unwrap_or("false"), err, "mine", "boolean"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -1126,7 +1047,7 @@ impl<'n> Engine<'n> {
 
     fn _channels_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.channels().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.channels().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1149,7 +1070,7 @@ impl<'n> Engine<'n> {
                     call = call.managed_by_me(arg_from_str(value.unwrap_or("false"), err, "managed-by-me", "boolean"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -1428,6 +1349,7 @@ impl<'n> Engine<'n> {
                     "snippet.top-level-comment.snippet.moderation-status" => Some(("snippet.topLevelComment.snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.video-id" => Some(("snippet.topLevelComment.snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.text-original" => Some(("snippet.topLevelComment.snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-channel-id.value" => Some(("snippet.topLevelComment.snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.published-at" => Some(("snippet.topLevelComment.snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.parent-id" => Some(("snippet.topLevelComment.snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.can-rate" => Some(("snippet.topLevelComment.snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1442,7 +1364,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1504,7 +1426,7 @@ impl<'n> Engine<'n> {
 
     fn _comment_threads_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.comment_threads().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.comment_threads().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1530,7 +1452,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
@@ -1620,6 +1542,7 @@ impl<'n> Engine<'n> {
                     "snippet.top-level-comment.snippet.moderation-status" => Some(("snippet.topLevelComment.snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.video-id" => Some(("snippet.topLevelComment.snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.text-original" => Some(("snippet.topLevelComment.snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-channel-id.value" => Some(("snippet.topLevelComment.snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.published-at" => Some(("snippet.topLevelComment.snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.parent-id" => Some(("snippet.topLevelComment.snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.top-level-comment.snippet.can-rate" => Some(("snippet.topLevelComment.snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1634,7 +1557,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1768,6 +1691,7 @@ impl<'n> Engine<'n> {
                     "snippet.moderation-status" => Some(("snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.text-original" => Some(("snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-channel-id.value" => Some(("snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.parent-id" => Some(("snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.can-rate" => Some(("snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1779,7 +1703,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1841,7 +1765,7 @@ impl<'n> Engine<'n> {
 
     fn _comments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.comments().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.comments().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1858,7 +1782,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1909,7 +1833,7 @@ impl<'n> Engine<'n> {
 
     fn _comments_mark_as_spam(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.comments().mark_as_spam(opt.value_of("id").unwrap_or(""));
+        let mut call = self.hub.comments().mark_as_spam(&opt.values_of("id").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1953,7 +1877,7 @@ impl<'n> Engine<'n> {
 
     fn _comments_set_moderation_status(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.comments().set_moderation_status(opt.value_of("id").unwrap_or(""), opt.value_of("moderation-status").unwrap_or(""));
+        let mut call = self.hub.comments().set_moderation_status(&opt.values_of("id").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>(), opt.value_of("moderation-status").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2029,6 +1953,7 @@ impl<'n> Engine<'n> {
                     "snippet.moderation-status" => Some(("snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.text-original" => Some(("snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-channel-id.value" => Some(("snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.parent-id" => Some(("snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.can-rate" => Some(("snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2040,7 +1965,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "video-id", "viewer-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2102,7 +2027,7 @@ impl<'n> Engine<'n> {
 
     fn _guide_categories_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.guide_categories().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.guide_categories().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2110,7 +2035,7 @@ impl<'n> Engine<'n> {
                     call = call.region_code(value.unwrap_or(""));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -2164,7 +2089,7 @@ impl<'n> Engine<'n> {
 
     fn _i18n_languages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.i18n_languages().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.i18n_languages().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2220,7 +2145,7 @@ impl<'n> Engine<'n> {
 
     fn _i18n_regions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.i18n_regions().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.i18n_regions().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2276,7 +2201,7 @@ impl<'n> Engine<'n> {
 
     fn _live_broadcasts_bind(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_broadcasts().bind(opt.value_of("id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_broadcasts().bind(opt.value_of("id").unwrap_or(""), &opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2338,7 +2263,7 @@ impl<'n> Engine<'n> {
 
     fn _live_broadcasts_control(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_broadcasts().control(opt.value_of("id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_broadcasts().control(opt.value_of("id").unwrap_or(""), &opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2485,20 +2410,18 @@ impl<'n> Engine<'n> {
                     "status.made-for-kids" => Some(("status.madeForKids", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-type" => Some(("contentDetails.closedCaptionsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.projection" => Some(("contentDetails.projection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-auto-start" => Some(("contentDetails.enableAutoStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.mesh" => Some(("contentDetails.mesh", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.latency-preference" => Some(("contentDetails.latencyPreference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-auto-stop" => Some(("contentDetails.enableAutoStop", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.mesh" => Some(("contentDetails.mesh", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-low-latency" => Some(("contentDetails.enableLowLatency", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.stereo-layout" => Some(("contentDetails.stereoLayout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-last-update-time-ms" => Some(("contentDetails.boundStreamLastUpdateTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2515,7 +2438,6 @@ impl<'n> Engine<'n> {
                     "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.broadcast-type" => Some(("snippet.broadcastType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.is-default-broadcast" => Some(("snippet.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2535,7 +2457,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "broadcast-type", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "stereo-layout", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2604,7 +2526,7 @@ impl<'n> Engine<'n> {
 
     fn _live_broadcasts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_broadcasts().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_broadcasts().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2624,7 +2546,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "broadcast-type" => {
                     call = call.broadcast_type(value.unwrap_or(""));
@@ -2681,7 +2603,7 @@ impl<'n> Engine<'n> {
 
     fn _live_broadcasts_transition(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_broadcasts().transition(opt.value_of("broadcast-status").unwrap_or(""), opt.value_of("id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_broadcasts().transition(opt.value_of("id").unwrap_or(""), opt.value_of("broadcast-status").unwrap_or(""), &opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2768,20 +2690,18 @@ impl<'n> Engine<'n> {
                     "status.made-for-kids" => Some(("status.madeForKids", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-type" => Some(("contentDetails.closedCaptionsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.projection" => Some(("contentDetails.projection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-auto-start" => Some(("contentDetails.enableAutoStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.mesh" => Some(("contentDetails.mesh", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.latency-preference" => Some(("contentDetails.latencyPreference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-auto-stop" => Some(("contentDetails.enableAutoStop", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.mesh" => Some(("contentDetails.mesh", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-low-latency" => Some(("contentDetails.enableLowLatency", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "content-details.stereo-layout" => Some(("contentDetails.stereoLayout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-last-update-time-ms" => Some(("contentDetails.boundStreamLastUpdateTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2798,7 +2718,6 @@ impl<'n> Engine<'n> {
                     "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.broadcast-type" => Some(("snippet.broadcastType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.is-default-broadcast" => Some(("snippet.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2818,7 +2737,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "broadcast-type", "channel-id", "closed-captions-type", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "stereo-layout", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "bound-stream-last-update-time-ms", "broadcast-stream-delay-ms", "channel-id", "closed-captions-type", "content-details", "default", "description", "embed-html", "enable-auto-start", "enable-auto-stop", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "latency-preference", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "made-for-kids", "maxres", "medium", "mesh", "monitor-stream", "privacy-status", "projection", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "self-declared-made-for-kids", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3118,16 +3037,9 @@ impl<'n> Engine<'n> {
                     "snippet.user-banned-details.ban-type" => Some(("snippet.userBannedDetails.banType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.live-chat-id" => Some(("snippet.liveChatId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.author-channel-id" => Some(("snippet.authorChannelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-edited-details.prompt" => Some(("snippet.pollEditedDetails.prompt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-edited-details.id" => Some(("snippet.pollEditedDetails.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.text-message-details.message-text" => Some(("snippet.textMessageDetails.messageText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.message-deleted-details.deleted-message-id" => Some(("snippet.messageDeletedDetails.deletedMessageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-voted-details.item-id" => Some(("snippet.pollVotedDetails.itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-voted-details.poll-id" => Some(("snippet.pollVotedDetails.pollId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-opened-details.prompt" => Some(("snippet.pollOpenedDetails.prompt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-opened-details.id" => Some(("snippet.pollOpenedDetails.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet.poll-closed-details.poll-id" => Some(("snippet.pollClosedDetails.pollId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "author-details.display-name" => Some(("authorDetails.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3140,7 +3052,7 @@ impl<'n> Engine<'n> {
                     "author-details.channel-url" => Some(("authorDetails.channelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alt-text", "alt-text-language", "amount-display-string", "amount-micros", "author-channel-id", "author-details", "ban-duration-seconds", "ban-type", "banned-user-details", "channel-id", "channel-url", "currency", "deleted-message-id", "display-message", "display-name", "etag", "fan-funding-event-details", "has-display-content", "id", "is-chat-moderator", "is-chat-owner", "is-chat-sponsor", "is-verified", "item-id", "kind", "live-chat-id", "message-deleted-details", "message-retracted-details", "message-text", "poll-closed-details", "poll-edited-details", "poll-id", "poll-opened-details", "poll-voted-details", "profile-image-url", "prompt", "published-at", "retracted-message-id", "snippet", "sticker-id", "super-chat-details", "super-sticker-details", "super-sticker-metadata", "text-message-details", "tier", "type", "user-banned-details", "user-comment"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alt-text", "alt-text-language", "amount-display-string", "amount-micros", "author-channel-id", "author-details", "ban-duration-seconds", "ban-type", "banned-user-details", "channel-id", "channel-url", "currency", "deleted-message-id", "display-message", "display-name", "etag", "fan-funding-event-details", "has-display-content", "id", "is-chat-moderator", "is-chat-owner", "is-chat-sponsor", "is-verified", "kind", "live-chat-id", "message-deleted-details", "message-retracted-details", "message-text", "profile-image-url", "published-at", "retracted-message-id", "snippet", "sticker-id", "super-chat-details", "super-sticker-details", "super-sticker-metadata", "text-message-details", "tier", "type", "user-banned-details", "user-comment"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3202,7 +3114,7 @@ impl<'n> Engine<'n> {
 
     fn _live_chat_messages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_chat_messages().list(opt.value_of("live-chat-id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_chat_messages().list(opt.value_of("live-chat-id").unwrap_or(""), &opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3403,7 +3315,7 @@ impl<'n> Engine<'n> {
 
     fn _live_chat_moderators_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_chat_moderators().list(opt.value_of("live-chat-id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_chat_moderators().list(opt.value_of("live-chat-id").unwrap_or(""), &opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3544,7 +3456,9 @@ impl<'n> Engine<'n> {
                     "cdn.ingestion-type" => Some(("cdn.ingestionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.backup-ingestion-address" => Some(("cdn.ingestionInfo.backupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.rtmps-ingestion-address" => Some(("cdn.ingestionInfo.rtmpsIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.rtmps-backup-ingestion-address" => Some(("cdn.ingestionInfo.rtmpsBackupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.resolution" => Some(("cdn.resolution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.is-default-stream" => Some(("snippet.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3555,7 +3469,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "frame-rate", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "resolution", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "frame-rate", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "resolution", "rtmps-backup-ingestion-address", "rtmps-ingestion-address", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3624,7 +3538,7 @@ impl<'n> Engine<'n> {
 
     fn _live_streams_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.live_streams().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.live_streams().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3644,7 +3558,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -3726,7 +3640,9 @@ impl<'n> Engine<'n> {
                     "cdn.ingestion-type" => Some(("cdn.ingestionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.backup-ingestion-address" => Some(("cdn.ingestionInfo.backupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.rtmps-ingestion-address" => Some(("cdn.ingestionInfo.rtmpsIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.rtmps-backup-ingestion-address" => Some(("cdn.ingestionInfo.rtmpsBackupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.resolution" => Some(("cdn.resolution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.is-default-stream" => Some(("snippet.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3737,7 +3653,7 @@ impl<'n> Engine<'n> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "frame-rate", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "resolution", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "frame-rate", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "resolution", "rtmps-backup-ingestion-address", "rtmps-ingestion-address", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3806,7 +3722,7 @@ impl<'n> Engine<'n> {
 
     fn _members_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.members().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.members().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3874,7 +3790,7 @@ impl<'n> Engine<'n> {
 
     fn _memberships_levels_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.memberships_levels().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.memberships_levels().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4097,7 +4013,7 @@ impl<'n> Engine<'n> {
 
     fn _playlist_items_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.playlist_items().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.playlist_items().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4117,7 +4033,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -4460,7 +4376,7 @@ impl<'n> Engine<'n> {
 
     fn _playlists_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.playlists().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.playlists().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4480,7 +4396,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -4655,7 +4571,7 @@ impl<'n> Engine<'n> {
 
     fn _search_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.search().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.search().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4687,7 +4603,7 @@ impl<'n> Engine<'n> {
                     call = call.video_caption(value.unwrap_or(""));
                 },
                 "type" => {
-                    call = call.type_(value.unwrap_or(""));
+                    call = call.add_type(value.unwrap_or(""));
                 },
                 "topic-id" => {
                     call = call.topic_id(value.unwrap_or(""));
@@ -4798,7 +4714,7 @@ impl<'n> Engine<'n> {
 
     fn _sponsors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.sponsors().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.sponsors().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5036,7 +4952,7 @@ impl<'n> Engine<'n> {
 
     fn _subscriptions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.subscriptions().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.subscriptions().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5065,7 +4981,7 @@ impl<'n> Engine<'n> {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "for-channel-id" => {
                     call = call.for_channel_id(value.unwrap_or(""));
@@ -5122,7 +5038,7 @@ impl<'n> Engine<'n> {
 
     fn _super_chat_events_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.super_chat_events().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.super_chat_events().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5182,6 +5098,283 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _third_party_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.third_party_links().delete(opt.value_of("linking-token").unwrap_or(""), opt.value_of("type").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "part" => {
+                    call = call.add_part(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["part"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _third_party_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "snippet.channel-to-store-link.store-url" => Some(("snippet.channelToStoreLink.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-to-store-link.store-name" => Some(("snippet.channelToStoreLink.storeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.link-status" => Some(("status.linkStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linking-token" => Some(("linkingToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-to-store-link", "etag", "kind", "link-status", "linking-token", "snippet", "status", "store-name", "store-url", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ThirdPartyLink = json::value::from_value(object).unwrap();
+        let mut call = self.hub.third_party_links().insert(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _third_party_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.third_party_links().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "type" => {
+                    call = call.type_(value.unwrap_or(""));
+                },
+                "linking-token" => {
+                    call = call.linking_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["linking-token", "type"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _third_party_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "snippet.channel-to-store-link.store-url" => Some(("snippet.channelToStoreLink.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-to-store-link.store-name" => Some(("snippet.channelToStoreLink.storeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.link-status" => Some(("status.linkStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linking-token" => Some(("linkingToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-to-store-link", "etag", "kind", "link-status", "linking-token", "snippet", "status", "store-name", "store-url", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ThirdPartyLink = json::value::from_value(object).unwrap();
+        let mut call = self.hub.third_party_links().update(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _thumbnails_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.thumbnails().set(opt.value_of("video-id").unwrap_or(""));
@@ -5211,7 +5404,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -5227,7 +5420,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5244,7 +5436,7 @@ impl<'n> Engine<'n> {
 
     fn _video_abuse_report_reasons_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.video_abuse_report_reasons().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.video_abuse_report_reasons().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5300,7 +5492,7 @@ impl<'n> Engine<'n> {
 
     fn _video_categories_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.video_categories().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.video_categories().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5308,7 +5500,7 @@ impl<'n> Engine<'n> {
                     call = call.region_code(value.unwrap_or(""));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -5410,7 +5602,7 @@ impl<'n> Engine<'n> {
 
     fn _videos_get_rating(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.videos().get_rating(opt.value_of("id").unwrap_or(""));
+        let mut call = self.hub.videos().get_rating(&opt.values_of("id").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5708,7 +5900,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -5724,7 +5916,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5741,7 +5932,7 @@ impl<'n> Engine<'n> {
 
     fn _videos_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.videos().list(opt.value_of("part").unwrap_or(""));
+        let mut call = self.hub.videos().list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5773,7 +5964,7 @@ impl<'n> Engine<'n> {
                     call = call.locale(value.unwrap_or(""));
                 },
                 "id" => {
-                    call = call.id(value.unwrap_or(""));
+                    call = call.add_id(value.unwrap_or(""));
                 },
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
@@ -6285,7 +6476,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -6297,7 +6488,6 @@ impl<'n> Engine<'n> {
             }
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6356,16 +6546,260 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _youtube_v3_infocards(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InfoCards = json::value::from_value(object).unwrap();
+        let mut call = self.hub.youtube().v3_infocards(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "video-id" => {
+                    call = call.video_id(value.unwrap_or(""));
+                },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "video-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _youtube_v3_infocards_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.youtube().v3_infocards_list(&opt.values_of("part").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "video-id" => {
+                    call = call.video_id(value.unwrap_or(""));
+                },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "video-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _youtube_v3_tests_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestItem = json::value::from_value(object).unwrap();
+        let mut call = self.hub.youtube().v3_tests_create(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "part" => {
+                    call = call.add_part(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["part"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("activities", Some(opt)) => {
+            ("abuse-reports", Some(opt)) => {
                 match opt.subcommand() {
                     ("insert", Some(opt)) => {
-                        call_result = self._activities_insert(opt, dry_run, &mut err);
+                        call_result = self._abuse_reports_insert(opt, dry_run, &mut err);
                     },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("abuse-reports".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("activities", Some(opt)) => {
+                match opt.subcommand() {
                     ("list", Some(opt)) => {
                         call_result = self._activities_list(opt, dry_run, &mut err);
                     },
@@ -6728,6 +7162,26 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("third-party-links", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._third_party_links_delete(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._third_party_links_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._third_party_links_list(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._third_party_links_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("third-party-links".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("thumbnails", Some(opt)) => {
                 match opt.subcommand() {
                     ("set", Some(opt)) => {
@@ -6804,6 +7258,23 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("youtube", Some(opt)) => {
+                match opt.subcommand() {
+                    ("v3-infocards", Some(opt)) => {
+                        call_result = self._youtube_v3_infocards(opt, dry_run, &mut err);
+                    },
+                    ("v3-infocards-list", Some(opt)) => {
+                        call_result = self._youtube_v3_infocards_list(opt, dry_run, &mut err);
+                    },
+                    ("v3-tests-create", Some(opt)) => {
+                        call_result = self._youtube_v3_tests_create(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("youtube".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
                 writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
@@ -6873,12 +7344,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::YouTube::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -6901,12 +7375,10 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("activities", "methods: 'insert' and 'list'", vec![
+        ("abuse-reports", "methods: 'insert'", vec![
             ("insert",
-                    Some(r##"Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
-        
-        Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/activities_insert",
+                    Some(r##"Inserts a new resource into this collection."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/abuse-reports_insert",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -6926,15 +7398,24 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ]),
+        
+        ("activities", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/activities_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in an activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>activity</code> resource
+        properties that the API response will include.<br><br>If the parameter
+        identifies a property that contains child properties, the child properties
+        will be included in the response. For example, in an <code>activity</code>
+        resource, the <code>snippet</code> property contains other properties that
+        identify the type of activity, a display title for the activity, and so
+        forth. If you set <code><strong>part=snippet</strong></code>, the API
+        response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
@@ -6954,12 +7435,12 @@ fn main() {
         
         ("captions", "methods: 'delete', 'download', 'insert', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a specified caption track."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter identifies the caption track that is being deleted. The value is a caption track ID as identified by the id property in a caption resource."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -6970,12 +7451,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("download",
-                    Some(r##"Downloads a caption track. The caption track is returned in its original format unless the request specifies a value for the tfmt parameter and in its original language unless the request specifies a value for the tlang parameter."##),
+                    Some(r##"Downloads a caption track."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_download",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter identifies the caption track that is being retrieved. The value is a caption track ID as identified by the id property in a caption resource."##),
+                     Some(r##"The ID of the caption track to download, required for One Platform."##),
                      Some(true),
                      Some(false)),
         
@@ -6992,7 +7473,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Uploads a caption track."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7003,7 +7484,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -7020,18 +7501,22 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of caption tracks that are associated with a specified video. Note that the API response does not contain the actual captions and that the captions.download method provides the ability to retrieve a caption track."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_list",
                   vec![
-                    (Some(r##"part"##),
+                    (Some(r##"video-id"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet."##),
+                     Some(r##"Returns the captions for the specified video."##),
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"video-id"##),
+                    (Some(r##"part"##),
                      None,
-                     Some(r##"The videoId parameter specifies the YouTube video ID of the video for which the API should return caption tracks."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>caption</code> resource parts
+        that the API response will include. The <code>part</code> names that you
+        can include in the parameter value are <code>id</code> and
+        <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7048,7 +7533,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a caption track. When updating a caption track, you can change the track's draft status, upload a new caption file for the track, or both."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7059,7 +7544,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -7079,11 +7564,7 @@ fn main() {
         
         ("channel-banners", "methods: 'insert'", vec![
             ("insert",
-                    Some(r##"Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
-        
-        - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
-        - Extract the url property's value from the response that the API returns for step 1.
-        - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-banners_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7094,7 +7575,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -7114,12 +7595,12 @@ fn main() {
         
         ("channel-sections", "methods: 'delete', 'insert', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a channelSection."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7130,7 +7611,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Adds a channelSection for the authenticated user's channel."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7152,14 +7633,22 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns channelSection resources that match the API request criteria."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>channelSection</code> resource
+        properties that the API response will include. The <code>part</code> names
+        that you can include in the parameter value are <code>id</code>,
+        <code>snippet</code>, and <code>contentDetails</code>.<br><br>If the
+        parameter identifies a property that contains child properties, the child
+        properties will be included in the response. For example, in a
+        <code>channelSection</code> resource, the <code>snippet</code> property
+        contains other properties, such as a display title for the channelSection.
+        If you set <code><strong>part=snippet</strong></code>, the API response
+        will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
@@ -7176,7 +7665,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update a channelSection."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7201,14 +7690,20 @@ fn main() {
         
         ("channels", "methods: 'list' and 'update'", vec![
             ("list",
-                    Some(r##"Returns a collection of zero or more channel resources that match the request criteria."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channels_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>channel</code> resource
+        properties that the API response will include.<br><br>If the parameter
+        identifies a property that contains child properties, the child properties
+        will be included in the response. For example, in a <code>channel</code>
+        resource, the <code>contentDetails</code> property contains other
+        properties, such as the <code>uploads</code> properties. As such, if you
+        set <code><strong>part=contentDetails</strong></code>, the API response
+        will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
@@ -7225,7 +7720,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a channel's metadata. Note that this method currently only supports updates to the channel resource's brandingSettings and invideoPromotion objects and their child properties."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channels_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7250,7 +7745,7 @@ fn main() {
         
         ("comment-threads", "methods: 'insert', 'list' and 'update'", vec![
             ("insert",
-                    Some(r##"Creates a new top-level comment. To add a reply to an existing comment, use the comments.insert method instead."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7272,12 +7767,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of comment threads that match the API request parameters."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more commentThread resource properties that the API response will include."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>commentThread</code> resource
+        properties that the API response will include."##),
                      Some(true),
                      Some(false)),
         
@@ -7294,7 +7791,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Modifies the top-level comment in a comment thread."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7319,12 +7816,12 @@ fn main() {
         
         ("comments", "methods: 'delete', 'insert', 'list', 'mark-as-spam', 'set-moderation-status' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a comment."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the comment ID for the resource that is being deleted."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7335,7 +7832,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Creates a reply to an existing comment. Note: To create a top-level comment, use the commentThreads.insert method."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7357,12 +7854,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of comments that match the API request parameters."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more comment resource properties that the API response will include."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>comment</code> resource
+        properties that the API response will include."##),
                      Some(true),
                      Some(false)),
         
@@ -7379,12 +7878,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("mark-as-spam",
-                    Some(r##"Expresses the caller's opinion that one or more comments should be flagged as spam."##),
+                    Some(r##"Expresses the caller's opinion that one or more comments should be flagged
+        as spam."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_mark-as-spam",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies a comma-separated list of IDs of comments that the caller believes should be classified as spam."##),
+                     Some(r##"Flags the comments with the given IDs as spam in the caller's opinion."##),
                      Some(true),
                      Some(false)),
         
@@ -7395,18 +7895,22 @@ fn main() {
                      Some(true)),
                   ]),
             ("set-moderation-status",
-                    Some(r##"Sets the moderation status of one or more comments. The API request must be authorized by the owner of the channel or video associated with the comments."##),
+                    Some(r##"Sets the moderation status of one or more comments."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_set-moderation-status",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies a comma-separated list of IDs that identify the comments for which you are updating the moderation status."##),
+                     Some(r##"Modifies the moderation status of the comments with the given IDs"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"moderation-status"##),
                      None,
-                     Some(r##"Identifies the new moderation status of the specified comments."##),
+                     Some(r##"Specifies the requested moderation status. Note, comments can be in
+        statuses, which are not available through this call. For example, this
+        call does not allow to mark a comment as 'likely spam'.
+        Valid values: MODERATION_STATUS_PUBLISHED,
+        MODERATION_STATUS_HELD_FOR_REVIEW, MODERATION_STATUS_REJECTED."##),
                      Some(true),
                      Some(false)),
         
@@ -7417,7 +7921,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("update",
-                    Some(r##"Modifies a comment."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7442,12 +7946,14 @@ fn main() {
         
         ("guide-categories", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of categories that can be associated with YouTube channels."##),
+                    Some(r##"Retrieves a list of guide categories."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/guide-categories_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the guideCategory resource properties that the API response will include. Set the parameter value to snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>guideCategory</code> resource properties that the API response will
+        include. Set the parameter value to <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7467,12 +7973,14 @@ fn main() {
         
         ("i18n-languages", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of application languages that the YouTube website supports."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/i18n-languages_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the i18nLanguage resource properties that the API response will include. Set the parameter value to snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>i18nLanguage</code> resource properties that the API response will
+        include. Set the parameter value to <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7492,12 +8000,14 @@ fn main() {
         
         ("i18n-regions", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of content regions that the YouTube website supports."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/i18n-regions_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the i18nRegion resource properties that the API response will include. Set the parameter value to snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>i18nRegion</code> resource properties that the API response will
+        include. Set the parameter value to <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7517,18 +8027,22 @@ fn main() {
         
         ("live-broadcasts", "methods: 'bind', 'control', 'delete', 'insert', 'list', 'transition' and 'update'", vec![
             ("bind",
-                    Some(r##"Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream, though a video stream may be bound to more than one broadcast."##),
+                    Some(r##"Bind a broadcast to a stream."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_bind",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the unique ID of the broadcast that is being bound to a video stream."##),
+                     Some(r##"Broadcast to bind to the stream"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>liveBroadcast</code> resource
+        properties that the API response will include. The <code>part</code> names
+        that you can include in the parameter value are <code>id</code>,
+        <code>snippet</code>, <code>contentDetails</code>, and <code>status</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7545,18 +8059,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("control",
-                    Some(r##"Controls the settings for a slate that can be displayed in the broadcast stream."##),
+                    Some(r##"Slate and recording control of the live broadcast.
+        Support actions: slate on/off, recording start/stop/pause/resume.
+        Design doc: goto/yt-api-liveBroadcast-control"##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_control",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated."##),
+                     Some(r##"Broadcast to operate."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>liveBroadcast</code> resource
+        properties that the API response will include. The <code>part</code> names
+        that you can include in the parameter value are <code>id</code>,
+        <code>snippet</code>, <code>contentDetails</code>, and <code>status</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7573,12 +8093,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a broadcast."##),
+                    Some(r##"Delete a given broadcast."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7589,7 +8109,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Creates a broadcast."##),
+                    Some(r##"Inserts a new stream for the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7611,12 +8131,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of YouTube broadcasts that match the API request parameters."##),
+                    Some(r##"Retrieve the list of broadcasts associated with the given channel."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>liveBroadcast</code> resource
+        properties that the API response will include. The <code>part</code> names
+        that you can include in the parameter value are <code>id</code>,
+        <code>snippet</code>, <code>contentDetails</code>, and <code>status</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7633,24 +8157,28 @@ fn main() {
                      Some(false)),
                   ]),
             ("transition",
-                    Some(r##"Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active."##),
+                    Some(r##"Transition a broadcast to a given status."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_transition",
                   vec![
-                    (Some(r##"broadcast-status"##),
+                    (Some(r##"id"##),
                      None,
-                     Some(r##"The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to."##),
+                     Some(r##"Broadcast to transition."##),
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"id"##),
+                    (Some(r##"broadcast-status"##),
                      None,
-                     Some(r##"The id parameter specifies the unique ID of the broadcast that is transitioning to another status."##),
+                     Some(r##"The status to which the broadcast is going to transition."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>liveBroadcast</code> resource
+        properties that the API response will include. The <code>part</code> names
+        that you can include in the parameter value are <code>id</code>,
+        <code>snippet</code>, <code>contentDetails</code>, and <code>status</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7667,7 +8195,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object."##),
+                    Some(r##"Updates an existing broadcast for the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7692,12 +8220,12 @@ fn main() {
         
         ("live-chat-bans", "methods: 'delete' and 'insert'", vec![
             ("delete",
-                    Some(r##"Removes a chat ban."##),
+                    Some(r##"Deletes a chat ban."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-bans_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter identifies the chat ban to remove. The value uniquely identifies both the ban and the chat."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7708,7 +8236,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Adds a new ban to the chat."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-bans_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7738,7 +8266,7 @@ fn main() {
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube chat message ID of the resource that is being deleted."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7749,7 +8277,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Adds a message to a live chat."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-messages_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7771,18 +8299,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists live chat messages for a specific chat."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-messages_list",
                   vec![
                     (Some(r##"live-chat-id"##),
                      None,
-                     Some(r##"The liveChatId parameter specifies the ID of the chat whose messages will be returned."##),
+                     Some(r##"The id of the live chat for which comments should be returned."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>liveChatComment</code> resource parts that the API response will
+        include. Supported values are <code>id</code> and <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7802,12 +8332,12 @@ fn main() {
         
         ("live-chat-moderators", "methods: 'delete', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Removes a chat moderator."##),
+                    Some(r##"Deletes a chat moderator."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-moderators_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter identifies the chat moderator to remove. The value uniquely identifies both the moderator and the chat."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7818,7 +8348,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Adds a new moderator for the chat."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-moderators_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7840,18 +8370,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists moderators for a live chat."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-moderators_list",
                   vec![
                     (Some(r##"live-chat-id"##),
                      None,
-                     Some(r##"The liveChatId parameter specifies the YouTube live chat for which the API should return moderators."##),
+                     Some(r##"The id of the live chat for which moderators should be returned."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the liveChatModerator resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>liveChatModerator</code> resource parts that the API response will
+        include. Supported values are <code>id</code> and <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7871,12 +8403,12 @@ fn main() {
         
         ("live-streams", "methods: 'delete', 'insert', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a video stream."##),
+                    Some(r##"Deletes an existing stream for the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube live stream ID for the resource that is being deleted."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -7887,7 +8419,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience."##),
+                    Some(r##"Inserts a new stream for the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -7909,12 +8441,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of video streams that match the API request parameters."##),
+                    Some(r##"Retrieve the list of streams associated with the given channel. --"##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>liveStream</code> resource
+        properties that the API response will include. The <code>part</code> names
+        that you can include in the parameter value are <code>id</code>,
+        <code>snippet</code>, <code>cdn</code>, and <code>status</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7931,7 +8467,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings."##),
+                    Some(r##"Updates an existing stream for the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_update",
                   vec![
                     (Some(r##"kv"##),
@@ -7956,12 +8492,14 @@ fn main() {
         
         ("members", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists members for a channel."##),
+                    Some(r##"Retrieves a list of members that match the request criteria for a channel."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/members_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the member resource parts that the API response will include. Set the parameter value to snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>member</code> resource parts that the API response will include. Set
+        the parameter value to <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -7981,12 +8519,14 @@ fn main() {
         
         ("memberships-levels", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists pricing levels for a channel."##),
+                    Some(r##"Retrieves a list of all pricing levels offered by a creator to the fans."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/memberships-levels_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the membershipsLevel resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>membershipsLevel</code> resource parts that the API response will
+        include. Supported values are <code>id</code> and <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -8006,12 +8546,12 @@ fn main() {
         
         ("playlist-items", "methods: 'delete', 'insert', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a playlist item."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8022,7 +8562,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Adds a resource to a playlist."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -8044,14 +8584,22 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>playlistItem</code> resource
+        properties that the API response will include.<br><br>If the parameter
+        identifies a property that contains child properties, the child properties
+        will be included in the response. For example, in a
+        <code>playlistItem</code> resource, the <code>snippet</code> property
+        contains numerous fields, including the <code>title</code>,
+        <code>description</code>, <code>position</code>, and
+        <code>resourceId</code> properties. As such, if you set
+        <code><strong>part=snippet</strong></code>, the API response will contain
+        all of those properties."##),
                      Some(true),
                      Some(false)),
         
@@ -8068,7 +8616,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Modifies a playlist item. For example, you could update the item's position in the playlist."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_update",
                   vec![
                     (Some(r##"kv"##),
@@ -8093,12 +8641,12 @@ fn main() {
         
         ("playlists", "methods: 'delete', 'insert', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a playlist."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8109,7 +8657,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Creates a playlist."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -8131,14 +8679,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>playlist</code> resource
+        properties that the API response will include.<br><br>If the parameter
+        identifies a property that contains child properties, the child properties
+        will be included in the response. For example, in a <code>playlist</code>
+        resource, the <code>snippet</code> property contains properties like
+        <code>author</code>, <code>title</code>, <code>description</code>,
+        <code>tags</code>, and <code>timeCreated</code>. As such, if you set
+        <code><strong>part=snippet</strong></code>, the API response will contain
+        all of those properties."##),
                      Some(true),
                      Some(false)),
         
@@ -8155,7 +8710,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Modifies a playlist. For example, you could change a playlist's title, description, or privacy status."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_update",
                   vec![
                     (Some(r##"kv"##),
@@ -8180,12 +8735,15 @@ fn main() {
         
         ("search", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource."##),
+                    Some(r##"Retrieves a list of search resources"##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/search_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. Set the parameter value to snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>search</code> resource properties
+        that the API response will include. Set the parameter value to
+        <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -8205,12 +8763,15 @@ fn main() {
         
         ("sponsors", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists sponsors for a channel."##),
+                    Some(r##"Retrieves a list of sponsors that match the request criteria for a
+        channel."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/sponsors_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the sponsor resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>sponsor</code> resource parts that the API response will include.
+        Supported values are <code>id</code> and <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -8230,12 +8791,12 @@ fn main() {
         
         ("subscriptions", "methods: 'delete', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Deletes a subscription."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/subscriptions_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8246,7 +8807,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Adds a subscription for the authenticated user's channel."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/subscriptions_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -8268,14 +8829,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns subscription resources that match the API request criteria."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/subscriptions_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>subscription</code> resource
+        properties that the API response will include.<br><br>If the parameter
+        identifies a property that contains child properties, the child properties
+        will be included in the response. For example, in a
+        <code>subscription</code> resource, the <code>snippet</code> property
+        contains other properties, such as a display title for the subscription. If
+        you set <code><strong>part=snippet</strong></code>, the API response will
+        also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
@@ -8295,12 +8862,14 @@ fn main() {
         
         ("super-chat-events", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists Super Chat events for a channel."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/super-chat-events_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the superChatEvent resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>superChatEvent</code> resource parts that the API response will
+        include. Supported values are <code>id</code> and <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -8318,20 +8887,116 @@ fn main() {
                   ]),
             ]),
         
+        ("third-party-links", "methods: 'delete', 'insert', 'list' and 'update'", vec![
+            ("delete",
+                    Some(r##"Deletes a resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/third-party-links_delete",
+                  vec![
+                    (Some(r##"linking-token"##),
+                     None,
+                     Some(r##"Delete the partner links with the given linking token."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"type"##),
+                     None,
+                     Some(r##"Type of the link to be deleted."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("insert",
+                    Some(r##"Inserts a new resource into this collection."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/third-party-links_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/third-party-links_list",
+                  vec![
+                    (Some(r##"part"##),
+                     None,
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>thirdPartyLink</code> resource parts that the API response will
+        include. Supported values are <code>linkingToken</code>,
+        <code>status</code>, and <code>snippet</code>."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",
+                    Some(r##"Updates an existing resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/third-party-links_update",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("thumbnails", "methods: 'set'", vec![
             ("set",
-                    Some(r##"Uploads a custom video thumbnail to YouTube and sets it for a video."##),
+                    Some(r##"As this is not an insert in a strict sense (it supports uploading/setting
+        of a thumbnail for multiple videos, which doesn't result in creation of a
+        single resource), I use a custom verb here."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/thumbnails_set",
                   vec![
                     (Some(r##"video-id"##),
                      None,
-                     Some(r##"The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided."##),
+                     Some(r##"Returns the Thumbnail with the given video IDs for Stubby or Apiary."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -8351,12 +9016,14 @@ fn main() {
         
         ("video-abuse-report-reasons", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of abuse reasons that can be used for reporting abusive videos."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/video-abuse-report-reasons_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>videoCategory</code> resource parts that the API response will
+        include. Supported values are <code>id</code> and <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -8376,12 +9043,14 @@ fn main() {
         
         ("video-categories", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of categories that can be associated with YouTube videos."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/video-categories_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the videoCategory resource properties that the API response will include. Set the parameter value to snippet."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies the
+        <code>videoCategory</code> resource properties that the API response will
+        include. Set the parameter value to <code>snippet</code>."##),
                      Some(true),
                      Some(false)),
         
@@ -8401,12 +9070,12 @@ fn main() {
         
         ("videos", "methods: 'delete', 'get-rating', 'insert', 'list', 'rate', 'report-abuse' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes a YouTube video."##),
+                    Some(r##"Deletes a resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_delete",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8417,12 +9086,13 @@ fn main() {
                      Some(true)),
                   ]),
             ("get-rating",
-                    Some(r##"Retrieves the ratings that the authorized user gave to a list of specified videos."##),
+                    Some(r##"Retrieves the ratings that the authorized user gave to a list of specified
+        videos."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_get-rating",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8439,7 +9109,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Uploads a video to YouTube and optionally sets the video's metadata."##),
+                    Some(r##"Inserts a new resource into this collection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -8450,7 +9120,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -8467,14 +9137,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns a list of videos that match the API request parameters."##),
+                    Some(r##"Retrieves a list of resources, possibly filtered."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties."##),
+                     Some(r##"The <code><strong>part</strong></code> parameter specifies a
+        comma-separated list of one or more <code>video</code> resource properties
+        that the API response will include.<br><br>If the parameter identifies a
+        property that contains child properties, the child properties will be
+        included in the response. For example, in a <code>video</code> resource,
+        the <code>snippet</code> property contains the <code>channelId</code>,
+        <code>title</code>, <code>description</code>, <code>tags</code>, and
+        <code>categoryId</code> properties. As such, if you set
+        <code><strong>part=snippet</strong></code>, the API response will contain
+        all of those properties."##),
                      Some(true),
                      Some(false)),
         
@@ -8491,18 +9168,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("rate",
-                    Some(r##"Add a like or dislike rating to a video or remove a rating from a video."##),
+                    Some(r##"Adds a like or dislike rating to a video or removes a rating from a video."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_rate",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed."##),
+                     None,
                      Some(true),
                      Some(false)),
         
                     (Some(r##"rating"##),
                      None,
-                     Some(r##"Specifies the rating to record."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8529,7 +9206,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("update",
-                    Some(r##"Updates a video's metadata."##),
+                    Some(r##"Updates an existing resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_update",
                   vec![
                     (Some(r##"kv"##),
@@ -8554,12 +9231,12 @@ fn main() {
         
         ("watermarks", "methods: 'set' and 'unset'", vec![
             ("set",
-                    Some(r##"Uploads a watermark image to YouTube and sets it for a channel."##),
+                    Some(r##"Allows upload of watermark image and setting it for a channel."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/watermarks_set",
                   vec![
                     (Some(r##"channel-id"##),
                      None,
-                     Some(r##"The channelId parameter specifies the YouTube channel ID for which the watermark is being provided."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8571,7 +9248,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -8582,12 +9259,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("unset",
-                    Some(r##"Deletes a channel's watermark image."##),
+                    Some(r##"Allows removal of channel watermark."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/watermarks_unset",
                   vec![
                     (Some(r##"channel-id"##),
                      None,
-                     Some(r##"The channelId parameter specifies the YouTube channel ID for which the watermark is being unset."##),
+                     None,
                      Some(true),
                      Some(false)),
         
@@ -8599,12 +9276,85 @@ fn main() {
                   ]),
             ]),
         
+        ("youtube", "methods: 'v3-infocards', 'v3-infocards-list' and 'v3-tests-create'", vec![
+            ("v3-infocards",
+                    Some(r##"Updates infocards for a given video.
+        Note:
+        * If the card id is not provided, a new card will be created.
+        * If the card id is provided, that card will be updated.
+        * Existing cards will be discarded if they're not included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/youtube_v3-infocards",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("v3-infocards-list",
+                    Some(r##"Retrieves all infocards for a given video."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/youtube_v3-infocards-list",
+                  vec![
+                    (Some(r##"part"##),
+                     None,
+                     Some(r##"The properties to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("v3-tests-create",
+                    Some(r##"POST method."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/youtube_v3-tests-create",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
     ];
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200402")
-           .about("Supports core YouTube features, such as uploading videos, creating and managing playlists, searching for content, and much more.")
+           .version("1.0.14+20200709")
+           .about("The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists, and channels.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

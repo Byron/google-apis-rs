@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Spanner* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Spanner* crate version *1.0.14+20200623*, where *20200623* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Spanner* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/spanner/).
@@ -347,7 +347,7 @@ impl<'a, C, A> Spanner<C, A>
         Spanner {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://spanner.googleapis.com/".to_string(),
             _root_url: "https://spanner.googleapis.com/".to_string(),
         }
@@ -358,7 +358,7 @@ impl<'a, C, A> Spanner<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -462,7 +462,7 @@ impl ResponseResult for ListSessionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateSessionRequest {
-    /// The session to create.
+    /// Required. The session to create.
     pub session: Option<Session>,
 }
 
@@ -786,10 +786,11 @@ impl ResponseResult for Empty {}
 
 /// # Transactions
 /// 
-/// Each session can have at most one active transaction at a time. After the
-/// active transaction is completed, the session can immediately be
-/// re-used for the next transaction. It is not necessary to create a
-/// new session for each transaction.
+/// Each session can have at most one active transaction at a time (note that
+/// standalone reads and queries use a transaction internally and do count
+/// towards the one transaction limit). After the active transaction is
+/// completed, the session can immediately be re-used for the next transaction.
+/// It is not necessary to create a new session for each transaction.
 /// 
 /// # Transaction Modes
 /// 
@@ -1248,7 +1249,7 @@ impl ResponseResult for ListBackupOperationsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
     /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
-    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    /// `GetIamPolicy`.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -1519,9 +1520,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -2202,10 +2211,12 @@ impl Part for BackupInfo {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -2223,7 +2234,9 @@ impl Part for BackupInfo {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -2311,6 +2324,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -2462,8 +2478,7 @@ pub struct Session {
     /// typically earlier than the actual last use time.
     #[serde(rename="approximateLastUseTime")]
     pub approximate_last_use_time: Option<String>,
-    /// The name of the session. This is always system-assigned; values provided
-    /// when creating a session are ignored.
+    /// Output only. The name of the session. This is always system-assigned.
     pub name: Option<String>,
 }
 
@@ -2836,6 +2851,9 @@ pub struct QueryOptions {
     /// SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS. Executing a SQL statement
     /// with an invalid optimizer version will fail with a syntax error
     /// (`INVALID_ARGUMENT`) status.
+    /// See
+    /// https://cloud.google.com/spanner/docs/query-optimizer/manage-query-optimizer
+    /// for more information on managing the query optimizer.
     /// 
     /// The `optimizer_version` statement hint has precedence over this setting.
     #[serde(rename="optimizerVersion")]
@@ -3143,6 +3161,10 @@ pub struct GetPolicyOptions {
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -3337,6 +3359,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// transactions. However, it can also happen for a variety of other
     /// reasons. If `Commit` returns `ABORTED`, the caller should re-attempt
     /// the transaction from the beginning, re-using the same session.
+    /// 
+    /// On very rare occasions, `Commit` might return `UNKNOWN`. This can happen,
+    /// for example, if the client job experiences a 1+ hour networking failure.
+    /// At that point, Cloud Spanner has lost track of the transaction outcome and
+    /// we recommend that you perform another read from the database to see the
+    /// state of things as they are now.
     /// 
     /// # Arguments
     ///
@@ -4067,6 +4095,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `database` - Required. The database whose schema we wish to get.
+    ///                Values are of the form
+    ///                `projects/<project>/instances/<instance>/databases/<database>`
     pub fn instances_databases_get_ddl(&self, database: &str) -> ProjectInstanceDatabaseGetDdlCall<'a, C, A> {
         ProjectInstanceDatabaseGetDdlCall {
             hub: self.hub,
@@ -5316,6 +5346,12 @@ impl<'a, C, A> ProjectInstanceDatabaseGetCall<'a, C, A> where C: BorrowMut<hyper
 /// transactions. However, it can also happen for a variety of other
 /// reasons. If `Commit` returns `ABORTED`, the caller should re-attempt
 /// the transaction from the beginning, re-using the same session.
+/// 
+/// On very rare occasions, `Commit` might return `UNKNOWN`. This can happen,
+/// for example, if the client job experiences a 1+ hour networking failure.
+/// At that point, Cloud Spanner has lost track of the transaction outcome and
+/// we recommend that you perform another read from the database to see the
+/// state of things as they are now.
 ///
 /// A builder for the *instances.databases.sessions.commit* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6153,9 +6189,9 @@ impl<'a, C, A> ProjectInstanceBackupOperationListCall<'a, C, A> where C: BorrowM
     /// * `done:true` - The operation is complete.
     /// * `metadata.database:prod` - The database the backup was taken from has
     ///   a name containing the string "prod".
-    /// * `(metadata.@type=type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata) AND` <br/>
-    ///   `(metadata.name:howl) AND` <br/>
-    ///   `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` <br/>
+    /// * `(metadata.@type=type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata) AND`   
+    ///   `(metadata.name:howl) AND`   
+    ///   `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND`   
     ///   `(error:*)` - Returns operations where:
     ///   * The operation's metadata type is CreateBackupMetadata.
     ///   * The backup name contains the string "howl".
@@ -11675,11 +11711,11 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationListCall<'a, C, A> where C: Borro
     /// Here are a few examples:
     /// 
     /// * `done:true` - The operation is complete.
-    /// * `(metadata.@type=type.googleapis.com/google.spanner.admin.database.v1.RestoreDatabaseMetadata) AND` <br/>
-    ///   `(metadata.source_type:BACKUP) AND` <br/>
-    ///   `(metadata.backup_info.backup:backup_howl) AND` <br/>
-    ///   `(metadata.name:restored_howl) AND` <br/>
-    ///   `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` <br/>
+    /// * `(metadata.@type=type.googleapis.com/google.spanner.admin.database.v1.RestoreDatabaseMetadata) AND`   
+    ///   `(metadata.source_type:BACKUP) AND`   
+    ///   `(metadata.backup_info.backup:backup_howl) AND`   
+    ///   `(metadata.name:restored_howl) AND`   
+    ///   `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND`   
     ///   `(error:*)` - Return operations where:
     ///   * The operation's metadata type is RestoreDatabaseMetadata.
     ///   * The database is restored from a backup.
@@ -13894,6 +13930,8 @@ impl<'a, C, A> ProjectInstanceDatabaseGetDdlCall<'a, C, A> where C: BorrowMut<hy
 
 
     /// Required. The database whose schema we wish to get.
+    /// Values are of the form
+    /// `projects/<project>/instances/<instance>/databases/<database>`
     ///
     /// Sets the *database* path property to the given value.
     ///

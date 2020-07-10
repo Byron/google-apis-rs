@@ -325,8 +325,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "ciphertext" => Some(("ciphertext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ciphertext-crc32c" => Some(("ciphertextCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ciphertext"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ciphertext", "ciphertext-crc32c"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -409,11 +410,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "digest-crc32c" => Some(("digestCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "digest.sha256" => Some(("digest.sha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "digest.sha512" => Some(("digest.sha512", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "digest.sha384" => Some(("digest.sha384", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["digest", "sha256", "sha384", "sha512"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["digest", "digest-crc32c", "sha256", "sha384", "sha512"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1125,8 +1127,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "ciphertext" => Some(("ciphertext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-authenticated-data" => Some(("additionalAuthenticatedData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ciphertext-crc32c" => Some(("ciphertextCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "additional-authenticated-data-crc32c" => Some(("additionalAuthenticatedDataCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-authenticated-data", "ciphertext"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-authenticated-data", "additional-authenticated-data-crc32c", "ciphertext", "ciphertext-crc32c"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1211,8 +1215,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "plaintext" => Some(("plaintext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-authenticated-data" => Some(("additionalAuthenticatedData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "additional-authenticated-data-crc32c" => Some(("additionalAuthenticatedDataCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plaintext-crc32c" => Some(("plaintextCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-authenticated-data", "plaintext"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-authenticated-data", "additional-authenticated-data-crc32c", "plaintext", "plaintext-crc32c"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3425,7 +3431,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3456,7 +3462,7 @@ fn main() {
             ("locations-key-rings-crypto-keys-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -3670,7 +3676,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-import-jobs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3701,7 +3707,7 @@ fn main() {
             ("locations-key-rings-import-jobs-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -3760,7 +3766,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3791,7 +3797,7 @@ fn main() {
             ("locations-key-rings-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -3851,7 +3857,7 @@ fn main() {
     
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200313")
+           .version("1.0.14+20200623")
            .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")

@@ -25,12 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Groups Migration* API at revision *20181126*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Groups Migration* API at revision *20200630*. The CLI is at version *1.0.14*.
 
 ```bash
 groupsmigration1 [options]
         archive
-                insert <group-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                insert <group-id> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
   groupsmigration1 --help
 
 Configuration:

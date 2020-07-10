@@ -1,4 +1,4 @@
-site_name: Dialogflow v1.0.13+20200408
+site_name: Dialogflow v1.0.14+20200706
 site_url: http://byron.github.io/google-apis-rs/google-dialogflow2-cli
 site_description: A complete library to interact with Dialogflow (protocol v2)
 
@@ -19,6 +19,7 @@ pages:
 - ['projects_agent-entity-types-get.md', 'Projects', 'Agent Entity Types Get']
 - ['projects_agent-entity-types-list.md', 'Projects', 'Agent Entity Types List']
 - ['projects_agent-entity-types-patch.md', 'Projects', 'Agent Entity Types Patch']
+- ['projects_agent-environments-list.md', 'Projects', 'Agent Environments List']
 - ['projects_agent-environments-users-sessions-contexts-create.md', 'Projects', 'Agent Environments Users Sessions Contexts Create']
 - ['projects_agent-environments-users-sessions-contexts-delete.md', 'Projects', 'Agent Environments Users Sessions Contexts Delete']
 - ['projects_agent-environments-users-sessions-contexts-get.md', 'Projects', 'Agent Environments Users Sessions Contexts Get']

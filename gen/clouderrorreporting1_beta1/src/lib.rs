@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Clouderrorreporting* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Clouderrorreporting* crate version *1.0.14+20200610*, where *20200610* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Clouderrorreporting* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/error-reporting/).
@@ -330,7 +330,7 @@ impl<'a, C, A> Clouderrorreporting<C, A>
         Clouderrorreporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://clouderrorreporting.googleapis.com/".to_string(),
             _root_url: "https://clouderrorreporting.googleapis.com/".to_string(),
         }
@@ -341,7 +341,7 @@ impl<'a, C, A> Clouderrorreporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -397,7 +397,7 @@ impl Part for TimedCount {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrackingIssue {
     /// A URL pointing to a related entry in an issue tracking system.
-    /// Example: https://github.com/user/project/issues/4
+    /// Example: `https://github.com/user/project/issues/4`
     pub url: Option<String>,
 }
 
@@ -856,12 +856,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `groupName` - Required. The group resource name. Written as
-    ///                 <code>projects/<var>projectID</var>/groups/<var>group_name</var></code>.
-    ///                 Call
-    ///                 <a href="/error-reporting/reference/rest/v1beta1/projects.groupStats/list">
-    ///                 <code>groupStats.list</code></a> to return a list of groups belonging to
-    ///                 this project.
-    ///                 Example: <code>projects/my-project-123/groups/my-group</code>
+    ///                 `projects/{projectID}/groups/{group_name}`. Call
+    ///                 [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list)
+    ///                 to return a list of groups belonging to this project.
+    ///                 Example: `projects/my-project-123/groups/my-group`
     pub fn groups_get(&self, group_name: &str) -> ProjectGroupGetCall<'a, C, A> {
         ProjectGroupGetCall {
             hub: self.hub,
@@ -1196,13 +1194,11 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
     /// Required. The group resource name. Written as
-    /// <code>projects/<var>projectID</var>/groups/<var>group_name</var></code>.
-    /// Call
-    /// <a href="/error-reporting/reference/rest/v1beta1/projects.groupStats/list">
-    /// <code>groupStats.list</code></a> to return a list of groups belonging to
-    /// this project.
+    /// `projects/{projectID}/groups/{group_name}`. Call
+    /// [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list)
+    /// to return a list of groups belonging to this project.
     /// 
-    /// Example: <code>projects/my-project-123/groups/my-group</code>
+    /// Example: `projects/my-project-123/groups/my-group`
     ///
     /// Sets the *group name* path property to the given value.
     ///

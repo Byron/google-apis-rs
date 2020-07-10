@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *storage* crate version *1.0.14+20200623*, where *20200623* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -416,7 +416,7 @@ impl<'a, C, A> Storage<C, A>
         Storage {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://storage.googleapis.com/storage/v1/".to_string(),
             _root_url: "https://storage.googleapis.com/".to_string(),
         }
@@ -448,7 +448,7 @@ impl<'a, C, A> Storage<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -654,6 +654,23 @@ impl Part for BucketRetentionPolicy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleCondition {
+    /// Number of days elapsed since the noncurrent timestamp of an object. The condition is satisfied if the days elapsed is at least this number. This condition is relevant only for versioned objects. The value of the field must be a nonnegative integer. If it's zero, the object version will become eligible for Lifecycle action as soon as it becomes noncurrent.
+    #[serde(rename="daysSinceNoncurrentTime")]
+    pub days_since_noncurrent_time: Option<i32>,
+    /// A timestamp in RFC 3339 format. This condition is satisfied when the noncurrent time on an object is before this timestamp. This condition is relevant only for versioned objects.
+    #[serde(rename="noncurrentTimeBefore")]
+    pub noncurrent_time_before: Option<String>,
+    /// Number of days elapsed since the user-specified timestamp set on an object. The condition is satisfied if the days elapsed is at least this number. If no custom timestamp is specified on an object, the condition does not apply.
+    #[serde(rename="daysSinceCustomTime")]
+    pub days_since_custom_time: Option<i32>,
+    /// Objects having any of the storage classes specified by this condition will be matched. Values include MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE, STANDARD, and DURABLE_REDUCED_AVAILABILITY.
+    #[serde(rename="matchesStorageClass")]
+    pub matches_storage_class: Option<Vec<String>>,
+    /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
+    pub age: Option<i32>,
+    /// A timestamp in RFC 3339 format. This condition is satisfied when the custom time on an object is before this timestamp.
+    #[serde(rename="customTimeBefore")]
+    pub custom_time_before: Option<String>,
     /// Relevant only for versioned objects. If the value is N, this condition is satisfied when there are at least N versions (including the live version) newer than this version of the object.
     #[serde(rename="numNewerVersions")]
     pub num_newer_versions: Option<i32>,
@@ -666,11 +683,6 @@ pub struct BucketLifecycleRuleCondition {
     /// Relevant only for versioned objects. If the value is true, this condition matches live objects; if the value is false, it matches archived objects.
     #[serde(rename="isLive")]
     pub is_live: Option<bool>,
-    /// Objects having any of the storage classes specified by this condition will be matched. Values include MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE, STANDARD, and DURABLE_REDUCED_AVAILABILITY.
-    #[serde(rename="matchesStorageClass")]
-    pub matches_storage_class: Option<Vec<String>>,
-    /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
-    pub age: Option<i32>,
 }
 
 impl NestedType for BucketLifecycleRuleCondition {}
@@ -1295,30 +1307,13 @@ impl ResponseResult for Buckets {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Object {
-    /// The modification time of the object metadata in RFC 3339 format.
-    pub updated: Option<String>,
-    /// Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
-    #[serde(rename="contentType")]
-    pub content_type: Option<String>,
-    /// Content-Disposition of the object data.
-    #[serde(rename="contentDisposition")]
-    pub content_disposition: Option<String>,
-    /// The creation time of the object in RFC 3339 format.
-    #[serde(rename="timeCreated")]
-    pub time_created: Option<String>,
     /// The content generation of this object. Used for object versioning.
     pub generation: Option<String>,
-    /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
-    #[serde(rename="customerEncryption")]
-    pub customer_encryption: Option<ObjectCustomerEncryption>,
+    /// The name of the bucket containing this object.
+    pub bucket: Option<String>,
     /// Number of underlying components that make up this object. Components are accumulated by compose operations.
     #[serde(rename="componentCount")]
     pub component_count: Option<i32>,
-    /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
-    #[serde(rename="timeStorageClassUpdated")]
-    pub time_storage_class_updated: Option<String>,
-    /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
-    pub metageneration: Option<String>,
     /// Media download link.
     #[serde(rename="mediaLink")]
     pub media_link: Option<String>,
@@ -1337,44 +1332,64 @@ pub struct Object {
     pub id: Option<String>,
     /// Content-Length of the data in bytes.
     pub size: Option<String>,
-    /// Whether an object is under event-based hold. Event-based hold is a way to retain objects until an event occurs, which is signified by the hold's release (i.e. this value is set to false). After being released (set to false), such objects will be subject to bucket-level retention (if any). One sample use case of this flag is for banks to hold loan documents for at least 3 years after loan is paid in full. Here, bucket-level retention is 3 years and the event is the loan being paid in full. In this example, these objects will be held intact for any number of years until the event has occurred (event-based hold on the object is released) and then 3 more years after that. That means retention duration of the objects begins from the moment event-based hold transitioned from true to false.
-    #[serde(rename="eventBasedHold")]
-    pub event_based_hold: Option<bool>,
     /// The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.
     #[serde(rename="timeDeleted")]
     pub time_deleted: Option<String>,
-    /// The kind of item this is. For objects, this is always storage#object.
-    pub kind: Option<String>,
-    /// Content-Language of the object data.
-    #[serde(rename="contentLanguage")]
-    pub content_language: Option<String>,
-    /// The name of the object. Required if not specified by URL parameter.
-    pub name: Option<String>,
+    /// The creation time of the object in RFC 3339 format.
+    #[serde(rename="timeCreated")]
+    pub time_created: Option<String>,
     /// MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see Hashes and ETags: Best Practices.
     #[serde(rename="md5Hash")]
     pub md5_hash: Option<String>,
-    /// The name of the bucket containing this object.
-    pub bucket: Option<String>,
-    /// Access controls on the object.
-    pub acl: Option<Vec<ObjectAccessControl>>,
     /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order. For more information about using the CRC32c checksum, see Hashes and ETags: Best Practices.
     pub crc32c: Option<String>,
     /// HTTP 1.1 Entity tag for the object.
     pub etag: Option<String>,
-    /// Storage class of the object.
-    #[serde(rename="storageClass")]
-    pub storage_class: Option<String>,
-    /// A server-determined value that specifies the earliest time that the object's retention period expires. This value is in RFC 3339 format. Note 1: This field is not provided for objects with an active event-based hold, since retention expiration is unknown until the hold is removed. Note 2: This value can be provided even when temporary hold is set (so that the user can reason about policy without having to first unset the temporary hold).
-    #[serde(rename="retentionExpirationTime")]
-    pub retention_expiration_time: Option<String>,
     /// Whether an object is under temporary hold. While this flag is set to true, the object is protected against deletion and overwrites. A common use case of this flag is regulatory investigations where objects need to be retained while the investigation is ongoing. Note that unlike event-based hold, temporary hold does not impact retention expiration time of an object.
     #[serde(rename="temporaryHold")]
     pub temporary_hold: Option<bool>,
+    /// User-provided metadata, in key/value pairs.
+    pub metadata: Option<HashMap<String, String>>,
+    /// The modification time of the object metadata in RFC 3339 format.
+    pub updated: Option<String>,
+    /// Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// Content-Language of the object data.
+    #[serde(rename="contentLanguage")]
+    pub content_language: Option<String>,
+    /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
+    #[serde(rename="customerEncryption")]
+    pub customer_encryption: Option<ObjectCustomerEncryption>,
+    /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
+    pub metageneration: Option<String>,
+    /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
+    #[serde(rename="timeStorageClassUpdated")]
+    pub time_storage_class_updated: Option<String>,
+    /// A server-determined value that specifies the earliest time that the object's retention period expires. This value is in RFC 3339 format. Note 1: This field is not provided for objects with an active event-based hold, since retention expiration is unknown until the hold is removed. Note 2: This value can be provided even when temporary hold is set (so that the user can reason about policy without having to first unset the temporary hold).
+    #[serde(rename="retentionExpirationTime")]
+    pub retention_expiration_time: Option<String>,
+    /// Whether an object is under event-based hold. Event-based hold is a way to retain objects until an event occurs, which is signified by the hold's release (i.e. this value is set to false). After being released (set to false), such objects will be subject to bucket-level retention (if any). One sample use case of this flag is for banks to hold loan documents for at least 3 years after loan is paid in full. Here, bucket-level retention is 3 years and the event is the loan being paid in full. In this example, these objects will be held intact for any number of years until the event has occurred (event-based hold on the object is released) and then 3 more years after that. That means retention duration of the objects begins from the moment event-based hold transitioned from true to false.
+    #[serde(rename="eventBasedHold")]
+    pub event_based_hold: Option<bool>,
+    /// The kind of item this is. For objects, this is always storage#object.
+    pub kind: Option<String>,
+    /// The name of the object. Required if not specified by URL parameter.
+    pub name: Option<String>,
+    /// A timestamp in RFC 3339 format specified by the user for an object.
+    #[serde(rename="customTime")]
+    pub custom_time: Option<String>,
+    /// Access controls on the object.
+    pub acl: Option<Vec<ObjectAccessControl>>,
+    /// Content-Disposition of the object data.
+    #[serde(rename="contentDisposition")]
+    pub content_disposition: Option<String>,
     /// The link to this object.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// User-provided metadata, in key/value pairs.
-    pub metadata: Option<HashMap<String, String>>,
+    /// Storage class of the object.
+    #[serde(rename="storageClass")]
+    pub storage_class: Option<String>,
 }
 
 impl RequestValue for Object {}
@@ -11208,7 +11223,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
-    /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
+    /// Not currently supported. Specifying the parameter causes the request to fail with status code 400 - Bad Request.
     ///
     /// Sets the *kms key name* query property to the given value.
     pub fn kms_key_name(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {

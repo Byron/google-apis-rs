@@ -1,4 +1,4 @@
-site_name: Firebase Hosting v1.0.13+20200325
+site_name: Firebase Hosting v1.0.14+20200709
 site_url: http://byron.github.io/google-apis-rs/google-firebasehosting1_beta1-cli
 site_description: A complete library to interact with Firebase Hosting (protocol v1beta1)
 
@@ -12,8 +12,21 @@ pages:
 - ['projects_operations-get.md', 'Projects', 'Operations Get']
 - ['projects_sites-channels-releases-create.md', 'Projects', 'Sites Channels Releases Create']
 - ['projects_sites-channels-releases-list.md', 'Projects', 'Sites Channels Releases List']
+- ['projects_sites-domains-create.md', 'Projects', 'Sites Domains Create']
+- ['projects_sites-domains-delete.md', 'Projects', 'Sites Domains Delete']
+- ['projects_sites-domains-get.md', 'Projects', 'Sites Domains Get']
+- ['projects_sites-domains-list.md', 'Projects', 'Sites Domains List']
+- ['projects_sites-domains-update.md', 'Projects', 'Sites Domains Update']
+- ['projects_sites-get-config.md', 'Projects', 'Sites Get Config']
 - ['projects_sites-releases-create.md', 'Projects', 'Sites Releases Create']
 - ['projects_sites-releases-list.md', 'Projects', 'Sites Releases List']
+- ['projects_sites-update-config.md', 'Projects', 'Sites Update Config']
+- ['projects_sites-versions-create.md', 'Projects', 'Sites Versions Create']
+- ['projects_sites-versions-delete.md', 'Projects', 'Sites Versions Delete']
+- ['projects_sites-versions-files-list.md', 'Projects', 'Sites Versions Files List']
+- ['projects_sites-versions-list.md', 'Projects', 'Sites Versions List']
+- ['projects_sites-versions-patch.md', 'Projects', 'Sites Versions Patch']
+- ['projects_sites-versions-populate-files.md', 'Projects', 'Sites Versions Populate Files']
 - ['sites_channels-releases-create.md', 'Sites', 'Channels Releases Create']
 - ['sites_channels-releases-list.md', 'Sites', 'Channels Releases List']
 - ['sites_domains-create.md', 'Sites', 'Domains Create']
@@ -25,7 +38,6 @@ pages:
 - ['sites_releases-create.md', 'Sites', 'Releases Create']
 - ['sites_releases-list.md', 'Sites', 'Releases List']
 - ['sites_update-config.md', 'Sites', 'Update Config']
-- ['sites_versions-clone.md', 'Sites', 'Versions Clone']
 - ['sites_versions-create.md', 'Sites', 'Versions Create']
 - ['sites_versions-delete.md', 'Sites', 'Versions Delete']
 - ['sites_versions-files-list.md', 'Sites', 'Versions Files List']

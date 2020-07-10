@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Cloud Messaging* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *fcm:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Firebase Cloud Messaging* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *fcm:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Firebase Cloud Messaging* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/cloud-messaging).
@@ -329,7 +329,7 @@ impl<'a, C, A> FirebaseCloudMessaging<C, A>
         FirebaseCloudMessaging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://fcm.googleapis.com/".to_string(),
             _root_url: "https://fcm.googleapis.com/".to_string(),
         }
@@ -340,7 +340,7 @@ impl<'a, C, A> FirebaseCloudMessaging<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -394,6 +394,10 @@ impl Part for FcmOptions {}
 /// that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB,
 /// DCI-P3, BT.2020, etc.). By default, applications SHOULD assume the sRGB color
 /// space.
+/// 
+/// Note: when color equality needs to be decided, implementations, unless
+/// documented otherwise, will treat two colors to be equal if all their red,
+/// green, blue and alpha values each differ by at most 1e-5.
 /// 
 /// Example (Java):
 /// 

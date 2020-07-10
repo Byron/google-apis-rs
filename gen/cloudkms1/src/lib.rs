@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud KMS* crate version *1.0.13+20200313*, where *20200313* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud KMS* crate version *1.0.14+20200623*, where *20200623* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud KMS* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kms/).
@@ -340,7 +340,7 @@ impl<'a, C, A> CloudKMS<C, A>
         CloudKMS {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://cloudkms.googleapis.com/".to_string(),
             _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
@@ -351,7 +351,7 @@ impl<'a, C, A> CloudKMS<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -418,6 +418,38 @@ impl ResponseResult for ListCryptoKeysResponse {}
 pub struct AsymmetricSignResponse {
     /// The created signature.
     pub signature: Option<String>,
+    /// Integrity verification field. A flag indicating whether
+    /// AsymmetricSignRequest.digest_crc32c was received by
+    /// KeyManagementService and used for the integrity verification of the
+    /// digest. A false value of this field
+    /// indicates either that AsymmetricSignRequest.digest_crc32c was left
+    /// unset or that it was not delivered to KeyManagementService. If you've
+    /// set AsymmetricSignRequest.digest_crc32c but this field is still false,
+    /// discard the response and perform a limited number of retries.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="verifiedDigestCrc32c")]
+    pub verified_digest_crc32c: Option<bool>,
+    /// The resource name of the CryptoKeyVersion used for signing. Check
+    /// this field to verify that the intended resource was used for signing.
+    /// 
+    /// NOTE: This field is in Beta.
+    pub name: Option<String>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// AsymmetricSignResponse.signature. An integrity check of
+    /// AsymmetricSignResponse.signature can be performed by computing the
+    /// CRC32C checksum of AsymmetricSignResponse.signature and comparing your
+    /// results to this field. Discard the response in case of non-matching
+    /// checksum values, and perform a limited number of retries. A persistent
+    /// mismatch may indicate an issue in your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="signatureCrc32c")]
+    pub signature_crc32c: Option<String>,
 }
 
 impl ResponseResult for AsymmetricSignResponse {}
@@ -444,8 +476,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -471,6 +503,41 @@ pub struct DecryptRequest {
     /// EncryptRequest.additional_authenticated_data.
     #[serde(rename="additionalAuthenticatedData")]
     pub additional_authenticated_data: Option<String>,
+    /// Optional. An optional CRC32C checksum of the DecryptRequest.ciphertext. If
+    /// specified, KeyManagementService will verify the integrity of the
+    /// received DecryptRequest.ciphertext using this checksum.
+    /// KeyManagementService will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C(DecryptRequest.ciphertext) is equal to
+    /// DecryptRequest.ciphertext_crc32c, and if so, perform a limited number
+    /// of retries. A persistent mismatch may indicate an issue in your computation
+    /// of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="ciphertextCrc32c")]
+    pub ciphertext_crc32c: Option<String>,
+    /// Optional. An optional CRC32C checksum of the
+    /// DecryptRequest.additional_authenticated_data. If specified,
+    /// KeyManagementService will verify the integrity of the received
+    /// DecryptRequest.additional_authenticated_data using this checksum.
+    /// KeyManagementService will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C(DecryptRequest.additional_authenticated_data) is equal to
+    /// DecryptRequest.additional_authenticated_data_crc32c, and if so, perform
+    /// a limited number of retries. A persistent mismatch may indicate an issue in
+    /// your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="additionalAuthenticatedDataCrc32c")]
+    pub additional_authenticated_data_crc32c: Option<String>,
 }
 
 impl RequestValue for DecryptRequest {}
@@ -718,10 +785,12 @@ impl ResponseResult for ImportJob {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -739,7 +808,9 @@ impl ResponseResult for ImportJob {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -830,6 +901,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -850,6 +924,23 @@ pub struct AsymmetricDecryptRequest {
     /// Required. The data encrypted with the named CryptoKeyVersion's public
     /// key using OAEP.
     pub ciphertext: Option<String>,
+    /// Optional. An optional CRC32C checksum of the AsymmetricDecryptRequest.ciphertext.
+    /// If specified, KeyManagementService will verify the integrity of the
+    /// received AsymmetricDecryptRequest.ciphertext using this checksum.
+    /// KeyManagementService will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C(AsymmetricDecryptRequest.ciphertext) is equal to
+    /// AsymmetricDecryptRequest.ciphertext_crc32c, and if so, perform a
+    /// limited number of retries. A persistent mismatch may indicate an issue in
+    /// your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="ciphertextCrc32c")]
+    pub ciphertext_crc32c: Option<String>,
 }
 
 impl RequestValue for AsymmetricDecryptRequest {}
@@ -886,8 +977,8 @@ impl ResponseResult for ListCryptoKeyVersionsResponse {}
 /// A CryptoKey represents a logical key that can be used for cryptographic
 /// operations.
 /// 
-/// A CryptoKey is made up of one or more versions, which
-/// represent the actual key material used in cryptographic operations.
+/// A CryptoKey is made up of zero or more versions,
+/// which represent the actual key material used in cryptographic operations.
 /// 
 /// # Activities
 /// 
@@ -902,7 +993,7 @@ impl ResponseResult for ListCryptoKeyVersionsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CryptoKey {
     /// Labels with user-defined metadata. For more information, see
-    /// [Labeling Keys](/kms/docs/labeling-keys).
+    /// [Labeling Keys](https://cloud.google.com/kms/docs/labeling-keys).
     pub labels: Option<HashMap<String, String>>,
     /// Output only. The resource name for this CryptoKey in the format
     /// `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
@@ -1008,6 +1099,23 @@ impl RequestValue for RestoreCryptoKeyVersionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AsymmetricSignRequest {
+    /// Optional. An optional CRC32C checksum of the AsymmetricSignRequest.digest. If
+    /// specified, KeyManagementService will verify the integrity of the
+    /// received AsymmetricSignRequest.digest using this checksum.
+    /// KeyManagementService will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C(AsymmetricSignRequest.digest) is equal to
+    /// AsymmetricSignRequest.digest_crc32c, and if so, perform a limited
+    /// number of retries. A persistent mismatch may indicate an issue in your
+    /// computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="digestCrc32c")]
+    pub digest_crc32c: Option<String>,
     /// Required. The digest of the data to sign. The digest must be produced with
     /// the same digest algorithm as specified by the key version's
     /// algorithm.
@@ -1030,6 +1138,33 @@ impl RequestValue for AsymmetricSignRequest {}
 pub struct AsymmetricDecryptResponse {
     /// The decrypted data originally encrypted with the matching public key.
     pub plaintext: Option<String>,
+    /// Integrity verification field. A flag indicating whether
+    /// AsymmetricDecryptRequest.ciphertext_crc32c was received by
+    /// KeyManagementService and used for the integrity verification of the
+    /// ciphertext. A false value of this
+    /// field indicates either that AsymmetricDecryptRequest.ciphertext_crc32c
+    /// was left unset or that it was not delivered to KeyManagementService. If
+    /// you've set AsymmetricDecryptRequest.ciphertext_crc32c but this field is
+    /// still false, discard the response and perform a limited number of retries.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="verifiedCiphertextCrc32c")]
+    pub verified_ciphertext_crc32c: Option<bool>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// AsymmetricDecryptResponse.plaintext. An integrity check of
+    /// AsymmetricDecryptResponse.plaintext can be performed by computing the
+    /// CRC32C checksum of AsymmetricDecryptResponse.plaintext and comparing
+    /// your results to this field. Discard the response in case of non-matching
+    /// checksum values, and perform a limited number of retries. A persistent
+    /// mismatch may indicate an issue in your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="plaintextCrc32c")]
+    pub plaintext_crc32c: Option<String>,
 }
 
 impl ResponseResult for AsymmetricDecryptResponse {}
@@ -1106,7 +1241,7 @@ impl RequestValue for UpdateCryptoKeyPrimaryVersionRequest {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1187,6 +1322,41 @@ pub struct EncryptRequest {
     /// 8KiB.
     #[serde(rename="additionalAuthenticatedData")]
     pub additional_authenticated_data: Option<String>,
+    /// Optional. An optional CRC32C checksum of the
+    /// EncryptRequest.additional_authenticated_data. If specified,
+    /// KeyManagementService will verify the integrity of the received
+    /// EncryptRequest.additional_authenticated_data using this checksum.
+    /// KeyManagementService will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C(EncryptRequest.additional_authenticated_data) is equal to
+    /// EncryptRequest.additional_authenticated_data_crc32c, and if so, perform
+    /// a limited number of retries. A persistent mismatch may indicate an issue in
+    /// your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="additionalAuthenticatedDataCrc32c")]
+    pub additional_authenticated_data_crc32c: Option<String>,
+    /// Optional. An optional CRC32C checksum of the EncryptRequest.plaintext. If
+    /// specified, KeyManagementService will verify the integrity of the
+    /// received EncryptRequest.plaintext using this checksum.
+    /// KeyManagementService will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C(EncryptRequest.plaintext) is equal to
+    /// EncryptRequest.plaintext_crc32c, and if so, perform a limited number of
+    /// retries. A persistent mismatch may indicate an issue in your computation of
+    /// the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="plaintextCrc32c")]
+    pub plaintext_crc32c: Option<String>,
 }
 
 impl RequestValue for EncryptRequest {}
@@ -1228,6 +1398,23 @@ impl RequestValue for TestIamPermissionsRequest {}
 pub struct DecryptResponse {
     /// The decrypted data originally supplied in EncryptRequest.plaintext.
     pub plaintext: Option<String>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// DecryptResponse.plaintext. An integrity check of
+    /// DecryptResponse.plaintext can be performed by computing the CRC32C
+    /// checksum of DecryptResponse.plaintext and comparing your results to
+    /// this field. Discard the response in case of non-matching checksum values,
+    /// and perform a limited number of retries. A persistent mismatch may indicate
+    /// an issue in your computation of the CRC32C checksum. Note: receiving this
+    /// response message indicates that KeyManagementService is able to
+    /// successfully decrypt the ciphertext.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="plaintextCrc32c")]
+    pub plaintext_crc32c: Option<String>,
 }
 
 impl ResponseResult for DecryptResponse {}
@@ -1399,9 +1586,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1471,9 +1666,29 @@ pub struct PublicKey {
     /// [Textual Encoding of Subject Public Key Info]
     /// (https://tools.ietf.org/html/rfc7468#section-13).
     pub pem: Option<String>,
+    /// The name of the CryptoKeyVersion public key.
+    /// Provided here for verification.
+    /// 
+    /// NOTE: This field is in Beta.
+    pub name: Option<String>,
     /// The Algorithm associated
     /// with this key.
     pub algorithm: Option<String>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// PublicKey.pem. An integrity check of PublicKey.pem can be performed
+    /// by computing the CRC32C checksum of PublicKey.pem and
+    /// comparing your results to this field. Discard the response in case of
+    /// non-matching checksum values, and perform a limited number of retries. A
+    /// persistent mismatch may indicate an issue in your computation of the CRC32C
+    /// checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="pemCrc32c")]
+    pub pem_crc32c: Option<String>,
 }
 
 impl ResponseResult for PublicKey {}
@@ -1495,7 +1710,7 @@ impl ResponseResult for PublicKey {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1504,18 +1719,18 @@ impl ResponseResult for PublicKey {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -1575,6 +1790,46 @@ impl Part for ExternalProtectionLevelOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EncryptResponse {
+    /// Integrity verification field. A flag indicating whether
+    /// EncryptRequest.additional_authenticated_data_crc32c was received by
+    /// KeyManagementService and used for the integrity verification of the
+    /// AAD. A false value of this
+    /// field indicates either that
+    /// EncryptRequest.additional_authenticated_data_crc32c was left unset or
+    /// that it was not delivered to KeyManagementService. If you've set
+    /// EncryptRequest.additional_authenticated_data_crc32c but this field is
+    /// still false, discard the response and perform a limited number of retries.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="verifiedAdditionalAuthenticatedDataCrc32c")]
+    pub verified_additional_authenticated_data_crc32c: Option<bool>,
+    /// Integrity verification field. A flag indicating whether
+    /// EncryptRequest.plaintext_crc32c was received by
+    /// KeyManagementService and used for the integrity verification of the
+    /// plaintext. A false value of this field
+    /// indicates either that EncryptRequest.plaintext_crc32c was left unset or
+    /// that it was not delivered to KeyManagementService. If you've set
+    /// EncryptRequest.plaintext_crc32c but this field is still false, discard
+    /// the response and perform a limited number of retries.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="verifiedPlaintextCrc32c")]
+    pub verified_plaintext_crc32c: Option<bool>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// EncryptResponse.ciphertext. An integrity check of
+    /// EncryptResponse.ciphertext can be performed by computing the CRC32C
+    /// checksum of EncryptResponse.ciphertext and comparing your results to
+    /// this field. Discard the response in case of non-matching checksum values,
+    /// and perform a limited number of retries. A persistent mismatch may indicate
+    /// an issue in your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    /// 
+    /// NOTE: This field is in Beta.
+    #[serde(rename="ciphertextCrc32c")]
+    pub ciphertext_crc32c: Option<String>,
     /// The encrypted data.
     pub ciphertext: Option<String>,
     /// The resource name of the CryptoKeyVersion used in encryption. Check
@@ -1974,7 +2229,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -2149,7 +2404,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2188,7 +2443,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -2261,7 +2516,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2325,7 +2580,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2372,7 +2627,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -6174,7 +6429,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -6671,6 +6926,10 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> where C
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> {
@@ -7819,6 +8078,10 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> where C
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> {
@@ -8408,6 +8671,10 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> {
@@ -8480,7 +8747,7 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *locations.keyRings.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9022,7 +9289,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -9966,7 +10233,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *locations.keyRings.importJobs.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10799,7 +11066,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C, A> 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *locations.keyRings.cryptoKeys.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11378,7 +11645,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C,
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation

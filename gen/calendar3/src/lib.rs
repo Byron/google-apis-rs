@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *calendar* crate version *1.0.14+20200705*, where *20200705* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -415,7 +415,7 @@ impl<'a, C, A> CalendarHub<C, A>
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://www.googleapis.com/calendar/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -447,7 +447,7 @@ impl<'a, C, A> CalendarHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -610,7 +610,7 @@ pub struct CalendarListEntry {
     /// The time zone of the calendar. Optional. Read-only.
     #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
-    /// Whether the calendar has been hidden from the list. Optional. The default is False.
+    /// Whether the calendar has been hidden from the list. Optional. The attribute is only returned when the calendar is hidden, in which case the value is true.
     pub hidden: Option<bool>,
 }
 
@@ -629,7 +629,7 @@ pub struct ConferenceSolutionKey {
     /// The possible values are:  
     /// - "eventHangout" for Hangouts for consumers (http://hangouts.google.com)
     /// - "eventNamedHangout" for classic Hangouts for G Suite users (http://hangouts.google.com)
-    /// - "hangoutsMeet" for Hangouts Meet (http://meet.google.com)
+    /// - "hangoutsMeet" for Google Meet (http://meet.google.com)
     /// - "addOn" for 3P conference providers
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -1007,7 +1007,7 @@ pub struct ConferenceData {
     /// Either conferenceSolution and at least one entryPoint, or createRequest is required.
     #[serde(rename="entryPoints")]
     pub entry_points: Option<Vec<EntryPoint>>,
-    /// The conference solution, such as Hangouts or Hangouts Meet.
+    /// The conference solution, such as Hangouts or Google Meet.
     /// Unset for a conference with a failed create request.
     /// Either conferenceSolution and at least one entryPoint, or createRequest is required.
     #[serde(rename="conferenceSolution")]
@@ -1120,7 +1120,7 @@ impl ResponseResult for FreeBusyResponse {}
 pub struct CreateConferenceRequest {
     /// The status of the conference create request.
     pub status: Option<ConferenceRequestStatus>,
-    /// The conference solution, such as Hangouts or Hangouts Meet.
+    /// The conference solution, such as Hangouts or Google Meet.
     #[serde(rename="conferenceSolutionKey")]
     pub conference_solution_key: Option<ConferenceSolutionKey>,
     /// The client-generated unique ID for this request.
@@ -1652,7 +1652,7 @@ pub struct Event {
     /// If set to True, Event propagation is disabled. Note that it is not the same thing as Private event properties. Optional. Immutable. The default is False.
     #[serde(rename="privateCopy")]
     pub private_copy: Option<bool>,
-    /// The conference-related information, such as details of a Hangouts Meet conference. To create new conference details use the createRequest field. To persist your changes, remember to set the conferenceDataVersion request parameter to 1 for all event modification requests.
+    /// The conference-related information, such as details of a Google Meet conference. To create new conference details use the createRequest field. To persist your changes, remember to set the conferenceDataVersion request parameter to 1 for all event modification requests.
     #[serde(rename="conferenceData")]
     pub conference_data: Option<ConferenceData>,
 }

@@ -25,31 +25,31 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20200331*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Android Publisher* API at revision *20200709*. The CLI is at version *1.0.14*.
 
 ```bash
 androidpublisher3 [options]
         edits
                 apks-addexternallyhosted <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 apks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
-                apks-upload <package-name> <edit-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                apks-upload <package-name> <edit-id> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 bundles-list <package-name> <edit-id> [-p <v>]... [-o <out>]
-                bundles-upload <package-name> <edit-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                bundles-upload <package-name> <edit-id> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 commit <package-name> <edit-id> [-p <v>]... [-o <out>]
                 delete <package-name> <edit-id> [-p <v>]...
-                deobfuscationfiles-upload <package-name> <edit-id> <apk-version-code> <deobfuscation-file-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                deobfuscationfiles-upload <package-name> <edit-id> <apk-version-code> <deobfuscation-file-type> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 details-get <package-name> <edit-id> [-p <v>]... [-o <out>]
                 details-patch <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 details-update <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 expansionfiles-get <package-name> <edit-id> <apk-version-code> <expansion-file-type> [-p <v>]... [-o <out>]
                 expansionfiles-patch <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-r <kv>)... [-p <v>]... [-o <out>]
                 expansionfiles-update <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-r <kv>)... [-p <v>]... [-o <out>]
-                expansionfiles-upload <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                expansionfiles-upload <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 get <package-name> <edit-id> [-p <v>]... [-o <out>]
                 images-delete <package-name> <edit-id> <language> <image-type> <image-id> [-p <v>]...
                 images-deleteall <package-name> <edit-id> <language> <image-type> [-p <v>]... [-o <out>]
                 images-list <package-name> <edit-id> <language> <image-type> [-p <v>]... [-o <out>]
-                images-upload <package-name> <edit-id> <language> <image-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                images-upload <package-name> <edit-id> <language> <image-type> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 insert <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 listings-delete <package-name> <edit-id> <language> [-p <v>]...
                 listings-deleteall <package-name> <edit-id> [-p <v>]...
@@ -73,8 +73,8 @@ androidpublisher3 [options]
                 patch <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
         internalappsharingartifacts
-                uploadapk <package-name> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
-                uploadbundle <package-name> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                uploadapk <package-name> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                uploadbundle <package-name> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         orders
                 refund <package-name> <order-id> [-p <v>]...
         purchases

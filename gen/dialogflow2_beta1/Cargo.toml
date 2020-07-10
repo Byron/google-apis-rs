@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dialogflow2_beta1"
-version = "1.0.13+20200408"
+version = "1.0.14+20200706"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dialogflow (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow2_beta1"
 homepage = "https://cloud.google.com/dialogflow/"
-documentation = "https://docs.rs/google-dialogflow2_beta1/1.0.13+20200408"
+documentation = "https://docs.rs/google-dialogflow2_beta1/1.0.14+20200706"
 license = "MIT"
 keywords = ["dialogflow", "google", "protocol", "web", "api"]
 autobins = false

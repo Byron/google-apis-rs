@@ -202,6 +202,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_corpura_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_corpura_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -583,6 +635,9 @@ impl<'n> Engine<'n> {
             },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-corpura-operations-get", Some(opt)) => {
+                        call_result = self._projects_locations_corpura_operations_get(opt, dry_run, &mut err);
+                    },
                     ("locations-operations-cancel", Some(opt)) => {
                         call_result = self._projects_locations_operations_cancel(opt, dry_run, &mut err);
                     },
@@ -780,7 +835,31 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-corpura-operations-get', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+            ("locations-corpura-operations-get",
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_videointelligence1_cli/projects_locations-corpura-operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-operations-cancel",
                     Some(r##"Starts asynchronous cancellation on a long-running operation.  The server
         makes a best effort to cancel the operation, but success is not
@@ -932,7 +1011,7 @@ fn main() {
     
     let mut app = App::new("videointelligence1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200325")
+           .version("1.0.14+20200706")
            .about("Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_videointelligence1_cli")
            .arg(Arg::with_name("url")

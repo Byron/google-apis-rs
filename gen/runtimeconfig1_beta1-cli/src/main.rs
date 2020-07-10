@@ -1940,7 +1940,7 @@ fn main() {
             ("configs-operations-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -1976,7 +1976,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli/projects_configs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2007,7 +2007,7 @@ fn main() {
             ("configs-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2192,7 +2192,7 @@ fn main() {
             ("configs-variables-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2409,7 +2409,7 @@ fn main() {
             ("configs-waiters-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2447,7 +2447,7 @@ fn main() {
     
     let mut app = App::new("runtimeconfig1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200406")
+           .version("1.0.14+20200622")
            .about("The Runtime Configurator allows you to dynamically configure and expose variables through Google Cloud Platform. In addition, you can also set Watchers and Waiters that will watch for changes to your data and return based on certain conditions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli")
            .arg(Arg::with_name("url")

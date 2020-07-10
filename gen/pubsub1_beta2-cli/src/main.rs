@@ -1918,7 +1918,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1949,7 +1949,7 @@ fn main() {
             ("subscriptions-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2143,7 +2143,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2196,7 +2196,7 @@ fn main() {
             ("topics-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2234,7 +2234,7 @@ fn main() {
     
     let mut app = App::new("pubsub1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200403")
+           .version("1.0.14+20200627")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli")

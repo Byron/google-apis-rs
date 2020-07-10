@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Sheets* API at revision *20200402*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Sheets* API at revision *20200630*. The CLI is at version *1.0.14*.
 
 ```bash
 sheets4 [options]

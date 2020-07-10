@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *People Service* API at revision *20200407*. The CLI is at version *1.0.13*.
+This documentation was generated from the *People Service* API at revision *20200708*. The CLI is at version *1.0.14*.
 
 ```bash
 people1 [options]
@@ -37,6 +37,9 @@ people1 [options]
                 list [-p <v>]... [-o <out>]
                 members-modify <resource-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <resource-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        other-contacts
+                copy-other-contact-to-my-contacts-group <resource-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
         people
                 connections-list <resource-name> [-p <v>]... [-o <out>]
                 create-contact (-r <kv>)... [-p <v>]... [-o <out>]
@@ -44,6 +47,8 @@ people1 [options]
                 delete-contact-photo <resource-name> [-p <v>]... [-o <out>]
                 get <resource-name> [-p <v>]... [-o <out>]
                 get-batch-get [-p <v>]... [-o <out>]
+                list-directory-people [-p <v>]... [-o <out>]
+                search-directory-people [-p <v>]... [-o <out>]
                 update-contact <resource-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 update-contact-photo <resource-name> (-r <kv>)... [-p <v>]... [-o <out>]
   people1 --help

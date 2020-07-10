@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adsense1d4-cli"
-version = "1.0.13+20200407"
+version = "1.0.14+20200708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-adsense1d4]
 path = "../adsense1d4"
-version = "1.0.13+20200407"
+version = "1.0.14+20200708"

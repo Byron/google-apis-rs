@@ -282,6 +282,7 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -297,7 +298,7 @@ impl<'n> Engine<'n> {
                     "ingress-settings" => Some(("ingressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-id", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -779,6 +780,7 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -794,7 +796,7 @@ impl<'n> Engine<'n> {
                     "ingress-settings" => Some(("ingressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-id", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1658,7 +1660,7 @@ fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200401")
+           .version("1.0.14+20200629")
            .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")

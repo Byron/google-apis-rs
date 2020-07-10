@@ -4,7 +4,7 @@
 [package]
 
 name = "google-oslogin1-cli"
-version = "1.0.13+20200329"
+version = "1.0.14+20200704"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud OS Login (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/oslogin1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-oslogin1]
 path = "../oslogin1"
-version = "1.0.13+20200329"
+version = "1.0.14+20200704"

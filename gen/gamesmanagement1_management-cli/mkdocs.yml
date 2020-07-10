@@ -1,4 +1,4 @@
-site_name: Games Management v1.0.13+20200402
+site_name: Games Management v1.0.14+20200701
 site_url: http://byron.github.io/google-apis-rs/google-gamesmanagement1_management-cli
 site_description: A complete library to interact with Games Management (protocol v1management)
 
@@ -22,15 +22,11 @@ pages:
 - ['events_reset-multiple-for-all-players.md', 'Events', 'Reset Multiple For All Players']
 - ['players_hide.md', 'Players', 'Hide']
 - ['players_unhide.md', 'Players', 'Unhide']
-- ['rooms_reset.md', 'Rooms', 'Reset']
-- ['rooms_reset-for-all-players.md', 'Rooms', 'Reset For All Players']
 - ['scores_reset.md', 'Scores', 'Reset']
 - ['scores_reset-all.md', 'Scores', 'Reset All']
 - ['scores_reset-all-for-all-players.md', 'Scores', 'Reset All For All Players']
 - ['scores_reset-for-all-players.md', 'Scores', 'Reset For All Players']
 - ['scores_reset-multiple-for-all-players.md', 'Scores', 'Reset Multiple For All Players']
-- ['turn-based-matches_reset.md', 'Turn Based Matches', 'Reset']
-- ['turn-based-matches_reset-for-all-players.md', 'Turn Based Matches', 'Reset For All Players']
 
 theme: readthedocs
 

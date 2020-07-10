@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storagetransfer* API at revision *20200405*. The CLI is at version *1.0.13*.
+This documentation was generated from the *storagetransfer* API at revision *20200702*. The CLI is at version *1.0.14*.
 
 ```bash
 storagetransfer1 [options]

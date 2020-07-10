@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Drive Activity* API at revision *20200407*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Drive Activity* API at revision *20200707*. The CLI is at version *1.0.14*.
 
 ```bash
 driveactivity2 [options]

@@ -1,4 +1,4 @@
-site_name: Games v1.0.13+20200402
+site_name: Games v1.0.14+20200701
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -28,17 +28,7 @@ pages:
 - ['metagame_list-categories-by-player.md', 'Metagame', 'List Categories By Player']
 - ['players_get.md', 'Players', 'Get']
 - ['players_list.md', 'Players', 'List']
-- ['pushtokens_remove.md', 'Pushtokens', 'Remove']
-- ['pushtokens_update.md', 'Pushtokens', 'Update']
 - ['revisions_check.md', 'Revisions', 'Check']
-- ['rooms_create.md', 'Rooms', 'Create']
-- ['rooms_decline.md', 'Rooms', 'Decline']
-- ['rooms_dismiss.md', 'Rooms', 'Dismiss']
-- ['rooms_get.md', 'Rooms', 'Get']
-- ['rooms_join.md', 'Rooms', 'Join']
-- ['rooms_leave.md', 'Rooms', 'Leave']
-- ['rooms_list.md', 'Rooms', 'List']
-- ['rooms_report-status.md', 'Rooms', 'Report Status']
 - ['scores_get.md', 'Scores', 'Get']
 - ['scores_list.md', 'Scores', 'List']
 - ['scores_list-window.md', 'Scores', 'List Window']
@@ -46,19 +36,7 @@ pages:
 - ['scores_submit-multiple.md', 'Scores', 'Submit Multiple']
 - ['snapshots_get.md', 'Snapshots', 'Get']
 - ['snapshots_list.md', 'Snapshots', 'List']
-- ['turn-based-matches_cancel.md', 'Turn Based Matches', 'Cancel']
-- ['turn-based-matches_create.md', 'Turn Based Matches', 'Create']
-- ['turn-based-matches_decline.md', 'Turn Based Matches', 'Decline']
-- ['turn-based-matches_dismiss.md', 'Turn Based Matches', 'Dismiss']
-- ['turn-based-matches_finish.md', 'Turn Based Matches', 'Finish']
-- ['turn-based-matches_get.md', 'Turn Based Matches', 'Get']
-- ['turn-based-matches_join.md', 'Turn Based Matches', 'Join']
-- ['turn-based-matches_leave.md', 'Turn Based Matches', 'Leave']
-- ['turn-based-matches_leave-turn.md', 'Turn Based Matches', 'Leave Turn']
-- ['turn-based-matches_list.md', 'Turn Based Matches', 'List']
-- ['turn-based-matches_rematch.md', 'Turn Based Matches', 'Rematch']
-- ['turn-based-matches_sync.md', 'Turn Based Matches', 'Sync']
-- ['turn-based-matches_take-turn.md', 'Turn Based Matches', 'Take Turn']
+- ['stats_get.md', 'Stats', 'Get']
 
 theme: readthedocs
 

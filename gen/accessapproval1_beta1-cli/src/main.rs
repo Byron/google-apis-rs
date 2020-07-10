@@ -2264,7 +2264,7 @@ fn main() {
     
     let mut app = App::new("accessapproval1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200409")
+           .version("1.0.14+20200708")
            .about("An API for controlling access to data by Google personnel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli")
            .arg(Arg::with_name("url")

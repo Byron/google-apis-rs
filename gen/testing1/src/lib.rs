@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *testing* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *testing* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *testing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-test-lab/).
@@ -340,7 +340,7 @@ impl<'a, C, A> Testing<C, A>
         Testing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://testing.googleapis.com/".to_string(),
             _root_url: "https://testing.googleapis.com/".to_string(),
         }
@@ -357,7 +357,7 @@ impl<'a, C, A> Testing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -644,16 +644,6 @@ impl Part for ApkManifest {}
 pub struct TestSetup {
     /// The device will be logged in on this account for the duration of the test.
     pub account: Option<Account>,
-    /// List of directories on the device to upload to GCS at the end of the test;
-    /// they must be absolute paths under /sdcard or /data/local/tmp.
-    /// Path names are restricted to characters a-z A-Z 0-9 _ - . + and /
-    /// 
-    /// Note: The paths /sdcard and /data will be made available and treated as
-    /// implicit path substitutions. E.g. if /sdcard on a particular device does
-    /// not map to external storage, the system will replace it with the external
-    /// storage path prefix for that device.
-    #[serde(rename="directoriesToPull")]
-    pub directories_to_pull: Option<Vec<String>>,
     /// Systrace configuration for the run.
     /// If set a systrace will be taken, starting on test start and lasting for the
     /// configured duration. The systrace file thus obtained is put in the results
@@ -665,14 +655,27 @@ pub struct TestSetup {
     /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
     #[serde(rename="networkProfile")]
     pub network_profile: Option<String>,
-    /// APKs to install in addition to those being directly tested.
-    /// Currently capped at 100.
-    #[serde(rename="additionalApks")]
-    pub additional_apks: Option<Vec<Apk>>,
+    /// List of directories on the device to upload to GCS at the end of the test;
+    /// they must be absolute paths under /sdcard, /storage or /data/local/tmp.
+    /// Path names are restricted to characters a-z A-Z 0-9 _ - . + and /
+    /// 
+    /// Note: The paths /sdcard and /data will be made available and treated as
+    /// implicit path substitutions. E.g. if /sdcard on a particular device does
+    /// not map to external storage, the system will replace it with the external
+    /// storage path prefix for that device.
+    #[serde(rename="directoriesToPull")]
+    pub directories_to_pull: Option<Vec<String>>,
     /// Environment variables to set for the test (only applicable for
     /// instrumentation tests).
     #[serde(rename="environmentVariables")]
     pub environment_variables: Option<Vec<EnvironmentVariable>>,
+    /// APKs to install in addition to those being directly tested.
+    /// Currently capped at 100.
+    #[serde(rename="additionalApks")]
+    pub additional_apks: Option<Vec<Apk>>,
+    /// Whether to prevent all runtime permissions to be granted at app install
+    #[serde(rename="dontAutograntPermissions")]
+    pub dont_autogrant_permissions: Option<bool>,
     /// List of files to push to the device before starting the test.
     #[serde(rename="filesToPush")]
     pub files_to_push: Option<Vec<DeviceFile>>,
@@ -803,7 +806,7 @@ impl Part for TestDetails {}
 
 
 /// A description of an iOS device tests may be run on.
-/// Next tag: 12
+/// Next tag: 13
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -981,7 +984,8 @@ impl Part for AndroidRoboTest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileReference {
     /// A path to a file in Google Cloud Storage.
-    /// Example: gs://build-app-1414623860166/app-debug-unaligned.apk
+    /// Example: gs://build-app-1414623860166/app%40debug-unaligned.apk
+    /// These paths are expected to be url encoded (percent encoding)
     #[serde(rename="gcsPath")]
     pub gcs_path: Option<String>,
 }
@@ -1327,7 +1331,9 @@ impl Part for AndroidMatrix {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManualSharding {
     /// Required. Group of packages, classes, and/or test methods to be run for
-    /// each shard. The number of shard_test_targets must be >= 1 and <= 50.
+    /// each shard. When any physical devices are selected,  the number of
+    /// test_targets_for_shard must be >= 1 and <= 50. When no physical devices are
+    /// selected, the number must be >= 1 and <= 250.
     #[serde(rename="testTargetsForShard")]
     pub test_targets_for_shard: Option<Vec<TestTargetsForShard>>,
 }
@@ -1429,6 +1435,11 @@ pub struct IosXcTest {
     /// Output only. The bundle id for the application under test.
     #[serde(rename="appBundleId")]
     pub app_bundle_id: Option<String>,
+    /// The option to test special app entitlements. Setting this would re-sign the
+    /// app having special entitlements with an explicit application-identifier.
+    /// Currently supports testing aps-environment entitlement.
+    #[serde(rename="testSpecialEntitlements")]
+    pub test_special_entitlements: Option<bool>,
     /// An .xctestrun file that will override the .xctestrun file in the
     /// tests zip. Because the .xctestrun file contains environment variables along
     /// with test methods to run and/or ignore, this can be useful for sharding
@@ -1775,10 +1786,10 @@ pub struct RegularFile {
     /// Required. The source file.
     pub content: Option<FileReference>,
     /// Required. Where to put the content on the device. Must be an absolute,
-    /// whitelisted path. If the file exists, it will be replaced.
+    /// allowlisted path. If the file exists, it will be replaced.
     /// The following device-side directories and any of their subdirectories are
-    /// whitelisted:
-    /// <p>${EXTERNAL_STORAGE}, or /sdcard</p>
+    /// allowlisted:
+    /// <p>${EXTERNAL_STORAGE}, /sdcard, or /storage</p>
     /// <p>${ANDROID_DATA}/local/tmp, or /data/local/tmp</p>
     /// <p>Specifying a path outside of these directory trees is invalid.
     /// 
@@ -1808,7 +1819,9 @@ impl Part for RegularFile {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UniformSharding {
-    /// Required. Total number of shards. The number must be >= 1 and <= 50.
+    /// Required. Total number of shards. When any physical devices are selected,
+    /// the number must be >= 1 and <= 50. When no physical devices are selected,
+    /// the number must be >= 1 and <= 250.
     #[serde(rename="numShards")]
     pub num_shards: Option<i32>,
 }
@@ -1922,7 +1935,8 @@ pub struct AndroidModel {
     /// Screen size in the vertical (Y) dimension measured in pixels.
     #[serde(rename="screenY")]
     pub screen_y: Option<i32>,
-    /// URL of a thumbnail image of the device.
+    /// URL of a thumbnail image (photo) of the device.
+    /// e.g. https://lh3.googleusercontent.com/90WcauuJiCYABEl8U0lcZeuS5STUbf2yW...
     #[serde(rename="thumbnailUrl")]
     pub thumbnail_url: Option<String>,
     /// The list of supported ABIs for this device.

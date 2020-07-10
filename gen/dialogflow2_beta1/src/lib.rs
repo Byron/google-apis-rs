@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dialogflow* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *dialogflow:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Dialogflow* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *dialogflow:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Dialogflow* *v2_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dialogflow/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Dialogflow.html) ... 
 //! 
 //! * projects
-//!  * [*agent entity types batch delete*](struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](struct.ProjectAgentEntityTypePatchCall.html), [*agent environments users sessions contexts create*](struct.ProjectAgentEnvironmentUserSessionContextCreateCall.html), [*agent environments users sessions contexts delete*](struct.ProjectAgentEnvironmentUserSessionContextDeleteCall.html), [*agent environments users sessions contexts get*](struct.ProjectAgentEnvironmentUserSessionContextGetCall.html), [*agent environments users sessions contexts list*](struct.ProjectAgentEnvironmentUserSessionContextListCall.html), [*agent environments users sessions contexts patch*](struct.ProjectAgentEnvironmentUserSessionContextPatchCall.html), [*agent environments users sessions delete contexts*](struct.ProjectAgentEnvironmentUserSessionDeleteContextCall.html), [*agent environments users sessions detect intent*](struct.ProjectAgentEnvironmentUserSessionDetectIntentCall.html), [*agent environments users sessions entity types create*](struct.ProjectAgentEnvironmentUserSessionEntityTypeCreateCall.html), [*agent environments users sessions entity types delete*](struct.ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall.html), [*agent environments users sessions entity types get*](struct.ProjectAgentEnvironmentUserSessionEntityTypeGetCall.html), [*agent environments users sessions entity types list*](struct.ProjectAgentEnvironmentUserSessionEntityTypeListCall.html), [*agent environments users sessions entity types patch*](struct.ProjectAgentEnvironmentUserSessionEntityTypePatchCall.html), [*agent export*](struct.ProjectAgentExportCall.html), [*agent get fulfillment*](struct.ProjectAgentGetFulfillmentCall.html), [*agent get validation result*](struct.ProjectAgentGetValidationResultCall.html), [*agent import*](struct.ProjectAgentImportCall.html), [*agent intents batch delete*](struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](struct.ProjectAgentIntentGetCall.html), [*agent intents list*](struct.ProjectAgentIntentListCall.html), [*agent intents patch*](struct.ProjectAgentIntentPatchCall.html), [*agent knowledge bases create*](struct.ProjectAgentKnowledgeBaseCreateCall.html), [*agent knowledge bases delete*](struct.ProjectAgentKnowledgeBaseDeleteCall.html), [*agent knowledge bases documents create*](struct.ProjectAgentKnowledgeBaseDocumentCreateCall.html), [*agent knowledge bases documents delete*](struct.ProjectAgentKnowledgeBaseDocumentDeleteCall.html), [*agent knowledge bases documents get*](struct.ProjectAgentKnowledgeBaseDocumentGetCall.html), [*agent knowledge bases documents list*](struct.ProjectAgentKnowledgeBaseDocumentListCall.html), [*agent knowledge bases documents patch*](struct.ProjectAgentKnowledgeBaseDocumentPatchCall.html), [*agent knowledge bases documents reload*](struct.ProjectAgentKnowledgeBaseDocumentReloadCall.html), [*agent knowledge bases get*](struct.ProjectAgentKnowledgeBaseGetCall.html), [*agent knowledge bases list*](struct.ProjectAgentKnowledgeBaseListCall.html), [*agent knowledge bases patch*](struct.ProjectAgentKnowledgeBasePatchCall.html), [*agent restore*](struct.ProjectAgentRestoreCall.html), [*agent search*](struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](struct.ProjectAgentTrainCall.html), [*agent update fulfillment*](struct.ProjectAgentUpdateFulfillmentCall.html), [*delete agent*](struct.ProjectDeleteAgentCall.html), [*get agent*](struct.ProjectGetAgentCall.html), [*knowledge bases create*](struct.ProjectKnowledgeBaseCreateCall.html), [*knowledge bases delete*](struct.ProjectKnowledgeBaseDeleteCall.html), [*knowledge bases documents create*](struct.ProjectKnowledgeBaseDocumentCreateCall.html), [*knowledge bases documents delete*](struct.ProjectKnowledgeBaseDocumentDeleteCall.html), [*knowledge bases documents get*](struct.ProjectKnowledgeBaseDocumentGetCall.html), [*knowledge bases documents list*](struct.ProjectKnowledgeBaseDocumentListCall.html), [*knowledge bases documents patch*](struct.ProjectKnowledgeBaseDocumentPatchCall.html), [*knowledge bases documents reload*](struct.ProjectKnowledgeBaseDocumentReloadCall.html), [*knowledge bases get*](struct.ProjectKnowledgeBaseGetCall.html), [*knowledge bases list*](struct.ProjectKnowledgeBaseListCall.html), [*knowledge bases patch*](struct.ProjectKnowledgeBasePatchCall.html), [*locations agent entity types batch delete*](struct.ProjectLocationAgentEntityTypeBatchDeleteCall.html), [*locations agent entity types batch update*](struct.ProjectLocationAgentEntityTypeBatchUpdateCall.html), [*locations agent entity types create*](struct.ProjectLocationAgentEntityTypeCreateCall.html), [*locations agent entity types delete*](struct.ProjectLocationAgentEntityTypeDeleteCall.html), [*locations agent entity types entities batch create*](struct.ProjectLocationAgentEntityTypeEntityBatchCreateCall.html), [*locations agent entity types entities batch delete*](struct.ProjectLocationAgentEntityTypeEntityBatchDeleteCall.html), [*locations agent entity types entities batch update*](struct.ProjectLocationAgentEntityTypeEntityBatchUpdateCall.html), [*locations agent entity types get*](struct.ProjectLocationAgentEntityTypeGetCall.html), [*locations agent entity types list*](struct.ProjectLocationAgentEntityTypeListCall.html), [*locations agent entity types patch*](struct.ProjectLocationAgentEntityTypePatchCall.html), [*locations agent environments users sessions contexts create*](struct.ProjectLocationAgentEnvironmentUserSessionContextCreateCall.html), [*locations agent environments users sessions contexts delete*](struct.ProjectLocationAgentEnvironmentUserSessionContextDeleteCall.html), [*locations agent environments users sessions contexts get*](struct.ProjectLocationAgentEnvironmentUserSessionContextGetCall.html), [*locations agent environments users sessions contexts list*](struct.ProjectLocationAgentEnvironmentUserSessionContextListCall.html), [*locations agent environments users sessions contexts patch*](struct.ProjectLocationAgentEnvironmentUserSessionContextPatchCall.html), [*locations agent environments users sessions delete contexts*](struct.ProjectLocationAgentEnvironmentUserSessionDeleteContextCall.html), [*locations agent environments users sessions detect intent*](struct.ProjectLocationAgentEnvironmentUserSessionDetectIntentCall.html), [*locations agent environments users sessions entity types create*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeCreateCall.html), [*locations agent environments users sessions entity types delete*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeDeleteCall.html), [*locations agent environments users sessions entity types get*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeGetCall.html), [*locations agent environments users sessions entity types list*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeListCall.html), [*locations agent environments users sessions entity types patch*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypePatchCall.html), [*locations agent export*](struct.ProjectLocationAgentExportCall.html), [*locations agent fulfillment*](struct.ProjectLocationAgentFulfillmentCall.html), [*locations agent get fulfillment*](struct.ProjectLocationAgentGetFulfillmentCall.html), [*locations agent import*](struct.ProjectLocationAgentImportCall.html), [*locations agent intents batch delete*](struct.ProjectLocationAgentIntentBatchDeleteCall.html), [*locations agent intents batch update*](struct.ProjectLocationAgentIntentBatchUpdateCall.html), [*locations agent intents create*](struct.ProjectLocationAgentIntentCreateCall.html), [*locations agent intents delete*](struct.ProjectLocationAgentIntentDeleteCall.html), [*locations agent intents get*](struct.ProjectLocationAgentIntentGetCall.html), [*locations agent intents list*](struct.ProjectLocationAgentIntentListCall.html), [*locations agent intents patch*](struct.ProjectLocationAgentIntentPatchCall.html), [*locations agent restore*](struct.ProjectLocationAgentRestoreCall.html), [*locations agent sessions contexts create*](struct.ProjectLocationAgentSessionContextCreateCall.html), [*locations agent sessions contexts delete*](struct.ProjectLocationAgentSessionContextDeleteCall.html), [*locations agent sessions contexts get*](struct.ProjectLocationAgentSessionContextGetCall.html), [*locations agent sessions contexts list*](struct.ProjectLocationAgentSessionContextListCall.html), [*locations agent sessions contexts patch*](struct.ProjectLocationAgentSessionContextPatchCall.html), [*locations agent sessions delete contexts*](struct.ProjectLocationAgentSessionDeleteContextCall.html), [*locations agent sessions detect intent*](struct.ProjectLocationAgentSessionDetectIntentCall.html), [*locations agent sessions entity types create*](struct.ProjectLocationAgentSessionEntityTypeCreateCall.html), [*locations agent sessions entity types delete*](struct.ProjectLocationAgentSessionEntityTypeDeleteCall.html), [*locations agent sessions entity types get*](struct.ProjectLocationAgentSessionEntityTypeGetCall.html), [*locations agent sessions entity types list*](struct.ProjectLocationAgentSessionEntityTypeListCall.html), [*locations agent sessions entity types patch*](struct.ProjectLocationAgentSessionEntityTypePatchCall.html), [*locations agent train*](struct.ProjectLocationAgentTrainCall.html), [*locations delete agent*](struct.ProjectLocationDeleteAgentCall.html), [*locations get agent*](struct.ProjectLocationGetAgentCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*locations set agent*](struct.ProjectLocationSetAgentCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*set agent*](struct.ProjectSetAgentCall.html)
+//!  * [*agent entity types batch delete*](struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](struct.ProjectAgentEntityTypePatchCall.html), [*agent environments list*](struct.ProjectAgentEnvironmentListCall.html), [*agent environments users sessions contexts create*](struct.ProjectAgentEnvironmentUserSessionContextCreateCall.html), [*agent environments users sessions contexts delete*](struct.ProjectAgentEnvironmentUserSessionContextDeleteCall.html), [*agent environments users sessions contexts get*](struct.ProjectAgentEnvironmentUserSessionContextGetCall.html), [*agent environments users sessions contexts list*](struct.ProjectAgentEnvironmentUserSessionContextListCall.html), [*agent environments users sessions contexts patch*](struct.ProjectAgentEnvironmentUserSessionContextPatchCall.html), [*agent environments users sessions delete contexts*](struct.ProjectAgentEnvironmentUserSessionDeleteContextCall.html), [*agent environments users sessions detect intent*](struct.ProjectAgentEnvironmentUserSessionDetectIntentCall.html), [*agent environments users sessions entity types create*](struct.ProjectAgentEnvironmentUserSessionEntityTypeCreateCall.html), [*agent environments users sessions entity types delete*](struct.ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall.html), [*agent environments users sessions entity types get*](struct.ProjectAgentEnvironmentUserSessionEntityTypeGetCall.html), [*agent environments users sessions entity types list*](struct.ProjectAgentEnvironmentUserSessionEntityTypeListCall.html), [*agent environments users sessions entity types patch*](struct.ProjectAgentEnvironmentUserSessionEntityTypePatchCall.html), [*agent export*](struct.ProjectAgentExportCall.html), [*agent get fulfillment*](struct.ProjectAgentGetFulfillmentCall.html), [*agent get validation result*](struct.ProjectAgentGetValidationResultCall.html), [*agent import*](struct.ProjectAgentImportCall.html), [*agent intents batch delete*](struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](struct.ProjectAgentIntentGetCall.html), [*agent intents list*](struct.ProjectAgentIntentListCall.html), [*agent intents patch*](struct.ProjectAgentIntentPatchCall.html), [*agent knowledge bases create*](struct.ProjectAgentKnowledgeBaseCreateCall.html), [*agent knowledge bases delete*](struct.ProjectAgentKnowledgeBaseDeleteCall.html), [*agent knowledge bases documents create*](struct.ProjectAgentKnowledgeBaseDocumentCreateCall.html), [*agent knowledge bases documents delete*](struct.ProjectAgentKnowledgeBaseDocumentDeleteCall.html), [*agent knowledge bases documents get*](struct.ProjectAgentKnowledgeBaseDocumentGetCall.html), [*agent knowledge bases documents list*](struct.ProjectAgentKnowledgeBaseDocumentListCall.html), [*agent knowledge bases documents patch*](struct.ProjectAgentKnowledgeBaseDocumentPatchCall.html), [*agent knowledge bases documents reload*](struct.ProjectAgentKnowledgeBaseDocumentReloadCall.html), [*agent knowledge bases get*](struct.ProjectAgentKnowledgeBaseGetCall.html), [*agent knowledge bases list*](struct.ProjectAgentKnowledgeBaseListCall.html), [*agent knowledge bases patch*](struct.ProjectAgentKnowledgeBasePatchCall.html), [*agent restore*](struct.ProjectAgentRestoreCall.html), [*agent search*](struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](struct.ProjectAgentTrainCall.html), [*agent update fulfillment*](struct.ProjectAgentUpdateFulfillmentCall.html), [*delete agent*](struct.ProjectDeleteAgentCall.html), [*get agent*](struct.ProjectGetAgentCall.html), [*knowledge bases create*](struct.ProjectKnowledgeBaseCreateCall.html), [*knowledge bases delete*](struct.ProjectKnowledgeBaseDeleteCall.html), [*knowledge bases documents create*](struct.ProjectKnowledgeBaseDocumentCreateCall.html), [*knowledge bases documents delete*](struct.ProjectKnowledgeBaseDocumentDeleteCall.html), [*knowledge bases documents get*](struct.ProjectKnowledgeBaseDocumentGetCall.html), [*knowledge bases documents list*](struct.ProjectKnowledgeBaseDocumentListCall.html), [*knowledge bases documents patch*](struct.ProjectKnowledgeBaseDocumentPatchCall.html), [*knowledge bases documents reload*](struct.ProjectKnowledgeBaseDocumentReloadCall.html), [*knowledge bases get*](struct.ProjectKnowledgeBaseGetCall.html), [*knowledge bases list*](struct.ProjectKnowledgeBaseListCall.html), [*knowledge bases patch*](struct.ProjectKnowledgeBasePatchCall.html), [*locations agent entity types batch delete*](struct.ProjectLocationAgentEntityTypeBatchDeleteCall.html), [*locations agent entity types batch update*](struct.ProjectLocationAgentEntityTypeBatchUpdateCall.html), [*locations agent entity types create*](struct.ProjectLocationAgentEntityTypeCreateCall.html), [*locations agent entity types delete*](struct.ProjectLocationAgentEntityTypeDeleteCall.html), [*locations agent entity types entities batch create*](struct.ProjectLocationAgentEntityTypeEntityBatchCreateCall.html), [*locations agent entity types entities batch delete*](struct.ProjectLocationAgentEntityTypeEntityBatchDeleteCall.html), [*locations agent entity types entities batch update*](struct.ProjectLocationAgentEntityTypeEntityBatchUpdateCall.html), [*locations agent entity types get*](struct.ProjectLocationAgentEntityTypeGetCall.html), [*locations agent entity types list*](struct.ProjectLocationAgentEntityTypeListCall.html), [*locations agent entity types patch*](struct.ProjectLocationAgentEntityTypePatchCall.html), [*locations agent environments list*](struct.ProjectLocationAgentEnvironmentListCall.html), [*locations agent environments users sessions contexts create*](struct.ProjectLocationAgentEnvironmentUserSessionContextCreateCall.html), [*locations agent environments users sessions contexts delete*](struct.ProjectLocationAgentEnvironmentUserSessionContextDeleteCall.html), [*locations agent environments users sessions contexts get*](struct.ProjectLocationAgentEnvironmentUserSessionContextGetCall.html), [*locations agent environments users sessions contexts list*](struct.ProjectLocationAgentEnvironmentUserSessionContextListCall.html), [*locations agent environments users sessions contexts patch*](struct.ProjectLocationAgentEnvironmentUserSessionContextPatchCall.html), [*locations agent environments users sessions delete contexts*](struct.ProjectLocationAgentEnvironmentUserSessionDeleteContextCall.html), [*locations agent environments users sessions detect intent*](struct.ProjectLocationAgentEnvironmentUserSessionDetectIntentCall.html), [*locations agent environments users sessions entity types create*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeCreateCall.html), [*locations agent environments users sessions entity types delete*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeDeleteCall.html), [*locations agent environments users sessions entity types get*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeGetCall.html), [*locations agent environments users sessions entity types list*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypeListCall.html), [*locations agent environments users sessions entity types patch*](struct.ProjectLocationAgentEnvironmentUserSessionEntityTypePatchCall.html), [*locations agent export*](struct.ProjectLocationAgentExportCall.html), [*locations agent get fulfillment*](struct.ProjectLocationAgentGetFulfillmentCall.html), [*locations agent import*](struct.ProjectLocationAgentImportCall.html), [*locations agent intents batch delete*](struct.ProjectLocationAgentIntentBatchDeleteCall.html), [*locations agent intents batch update*](struct.ProjectLocationAgentIntentBatchUpdateCall.html), [*locations agent intents create*](struct.ProjectLocationAgentIntentCreateCall.html), [*locations agent intents delete*](struct.ProjectLocationAgentIntentDeleteCall.html), [*locations agent intents get*](struct.ProjectLocationAgentIntentGetCall.html), [*locations agent intents list*](struct.ProjectLocationAgentIntentListCall.html), [*locations agent intents patch*](struct.ProjectLocationAgentIntentPatchCall.html), [*locations agent restore*](struct.ProjectLocationAgentRestoreCall.html), [*locations agent search*](struct.ProjectLocationAgentSearchCall.html), [*locations agent sessions contexts create*](struct.ProjectLocationAgentSessionContextCreateCall.html), [*locations agent sessions contexts delete*](struct.ProjectLocationAgentSessionContextDeleteCall.html), [*locations agent sessions contexts get*](struct.ProjectLocationAgentSessionContextGetCall.html), [*locations agent sessions contexts list*](struct.ProjectLocationAgentSessionContextListCall.html), [*locations agent sessions contexts patch*](struct.ProjectLocationAgentSessionContextPatchCall.html), [*locations agent sessions delete contexts*](struct.ProjectLocationAgentSessionDeleteContextCall.html), [*locations agent sessions detect intent*](struct.ProjectLocationAgentSessionDetectIntentCall.html), [*locations agent sessions entity types create*](struct.ProjectLocationAgentSessionEntityTypeCreateCall.html), [*locations agent sessions entity types delete*](struct.ProjectLocationAgentSessionEntityTypeDeleteCall.html), [*locations agent sessions entity types get*](struct.ProjectLocationAgentSessionEntityTypeGetCall.html), [*locations agent sessions entity types list*](struct.ProjectLocationAgentSessionEntityTypeListCall.html), [*locations agent sessions entity types patch*](struct.ProjectLocationAgentSessionEntityTypePatchCall.html), [*locations agent train*](struct.ProjectLocationAgentTrainCall.html), [*locations agent update fulfillment*](struct.ProjectLocationAgentUpdateFulfillmentCall.html), [*locations delete agent*](struct.ProjectLocationDeleteAgentCall.html), [*locations get agent*](struct.ProjectLocationGetAgentCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*locations set agent*](struct.ProjectLocationSetAgentCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*set agent*](struct.ProjectSetAgentCall.html)
 //! 
 //! 
 //! 
@@ -366,7 +366,7 @@ impl<'a, C, A> Dialogflow<C, A>
         Dialogflow {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://dialogflow.googleapis.com/".to_string(),
             _root_url: "https://dialogflow.googleapis.com/".to_string(),
         }
@@ -377,7 +377,7 @@ impl<'a, C, A> Dialogflow<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -548,11 +548,6 @@ pub struct GoogleCloudDialogflowV2beta1Document {
     /// Required. The MIME type of this document.
     #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
-    /// The raw content of the document. This field is only permitted for
-    /// EXTRACTIVE_QA and FAQ knowledge types.
-    /// Note: This field is in the process of being deprecated, please use
-    /// raw_content instead.
-    pub content: Option<String>,
     /// Required. The display name of the document. The name must be 1024 bytes or
     /// less; otherwise, the creation request fails.
     #[serde(rename="displayName")]
@@ -568,14 +563,42 @@ pub struct GoogleCloudDialogflowV2beta1Document {
     /// Instead use the `gs://` format URI described above.
     #[serde(rename="contentUri")]
     pub content_uri: Option<String>,
+    /// The raw content of the document. This field is only permitted for
+    /// EXTRACTIVE_QA and FAQ knowledge types.
+    /// Note: This field is in the process of being deprecated, please use
+    /// raw_content instead.
+    pub content: Option<String>,
     /// Required. The knowledge type of document content.
     #[serde(rename="knowledgeTypes")]
     pub knowledge_types: Option<Vec<String>>,
+    /// Output only. The time and status of the latest reload.
+    /// This reload may have been triggered automatically or manually
+    /// and may not have succeeded.
+    #[serde(rename="latestReloadStatus")]
+    pub latest_reload_status: Option<GoogleCloudDialogflowV2beta1DocumentReloadStatus>,
     /// The raw content of the document. This field is only permitted for
     /// EXTRACTIVE_QA and FAQ knowledge types.
     #[serde(rename="rawContent")]
     pub raw_content: Option<String>,
-    /// The document resource name.
+    /// Optional. If true, we try to automatically reload the document every day
+    /// (at a time picked by the system). If false or unspecified, we don't try
+    /// to automatically reload the document.
+    /// 
+    /// Currently you can only enable automatic reload for documents sourced from
+    /// a public url, see `source` field for the source types.
+    /// 
+    /// Reload status can be tracked in `latest_reload_status`. If a reload
+    /// fails, we will keep the document unchanged.
+    /// 
+    /// If a reload fails with internal errors, the system will try to reload the
+    /// document on the next day.
+    /// If a reload fails with non-retriable errors (e.g. PERMISION_DENIED), the
+    /// system will not try to reload the document anymore. You need to manually
+    /// reload the document successfully by calling `ReloadDocument` and clear the
+    /// errors.
+    #[serde(rename="enableAutoReload")]
+    pub enable_auto_reload: Option<bool>,
+    /// Optional. The document resource name.
     /// The name must be empty when creating a document.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`.
@@ -632,8 +655,6 @@ impl Part for GoogleCloudDialogflowV2beta1IntentTrainingPhrase {}
 /// Rich cards allow you to respond to users with more vivid content, e.g.
 /// with media and suggestions.
 /// 
-/// For more details about RBM rich cards, please see:
-/// https://developers.google.com/rcs-business-messaging/rbm/guides/build/send-messages#rich-cards.
 /// If you want to show a single card with more control over the layout,
 /// please use RbmStandaloneCard instead.
 /// 
@@ -677,6 +698,7 @@ pub struct GoogleCloudDialogflowV2beta1IntentParameter {
     #[serde(rename="entityTypeDisplayName")]
     pub entity_type_display_name: Option<String>,
     /// Optional. The definition of the parameter value. It can be:
+    /// 
     /// - a constant string,
     /// - a parameter value defined as `$parameter_name`,
     /// - an original parameter value defined as `$parameter_name.original`,
@@ -718,6 +740,7 @@ pub struct GoogleCloudDialogflowV2beta1SpeechContext {
     /// limits.
     pub phrases: Option<Vec<String>>,
     /// Optional. Boost for this context compared to other contexts:
+    /// 
     /// * If the boost is positive, Dialogflow will increase the probability that
     ///   the phrases in this context are recognized over similar sounding phrases.
     /// * If the boost is unspecified or non-positive, Dialogflow will not apply
@@ -731,30 +754,28 @@ pub struct GoogleCloudDialogflowV2beta1SpeechContext {
 impl Part for GoogleCloudDialogflowV2beta1SpeechContext {}
 
 
-/// Instructs the speech synthesizer how to generate the output audio content.
-/// If this audio config is supplied in a request, it overrides all existing
-/// text-to-speech settings applied to the agent.
+/// The request message for Agents.ExportAgent.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agent export projects](struct.ProjectLocationAgentExportCall.html) (request)
+/// * [agent export projects](struct.ProjectAgentExportCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1OutputAudioConfig {
-    /// Required. Audio encoding of the synthesized audio content.
-    #[serde(rename="audioEncoding")]
-    pub audio_encoding: Option<String>,
-    /// The synthesis sample rate (in hertz) for this audio. If not
-    /// provided, then the synthesizer will use the default sample rate based on
-    /// the audio encoding. If this is different from the voice's natural sample
-    /// rate, then the synthesizer will honor this request by converting to the
-    /// desired sample rate (which might result in worse audio quality).
-    #[serde(rename="sampleRateHertz")]
-    pub sample_rate_hertz: Option<i32>,
-    /// Configuration of how speech should be synthesized.
-    #[serde(rename="synthesizeSpeechConfig")]
-    pub synthesize_speech_config: Option<GoogleCloudDialogflowV2beta1SynthesizeSpeechConfig>,
+pub struct GoogleCloudDialogflowV2beta1ExportAgentRequest {
+    /// Optional. The
+    /// [Google Cloud Storage](https://cloud.google.com/storage/docs/)
+    /// URI to export the agent to.
+    /// The format of this URI must be `gs://<bucket-name>/<object-name>`.
+    /// If left unspecified, the serialized agent is returned inline.
+    #[serde(rename="agentUri")]
+    pub agent_uri: Option<String>,
 }
 
-impl Part for GoogleCloudDialogflowV2beta1OutputAudioConfig {}
+impl RequestValue for GoogleCloudDialogflowV2beta1ExportAgentRequest {}
 
 
 /// Actions on Google action to open a given url.
@@ -772,39 +793,6 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCaro
 }
 
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction {}
-
-
-/// Represents a fulfillment.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations agent get fulfillment projects](struct.ProjectLocationAgentGetFulfillmentCall.html) (response)
-/// * [locations agent fulfillment projects](struct.ProjectLocationAgentFulfillmentCall.html) (request|response)
-/// * [agent get fulfillment projects](struct.ProjectAgentGetFulfillmentCall.html) (response)
-/// * [agent update fulfillment projects](struct.ProjectAgentUpdateFulfillmentCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1Fulfillment {
-    /// Optional. The human-readable name of the fulfillment, unique within the agent.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Optional. Whether fulfillment is enabled.
-    pub enabled: Option<bool>,
-    /// Optional. The field defines whether the fulfillment is enabled for certain features.
-    pub features: Option<Vec<GoogleCloudDialogflowV2beta1FulfillmentFeature>>,
-    /// Configuration for a generic web service.
-    #[serde(rename="genericWebService")]
-    pub generic_web_service: Option<GoogleCloudDialogflowV2beta1FulfillmentGenericWebService>,
-    /// Required. The unique identifier of the fulfillment.
-    /// Format: `projects/<Project ID>/agent/fulfillment`.
-    pub name: Option<String>,
-}
-
-impl RequestValue for GoogleCloudDialogflowV2beta1Fulfillment {}
-impl ResponseResult for GoogleCloudDialogflowV2beta1Fulfillment {}
 
 
 /// The request message for Agents.TrainAgent.
@@ -854,13 +842,27 @@ pub struct GoogleCloudDialogflowV2beta1ValidationError {
 impl Part for GoogleCloudDialogflowV2beta1ValidationError {}
 
 
+/// Google Cloud Storage location for single input.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1GcsSource {
+    /// Required. The Google Cloud Storage URIs for the inputs. A URI is of the
+    /// form:
+    ///   gs://bucket/object-prefix-or-name
+    /// Whether a prefix or name is used depends on the use case.
+    pub uri: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2beta1GcsSource {}
+
+
 /// Standalone Rich Business Messaging (RBM) rich card.
 /// 
 /// Rich cards allow you to respond to users with more vivid content, e.g.
 /// with media and suggestions.
 /// 
-/// For more details about RBM rich cards, please see:
-/// https://developers.google.com/rcs-business-messaging/rbm/guides/build/send-messages#rich-cards.
 /// You can group multiple rich cards into one using RbmCarouselCard but
 /// carousel cards will give you less control over the card layout.
 /// 
@@ -948,14 +950,14 @@ pub struct GoogleCloudDialogflowV2beta1Intent {
     /// Required. The name of this intent.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The unique identifier of this intent.
+    /// Optional. The unique identifier of this intent.
     /// Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
     /// methods.
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     pub name: Option<String>,
     /// Optional. The collection of parameters associated with the intent.
     pub parameters: Option<Vec<GoogleCloudDialogflowV2beta1IntentParameter>>,
-    /// Read-only after creation. The unique identifier of the parent intent in the
+    /// Optional. The unique identifier of the parent intent in the
     /// chain of followup intents. You can set this field when creating an intent,
     /// for example with CreateIntent or
     /// BatchUpdateIntents, in order to make this
@@ -965,7 +967,7 @@ pub struct GoogleCloudDialogflowV2beta1Intent {
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     #[serde(rename="parentFollowupIntentName")]
     pub parent_followup_intent_name: Option<String>,
-    /// Read-only. Information about all followup intents that have this intent as
+    /// Output only. Information about all followup intents that have this intent as
     /// a direct or indirect parent. We populate this field only in the output.
     #[serde(rename="followupIntentInfo")]
     pub followup_intent_info: Option<Vec<GoogleCloudDialogflowV2beta1IntentFollowupIntentInfo>>,
@@ -976,7 +978,7 @@ pub struct GoogleCloudDialogflowV2beta1Intent {
     /// Optional. The collection of rich messages corresponding to the
     /// `Response` field in the Dialogflow console.
     pub messages: Option<Vec<GoogleCloudDialogflowV2beta1IntentMessage>>,
-    /// The priority of this intent. Higher numbers represent higher
+    /// Optional. The priority of this intent. Higher numbers represent higher
     /// priorities.
     /// 
     /// - If the supplied value is unspecified or 0, the service
@@ -985,9 +987,9 @@ pub struct GoogleCloudDialogflowV2beta1Intent {
     /// - If the supplied value is negative, the intent is ignored
     ///   in runtime detect intent requests.
     pub priority: Option<i32>,
-    /// Read-only. The unique identifier of the root intent in the chain of
+    /// Output only. The unique identifier of the root intent in the chain of
     /// followup intents. It identifies the correct followup intents chain for
-    /// this intent. We populate this field only in the output.
+    /// this intent.
     /// 
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     #[serde(rename="rootFollowupIntentName")]
@@ -1078,7 +1080,7 @@ impl Part for GoogleTypeLatLng {}
 
 
 /// Opens the user's default dialer app with the specified phone number
-/// but does not dial automatically (https://goo.gl/ergbB2).
+/// but does not dial automatically.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1093,6 +1095,30 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggest
 }
 
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedActionRbmSuggestedActionDial {}
+
+
+/// The response message for Environments.ListEnvironments.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agent environments list projects](struct.ProjectLocationAgentEnvironmentListCall.html) (response)
+/// * [agent environments list projects](struct.ProjectAgentEnvironmentListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1ListEnvironmentsResponse {
+    /// Token to retrieve the next page of results, or empty if there are no
+    /// more results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of agent environments. There will be a maximum number of items
+    /// returned based on the page_size field in the request.
+    pub environments: Option<Vec<GoogleCloudDialogflowV2beta1Environment>>,
+}
+
+impl ResponseResult for GoogleCloudDialogflowV2beta1ListEnvironmentsResponse {}
 
 
 /// Response media object for media content card.
@@ -1118,18 +1144,35 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageMediaContentResponseMediaObj
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageMediaContentResponseMediaObject {}
 
 
-/// This message is a wrapper around a collection of entity types.
+/// Represents an agent environment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1EntityTypeBatch {
-    /// A collection of entity types.
-    #[serde(rename="entityTypes")]
-    pub entity_types: Option<Vec<GoogleCloudDialogflowV2beta1EntityType>>,
+pub struct GoogleCloudDialogflowV2beta1Environment {
+    /// Output only. The unique identifier of this agent environment.
+    /// Format:
+    /// - `projects/<Project Number / ID>/agent/environments/<Environment ID>`
+    /// - `projects/<Project Number / ID>/locations/<Location
+    /// ID>/agent/environments/<Environment ID>`
+    pub name: Option<String>,
+    /// Output only. The state of this environment. This field is read-only, i.e., it cannot be
+    /// set by create and update methods.
+    pub state: Option<String>,
+    /// Optional. The agent version loaded into this environment.
+    /// Format: `projects/<Project ID>/agent/versions/<Version ID>`.
+    #[serde(rename="agentVersion")]
+    pub agent_version: Option<String>,
+    /// Output only. The last update time of this environment. This field is read-only, i.e., it
+    /// cannot be set by create and update methods.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Optional. The developer-provided description for this environment.
+    /// The maximum length is 500 characters. If exceeded, the request is rejected.
+    pub description: Option<String>,
 }
 
-impl Part for GoogleCloudDialogflowV2beta1EntityTypeBatch {}
+impl Part for GoogleCloudDialogflowV2beta1Environment {}
 
 
 /// The request to detect user's intent.
@@ -1259,6 +1302,42 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageCard {
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageCard {}
 
 
+/// The request message for EntityTypes.BatchUpdateEntityTypes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [agent entity types batch update projects](struct.ProjectAgentEntityTypeBatchUpdateCall.html) (request)
+/// * [locations agent entity types batch update projects](struct.ProjectLocationAgentEntityTypeBatchUpdateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesRequest {
+    /// Optional. The language used to access language-specific data.
+    /// If not specified, the agent's default language is used.
+    /// For more information, see
+    /// [Multilingual intent and entity
+    /// data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// The URI to a Google Cloud Storage file containing entity types to update
+    /// or create. The file format can either be a serialized proto (of
+    /// EntityBatch type) or a JSON object. Note: The URI must start with
+    /// "gs://".
+    #[serde(rename="entityTypeBatchUri")]
+    pub entity_type_batch_uri: Option<String>,
+    /// The collection of entity types to update or create.
+    #[serde(rename="entityTypeBatchInline")]
+    pub entity_type_batch_inline: Option<GoogleCloudDialogflowV2beta1EntityTypeBatch>,
+    /// Optional. The mask to control which fields get updated.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
+
+impl RequestValue for GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesRequest {}
+
+
 /// Whether fulfillment is enabled for the specific feature.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1271,6 +1350,20 @@ pub struct GoogleCloudDialogflowV2beta1FulfillmentFeature {
 }
 
 impl Part for GoogleCloudDialogflowV2beta1FulfillmentFeature {}
+
+
+/// This message is a wrapper around a collection of entity types.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1EntityTypeBatch {
+    /// A collection of entity types.
+    #[serde(rename="entityTypes")]
+    pub entity_types: Option<Vec<GoogleCloudDialogflowV2beta1EntityType>>,
+}
+
+impl Part for GoogleCloudDialogflowV2beta1EntityTypeBatch {}
 
 
 /// The card for presenting a carousel of options to select from.
@@ -1322,28 +1415,37 @@ pub struct GoogleCloudDialogflowV2beta1SubAgent {
 impl Part for GoogleCloudDialogflowV2beta1SubAgent {}
 
 
-/// The request message for Agents.ExportAgent.
+/// Represents a fulfillment.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations agent export projects](struct.ProjectLocationAgentExportCall.html) (request)
-/// * [agent export projects](struct.ProjectAgentExportCall.html) (request)
+/// * [agent update fulfillment projects](struct.ProjectAgentUpdateFulfillmentCall.html) (request|response)
+/// * [locations agent get fulfillment projects](struct.ProjectLocationAgentGetFulfillmentCall.html) (response)
+/// * [agent get fulfillment projects](struct.ProjectAgentGetFulfillmentCall.html) (response)
+/// * [locations agent update fulfillment projects](struct.ProjectLocationAgentUpdateFulfillmentCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1ExportAgentRequest {
-    /// Optional. The
-    /// [Google Cloud Storage](https://cloud.google.com/storage/docs/)
-    /// URI to export the agent to.
-    /// The format of this URI must be `gs://<bucket-name>/<object-name>`.
-    /// If left unspecified, the serialized agent is returned inline.
-    #[serde(rename="agentUri")]
-    pub agent_uri: Option<String>,
+pub struct GoogleCloudDialogflowV2beta1Fulfillment {
+    /// Optional. The human-readable name of the fulfillment, unique within the agent.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Optional. Whether fulfillment is enabled.
+    pub enabled: Option<bool>,
+    /// Optional. The field defines whether the fulfillment is enabled for certain features.
+    pub features: Option<Vec<GoogleCloudDialogflowV2beta1FulfillmentFeature>>,
+    /// Configuration for a generic web service.
+    #[serde(rename="genericWebService")]
+    pub generic_web_service: Option<GoogleCloudDialogflowV2beta1FulfillmentGenericWebService>,
+    /// Required. The unique identifier of the fulfillment.
+    /// Format: `projects/<Project ID>/agent/fulfillment`.
+    pub name: Option<String>,
 }
 
-impl RequestValue for GoogleCloudDialogflowV2beta1ExportAgentRequest {}
+impl RequestValue for GoogleCloudDialogflowV2beta1Fulfillment {}
+impl ResponseResult for GoogleCloudDialogflowV2beta1Fulfillment {}
 
 
 /// Table card for Actions on Google.
@@ -1434,7 +1536,7 @@ impl Part for GoogleCloudDialogflowV2beta1IntentMessageMediaContent {}
 
 
 /// Opens the user's default web browser app to the specified uri
-/// (https://goo.gl/6GLJD2). If the user has an app installed that is
+/// If the user has an app installed that is
 /// registered as the default handler for the URL, then this app will be
 /// opened instead, and its icon will be used in the suggested action UI.
 /// 
@@ -1542,63 +1644,79 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmText {
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageRbmText {}
 
 
-/// Represents the result of querying a Knowledge base.
+/// Represents a conversational agent.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1KnowledgeAnswers {
-    /// A list of answers from Knowledge Connector.
-    pub answers: Option<Vec<GoogleCloudDialogflowV2beta1KnowledgeAnswersAnswer>>,
-}
-
-impl Part for GoogleCloudDialogflowV2beta1KnowledgeAnswers {}
-
-
-/// Rich Business Messaging (RBM) Media displayed in Cards
-/// The following media-types are currently supported:
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// Image Types
-/// 
-/// * image/jpeg
-/// * image/jpg'
-/// * image/gif
-/// * image/png
-/// 
-/// Video Types
-/// 
-/// * video/h263
-/// * video/m4v
-/// * video/mp4
-/// * video/mpeg
-/// * video/mpeg4
-/// * video/webm
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [locations get agent projects](struct.ProjectLocationGetAgentCall.html) (response)
+/// * [locations set agent projects](struct.ProjectLocationSetAgentCall.html) (request|response)
+/// * [get agent projects](struct.ProjectGetAgentCall.html) (response)
+/// * [set agent projects](struct.ProjectSetAgentCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia {
-    /// Required. Publicly reachable URI of the file. The RBM platform
-    /// determines the MIME type of the file from the content-type field in
-    /// the HTTP headers when the platform fetches the file. The content-type
-    /// field must be present and accurate in the HTTP response from the URL.
-    #[serde(rename="fileUri")]
-    pub file_uri: Option<String>,
-    /// Optional. Publicly reachable URI of the thumbnail.If you don't
-    /// provide a thumbnail URI, the RBM platform displays a blank
-    /// placeholder thumbnail until the user's device downloads the file.
-    /// Depending on the user's setting, the file may not download
-    /// automatically and may require the user to tap a download button.
-    #[serde(rename="thumbnailUri")]
-    pub thumbnail_uri: Option<String>,
-    /// Required for cards with vertical orientation. The height of the media
-    /// within a rich card with a vertical layout. (https://goo.gl/NeFCjz).
-    /// For a standalone card with horizontal layout, height is not
-    /// customizable, and this field is ignored.
-    pub height: Option<String>,
+pub struct GoogleCloudDialogflowV2beta1Agent {
+    /// Optional. The URI of the agent's avatar.
+    /// Avatars are used throughout the Dialogflow console and in the self-hosted
+    /// [Web
+    /// Demo](https://cloud.google.com/dialogflow/docs/integrations/web-demo)
+    /// integration.
+    #[serde(rename="avatarUri")]
+    pub avatar_uri: Option<String>,
+    /// Required. The name of this agent.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Optional. The description of this agent.
+    /// The maximum length is 500 characters. If exceeded, the request is rejected.
+    pub description: Option<String>,
+    /// Required. The project of this agent.
+    /// Format: `projects/<Project ID>`.
+    pub parent: Option<String>,
+    /// Required. The default language of the agent as a language tag. See
+    /// [Language
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
+    /// for a list of the currently supported language codes. This field cannot be
+    /// set by the `Update` method.
+    #[serde(rename="defaultLanguageCode")]
+    pub default_language_code: Option<String>,
+    /// Optional. API version displayed in Dialogflow console. If not specified,
+    /// V2 API is assumed. Clients are free to query different service endpoints
+    /// for different API versions. However, bots connectors and webhook calls will
+    /// follow the specified API version.
+    #[serde(rename="apiVersion")]
+    pub api_version: Option<String>,
+    /// Optional. Determines whether this agent should log conversation queries.
+    #[serde(rename="enableLogging")]
+    pub enable_logging: Option<bool>,
+    /// Optional. Determines how intents are detected from user queries.
+    #[serde(rename="matchMode")]
+    pub match_mode: Option<String>,
+    /// Optional. The list of all languages supported by this agent (except for the
+    /// `default_language_code`).
+    #[serde(rename="supportedLanguageCodes")]
+    pub supported_language_codes: Option<Vec<String>>,
+    /// Optional. The agent tier. If not specified, TIER_STANDARD is assumed.
+    pub tier: Option<String>,
+    /// Required. The time zone of this agent from the
+    /// [time zone database](https://www.iana.org/time-zones), e.g.,
+    /// America/New_York, Europe/Paris.
+    #[serde(rename="timeZone")]
+    pub time_zone: Option<String>,
+    /// Optional. To filter out false positive results and still get variety in
+    /// matched natural language inputs for your agent, you can tune the machine
+    /// learning classification threshold. If the returned score value is less than
+    /// the threshold value, then a fallback intent will be triggered or, if there
+    /// are no fallback intents defined, no intent will be triggered. The score
+    /// values range from 0.0 (completely uncertain) to 1.0 (completely certain).
+    /// If set to 0.0, the default of 0.3 is used.
+    #[serde(rename="classificationThreshold")]
+    pub classification_threshold: Option<f32>,
 }
 
-impl Part for GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia {}
+impl RequestValue for GoogleCloudDialogflowV2beta1Agent {}
+impl ResponseResult for GoogleCloudDialogflowV2beta1Agent {}
 
 
 /// Represents a session entity type.
@@ -1742,6 +1860,20 @@ pub struct GoogleCloudDialogflowV2beta1EventInput {
     /// Required. The unique identifier of the event.
     pub name: Option<String>,
     /// The collection of parameters associated with the event.
+    /// 
+    /// Depending on your protocol or client library language, this is a
+    /// map, associative array, symbol table, dictionary, or JSON object
+    /// composed of a collection of (MapKey, MapValue) pairs:
+    /// 
+    /// * MapKey type: string
+    /// * MapKey value: parameter name
+    /// * MapValue type:
+    ///   * If parameter's entity type is a composite entity: map
+    ///   * Else: string or number, depending on parameter value type
+    /// * MapValue value:
+    ///   * If parameter's entity type is a composite entity:
+    ///     map from composite entity property names to property values
+    ///   * Else: parameter value
     pub parameters: Option<HashMap<String, String>>,
 }
 
@@ -1767,24 +1899,16 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCard {
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageBrowseCarouselCard {}
 
 
-/// Google Cloud Storage location for single input.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1GcsSource {
-    /// Required. The Google Cloud Storage URIs for the inputs. A URI is of the
-    /// form:
-    ///   gs://bucket/object-prefix-or-name
-    /// Whether a prefix or name is used depends on the use case.
-    pub uri: Option<String>,
-}
-
-impl Part for GoogleCloudDialogflowV2beta1GcsSource {}
-
-
-/// The result of sentiment analysis as configured by
-/// `sentiment_analysis_request_config`.
+/// The result of sentiment analysis. Sentiment analysis inspects user input
+/// and identifies the prevailing subjective opinion, especially to determine a
+/// user's attitude as positive, negative, or neutral.
+/// For Participants.AnalyzeContent, it needs to be configured in
+/// DetectIntentRequest.query_params. For
+/// Participants.StreamingAnalyzeContent, it needs to be configured in
+/// StreamingDetectIntentRequest.query_params.
+/// And for Participants.AnalyzeContent and
+/// Participants.StreamingAnalyzeContent, it needs to be configured in
+/// ConversationProfile.human_agent_assistant_config
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1816,40 +1940,30 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageImage {
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageImage {}
 
 
-/// The request message for EntityTypes.BatchUpdateEntityTypes.
+/// Instructs the speech synthesizer how to generate the output audio content.
+/// If this audio config is supplied in a request, it overrides all existing
+/// text-to-speech settings applied to the agent.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [agent entity types batch update projects](struct.ProjectAgentEntityTypeBatchUpdateCall.html) (request)
-/// * [locations agent entity types batch update projects](struct.ProjectLocationAgentEntityTypeBatchUpdateCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesRequest {
-    /// Optional. The language used to access language-specific data.
-    /// If not specified, the agent's default language is used.
-    /// For more information, see
-    /// [Multilingual intent and entity
-    /// data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// The URI to a Google Cloud Storage file containing entity types to update
-    /// or create. The file format can either be a serialized proto (of
-    /// EntityBatch type) or a JSON object. Note: The URI must start with
-    /// "gs://".
-    #[serde(rename="entityTypeBatchUri")]
-    pub entity_type_batch_uri: Option<String>,
-    /// The collection of entity types to update or create.
-    #[serde(rename="entityTypeBatchInline")]
-    pub entity_type_batch_inline: Option<GoogleCloudDialogflowV2beta1EntityTypeBatch>,
-    /// Optional. The mask to control which fields get updated.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
+pub struct GoogleCloudDialogflowV2beta1OutputAudioConfig {
+    /// Required. Audio encoding of the synthesized audio content.
+    #[serde(rename="audioEncoding")]
+    pub audio_encoding: Option<String>,
+    /// The synthesis sample rate (in hertz) for this audio. If not
+    /// provided, then the synthesizer will use the default sample rate based on
+    /// the audio encoding. If this is different from the voice's natural sample
+    /// rate, then the synthesizer will honor this request by converting to the
+    /// desired sample rate (which might result in worse audio quality).
+    #[serde(rename="sampleRateHertz")]
+    pub sample_rate_hertz: Option<i32>,
+    /// Configuration of how speech should be synthesized.
+    #[serde(rename="synthesizeSpeechConfig")]
+    pub synthesize_speech_config: Option<GoogleCloudDialogflowV2beta1SynthesizeSpeechConfig>,
 }
 
-impl RequestValue for GoogleCloudDialogflowV2beta1BatchUpdateEntityTypesRequest {}
+impl Part for GoogleCloudDialogflowV2beta1OutputAudioConfig {}
 
 
 /// An answer from Knowledge Connector.
@@ -2014,81 +2128,6 @@ pub struct GoogleCloudDialogflowV2beta1SentimentAnalysisRequestConfig {
 impl Part for GoogleCloudDialogflowV2beta1SentimentAnalysisRequestConfig {}
 
 
-/// Represents a conversational agent.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations get agent projects](struct.ProjectLocationGetAgentCall.html) (response)
-/// * [locations set agent projects](struct.ProjectLocationSetAgentCall.html) (request|response)
-/// * [get agent projects](struct.ProjectGetAgentCall.html) (response)
-/// * [set agent projects](struct.ProjectSetAgentCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2beta1Agent {
-    /// Optional. The URI of the agent's avatar.
-    /// Avatars are used throughout the Dialogflow console and in the self-hosted
-    /// [Web
-    /// Demo](https://cloud.google.com/dialogflow/docs/integrations/web-demo)
-    /// integration.
-    #[serde(rename="avatarUri")]
-    pub avatar_uri: Option<String>,
-    /// Required. The name of this agent.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Optional. The description of this agent.
-    /// The maximum length is 500 characters. If exceeded, the request is rejected.
-    pub description: Option<String>,
-    /// Required. The project of this agent.
-    /// Format: `projects/<Project ID>`.
-    pub parent: Option<String>,
-    /// Required. The default language of the agent as a language tag. See
-    /// [Language
-    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
-    /// for a list of the currently supported language codes. This field cannot be
-    /// set by the `Update` method.
-    #[serde(rename="defaultLanguageCode")]
-    pub default_language_code: Option<String>,
-    /// Optional. API version displayed in Dialogflow console. If not specified,
-    /// V2 API is assumed. Clients are free to query different service endpoints
-    /// for different API versions. However, bots connectors and webhook calls will
-    /// follow the specified API version.
-    #[serde(rename="apiVersion")]
-    pub api_version: Option<String>,
-    /// Optional. Determines whether this agent should log conversation queries.
-    #[serde(rename="enableLogging")]
-    pub enable_logging: Option<bool>,
-    /// Optional. Determines how intents are detected from user queries.
-    #[serde(rename="matchMode")]
-    pub match_mode: Option<String>,
-    /// Optional. The list of all languages supported by this agent (except for the
-    /// `default_language_code`).
-    #[serde(rename="supportedLanguageCodes")]
-    pub supported_language_codes: Option<Vec<String>>,
-    /// Optional. The agent tier. If not specified, TIER_STANDARD is assumed.
-    pub tier: Option<String>,
-    /// Required. The time zone of this agent from the
-    /// [time zone database](https://www.iana.org/time-zones), e.g.,
-    /// America/New_York, Europe/Paris.
-    #[serde(rename="timeZone")]
-    pub time_zone: Option<String>,
-    /// Optional. To filter out false positive results and still get variety in
-    /// matched natural language inputs for your agent, you can tune the machine
-    /// learning classification threshold. If the returned score value is less than
-    /// the threshold value, then a fallback intent will be triggered or, if there
-    /// are no fallback intents defined, no intent will be triggered. The score
-    /// values range from 0.0 (completely uncertain) to 1.0 (completely certain).
-    /// If set to 0.0, the default of 0.3 is used.
-    #[serde(rename="classificationThreshold")]
-    pub classification_threshold: Option<f32>,
-}
-
-impl RequestValue for GoogleCloudDialogflowV2beta1Agent {}
-impl ResponseResult for GoogleCloudDialogflowV2beta1Agent {}
-
-
 /// Represents an entity type.
 /// Entity types serve as a tool for extracting parameter values from natural
 /// language queries.
@@ -2150,7 +2189,7 @@ impl Part for GoogleCloudDialogflowV2beta1IntentMessageTelephonyTransferCall {}
 
 
 /// Opens the device's location chooser so the user can pick a location
-/// to send back to the agent (https://goo.gl/GXotJW).
+/// to send back to the agent.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2185,7 +2224,7 @@ impl Part for GoogleCloudDialogflowV2beta1IntentMessageTableCardCell {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2beta1ReloadDocumentRequest {
-    /// Optional. The path for a Cloud Storage source file for reloading document content.
+    /// The path for a Cloud Storage source file for reloading document content.
     /// If not provided, the Document's existing source will be reloaded.
     #[serde(rename="gcsSource")]
     pub gcs_source: Option<GoogleCloudDialogflowV2beta1GcsSource>,
@@ -2334,6 +2373,7 @@ impl Part for GoogleCloudDialogflowV2beta1IntentMessageRbmSuggestedAction {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations agent search projects](struct.ProjectLocationAgentSearchCall.html) (response)
 /// * [agent search projects](struct.ProjectAgentSearchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -2531,6 +2571,19 @@ pub struct GoogleCloudDialogflowV2beta1IntentMessageListSelectItem {
 impl Part for GoogleCloudDialogflowV2beta1IntentMessageListSelectItem {}
 
 
+/// Represents the result of querying a Knowledge base.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1KnowledgeAnswers {
+    /// A list of answers from Knowledge Connector.
+    pub answers: Option<Vec<GoogleCloudDialogflowV2beta1KnowledgeAnswersAnswer>>,
+}
+
+impl Part for GoogleCloudDialogflowV2beta1KnowledgeAnswers {}
+
+
 /// Response message for KnowledgeBases.ListKnowledgeBases.
 /// 
 /// # Activities
@@ -2553,6 +2606,23 @@ pub struct GoogleCloudDialogflowV2beta1ListKnowledgeBasesResponse {
 }
 
 impl ResponseResult for GoogleCloudDialogflowV2beta1ListKnowledgeBasesResponse {}
+
+
+/// The status of a reload attempt.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1DocumentReloadStatus {
+    /// Output only. The status of a reload attempt or the initial load.
+    pub status: Option<GoogleRpcStatus>,
+    /// Output only. The time of a reload attempt.
+    /// This reload may have been triggered automatically or manually and may
+    /// not have succeeded.
+    pub time: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2beta1DocumentReloadStatus {}
 
 
 /// Synthesizes speech and plays back the synthesized audio to the caller in
@@ -2799,6 +2869,52 @@ pub struct GoogleCloudDialogflowV2beta1SynthesizeSpeechConfig {
 impl Part for GoogleCloudDialogflowV2beta1SynthesizeSpeechConfig {}
 
 
+/// Rich Business Messaging (RBM) Media displayed in Cards
+/// The following media-types are currently supported:
+/// 
+/// Image Types
+/// 
+/// * image/jpeg
+/// * image/jpg'
+/// * image/gif
+/// * image/png
+/// 
+/// Video Types
+/// 
+/// * video/h263
+/// * video/m4v
+/// * video/mp4
+/// * video/mpeg
+/// * video/mpeg4
+/// * video/webm
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia {
+    /// Required. Publicly reachable URI of the file. The RBM platform
+    /// determines the MIME type of the file from the content-type field in
+    /// the HTTP headers when the platform fetches the file. The content-type
+    /// field must be present and accurate in the HTTP response from the URL.
+    #[serde(rename="fileUri")]
+    pub file_uri: Option<String>,
+    /// Optional. Publicly reachable URI of the thumbnail.If you don't
+    /// provide a thumbnail URI, the RBM platform displays a blank
+    /// placeholder thumbnail until the user's device downloads the file.
+    /// Depending on the user's setting, the file may not download
+    /// automatically and may require the user to tap a download button.
+    #[serde(rename="thumbnailUri")]
+    pub thumbnail_uri: Option<String>,
+    /// Required for cards with vertical orientation. The height of the media
+    /// within a rich card with a vertical layout.
+    /// For a standalone card with horizontal layout, height is not
+    /// customizable, and this field is ignored.
+    pub height: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2beta1IntentMessageRbmCardContentRbmMedia {}
+
+
 /// Rich Business Messaging (RBM) suggested reply that the user can click
 /// instead of typing in their own response.
 /// 
@@ -2925,6 +3041,20 @@ pub struct GoogleCloudDialogflowV2beta1QueryResult {
     #[serde(rename="webhookPayload")]
     pub webhook_payload: Option<HashMap<String, String>>,
     /// The collection of extracted parameters.
+    /// 
+    /// Depending on your protocol or client library language, this is a
+    /// map, associative array, symbol table, dictionary, or JSON object
+    /// composed of a collection of (MapKey, MapValue) pairs:
+    /// 
+    /// * MapKey type: string
+    /// * MapKey value: parameter name
+    /// * MapValue type:
+    ///   * If parameter's entity type is a composite entity: map
+    ///   * Else: string or number, depending on parameter value type
+    /// * MapValue value:
+    ///   * If parameter's entity type is a composite entity:
+    ///     map from composite entity property names to property values
+    ///   * Else: parameter value
     pub parameters: Option<HashMap<String, String>>,
     /// The Speech recognition confidence between 0.0 and 1.0. A higher number
     /// indicates an estimated greater likelihood that the recognized words are
@@ -2990,6 +3120,10 @@ pub struct GoogleCloudDialogflowV2beta1DetectIntentResponse {
     /// multiple default text responses exist, they will be concatenated when
     /// generating audio. If no default platform text responses exist, the
     /// generated audio content will be empty.
+    /// 
+    /// In some scenarios, multiple output audio fields may be present in the
+    /// response structure. In these cases, only the top-most-level audio output
+    /// has content.
     #[serde(rename="outputAudio")]
     pub output_audio: Option<String>,
     /// The selected results of the conversational query or event processing.
@@ -3067,6 +3201,7 @@ pub struct GoogleCloudDialogflowV2beta1FulfillmentGenericWebService {
     /// Optional. The password for HTTP Basic authentication.
     pub password: Option<String>,
     /// Required. The fulfillment URI for receiving POST requests.
+    /// It must use https protocol.
     pub uri: Option<String>,
 }
 
@@ -3219,7 +3354,7 @@ pub struct GoogleCloudDialogflowV2beta1Context {
     /// * MapKey value: parameter name
     /// * MapValue type:
     ///   * If parameter's entity type is a composite entity: map
-    ///   * Else: string
+    ///   * Else: string or number, depending on parameter value type
     /// * MapValue value:
     ///   * If parameter's entity type is a composite entity:
     ///     map from composite entity property names to property values
@@ -3410,7 +3545,7 @@ impl Part for GoogleCloudDialogflowV2beta1IntentMessageQuickReplies {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_environments_users_sessions_contexts_create(...)`, `agent_environments_users_sessions_contexts_delete(...)`, `agent_environments_users_sessions_contexts_get(...)`, `agent_environments_users_sessions_contexts_list(...)`, `agent_environments_users_sessions_contexts_patch(...)`, `agent_environments_users_sessions_delete_contexts(...)`, `agent_environments_users_sessions_detect_intent(...)`, `agent_environments_users_sessions_entity_types_create(...)`, `agent_environments_users_sessions_entity_types_delete(...)`, `agent_environments_users_sessions_entity_types_get(...)`, `agent_environments_users_sessions_entity_types_list(...)`, `agent_environments_users_sessions_entity_types_patch(...)`, `agent_export(...)`, `agent_get_fulfillment(...)`, `agent_get_validation_result(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_knowledge_bases_create(...)`, `agent_knowledge_bases_delete(...)`, `agent_knowledge_bases_documents_create(...)`, `agent_knowledge_bases_documents_delete(...)`, `agent_knowledge_bases_documents_get(...)`, `agent_knowledge_bases_documents_list(...)`, `agent_knowledge_bases_documents_patch(...)`, `agent_knowledge_bases_documents_reload(...)`, `agent_knowledge_bases_get(...)`, `agent_knowledge_bases_list(...)`, `agent_knowledge_bases_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `agent_update_fulfillment(...)`, `delete_agent(...)`, `get_agent(...)`, `knowledge_bases_create(...)`, `knowledge_bases_delete(...)`, `knowledge_bases_documents_create(...)`, `knowledge_bases_documents_delete(...)`, `knowledge_bases_documents_get(...)`, `knowledge_bases_documents_list(...)`, `knowledge_bases_documents_patch(...)`, `knowledge_bases_documents_reload(...)`, `knowledge_bases_get(...)`, `knowledge_bases_list(...)`, `knowledge_bases_patch(...)`, `locations_agent_entity_types_batch_delete(...)`, `locations_agent_entity_types_batch_update(...)`, `locations_agent_entity_types_create(...)`, `locations_agent_entity_types_delete(...)`, `locations_agent_entity_types_entities_batch_create(...)`, `locations_agent_entity_types_entities_batch_delete(...)`, `locations_agent_entity_types_entities_batch_update(...)`, `locations_agent_entity_types_get(...)`, `locations_agent_entity_types_list(...)`, `locations_agent_entity_types_patch(...)`, `locations_agent_environments_users_sessions_contexts_create(...)`, `locations_agent_environments_users_sessions_contexts_delete(...)`, `locations_agent_environments_users_sessions_contexts_get(...)`, `locations_agent_environments_users_sessions_contexts_list(...)`, `locations_agent_environments_users_sessions_contexts_patch(...)`, `locations_agent_environments_users_sessions_delete_contexts(...)`, `locations_agent_environments_users_sessions_detect_intent(...)`, `locations_agent_environments_users_sessions_entity_types_create(...)`, `locations_agent_environments_users_sessions_entity_types_delete(...)`, `locations_agent_environments_users_sessions_entity_types_get(...)`, `locations_agent_environments_users_sessions_entity_types_list(...)`, `locations_agent_environments_users_sessions_entity_types_patch(...)`, `locations_agent_export(...)`, `locations_agent_fulfillment(...)`, `locations_agent_get_fulfillment(...)`, `locations_agent_import(...)`, `locations_agent_intents_batch_delete(...)`, `locations_agent_intents_batch_update(...)`, `locations_agent_intents_create(...)`, `locations_agent_intents_delete(...)`, `locations_agent_intents_get(...)`, `locations_agent_intents_list(...)`, `locations_agent_intents_patch(...)`, `locations_agent_restore(...)`, `locations_agent_sessions_contexts_create(...)`, `locations_agent_sessions_contexts_delete(...)`, `locations_agent_sessions_contexts_get(...)`, `locations_agent_sessions_contexts_list(...)`, `locations_agent_sessions_contexts_patch(...)`, `locations_agent_sessions_delete_contexts(...)`, `locations_agent_sessions_detect_intent(...)`, `locations_agent_sessions_entity_types_create(...)`, `locations_agent_sessions_entity_types_delete(...)`, `locations_agent_sessions_entity_types_get(...)`, `locations_agent_sessions_entity_types_list(...)`, `locations_agent_sessions_entity_types_patch(...)`, `locations_agent_train(...)`, `locations_delete_agent(...)`, `locations_get_agent(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_set_agent(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `set_agent(...)`
+/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_environments_list(...)`, `agent_environments_users_sessions_contexts_create(...)`, `agent_environments_users_sessions_contexts_delete(...)`, `agent_environments_users_sessions_contexts_get(...)`, `agent_environments_users_sessions_contexts_list(...)`, `agent_environments_users_sessions_contexts_patch(...)`, `agent_environments_users_sessions_delete_contexts(...)`, `agent_environments_users_sessions_detect_intent(...)`, `agent_environments_users_sessions_entity_types_create(...)`, `agent_environments_users_sessions_entity_types_delete(...)`, `agent_environments_users_sessions_entity_types_get(...)`, `agent_environments_users_sessions_entity_types_list(...)`, `agent_environments_users_sessions_entity_types_patch(...)`, `agent_export(...)`, `agent_get_fulfillment(...)`, `agent_get_validation_result(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_knowledge_bases_create(...)`, `agent_knowledge_bases_delete(...)`, `agent_knowledge_bases_documents_create(...)`, `agent_knowledge_bases_documents_delete(...)`, `agent_knowledge_bases_documents_get(...)`, `agent_knowledge_bases_documents_list(...)`, `agent_knowledge_bases_documents_patch(...)`, `agent_knowledge_bases_documents_reload(...)`, `agent_knowledge_bases_get(...)`, `agent_knowledge_bases_list(...)`, `agent_knowledge_bases_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `agent_update_fulfillment(...)`, `delete_agent(...)`, `get_agent(...)`, `knowledge_bases_create(...)`, `knowledge_bases_delete(...)`, `knowledge_bases_documents_create(...)`, `knowledge_bases_documents_delete(...)`, `knowledge_bases_documents_get(...)`, `knowledge_bases_documents_list(...)`, `knowledge_bases_documents_patch(...)`, `knowledge_bases_documents_reload(...)`, `knowledge_bases_get(...)`, `knowledge_bases_list(...)`, `knowledge_bases_patch(...)`, `locations_agent_entity_types_batch_delete(...)`, `locations_agent_entity_types_batch_update(...)`, `locations_agent_entity_types_create(...)`, `locations_agent_entity_types_delete(...)`, `locations_agent_entity_types_entities_batch_create(...)`, `locations_agent_entity_types_entities_batch_delete(...)`, `locations_agent_entity_types_entities_batch_update(...)`, `locations_agent_entity_types_get(...)`, `locations_agent_entity_types_list(...)`, `locations_agent_entity_types_patch(...)`, `locations_agent_environments_list(...)`, `locations_agent_environments_users_sessions_contexts_create(...)`, `locations_agent_environments_users_sessions_contexts_delete(...)`, `locations_agent_environments_users_sessions_contexts_get(...)`, `locations_agent_environments_users_sessions_contexts_list(...)`, `locations_agent_environments_users_sessions_contexts_patch(...)`, `locations_agent_environments_users_sessions_delete_contexts(...)`, `locations_agent_environments_users_sessions_detect_intent(...)`, `locations_agent_environments_users_sessions_entity_types_create(...)`, `locations_agent_environments_users_sessions_entity_types_delete(...)`, `locations_agent_environments_users_sessions_entity_types_get(...)`, `locations_agent_environments_users_sessions_entity_types_list(...)`, `locations_agent_environments_users_sessions_entity_types_patch(...)`, `locations_agent_export(...)`, `locations_agent_get_fulfillment(...)`, `locations_agent_import(...)`, `locations_agent_intents_batch_delete(...)`, `locations_agent_intents_batch_update(...)`, `locations_agent_intents_create(...)`, `locations_agent_intents_delete(...)`, `locations_agent_intents_get(...)`, `locations_agent_intents_list(...)`, `locations_agent_intents_patch(...)`, `locations_agent_restore(...)`, `locations_agent_search(...)`, `locations_agent_sessions_contexts_create(...)`, `locations_agent_sessions_contexts_delete(...)`, `locations_agent_sessions_contexts_get(...)`, `locations_agent_sessions_contexts_list(...)`, `locations_agent_sessions_contexts_patch(...)`, `locations_agent_sessions_delete_contexts(...)`, `locations_agent_sessions_detect_intent(...)`, `locations_agent_sessions_entity_types_create(...)`, `locations_agent_sessions_entity_types_delete(...)`, `locations_agent_sessions_entity_types_get(...)`, `locations_agent_sessions_entity_types_list(...)`, `locations_agent_sessions_entity_types_patch(...)`, `locations_agent_train(...)`, `locations_agent_update_fulfillment(...)`, `locations_delete_agent(...)`, `locations_get_agent(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_set_agent(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `set_agent(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -3456,7 +3591,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes entity types in the specified agent.
-    /// 
     /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
@@ -3547,7 +3681,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates/Creates multiple entity types in the specified agent.
-    /// 
     /// Operation <response: BatchUpdateEntityTypesResponse>
     /// 
     /// # Arguments
@@ -3659,10 +3792,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Restores the specified agent from a ZIP file.
     /// 
     /// Replaces the current agent version with a new one. All the intents and
-    /// entity types in the older version are deleted.
+    /// entity types in the older version are deleted. After the restore, the
+    /// restored draft agent will be trained automatically (unless disabled in
+    /// agent settings). However, once the restore is done, training may not be
+    /// completed yet. Please call TrainAgent and wait for the operation it
+    /// returns in order to train explicitly.
     /// 
     /// 
     /// Operation <response: google.protobuf.Empty>
+    /// An operation which tracks when restoring is complete. It only tracks
+    /// when the draft agent is updated not when it is done training.
     /// 
     /// # Arguments
     ///
@@ -3957,6 +4096,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates the fulfillment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The unique identifier of the fulfillment.
+    ///            Format: `projects/<Project ID>/agent/fulfillment`.
+    pub fn locations_agent_update_fulfillment(&self, request: GoogleCloudDialogflowV2beta1Fulfillment, name: &str) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> {
+        ProjectLocationAgentUpdateFulfillmentCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Returns the list of all contexts in the specified session.
     /// 
     /// # Arguments
@@ -4087,7 +4247,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the document to delete.
+    /// * `name` - Required. The name of the document to delete.
     ///            Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     ///            ID>/documents/<Document ID>`.
     pub fn knowledge_bases_documents_delete(&self, name: &str) -> ProjectKnowledgeBaseDocumentDeleteCall<'a, C, A> {
@@ -4102,24 +4262,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a context.
-    /// 
-    /// If the specified context already exists, overrides the context.
+    /// Returns the list of agents.
+    /// Since there is at most one conversational agent per project, this method is
+    /// useful primarily for listing all agents across projects the caller has
+    /// access to. One can achieve that with a wildcard project collection id "-".
+    /// Refer to [List
+    /// Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections).
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. The session to create a context for.
-    ///              Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
-    ///              `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-    ///              ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
-    ///              default 'draft' environment. If `User ID` is not specified, we assume
-    ///              default '-' user.
-    pub fn agent_sessions_contexts_create(&self, request: GoogleCloudDialogflowV2beta1Context, parent: &str) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
-        ProjectAgentSessionContextCreateCall {
+    /// * `parent` - Required. The project to list agents from.
+    ///              Format: `projects/<Project ID or '-'>`.
+    pub fn agent_search(&self, parent: &str) -> ProjectAgentSearchCall<'a, C, A> {
+        ProjectAgentSearchCall {
             hub: self.hub,
-            _request: request,
             _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4173,7 +4332,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique identifier of this intent.
+    /// * `name` - Optional. The unique identifier of this intent.
     ///            Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
     ///            methods.
     ///            Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
@@ -4185,32 +4344,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _update_mask: Default::default(),
             _language_code: Default::default(),
             _intent_view: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns the list of agents.
-    /// 
-    /// Since there is at most one conversational agent per project, this method is
-    /// useful primarily for listing all agents across projects the caller has
-    /// access to. One can achieve that with a wildcard project collection id "-".
-    /// Refer to [List
-    /// Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections).
-    /// 
-    /// # Arguments
-    ///
-    /// * `parent` - Required. The project to list agents from.
-    ///              Format: `projects/<Project ID or '-'>`.
-    pub fn agent_search(&self, parent: &str) -> ProjectAgentSearchCall<'a, C, A> {
-        ProjectAgentSearchCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4245,7 +4378,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique identifier of this intent.
+    /// * `name` - Optional. The unique identifier of this intent.
     ///            Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
     ///            methods.
     ///            Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
@@ -4341,7 +4474,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the document to delete.
+    /// * `name` - Required. The name of the document to delete.
     ///            Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     ///            ID>/documents/<Document ID>`.
     pub fn agent_knowledge_bases_documents_delete(&self, name: &str) -> ProjectAgentKnowledgeBaseDocumentDeleteCall<'a, C, A> {
@@ -4382,14 +4515,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the fulfillment.
+    /// Retrieves the specified document.
+    /// 
+    /// Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
+    /// only use `projects.knowledgeBases.documents`.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the fulfillment.
-    ///            Format: `projects/<Project ID>/agent/fulfillment`.
-    pub fn locations_agent_get_fulfillment(&self, name: &str) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A> {
-        ProjectLocationAgentGetFulfillmentCall {
+    /// * `name` - Required. The name of the document to retrieve.
+    ///            Format `projects/<Project ID>/knowledgeBases/<Knowledge Base
+    ///            ID>/documents/<Document ID>`.
+    pub fn agent_knowledge_bases_documents_get(&self, name: &str) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {
+        ProjectAgentKnowledgeBaseDocumentGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -4422,7 +4559,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes entity types in the specified agent.
-    /// 
     /// Operation <response: google.protobuf.Empty>
     /// 
     /// # Arguments
@@ -4447,10 +4583,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Uploads new intents and entity types without deleting the existing ones.
     /// Intents and entity types with the same name are replaced with the new
-    /// versions from ImportAgentRequest.
+    /// versions from ImportAgentRequest. After the import, the imported draft
+    /// agent will be trained automatically (unless disabled in agent settings).
+    /// However, once the import is done, training may not be completed yet. Please
+    /// call TrainAgent and wait for the operation it returns in order to train
+    /// explicitly.
     /// 
     /// 
     /// Operation <response: google.protobuf.Empty>
+    /// An operation which tracks when importing is complete. It only tracks
+    /// when the draft agent is updated not when it is done training.
     /// 
     /// # Arguments
     ///
@@ -4564,19 +4706,24 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the fulfillment.
+    /// Creates a context.
+    /// 
+    /// If the specified context already exists, overrides the context.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The unique identifier of the fulfillment.
-    ///            Format: `projects/<Project ID>/agent/fulfillment`.
-    pub fn locations_agent_fulfillment(&self, request: GoogleCloudDialogflowV2beta1Fulfillment, name: &str) -> ProjectLocationAgentFulfillmentCall<'a, C, A> {
-        ProjectLocationAgentFulfillmentCall {
+    /// * `parent` - Required. The session to create a context for.
+    ///              Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
+    ///              `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+    ///              ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
+    ///              default 'draft' environment. If `User ID` is not specified, we assume
+    ///              default '-' user.
+    pub fn agent_sessions_contexts_create(&self, request: GoogleCloudDialogflowV2beta1Context, parent: &str) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
+        ProjectAgentSessionContextCreateCall {
             hub: self.hub,
             _request: request,
-            _name: name.to_string(),
-            _update_mask: Default::default(),
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4778,6 +4925,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns the list of all non-draft environments of the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The agent to list all environments from.
+    ///              Format:
+    ///              - `projects/<Project Number / ID>/agent`
+    ///              - `projects/<Project Number / ID>/locations/<Location
+    ///              ID>/agent
+    pub fn locations_agent_environments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentListCall<'a, C, A> {
+        ProjectLocationAgentEnvironmentListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Exports the specified agent to a ZIP file.
     /// 
     /// 
@@ -4910,7 +5080,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The document resource name.
+    /// * `name` - Optional. The document resource name.
     ///            The name must be empty when creating a document.
     ///            Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     ///            ID>/documents/<Document ID>`.
@@ -5166,7 +5336,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates/Creates multiple entity types in the specified agent.
-    /// 
     /// Operation <response: BatchUpdateEntityTypesResponse>
     /// 
     /// # Arguments
@@ -5274,6 +5443,31 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _name: name.to_string(),
             _force: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the list of agents.
+    /// Since there is at most one conversational agent per project, this method is
+    /// useful primarily for listing all agents across projects the caller has
+    /// access to. One can achieve that with a wildcard project collection id "-".
+    /// Refer to [List
+    /// Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections).
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project to list agents from.
+    ///              Format: `projects/<Project ID or '-'>`.
+    pub fn locations_agent_search(&self, parent: &str) -> ProjectLocationAgentSearchCall<'a, C, A> {
+        ProjectLocationAgentSearchCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5653,6 +5847,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns the list of all non-draft environments of the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The agent to list all environments from.
+    ///              Format:
+    ///              - `projects/<Project Number / ID>/agent`
+    ///              - `projects/<Project Number / ID>/locations/<Location
+    ///              ID>/agent
+    pub fn agent_environments_list(&self, parent: &str) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        ProjectAgentEnvironmentListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the specified knowledge base.
     /// 
     /// Note: The `projects.agent.knowledgeBases` resource is deprecated;
@@ -5801,10 +6018,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Restores the specified agent from a ZIP file.
     /// 
     /// Replaces the current agent version with a new one. All the intents and
-    /// entity types in the older version are deleted.
+    /// entity types in the older version are deleted. After the restore, the
+    /// restored draft agent will be trained automatically (unless disabled in
+    /// agent settings). However, once the restore is done, training may not be
+    /// completed yet. Please call TrainAgent and wait for the operation it
+    /// returns in order to train explicitly.
     /// 
     /// 
     /// Operation <response: google.protobuf.Empty>
+    /// An operation which tracks when restoring is complete. It only tracks
+    /// when the draft agent is updated not when it is done training.
     /// 
     /// # Arguments
     ///
@@ -5876,7 +6099,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The document resource name.
+    /// * `name` - Optional. The document resource name.
     ///            The name must be empty when creating a document.
     ///            Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     ///            ID>/documents/<Document ID>`.
@@ -5973,7 +6196,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the document to reload.
+    /// * `name` - Required. The name of the document to reload.
     ///            Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     ///            ID>/documents/<Document ID>`
     pub fn agent_knowledge_bases_documents_reload(&self, request: GoogleCloudDialogflowV2beta1ReloadDocumentRequest, name: &str) -> ProjectAgentKnowledgeBaseDocumentReloadCall<'a, C, A> {
@@ -6112,18 +6335,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified document.
-    /// 
-    /// Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
-    /// only use `projects.knowledgeBases.documents`.
+    /// Retrieves the fulfillment.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the document to retrieve.
-    ///            Format `projects/<Project ID>/knowledgeBases/<Knowledge Base
-    ///            ID>/documents/<Document ID>`.
-    pub fn agent_knowledge_bases_documents_get(&self, name: &str) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {
-        ProjectAgentKnowledgeBaseDocumentGetCall {
+    /// * `name` - Required. The name of the fulfillment.
+    ///            Format: `projects/<Project ID>/agent/fulfillment`.
+    pub fn locations_agent_get_fulfillment(&self, name: &str) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A> {
+        ProjectLocationAgentGetFulfillmentCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -6200,10 +6419,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Uploads new intents and entity types without deleting the existing ones.
     /// Intents and entity types with the same name are replaced with the new
-    /// versions from ImportAgentRequest.
+    /// versions from ImportAgentRequest. After the import, the imported draft
+    /// agent will be trained automatically (unless disabled in agent settings).
+    /// However, once the import is done, training may not be completed yet. Please
+    /// call TrainAgent and wait for the operation it returns in order to train
+    /// explicitly.
     /// 
     /// 
     /// Operation <response: google.protobuf.Empty>
+    /// An operation which tracks when importing is complete. It only tracks
+    /// when the draft agent is updated not when it is done training.
     /// 
     /// # Arguments
     ///
@@ -6471,7 +6696,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the document to reload.
+    /// * `name` - Required. The name of the document to reload.
     ///            Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     ///            ID>/documents/<Document ID>`
     pub fn knowledge_bases_documents_reload(&self, request: GoogleCloudDialogflowV2beta1ReloadDocumentRequest, name: &str) -> ProjectKnowledgeBaseDocumentReloadCall<'a, C, A> {
@@ -6835,7 +7060,6 @@ impl<'a, C, A> ProjectLocationAgentEnvironmentUserSessionEntityTypeListCall<'a, 
 
 
 /// Deletes entity types in the specified agent.
-/// 
 /// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *locations.agent.entityTypes.batchDelete* method supported by a *project* resource.
@@ -7941,7 +8165,6 @@ impl<'a, C, A> ProjectLocationAgentEntityTypeListCall<'a, C, A> where C: BorrowM
 
 
 /// Updates/Creates multiple entity types in the specified agent.
-/// 
 /// Operation <response: BatchUpdateEntityTypesResponse>
 ///
 /// A builder for the *agent.entityTypes.batchUpdate* method supported by a *project* resource.
@@ -9354,10 +9577,16 @@ impl<'a, C, A> ProjectLocationAgentEntityTypeEntityBatchCreateCall<'a, C, A> whe
 /// Restores the specified agent from a ZIP file.
 /// 
 /// Replaces the current agent version with a new one. All the intents and
-/// entity types in the older version are deleted.
+/// entity types in the older version are deleted. After the restore, the
+/// restored draft agent will be trained automatically (unless disabled in
+/// agent settings). However, once the restore is done, training may not be
+/// completed yet. Please call TrainAgent and wait for the operation it
+/// returns in order to train explicitly.
 /// 
 /// 
 /// Operation <response: google.protobuf.Empty>
+/// An operation which tracks when restoring is complete. It only tracks
+/// when the draft agent is updated not when it is done training.
 ///
 /// A builder for the *agent.restore* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12556,6 +12785,305 @@ impl<'a, C, A> ProjectAgentEnvironmentUserSessionContextListCall<'a, C, A> where
 }
 
 
+/// Updates the fulfillment.
+///
+/// A builder for the *locations.agent.updateFulfillment* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
+/// use dialogflow2_beta1::GoogleCloudDialogflowV2beta1Fulfillment;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2_beta1::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2beta1Fulfillment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agent_update_fulfillment(req, "name")
+///              .update_mask("dolore")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAgentUpdateFulfillmentCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _request: GoogleCloudDialogflowV2beta1Fulfillment,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Fulfillment)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.locations.agent.updateFulfillment",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2beta1Fulfillment) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The unique identifier of the fulfillment.
+    /// Format: `projects/<Project ID>/agent/fulfillment`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. The mask to control which fields get updated. If the mask is not
+    /// present, all fields will be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentUpdateFulfillmentCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Returns the list of all contexts in the specified session.
 ///
 /// A builder for the *agent.sessions.contexts.list* method supported by a *project* resource.
@@ -12584,8 +13112,8 @@ impl<'a, C, A> ProjectAgentEnvironmentUserSessionContextListCall<'a, C, A> where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_contexts_list("parent")
-///              .page_token("dolore")
-///              .page_size(-37)
+///              .page_token("aliquyam")
+///              .page_size(-73)
 ///              .doit();
 /// # }
 /// ```
@@ -12868,7 +13396,7 @@ impl<'a, C, A> ProjectAgentSessionContextListCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_get("name")
-///              .language_code("accusam")
+///              .language_code("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -13702,8 +14230,8 @@ impl<'a, C, A> ProjectLocationAgentSessionEntityTypeCreateCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_documents_list("parent")
-///              .page_token("duo")
-///              .page_size(-21)
+///              .page_token("eirmod")
+///              .page_size(-58)
 ///              .doit();
 /// # }
 /// ```
@@ -13876,14 +14404,14 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentListCall<'a, C, A> where C: BorrowMut
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. The next_page_token value returned from a previous list request.
+    /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectKnowledgeBaseDocumentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. The maximum number of items to return in a single page. By
+    /// The maximum number of items to return in a single page. By
     /// default 10 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
@@ -14138,7 +14666,7 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentDeleteCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// The name of the document to delete.
+    /// Required. The name of the document to delete.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`.
     ///
@@ -14213,11 +14741,14 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentDeleteCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Creates a context.
-/// 
-/// If the specified context already exists, overrides the context.
+/// Returns the list of agents.
+/// Since there is at most one conversational agent per project, this method is
+/// useful primarily for listing all agents across projects the caller has
+/// access to. One can achieve that with a wildcard project collection id "-".
+/// Refer to [List
+/// Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections).
 ///
-/// A builder for the *agent.sessions.contexts.create* method supported by a *project* resource.
+/// A builder for the *agent.search* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -14229,7 +14760,6 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentDeleteCall<'a, C, A> where C: BorrowM
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
-/// use dialogflow2_beta1::GoogleCloudDialogflowV2beta1Context;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14240,36 +14770,34 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentDeleteCall<'a, C, A> where C: BorrowM
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudDialogflowV2beta1Context::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().agent_sessions_contexts_create(req, "parent")
+/// let result = hub.projects().agent_search("parent")
+///              .page_token("et")
+///              .page_size(-45)
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectAgentSessionContextCreateCall<'a, C, A>
+pub struct ProjectAgentSearchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dialogflow<C, A>,
-    _request: GoogleCloudDialogflowV2beta1Context,
     _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectAgentSessionContextCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectAgentSearchCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Context)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1SearchAgentsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -14278,11 +14806,17 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.sessions.contexts.create",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.search",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14294,7 +14828,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/contexts";
+        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/agent:search";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -14326,17 +14860,6 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -14353,15 +14876,11 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -14418,28 +14937,30 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowV2beta1Context) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The session to create a context for.
-    /// Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
-    /// `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
-    /// ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
-    /// default 'draft' environment. If `User ID` is not specified, we assume
-    /// default '-' user.
+    /// Required. The project to list agents from.
+    /// Format: `projects/<Project ID or '-'>`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAgentSearchCall<'a, C, A> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectAgentSearchCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of items to return in a single page. By
+    /// default 100 and at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectAgentSearchCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -14448,7 +14969,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14473,7 +14994,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14493,7 +15014,7 @@ impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentSessionContextCreateCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentSearchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15053,9 +15574,9 @@ impl<'a, C, A> ProjectDeleteAgentCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_patch(req, "name")
-///              .update_mask("consetetur")
-///              .language_code("ut")
-///              .intent_view("ea")
+///              .update_mask("dolor")
+///              .language_code("dolor")
+///              .intent_view("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -15246,7 +15767,7 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The unique identifier of this intent.
+    /// Optional. The unique identifier of this intent.
     /// Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
     /// methods.
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
@@ -15336,292 +15857,6 @@ impl<'a, C, A> ProjectAgentIntentPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentIntentPatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Returns the list of agents.
-/// 
-/// Since there is at most one conversational agent per project, this method is
-/// useful primarily for listing all agents across projects the caller has
-/// access to. One can achieve that with a wildcard project collection id "-".
-/// Refer to [List
-/// Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections).
-///
-/// A builder for the *agent.search* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use dialogflow2_beta1::Dialogflow;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().agent_search("parent")
-///              .page_token("dolor")
-///              .page_size(-48)
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectAgentSearchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Dialogflow<C, A>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectAgentSearchCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1SearchAgentsResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.search",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/agent:search";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-
-                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
-                            .ok();
-
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Required. The project to list agents from.
-    /// Format: `projects/<Project ID or '-'>`.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAgentSearchCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// Optional. The next_page_token value returned from a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAgentSearchCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. The maximum number of items to return in a single page. By
-    /// default 100 and at most 1000.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAgentSearchCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentSearchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSearchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentSearchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15925,9 +16160,9 @@ impl<'a, C, A> ProjectAgentEnvironmentUserSessionDeleteContextCall<'a, C, A> whe
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_patch(req, "name")
-///              .update_mask("consetetur")
-///              .language_code("amet.")
-///              .intent_view("voluptua.")
+///              .update_mask("amet.")
+///              .language_code("voluptua.")
+///              .intent_view("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -16118,7 +16353,7 @@ impl<'a, C, A> ProjectLocationAgentIntentPatchCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The unique identifier of this intent.
+    /// Optional. The unique identifier of this intent.
     /// Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
     /// methods.
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
@@ -16250,8 +16485,8 @@ impl<'a, C, A> ProjectLocationAgentIntentPatchCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-20)
+///              .page_token("justo")
+///              .page_size(-52)
 ///              .doit();
 /// # }
 /// ```
@@ -16539,7 +16774,7 @@ impl<'a, C, A> ProjectKnowledgeBaseListCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_patch(req, "name")
-///              .update_mask("vero")
+///              .update_mask("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -17248,7 +17483,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentDeleteCall<'a, C, A> where C: Bo
     }
 
 
-    /// The name of the document to delete.
+    /// Required. The name of the document to delete.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`.
     ///
@@ -17615,9 +17850,12 @@ impl<'a, C, A> ProjectLocationAgentSessionContextCreateCall<'a, C, A> where C: B
 }
 
 
-/// Retrieves the fulfillment.
+/// Retrieves the specified document.
+/// 
+/// Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
+/// only use `projects.knowledgeBases.documents`.
 ///
-/// A builder for the *locations.agent.getFulfillment* method supported by a *project* resource.
+/// A builder for the *agent.knowledgeBases.documents.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -17642,11 +17880,11 @@ impl<'a, C, A> ProjectLocationAgentSessionContextCreateCall<'a, C, A> where C: B
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_agent_get_fulfillment("name")
+/// let result = hub.projects().agent_knowledge_bases_documents_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationAgentGetFulfillmentCall<'a, C, A>
+pub struct ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dialogflow<C, A>,
@@ -17656,13 +17894,13 @@ pub struct ProjectLocationAgentGetFulfillmentCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationAgentGetFulfillmentCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Fulfillment)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Document)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -17671,7 +17909,7 @@ impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dialogflow.projects.locations.agent.getFulfillment",
+        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.knowledgeBases.documents.get",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
@@ -17796,14 +18034,15 @@ impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Required. The name of the fulfillment.
-    /// Format: `projects/<Project ID>/agent/fulfillment`.
+    /// Required. The name of the document to retrieve.
+    /// Format `projects/<Project ID>/knowledgeBases/<Knowledge Base
+    /// ID>/documents/<Document ID>`.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -17813,7 +18052,7 @@ impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17838,7 +18077,7 @@ impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowM
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17858,7 +18097,7 @@ impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17904,7 +18143,7 @@ impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().set_agent(req, "parent")
-///              .update_mask("sadipscing")
+///              .update_mask("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -18169,7 +18408,6 @@ impl<'a, C, A> ProjectSetAgentCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Deletes entity types in the specified agent.
-/// 
 /// Operation <response: google.protobuf.Empty>
 ///
 /// A builder for the *agent.entityTypes.batchDelete* method supported by a *project* resource.
@@ -18460,10 +18698,16 @@ impl<'a, C, A> ProjectAgentEntityTypeBatchDeleteCall<'a, C, A> where C: BorrowMu
 /// 
 /// Uploads new intents and entity types without deleting the existing ones.
 /// Intents and entity types with the same name are replaced with the new
-/// versions from ImportAgentRequest.
+/// versions from ImportAgentRequest. After the import, the imported draft
+/// agent will be trained automatically (unless disabled in agent settings).
+/// However, once the import is done, training may not be completed yet. Please
+/// call TrainAgent and wait for the operation it returns in order to train
+/// explicitly.
 /// 
 /// 
 /// Operation <response: google.protobuf.Empty>
+/// An operation which tracks when importing is complete. It only tracks
+/// when the draft agent is updated not when it is done training.
 ///
 /// A builder for the *agent.import* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -18780,8 +19024,8 @@ impl<'a, C, A> ProjectAgentImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_list("parent")
-///              .page_token("duo")
-///              .page_size(-82)
+///              .page_token("aliquyam")
+///              .page_size(-5)
 ///              .doit();
 /// # }
 /// ```
@@ -19901,9 +20145,11 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
 }
 
 
-/// Updates the fulfillment.
+/// Creates a context.
+/// 
+/// If the specified context already exists, overrides the context.
 ///
-/// A builder for the *locations.agent.fulfillment* method supported by a *project* resource.
+/// A builder for the *agent.sessions.contexts.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -19915,7 +20161,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
-/// use dialogflow2_beta1::GoogleCloudDialogflowV2beta1Fulfillment;
+/// use dialogflow2_beta1::GoogleCloudDialogflowV2beta1Context;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19929,35 +20175,33 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchUpdateCall<'a, C, A> where C: Bo
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudDialogflowV2beta1Fulfillment::default();
+/// let mut req = GoogleCloudDialogflowV2beta1Context::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_agent_fulfillment(req, "name")
-///              .update_mask("takimata")
+/// let result = hub.projects().agent_sessions_contexts_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationAgentFulfillmentCall<'a, C, A>
+pub struct ProjectAgentSessionContextCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dialogflow<C, A>,
-    _request: GoogleCloudDialogflowV2beta1Fulfillment,
-    _name: String,
-    _update_mask: Option<String>,
+    _request: GoogleCloudDialogflowV2beta1Context,
+    _parent: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationAgentFulfillmentCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectAgentSessionContextCreateCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectAgentSessionContextCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Fulfillment)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Context)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -19966,14 +20210,11 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dialogflow.projects.locations.agent.fulfillment",
+        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.sessions.contexts.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
-        for &field in ["alt", "name", "updateMask"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19985,12 +20226,12 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2beta1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/contexts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -20005,7 +20246,7 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -20114,27 +20355,23 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowV2beta1Fulfillment) -> ProjectLocationAgentFulfillmentCall<'a, C, A> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2beta1Context) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Required. The unique identifier of the fulfillment.
-    /// Format: `projects/<Project ID>/agent/fulfillment`.
+    /// Required. The session to create a context for.
+    /// Format: `projects/<Project ID>/agent/sessions/<Session ID>` or
+    /// `projects/<Project ID>/agent/environments/<Environment ID>/users/<User
+    /// ID>/sessions/<Session ID>`. If `Environment ID` is not specified, we assume
+    /// default 'draft' environment. If `User ID` is not specified, we assume
+    /// default '-' user.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFulfillmentCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// Required. The mask to control which fields get updated. If the mask is not
-    /// present, all fields will be updated.
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFulfillmentCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
+    pub fn parent(mut self, new_value: &str) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20143,7 +20380,7 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAgentFulfillmentCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentSessionContextCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20168,7 +20405,7 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFulfillmentCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentSessionContextCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20188,7 +20425,7 @@ impl<'a, C, A> ProjectLocationAgentFulfillmentCall<'a, C, A> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFulfillmentCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentSessionContextCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22455,6 +22692,289 @@ impl<'a, C, A> ProjectAgentEntityTypeDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
+/// Returns the list of all non-draft environments of the specified agent.
+///
+/// A builder for the *locations.agent.environments.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2_beta1::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agent_environments_list("parent")
+///              .page_token("aliquyam")
+///              .page_size(-53)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAgentEnvironmentListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAgentEnvironmentListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAgentEnvironmentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1ListEnvironmentsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.locations.agent.environments.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/environments";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The agent to list all environments from.
+    /// Format:
+    /// - `projects/<Project Number / ID>/agent`
+    /// - `projects/<Project Number / ID>/locations/<Location
+    /// ID>/agent
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of items to return in a single page. By default 100 and
+    /// at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAgentEnvironmentListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Exports the specified agent to a ZIP file.
 /// 
 /// 
@@ -23066,7 +23586,7 @@ impl<'a, C, A> ProjectLocationAgentIntentBatchDeleteCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_contexts_patch(req, "name")
-///              .update_mask("eirmod")
+///              .update_mask("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -23642,7 +24162,7 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_create(req, "parent")
-///              .language_code("sed")
+///              .language_code("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -23947,7 +24467,7 @@ impl<'a, C, A> ProjectLocationAgentEntityTypeCreateCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_documents_patch(req, "name")
-///              .update_mask("gubergren")
+///              .update_mask("tempor")
 ///              .doit();
 /// # }
 /// ```
@@ -24130,7 +24650,7 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentPatchCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// The document resource name.
+    /// Optional. The document resource name.
     /// The name must be empty when creating a document.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`.
@@ -24791,8 +25311,8 @@ impl<'a, C, A> ProjectAgentSessionContextDeleteCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_get("name")
-///              .language_code("sea")
-///              .intent_view("labore")
+///              .language_code("aliquyam")
+///              .intent_view("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -25336,8 +25856,8 @@ impl<'a, C, A> ProjectLocationAgentSessionDeleteContextCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_entity_types_list("parent")
-///              .page_token("dolores")
-///              .page_size(-98)
+///              .page_token("ut")
+///              .page_size(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -26407,7 +26927,7 @@ impl<'a, C, A> ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall<'a, C, A> 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_set_agent(req, "parent")
-///              .update_mask("amet")
+///              .update_mask("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -26709,7 +27229,7 @@ impl<'a, C, A> ProjectLocationSetAgentCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_entity_types_patch(req, "name")
-///              .update_mask("clita")
+///              .update_mask("est")
 ///              .doit();
 /// # }
 /// ```
@@ -26982,7 +27502,6 @@ impl<'a, C, A> ProjectAgentSessionEntityTypePatchCall<'a, C, A> where C: BorrowM
 
 
 /// Updates/Creates multiple entity types in the specified agent.
-/// 
 /// Operation <response: BatchUpdateEntityTypesResponse>
 ///
 /// A builder for the *locations.agent.entityTypes.batchUpdate* method supported by a *project* resource.
@@ -27297,8 +27816,8 @@ impl<'a, C, A> ProjectLocationAgentEntityTypeBatchUpdateCall<'a, C, A> where C: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_get("name")
-///              .language_code("est")
-///              .intent_view("clita")
+///              .language_code("ut")
+///              .intent_view("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -28168,7 +28687,7 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentCreateCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_delete("name")
-///              .force(true)
+///              .force(false)
 ///              .doit();
 /// # }
 /// ```
@@ -28408,6 +28927,291 @@ impl<'a, C, A> ProjectKnowledgeBaseDeleteCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
+/// Returns the list of agents.
+/// Since there is at most one conversational agent per project, this method is
+/// useful primarily for listing all agents across projects the caller has
+/// access to. One can achieve that with a wildcard project collection id "-".
+/// Refer to [List
+/// Sub-Collections](https://cloud.google.com/apis/design/design_patterns#list_sub-collections).
+///
+/// A builder for the *locations.agent.search* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2_beta1::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agent_search("parent")
+///              .page_token("ea")
+///              .page_size(-17)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAgentSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAgentSearchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAgentSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1SearchAgentsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.locations.agent.search",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/agent:search";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The project to list agents from.
+    /// Format: `projects/<Project ID or '-'>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentSearchCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentSearchCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of items to return in a single page. By
+    /// default 100 and at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentSearchCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAgentSearchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSearchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSearchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists operations that match the specified filter in the request. If the
 /// server doesn't support this method, it returns `UNIMPLEMENTED`.
 /// 
@@ -28445,9 +29249,9 @@ impl<'a, C, A> ProjectKnowledgeBaseDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("duo")
-///              .page_size(-93)
-///              .filter("aliquyam")
+///              .page_token("dolor")
+///              .page_size(-41)
+///              .filter("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -28735,7 +29539,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_get("name")
-///              .language_code("ea")
+///              .language_code("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -29781,7 +30585,7 @@ impl<'a, C, A> ProjectLocationAgentEnvironmentUserSessionEntityTypeDeleteCall<'a
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_get_validation_result("parent")
-///              .language_code("invidunt")
+///              .language_code("At")
 ///              .doit();
 /// # }
 /// ```
@@ -30906,8 +31710,8 @@ impl<'a, C, A> ProjectAgentEnvironmentUserSessionContextCreateCall<'a, C, A> whe
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_patch(req, "name")
-///              .update_mask("eirmod")
-///              .language_code("At")
+///              .update_mask("takimata")
+///              .language_code("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -31766,8 +32570,8 @@ impl<'a, C, A> ProjectLocationAgentEnvironmentUserSessionDeleteContextCall<'a, C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_contexts_list("parent")
-///              .page_token("sit")
-///              .page_size(-8)
+///              .page_token("Lorem")
+///              .page_size(-42)
 ///              .doit();
 /// # }
 /// ```
@@ -32056,7 +32860,7 @@ impl<'a, C, A> ProjectLocationAgentSessionContextListCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_create(req, "parent")
-///              .language_code("nonumy")
+///              .language_code("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -32901,6 +33705,289 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentCreateCall<'a, C, A> where C: Bo
 }
 
 
+/// Returns the list of all non-draft environments of the specified agent.
+///
+/// A builder for the *agent.environments.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2_beta1 as dialogflow2_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2_beta1::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().agent_environments_list("parent")
+///              .page_token("dolor")
+///              .page_size(-9)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectAgentEnvironmentListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectAgentEnvironmentListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectAgentEnvironmentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1ListEnvironmentsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.environments.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta1/{+parent}/environments";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The agent to list all environments from.
+    /// Format:
+    /// - `projects/<Project Number / ID>/agent`
+    /// - `projects/<Project Number / ID>/locations/<Location
+    /// ID>/agent
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of items to return in a single page. By default 100 and
+    /// at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEnvironmentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentEnvironmentListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the specified knowledge base.
 /// 
 /// Note: The `projects.agent.knowledgeBases` resource is deprecated;
@@ -32938,7 +34025,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentCreateCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_patch(req, "name")
-///              .update_mask("diam")
+///              .update_mask("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -33499,8 +34586,8 @@ impl<'a, C, A> ProjectLocationAgentEnvironmentUserSessionEntityTypeGetCall<'a, C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_documents_list("parent")
-///              .page_token("amet.")
-///              .page_size(-100)
+///              .page_token("dolor")
+///              .page_size(-22)
 ///              .doit();
 /// # }
 /// ```
@@ -33673,14 +34760,14 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentListCall<'a, C, A> where C: Borr
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. The next_page_token value returned from a previous list request.
+    /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectAgentKnowledgeBaseDocumentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional. The maximum number of items to return in a single page. By
+    /// The maximum number of items to return in a single page. By
     /// default 10 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
@@ -34578,10 +35665,16 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDeleteCall<'a, C, A> where C: BorrowMut<
 /// Restores the specified agent from a ZIP file.
 /// 
 /// Replaces the current agent version with a new one. All the intents and
-/// entity types in the older version are deleted.
+/// entity types in the older version are deleted. After the restore, the
+/// restored draft agent will be trained automatically (unless disabled in
+/// agent settings). However, once the restore is done, training may not be
+/// completed yet. Please call TrainAgent and wait for the operation it
+/// returns in order to train explicitly.
 /// 
 /// 
 /// Operation <response: google.protobuf.Empty>
+/// An operation which tracks when restoring is complete. It only tracks
+/// when the draft agent is updated not when it is done training.
 ///
 /// A builder for the *locations.agent.restore* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -35189,8 +36282,8 @@ impl<'a, C, A> ProjectLocationAgentEntityTypeEntityBatchDeleteCall<'a, C, A> whe
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_create(req, "parent")
-///              .language_code("dolor")
-///              .intent_view("et")
+///              .language_code("dolore")
+///              .intent_view("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -35506,7 +36599,7 @@ impl<'a, C, A> ProjectLocationAgentIntentCreateCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_documents_patch(req, "name")
-///              .update_mask("vero")
+///              .update_mask("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -35689,7 +36782,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentPatchCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// The document resource name.
+    /// Optional. The document resource name.
     /// The name must be empty when creating a document.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`.
@@ -35808,7 +36901,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentPatchCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_users_sessions_contexts_patch(req, "name")
-///              .update_mask("sed")
+///              .update_mask("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -36815,7 +37908,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentReloadCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// The name of the document to reload.
+    /// Required. The name of the document to reload.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`
     ///
@@ -36918,10 +38011,10 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentReloadCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_list("parent")
-///              .page_token("vero")
-///              .page_size(-99)
-///              .language_code("takimata")
-///              .intent_view("et")
+///              .page_token("rebum.")
+///              .page_size(-86)
+///              .language_code("aliquyam")
+///              .intent_view("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -38074,10 +39167,10 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchCreateCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-15)
-///              .language_code("labore")
-///              .intent_view("aliquyam")
+///              .page_token("sea")
+///              .page_size(-96)
+///              .language_code("diam")
+///              .intent_view("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -38354,12 +39447,9 @@ impl<'a, C, A> ProjectLocationAgentIntentListCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Retrieves the specified document.
-/// 
-/// Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
-/// only use `projects.knowledgeBases.documents`.
+/// Retrieves the fulfillment.
 ///
-/// A builder for the *agent.knowledgeBases.documents.get* method supported by a *project* resource.
+/// A builder for the *locations.agent.getFulfillment* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -38384,11 +39474,11 @@ impl<'a, C, A> ProjectLocationAgentIntentListCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().agent_knowledge_bases_documents_get("name")
+/// let result = hub.projects().locations_agent_get_fulfillment("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
+pub struct ProjectLocationAgentGetFulfillmentCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dialogflow<C, A>,
@@ -38398,13 +39488,13 @@ pub struct ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationAgentGetFulfillmentCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationAgentGetFulfillmentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Document)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2beta1Fulfillment)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -38413,7 +39503,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: Borro
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.knowledgeBases.documents.get",
+        dlg.begin(MethodInfo { id: "dialogflow.projects.locations.agent.getFulfillment",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
@@ -38538,15 +39628,14 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: Borro
     }
 
 
-    /// Required. The name of the document to retrieve.
-    /// Format `projects/<Project ID>/knowledgeBases/<Knowledge Base
-    /// ID>/documents/<Document ID>`.
+    /// Required. The name of the fulfillment.
+    /// Format: `projects/<Project ID>/agent/fulfillment`.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -38556,7 +39645,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -38581,7 +39670,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: Borro
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38601,7 +39690,7 @@ impl<'a, C, A> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentKnowledgeBaseDocumentGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentGetFulfillmentCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -39419,10 +40508,16 @@ impl<'a, C, A> ProjectLocationAgentEnvironmentUserSessionContextGetCall<'a, C, A
 /// 
 /// Uploads new intents and entity types without deleting the existing ones.
 /// Intents and entity types with the same name are replaced with the new
-/// versions from ImportAgentRequest.
+/// versions from ImportAgentRequest. After the import, the imported draft
+/// agent will be trained automatically (unless disabled in agent settings).
+/// However, once the import is done, training may not be completed yet. Please
+/// call TrainAgent and wait for the operation it returns in order to train
+/// explicitly.
 /// 
 /// 
 /// Operation <response: google.protobuf.Empty>
+/// An operation which tracks when importing is complete. It only tracks
+/// when the draft agent is updated not when it is done training.
 ///
 /// A builder for the *locations.agent.import* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -40257,7 +41352,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_update_fulfillment(req, "name")
-///              .update_mask("accusam")
+///              .update_mask("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -41077,9 +42172,9 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeGetCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("aliquyam")
-///              .page_size(-94)
-///              .filter("ea")
+///              .page_token("Lorem")
+///              .page_size(-96)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -41656,9 +42751,9 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_list("parent")
-///              .page_token("sed")
-///              .page_size(-99)
-///              .language_code("sanctus")
+///              .page_token("gubergren")
+///              .page_size(-73)
+///              .language_code("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -42225,7 +43320,7 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_entity_types_patch(req, "name")
-///              .update_mask("consetetur")
+///              .update_mask("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -42715,7 +43810,7 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentReloadCall<'a, C, A> where C: BorrowM
         self._request = new_value;
         self
     }
-    /// The name of the document to reload.
+    /// Required. The name of the document to reload.
     /// Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
     /// ID>/documents/<Document ID>`
     ///
@@ -42824,8 +43919,8 @@ impl<'a, C, A> ProjectKnowledgeBaseDocumentReloadCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_create(req, "parent")
-///              .language_code("labore")
-///              .intent_view("gubergren")
+///              .language_code("clita")
+///              .intent_view("eos")
 ///              .doit();
 /// # }
 /// ```

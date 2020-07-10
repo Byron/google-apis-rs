@@ -665,6 +665,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status.url" => Some(("status.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.mapped-route-name" => Some(("status.mappedRouteName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.route-name" => Some(("spec.routeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -686,7 +687,7 @@ impl<'n> Engine<'n> {
                     "metadata.self-link" => Some(("metadata.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.uid" => Some(("metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "certificate-mode", "cluster-name", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "finalizers", "force-override", "generate-name", "generation", "kind", "labels", "mapped-route-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "route-name", "self-link", "spec", "status", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "certificate-mode", "cluster-name", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "finalizers", "force-override", "generate-name", "generation", "kind", "labels", "mapped-route-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "route-name", "self-link", "spec", "status", "uid", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1889,6 +1890,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status.url" => Some(("status.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.mapped-route-name" => Some(("status.mappedRouteName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.route-name" => Some(("spec.routeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1910,7 +1912,7 @@ impl<'n> Engine<'n> {
                     "metadata.self-link" => Some(("metadata.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.uid" => Some(("metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "certificate-mode", "cluster-name", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "finalizers", "force-override", "generate-name", "generation", "kind", "labels", "mapped-route-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "route-name", "self-link", "spec", "status", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "certificate-mode", "cluster-name", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "finalizers", "force-override", "generate-name", "generation", "kind", "labels", "mapped-route-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "route-name", "self-link", "spec", "status", "uid", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5128,7 +5130,7 @@ fn main() {
     
     let mut app = App::new("run1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200407")
+           .version("1.0.14+20200622")
            .about("Deploy and manage user provided container images that scale automatically based on HTTP traffic.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_run1_cli")
            .arg(Arg::with_name("url")

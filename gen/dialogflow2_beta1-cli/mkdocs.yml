@@ -1,4 +1,4 @@
-site_name: Dialogflow v1.0.13+20200408
+site_name: Dialogflow v1.0.14+20200706
 site_url: http://byron.github.io/google-apis-rs/google-dialogflow2_beta1-cli
 site_description: A complete library to interact with Dialogflow (protocol v2beta1)
 
@@ -19,6 +19,7 @@ pages:
 - ['projects_agent-entity-types-get.md', 'Projects', 'Agent Entity Types Get']
 - ['projects_agent-entity-types-list.md', 'Projects', 'Agent Entity Types List']
 - ['projects_agent-entity-types-patch.md', 'Projects', 'Agent Entity Types Patch']
+- ['projects_agent-environments-list.md', 'Projects', 'Agent Environments List']
 - ['projects_agent-environments-users-sessions-contexts-create.md', 'Projects', 'Agent Environments Users Sessions Contexts Create']
 - ['projects_agent-environments-users-sessions-contexts-delete.md', 'Projects', 'Agent Environments Users Sessions Contexts Delete']
 - ['projects_agent-environments-users-sessions-contexts-get.md', 'Projects', 'Agent Environments Users Sessions Contexts Get']
@@ -92,6 +93,7 @@ pages:
 - ['projects_locations-agent-entity-types-get.md', 'Projects', 'Locations Agent Entity Types Get']
 - ['projects_locations-agent-entity-types-list.md', 'Projects', 'Locations Agent Entity Types List']
 - ['projects_locations-agent-entity-types-patch.md', 'Projects', 'Locations Agent Entity Types Patch']
+- ['projects_locations-agent-environments-list.md', 'Projects', 'Locations Agent Environments List']
 - ['projects_locations-agent-environments-users-sessions-contexts-create.md', 'Projects', 'Locations Agent Environments Users Sessions Contexts Create']
 - ['projects_locations-agent-environments-users-sessions-contexts-delete.md', 'Projects', 'Locations Agent Environments Users Sessions Contexts Delete']
 - ['projects_locations-agent-environments-users-sessions-contexts-get.md', 'Projects', 'Locations Agent Environments Users Sessions Contexts Get']
@@ -105,7 +107,6 @@ pages:
 - ['projects_locations-agent-environments-users-sessions-entity-types-list.md', 'Projects', 'Locations Agent Environments Users Sessions Entity Types List']
 - ['projects_locations-agent-environments-users-sessions-entity-types-patch.md', 'Projects', 'Locations Agent Environments Users Sessions Entity Types Patch']
 - ['projects_locations-agent-export.md', 'Projects', 'Locations Agent Export']
-- ['projects_locations-agent-fulfillment.md', 'Projects', 'Locations Agent Fulfillment']
 - ['projects_locations-agent-get-fulfillment.md', 'Projects', 'Locations Agent Get Fulfillment']
 - ['projects_locations-agent-import.md', 'Projects', 'Locations Agent Import']
 - ['projects_locations-agent-intents-batch-delete.md', 'Projects', 'Locations Agent Intents Batch Delete']
@@ -116,6 +117,7 @@ pages:
 - ['projects_locations-agent-intents-list.md', 'Projects', 'Locations Agent Intents List']
 - ['projects_locations-agent-intents-patch.md', 'Projects', 'Locations Agent Intents Patch']
 - ['projects_locations-agent-restore.md', 'Projects', 'Locations Agent Restore']
+- ['projects_locations-agent-search.md', 'Projects', 'Locations Agent Search']
 - ['projects_locations-agent-sessions-contexts-create.md', 'Projects', 'Locations Agent Sessions Contexts Create']
 - ['projects_locations-agent-sessions-contexts-delete.md', 'Projects', 'Locations Agent Sessions Contexts Delete']
 - ['projects_locations-agent-sessions-contexts-get.md', 'Projects', 'Locations Agent Sessions Contexts Get']
@@ -129,6 +131,7 @@ pages:
 - ['projects_locations-agent-sessions-entity-types-list.md', 'Projects', 'Locations Agent Sessions Entity Types List']
 - ['projects_locations-agent-sessions-entity-types-patch.md', 'Projects', 'Locations Agent Sessions Entity Types Patch']
 - ['projects_locations-agent-train.md', 'Projects', 'Locations Agent Train']
+- ['projects_locations-agent-update-fulfillment.md', 'Projects', 'Locations Agent Update Fulfillment']
 - ['projects_locations-delete-agent.md', 'Projects', 'Locations Delete Agent']
 - ['projects_locations-get-agent.md', 'Projects', 'Locations Get Agent']
 - ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']

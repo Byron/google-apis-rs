@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Video Intelligence* crate version *1.0.13+20200325*, where *20200325* is the exact revision of the *videointelligence:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Video Intelligence* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *videointelligence:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Video Intelligence* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/video-intelligence/docs/).
@@ -14,7 +14,7 @@
 //! * operations
 //!  * [*projects locations operations cancel*](struct.OperationProjectLocationOperationCancelCall.html), [*projects locations operations delete*](struct.OperationProjectLocationOperationDeleteCall.html) and [*projects locations operations get*](struct.OperationProjectLocationOperationGetCall.html)
 //! * projects
-//!  * [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
+//!  * [*locations corpura operations get*](struct.ProjectLocationCorpuraOperationGetCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
 //! * videos
 //!  * [*annotate*](struct.VideoAnnotateCall.html)
 //! 
@@ -51,10 +51,10 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_operations_cancel(...).doit()
-//! let r = hub.operations().projects_locations_operations_cancel(...).doit()
-//! let r = hub.operations().projects_locations_operations_delete(...).doit()
-//! let r = hub.projects().locations_operations_delete(...).doit()
+//! let r = hub.videos().annotate(...).doit()
+//! let r = hub.projects().locations_corpura_operations_get(...).doit()
+//! let r = hub.operations().projects_locations_operations_get(...).doit()
+//! let r = hub.projects().locations_operations_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -88,7 +88,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_videointelligence1 as videointelligence1;
-//! use videointelligence1::GoogleLongrunning_CancelOperationRequest;
+//! use videointelligence1::GoogleCloudVideointelligenceV1_AnnotateVideoRequest;
 //! use videointelligence1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -110,12 +110,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleLongrunning_CancelOperationRequest::default();
+//! let mut req = GoogleCloudVideointelligenceV1_AnnotateVideoRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_operations_cancel(req, "name")
+//! let result = hub.videos().annotate(req)
 //!              .doit();
 //! 
 //! match result {
@@ -271,7 +271,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_videointelligence1 as videointelligence1;
-/// use videointelligence1::GoogleLongrunning_CancelOperationRequest;
+/// use videointelligence1::GoogleCloudVideointelligenceV1_AnnotateVideoRequest;
 /// use videointelligence1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -293,12 +293,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleLongrunning_CancelOperationRequest::default();
+/// let mut req = GoogleCloudVideointelligenceV1_AnnotateVideoRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_operations_cancel(req, "name")
+/// let result = hub.videos().annotate(req)
 ///              .doit();
 /// 
 /// match result {
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudVideoIntelligence<C, A>
         CloudVideoIntelligence {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://videointelligence.googleapis.com/".to_string(),
             _root_url: "https://videointelligence.googleapis.com/".to_string(),
         }
@@ -353,7 +353,7 @@ impl<'a, C, A> CloudVideoIntelligence<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -456,32 +456,33 @@ pub struct GoogleCloudVideointelligenceV1_AnnotateVideoRequest {
     #[serde(rename="videoContext")]
     pub video_context: Option<GoogleCloudVideointelligenceV1_VideoContext>,
     /// Optional. Cloud region where annotation should take place. Supported cloud
-    /// regions: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no region
-    /// is specified, a region will be determined based on video file location.
+    /// regions are: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no
+    /// region is specified, the region will be determined based on video file
+    /// location.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Required. Requested video annotation features.
     pub features: Option<Vec<String>>,
     /// The video data bytes.
-    /// If unset, the input video(s) should be specified via `input_uri`.
-    /// If set, `input_uri` should be unset.
+    /// If unset, the input video(s) should be specified via the `input_uri`.
+    /// If set, `input_uri` must be unset.
     #[serde(rename="inputContent")]
     pub input_content: Option<String>,
     /// Input video location. Currently, only
     /// [Cloud Storage](https://cloud.google.com/storage/) URIs are
-    /// supported, which must be specified in the following format:
+    /// supported. URIs must be specified in the following format:
     /// `gs://bucket-id/object-id` (other URI formats return
     /// google.rpc.Code.INVALID_ARGUMENT). For more information, see
     /// [Request URIs](https://cloud.google.com/storage/docs/request-endpoints).
-    /// A video URI may include wildcards in `object-id`, and thus identify
-    /// multiple videos. Supported wildcards: '*' to match 0 or more characters;
+    /// To identify multiple videos, a video URI may include wildcards in the
+    /// `object-id`. Supported wildcards: '*' to match 0 or more characters;
     /// '?' to match 1 character. If unset, the input video should be embedded
-    /// in the request as `input_content`. If set, `input_content` should be unset.
+    /// in the request as `input_content`. If set, `input_content` must be unset.
     #[serde(rename="inputUri")]
     pub input_uri: Option<String>,
     /// Optional. Location where the output (in JSON format) should be stored.
     /// Currently, only [Cloud Storage](https://cloud.google.com/storage/)
-    /// URIs are supported, which must be specified in the following format:
+    /// URIs are supported. These must be specified in the following format:
     /// `gs://bucket-id/object-id` (other URI formats return
     /// google.rpc.Code.INVALID_ARGUMENT). For more information, see
     /// [Request URIs](https://cloud.google.com/storage/docs/request-endpoints).
@@ -523,7 +524,7 @@ pub struct GoogleCloudVideointelligenceV1_SpeechTranscriptionConfig {
     /// the top alternative of the recognition result using a speaker_tag provided
     /// in the WordInfo.
     /// Note: When this is true, we send all the words from the beginning of the
-    /// audio for the top alternative in every consecutive responses.
+    /// audio for the top alternative in every consecutive response.
     /// This is done in order to improve our speaker tags as our models learn to
     /// identify the speakers in the conversation over time.
     #[serde(rename="enableSpeakerDiarization")]
@@ -662,6 +663,7 @@ impl Part for GoogleCloudVideointelligenceV1_VideoSegment {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [annotate videos](struct.VideoAnnotateCall.html) (response)
+/// * [locations corpura operations get projects](struct.ProjectLocationCorpuraOperationGetCall.html) (response)
 /// * [projects locations operations get operations](struct.OperationProjectLocationOperationGetCall.html) (response)
 /// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
 /// 
@@ -782,24 +784,24 @@ pub struct GoogleCloudVideointelligenceV1_LabelDetectionConfig {
     /// Supported values: "builtin/stable" (the default if unset) and
     /// "builtin/latest".
     pub model: Option<String>,
-    /// Whether the video has been shot from a stationary (i.e. non-moving) camera.
-    /// When set to true, might improve detection accuracy for moving objects.
-    /// Should be used with `SHOT_AND_FRAME_MODE` enabled.
+    /// Whether the video has been shot from a stationary (i.e., non-moving)
+    /// camera. When set to true, might improve detection accuracy for moving
+    /// objects. Should be used with `SHOT_AND_FRAME_MODE` enabled.
     #[serde(rename="stationaryCamera")]
     pub stationary_camera: Option<bool>,
     /// The confidence threshold we perform filtering on the labels from
     /// frame-level detection. If not set, it is set to 0.4 by default. The valid
     /// range for this threshold is [0.1, 0.9]. Any value set outside of this
     /// range will be clipped.
-    /// Note: for best results please follow the default threshold. We will update
+    /// Note: For best results, follow the default threshold. We will update
     /// the default threshold everytime when we release a new model.
     #[serde(rename="frameConfidenceThreshold")]
     pub frame_confidence_threshold: Option<f32>,
     /// The confidence threshold we perform filtering on the labels from
-    /// video-level and shot-level detections. If not set, it is set to 0.3 by
+    /// video-level and shot-level detections. If not set, it's set to 0.3 by
     /// default. The valid range for this threshold is [0.1, 0.9]. Any value set
     /// outside of this range will be clipped.
-    /// Note: for best results please follow the default threshold. We will update
+    /// Note: For best results, follow the default threshold. We will update
     /// the default threshold everytime when we release a new model.
     #[serde(rename="videoConfidenceThreshold")]
     pub video_confidence_threshold: Option<f32>,
@@ -1006,7 +1008,7 @@ impl<'a, C, A> VideoMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudVideoIntelligence::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
+/// // like `locations_corpura_operations_get(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1042,6 +1044,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationOperationCancelCall {
             hub: self.hub,
             _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn locations_corpura_operations_get(&self, name: &str) -> ProjectLocationCorpuraOperationGetCall<'a, C, A> {
+        ProjectLocationCorpuraOperationGetCall {
+            hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2447,6 +2468,262 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 }
 
 
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *locations.corpura.operations.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_videointelligence1 as videointelligence1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use videointelligence1::CloudVideoIntelligence;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudVideoIntelligence::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_corpura_operations_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationCorpuraOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudVideoIntelligence<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationCorpuraOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationCorpuraOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning_Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "videointelligence.projects.locations.corpura.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCorpuraOperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationCorpuraOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCorpuraOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCorpuraOperationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists operations that match the specified filter in the request. If the
 /// server doesn't support this method, it returns `UNIMPLEMENTED`.
 /// 
@@ -2484,9 +2761,9 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("takimata")
-///              .page_size(-70)
-///              .filter("amet.")
+///              .page_token("kasd")
+///              .page_size(-22)
+///              .filter("takimata")
 ///              .doit();
 /// # }
 /// ```

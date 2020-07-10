@@ -1,4 +1,4 @@
-site_name: bigquery v1.0.13+20200330
+site_name: bigquery v1.0.14+20200625
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
 site_description: A complete library to interact with bigquery (protocol v2)
 
@@ -36,9 +36,12 @@ pages:
 - ['tabledata_list.md', 'Tabledata', 'List']
 - ['tables_delete.md', 'Tables', 'Delete']
 - ['tables_get.md', 'Tables', 'Get']
+- ['tables_get-iam-policy.md', 'Tables', 'Get Iam Policy']
 - ['tables_insert.md', 'Tables', 'Insert']
 - ['tables_list.md', 'Tables', 'List']
 - ['tables_patch.md', 'Tables', 'Patch']
+- ['tables_set-iam-policy.md', 'Tables', 'Set Iam Policy']
+- ['tables_test-iam-permissions.md', 'Tables', 'Test Iam Permissions']
 - ['tables_update.md', 'Tables', 'Update']
 
 theme: readthedocs

@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *customsearch* crate version *1.0.13+20181001*, where *20181001* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *customsearch* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *customsearch* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/custom-search/v1/using_rest).
+//! [official documentation site](https://developers.google.com/custom-search/v1/introduction).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/customsearch1).
 //! # Features
 //! 
@@ -103,17 +103,18 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.cse().siterestrict_list("q")
-//!              .start(46)
-//!              .sort("eos")
-//!              .site_search_filter("erat")
-//!              .site_search("sadipscing")
-//!              .search_type("dolor")
-//!              .safe("eirmod")
-//!              .rights("elitr")
-//!              .related_site("amet")
+//! let result = hub.cse().siterestrict_list()
+//!              .start(92)
+//!              .sort("Lorem")
+//!              .site_search_filter("eos")
+//!              .site_search("erat")
+//!              .search_type("sadipscing")
+//!              .safe("dolor")
+//!              .rights("eirmod")
+//!              .related_site("elitr")
+//!              .q("amet")
 //!              .or_terms("no")
-//!              .num(65)
+//!              .num(-36)
 //!              .lr("eirmod")
 //!              .low_range("dolore")
 //!              .link_site("invidunt")
@@ -288,17 +289,18 @@ pub use cmn::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.cse().siterestrict_list("q")
+/// let result = hub.cse().siterestrict_list()
 ///              .start(53)
-///              .sort("et")
-///              .site_search_filter("consetetur")
-///              .site_search("amet.")
-///              .search_type("voluptua.")
-///              .safe("Lorem")
-///              .rights("gubergren")
-///              .related_site("justo")
+///              .sort("dolor")
+///              .site_search_filter("et")
+///              .site_search("consetetur")
+///              .search_type("amet.")
+///              .safe("voluptua.")
+///              .rights("Lorem")
+///              .related_site("gubergren")
+///              .q("justo")
 ///              .or_terms("sit")
-///              .num(75)
+///              .num(-26)
 ///              .lr("diam")
 ///              .low_range("rebum.")
 ///              .link_site("consetetur")
@@ -356,9 +358,9 @@ impl<'a, C, A> Customsearch<C, A>
         Customsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
-            _base_url: "https://www.googleapis.com/customsearch/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
+            _base_url: "https://customsearch.googleapis.com/".to_string(),
+            _root_url: "https://customsearch.googleapis.com/".to_string(),
         }
     }
 
@@ -367,7 +369,7 @@ impl<'a, C, A> Customsearch<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -375,7 +377,7 @@ impl<'a, C, A> Customsearch<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/customsearch/`.
+    /// It defaults to `https://customsearch.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -383,7 +385,7 @@ impl<'a, C, A> Customsearch<C, A>
     }
 
     /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
+    /// It defaults to `https://customsearch.googleapis.com/`.
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
@@ -395,30 +397,30 @@ impl<'a, C, A> Customsearch<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// There is no detailed description.
+/// Image belonging to a custom search result.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultImage {
-    /// no description provided
+    /// The width of the image, in pixels.
     pub width: Option<i32>,
-    /// no description provided
+    /// A URL pointing to the webpage hosting the image.
     #[serde(rename="contextLink")]
     pub context_link: Option<String>,
-    /// no description provided
+    /// The width of the thumbnail image, in pixels.
     #[serde(rename="thumbnailWidth")]
     pub thumbnail_width: Option<i32>,
-    /// no description provided
+    /// A URL to the thumbnail image.
     #[serde(rename="thumbnailLink")]
     pub thumbnail_link: Option<String>,
-    /// no description provided
+    /// The size of the image, in pixels.
     #[serde(rename="byteSize")]
     pub byte_size: Option<i32>,
-    /// no description provided
+    /// The height of the thumbnail image, in pixels.
     #[serde(rename="thumbnailHeight")]
     pub thumbnail_height: Option<i32>,
-    /// no description provided
+    /// The height of the image, in pixels.
     pub height: Option<i32>,
 }
 
@@ -426,7 +428,7 @@ impl NestedType for ResultImage {}
 impl Part for ResultImage {}
 
 
-/// There is no detailed description.
+/// Response to a custom search request.
 /// 
 /// # Activities
 /// 
@@ -438,21 +440,32 @@ impl Part for ResultImage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Search {
-    /// no description provided
+    /// The set of
+    /// [promotions](https://developers.google.com/custom-search/docs/promotions).
+    /// Present only if the custom search engine's configuration files define any
+    /// promotions for the given query.
     pub promotions: Option<Vec<Promotion>>,
-    /// no description provided
+    /// Unique identifier for the type of current object. For this API, it is
+    /// customsearch#search.
     pub kind: Option<String>,
-    /// no description provided
+    /// OpenSearch template and URL.
     pub url: Option<SearchUrl>,
-    /// no description provided
+    /// The current set of custom search results.
     pub items: Option<Vec<ResultType>>,
-    /// no description provided
-    pub context: Option<Context>,
-    /// no description provided
-    pub queries: Option<HashMap<String, Vec<Query>>>,
-    /// no description provided
+    /// Metadata and refinements associated with the given search engine,
+    /// including:
+    /// 
+    /// * The name of the search engine that was used for the query.
+    /// 
+    /// *   A set of [facet
+    /// objects](https://developers.google.com/custom-search/docs/refinements#create)
+    /// (refinements) you can use for refining a search.
+    pub context: Option<HashMap<String, String>>,
+    /// Query metadata for the previous, current, and next pages of results.
+    pub queries: Option<SearchQueries>,
+    /// Spell correction information for a query.
     pub spelling: Option<SearchSpelling>,
-    /// no description provided
+    /// Metadata about a search operation.
     #[serde(rename="searchInformation")]
     pub search_information: Option<SearchSearchInformation>,
 }
@@ -460,17 +473,308 @@ pub struct Search {
 impl ResponseResult for Search {}
 
 
-/// There is no detailed description.
+/// Custom search request metadata.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchQueriesRequest {
+    /// Restricts results to URLs based on date. Supported values include:
+    /// 
+    /// * `d[number]`: requests results from the specified number of past days.
+    /// 
+    /// * `w[number]`: requests results from the specified number of past weeks.
+    /// 
+    /// * `m[number]`: requests results from the specified number of past months.
+    /// 
+    /// * `y[number]`: requests results from the specified number of past years.
+    #[serde(rename="dateRestrict")]
+    pub date_restrict: Option<String>,
+    /// The character encoding supported for search requests.
+    #[serde(rename="inputEncoding")]
+    pub input_encoding: Option<String>,
+    /// Provides additional search terms to check for in a document, where each
+    /// document in the search results must contain at least one of the
+    /// additional search terms. You can also use the [Boolean
+    /// OR](https://developers.google.com/custom-search/docs/xml_results#BooleanOrqt)
+    /// query term for this type of query.
+    #[serde(rename="orTerms")]
+    pub or_terms: Option<String>,
+    /// Specifies the ending value for a search range. Use `cse:lowRange` and
+    /// `cse:highrange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
+    #[serde(rename="highRange")]
+    pub high_range: Option<String>,
+    /// The identifier of a custom search engine created using the Custom Search
+    /// [Control Panel](https://cse.google.com/). This is a custom property not
+    /// defined in the OpenSearch spec. This parameter is **required**.
+    pub cx: Option<String>,
+    /// The page number of this set of results, where the page length is set by
+    /// the `count` property.
+    #[serde(rename="startPage")]
+    pub start_page: Option<i32>,
+    /// Enables or disables the [Simplified and Traditional Chinese
+    /// Search](https://developers.google.com/custom-search/docs/xml_results#chineseSearch)
+    /// feature.
+    /// 
+    /// Supported values are:
+    /// 
+    /// * `0`: enabled (default)
+    /// 
+    /// * `1`: disabled
+    #[serde(rename="disableCnTwTranslation")]
+    pub disable_cn_tw_translation: Option<String>,
+    /// Restricts search results to documents originating in a particular
+    /// country. You may use [Boolean
+    /// operators](https://developers.google.com/custom-search/docs/xml_results#booleanOperators)
+    /// in the `cr` parameter's value.
+    /// 
+    /// Google WebSearch determines the country of a document by analyzing the
+    /// following:
+    /// 
+    /// * The top-level domain (TLD) of the document's URL.
+    /// 
+    /// * The geographic location of the web server's IP address.
+    /// 
+    /// See [Country (cr) Parameter
+    /// Values](https://developers.google.com/custom-search/docs/xml_results#countryCollections)
+    /// for a list of valid values for this parameter.
+    pub cr: Option<String>,
+    /// Restricts results to images of a specified type. Supported values are:
+    /// 
+    /// * `clipart` (Clip art)
+    /// 
+    /// * `face` (Face)
+    /// 
+    /// * `lineart` (Line drawing)
+    /// 
+    /// * `photo` (Photo)
+    /// 
+    /// * `animated` (Animated)
+    /// 
+    /// * `stock` (Stock)
+    #[serde(rename="imgType")]
+    pub img_type: Option<String>,
+    /// Specifies that all search results should be pages that are related to the
+    /// specified URL. The parameter value should be a URL.
+    #[serde(rename="relatedSite")]
+    pub related_site: Option<String>,
+    /// Boosts search results whose country of origin matches the parameter
+    /// value. See [Country
+    /// Codes](https://developers.google.com/custom-search/docs/xml_results#countryCodes)
+    /// for a list of valid values.
+    /// 
+    /// Specifying a `gl` parameter value in WebSearch requests should improve
+    /// the relevance of results. This is particularly true for international
+    /// customers and, even more specifically, for customers in English-speaking
+    /// countries other than the United States.
+    pub gl: Option<String>,
+    /// Allowed values are `web` or `image`. If unspecified, results are limited
+    /// to webpages.
+    #[serde(rename="searchType")]
+    pub search_type: Option<String>,
+    /// A description of the query.
+    pub title: Option<String>,
+    /// Specifies the Google domain (for example, google.com, google.de, or
+    /// google.fr) to which the search should be limited.
+    #[serde(rename="googleHost")]
+    pub google_host: Option<String>,
+    /// Restricts results to files of a specified extension. Filetypes supported
+    /// by Google include:
+    /// 
+    /// * Adobe Portable Document Format (`pdf`)
+    /// 
+    /// * Adobe PostScript (`ps`)
+    /// 
+    /// * Lotus 1-2-3 (`wk1`, `wk2`, `wk3`, `wk4`, `wk5`, `wki`, `wks`, `wku`)
+    /// 
+    /// * Lotus WordPro (`lwp`)
+    /// 
+    /// * Macwrite (`mw`)
+    /// 
+    /// * Microsoft Excel (`xls`)
+    /// 
+    /// * Microsoft PowerPoint (`ppt`)
+    /// 
+    /// * Microsoft Word (`doc`)
+    /// 
+    /// * Microsoft Works (`wks`, `wps`, `wdb`)
+    /// 
+    /// * Microsoft Write (`wri`)
+    /// 
+    /// * Rich Text Format (`rtf`)
+    /// 
+    /// * Shockwave Flash (`swf`)
+    /// 
+    /// * Text (`ans`, `txt`).
+    /// 
+    /// Additional filetypes may be added in the future. An up-to-date list can
+    /// always be found in Google's [file type
+    /// FAQ](https://support.google.com/webmasters/answer/35287).
+    #[serde(rename="fileType")]
+    pub file_type: Option<String>,
+    /// Restricts results to images with a specific dominant color. Supported
+    /// values are:
+    /// 
+    /// * `red`
+    /// 
+    /// * `orange`
+    /// 
+    /// * `yellow`
+    /// 
+    /// * `green`
+    /// 
+    /// * `teal`
+    /// 
+    /// * `blue`
+    /// 
+    /// * `purple`
+    /// 
+    /// * `pink`
+    /// 
+    /// * `white`
+    /// 
+    /// * `gray`
+    /// 
+    /// * `black`
+    /// 
+    /// * `brown`
+    #[serde(rename="imgDominantColor")]
+    pub img_dominant_color: Option<String>,
+    /// Restricts results to URLs from a specified site.
+    #[serde(rename="siteSearch")]
+    pub site_search: Option<String>,
+    /// Specifies that results should be sorted according to the specified
+    /// expression. For example, sort by date.
+    pub sort: Option<String>,
+    /// Appends the specified query terms to the query, as if they were combined
+    /// with a logical `AND` operator.
+    pub hq: Option<String>,
+    /// The character encoding supported for search results.
+    #[serde(rename="outputEncoding")]
+    pub output_encoding: Option<String>,
+    /// Specifies the [SafeSearch
+    /// level](https://developers.google.com/custom-search/docs/xml_results#safeSearchLevels)
+    /// used for filtering out adult results. This is a custom property not
+    /// defined in the OpenSearch spec. Valid parameter values are:
+    /// 
+    /// * `"off"`: Disable SafeSearch
+    /// 
+    /// * `"active"`: Enable SafeSearch
+    pub safe: Option<String>,
+    /// The search terms entered by the user.
+    #[serde(rename="searchTerms")]
+    pub search_terms: Option<String>,
+    /// Identifies a phrase that all documents in the search results must
+    /// contain.
+    #[serde(rename="exactTerms")]
+    pub exact_terms: Option<String>,
+    /// Restricts results to images of a specified color type. Supported values
+    ///   are:
+    /// 
+    /// * `mono` (black and white)
+    /// 
+    /// * `gray` (grayscale)
+    /// 
+    /// * `color` (color)
+    #[serde(rename="imgColorType")]
+    pub img_color_type: Option<String>,
+    /// Specifies the interface language (host language) of your user interface.
+    /// Explicitly setting this parameter improves the performance and the
+    /// quality of your search results.
+    /// 
+    /// See the [Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages)
+    /// section of [Internationalizing Queries and Results
+    /// Presentation](https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing)
+    /// for more information, and [Supported Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages)
+    /// for a list of supported languages.
+    pub hl: Option<String>,
+    /// Estimated number of total search results. May not be accurate.
+    #[serde(rename="totalResults")]
+    pub total_results: Option<String>,
+    /// Specifies the starting value for a search range. Use `cse:lowRange` and
+    /// `cse:highrange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
+    #[serde(rename="lowRange")]
+    pub low_range: Option<String>,
+    /// Number of search results returned in this set.
+    pub count: Option<i32>,
+    /// Restricts results to images of a specified size. Supported values are:
+    /// 
+    /// * `icon` (small)
+    /// 
+    /// * `small | medium | large | xlarge` (medium)
+    /// 
+    /// * `xxlarge` (large)
+    /// 
+    /// * `huge` (extra-large)
+    #[serde(rename="imgSize")]
+    pub img_size: Option<String>,
+    /// The language of the search results.
+    pub language: Option<String>,
+    /// Filters based on licensing. Supported values include:
+    /// 
+    /// * `cc_publicdomain`
+    /// 
+    /// * `cc_attribute`
+    /// 
+    /// * `cc_sharealike`
+    /// 
+    /// * `cc_noncommercial`
+    /// 
+    /// * `cc_nonderived`
+    pub rights: Option<String>,
+    /// The index of the current set of search results into the total set of
+    /// results, where the index of the first result is 1.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// Identifies a word or phrase that should not appear in any documents in
+    /// the search results.
+    #[serde(rename="excludeTerms")]
+    pub exclude_terms: Option<String>,
+    /// Activates or deactivates the automatic filtering of Google search
+    /// results. See [Automatic
+    /// Filtering](https://developers.google.com/custom-search/docs/xml_results#automaticFiltering)
+    /// for more information about Google's search results filters. Valid values
+    /// for this parameter are:
+    /// 
+    /// * `0`: Disabled
+    /// 
+    /// * `1`: Enabled (default)
+    /// 
+    /// **Note**: By default, Google applies filtering to all search results to
+    /// improve the quality of those results.
+    pub filter: Option<String>,
+    /// Specifies that all results should contain a link to a specific URL.
+    #[serde(rename="linkSite")]
+    pub link_site: Option<String>,
+    /// Specifies whether to include or exclude results from the site named in
+    /// the `sitesearch` parameter. Supported values are:
+    /// 
+    /// * `i`: include content from site
+    /// 
+    /// * `e`: exclude content from site
+    #[serde(rename="siteSearchFilter")]
+    pub site_search_filter: Option<String>,
+}
+
+impl NestedType for SearchQueriesRequest {}
+impl Part for SearchQueriesRequest {}
+
+
+/// Image belonging to a promotion.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionImage {
-    /// no description provided
+    /// URL of the image for this promotion link.
     pub source: Option<String>,
-    /// no description provided
+    /// Image height in pixels.
     pub height: Option<i32>,
-    /// no description provided
+    /// Image width in pixels.
     pub width: Option<i32>,
 }
 
@@ -478,16 +782,309 @@ impl NestedType for PromotionImage {}
 impl Part for PromotionImage {}
 
 
-/// There is no detailed description.
+/// Custom search request metadata.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchQueriesNextPage {
+    /// Restricts results to URLs based on date. Supported values include:
+    /// 
+    /// * `d[number]`: requests results from the specified number of past days.
+    /// 
+    /// * `w[number]`: requests results from the specified number of past weeks.
+    /// 
+    /// * `m[number]`: requests results from the specified number of past months.
+    /// 
+    /// * `y[number]`: requests results from the specified number of past years.
+    #[serde(rename="dateRestrict")]
+    pub date_restrict: Option<String>,
+    /// The character encoding supported for search requests.
+    #[serde(rename="inputEncoding")]
+    pub input_encoding: Option<String>,
+    /// Provides additional search terms to check for in a document, where each
+    /// document in the search results must contain at least one of the
+    /// additional search terms. You can also use the [Boolean
+    /// OR](https://developers.google.com/custom-search/docs/xml_results#BooleanOrqt)
+    /// query term for this type of query.
+    #[serde(rename="orTerms")]
+    pub or_terms: Option<String>,
+    /// Specifies the ending value for a search range. Use `cse:lowRange` and
+    /// `cse:highrange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
+    #[serde(rename="highRange")]
+    pub high_range: Option<String>,
+    /// The identifier of a custom search engine created using the Custom Search
+    /// [Control Panel](https://cse.google.com/). This is a custom property not
+    /// defined in the OpenSearch spec. This parameter is **required**.
+    pub cx: Option<String>,
+    /// The page number of this set of results, where the page length is set by
+    /// the `count` property.
+    #[serde(rename="startPage")]
+    pub start_page: Option<i32>,
+    /// Enables or disables the [Simplified and Traditional Chinese
+    /// Search](https://developers.google.com/custom-search/docs/xml_results#chineseSearch)
+    /// feature.
+    /// 
+    /// Supported values are:
+    /// 
+    /// * `0`: enabled (default)
+    /// 
+    /// * `1`: disabled
+    #[serde(rename="disableCnTwTranslation")]
+    pub disable_cn_tw_translation: Option<String>,
+    /// Restricts search results to documents originating in a particular
+    /// country. You may use [Boolean
+    /// operators](https://developers.google.com/custom-search/docs/xml_results#booleanOperators)
+    /// in the `cr` parameter's value.
+    /// 
+    /// Google WebSearch determines the country of a document by analyzing the
+    /// following:
+    /// 
+    /// * The top-level domain (TLD) of the document's URL.
+    /// 
+    /// * The geographic location of the web server's IP address.
+    /// 
+    /// See [Country (cr) Parameter
+    /// Values](https://developers.google.com/custom-search/docs/xml_results#countryCollections)
+    /// for a list of valid values for this parameter.
+    pub cr: Option<String>,
+    /// Restricts results to images of a specified type. Supported values are:
+    /// 
+    /// * `clipart` (Clip art)
+    /// 
+    /// * `face` (Face)
+    /// 
+    /// * `lineart` (Line drawing)
+    /// 
+    /// * `photo` (Photo)
+    /// 
+    /// * `animated` (Animated)
+    /// 
+    /// * `stock` (Stock)
+    #[serde(rename="imgType")]
+    pub img_type: Option<String>,
+    /// Specifies that all search results should be pages that are related to the
+    /// specified URL. The parameter value should be a URL.
+    #[serde(rename="relatedSite")]
+    pub related_site: Option<String>,
+    /// Boosts search results whose country of origin matches the parameter
+    /// value. See [Country
+    /// Codes](https://developers.google.com/custom-search/docs/xml_results#countryCodes)
+    /// for a list of valid values.
+    /// 
+    /// Specifying a `gl` parameter value in WebSearch requests should improve
+    /// the relevance of results. This is particularly true for international
+    /// customers and, even more specifically, for customers in English-speaking
+    /// countries other than the United States.
+    pub gl: Option<String>,
+    /// Allowed values are `web` or `image`. If unspecified, results are limited
+    /// to webpages.
+    #[serde(rename="searchType")]
+    pub search_type: Option<String>,
+    /// A description of the query.
+    pub title: Option<String>,
+    /// Specifies the Google domain (for example, google.com, google.de, or
+    /// google.fr) to which the search should be limited.
+    #[serde(rename="googleHost")]
+    pub google_host: Option<String>,
+    /// Restricts results to files of a specified extension. Filetypes supported
+    /// by Google include:
+    /// 
+    /// * Adobe Portable Document Format (`pdf`)
+    /// 
+    /// * Adobe PostScript (`ps`)
+    /// 
+    /// * Lotus 1-2-3 (`wk1`, `wk2`, `wk3`, `wk4`, `wk5`, `wki`, `wks`, `wku`)
+    /// 
+    /// * Lotus WordPro (`lwp`)
+    /// 
+    /// * Macwrite (`mw`)
+    /// 
+    /// * Microsoft Excel (`xls`)
+    /// 
+    /// * Microsoft PowerPoint (`ppt`)
+    /// 
+    /// * Microsoft Word (`doc`)
+    /// 
+    /// * Microsoft Works (`wks`, `wps`, `wdb`)
+    /// 
+    /// * Microsoft Write (`wri`)
+    /// 
+    /// * Rich Text Format (`rtf`)
+    /// 
+    /// * Shockwave Flash (`swf`)
+    /// 
+    /// * Text (`ans`, `txt`).
+    /// 
+    /// Additional filetypes may be added in the future. An up-to-date list can
+    /// always be found in Google's [file type
+    /// FAQ](https://support.google.com/webmasters/answer/35287).
+    #[serde(rename="fileType")]
+    pub file_type: Option<String>,
+    /// Restricts results to images with a specific dominant color. Supported
+    /// values are:
+    /// 
+    /// * `red`
+    /// 
+    /// * `orange`
+    /// 
+    /// * `yellow`
+    /// 
+    /// * `green`
+    /// 
+    /// * `teal`
+    /// 
+    /// * `blue`
+    /// 
+    /// * `purple`
+    /// 
+    /// * `pink`
+    /// 
+    /// * `white`
+    /// 
+    /// * `gray`
+    /// 
+    /// * `black`
+    /// 
+    /// * `brown`
+    #[serde(rename="imgDominantColor")]
+    pub img_dominant_color: Option<String>,
+    /// Restricts results to URLs from a specified site.
+    #[serde(rename="siteSearch")]
+    pub site_search: Option<String>,
+    /// Specifies that results should be sorted according to the specified
+    /// expression. For example, sort by date.
+    pub sort: Option<String>,
+    /// Appends the specified query terms to the query, as if they were combined
+    /// with a logical `AND` operator.
+    pub hq: Option<String>,
+    /// The character encoding supported for search results.
+    #[serde(rename="outputEncoding")]
+    pub output_encoding: Option<String>,
+    /// Specifies the [SafeSearch
+    /// level](https://developers.google.com/custom-search/docs/xml_results#safeSearchLevels)
+    /// used for filtering out adult results. This is a custom property not
+    /// defined in the OpenSearch spec. Valid parameter values are:
+    /// 
+    /// * `"off"`: Disable SafeSearch
+    /// 
+    /// * `"active"`: Enable SafeSearch
+    pub safe: Option<String>,
+    /// The search terms entered by the user.
+    #[serde(rename="searchTerms")]
+    pub search_terms: Option<String>,
+    /// Identifies a phrase that all documents in the search results must
+    /// contain.
+    #[serde(rename="exactTerms")]
+    pub exact_terms: Option<String>,
+    /// Restricts results to images of a specified color type. Supported values
+    ///   are:
+    /// 
+    /// * `mono` (black and white)
+    /// 
+    /// * `gray` (grayscale)
+    /// 
+    /// * `color` (color)
+    #[serde(rename="imgColorType")]
+    pub img_color_type: Option<String>,
+    /// Specifies the interface language (host language) of your user interface.
+    /// Explicitly setting this parameter improves the performance and the
+    /// quality of your search results.
+    /// 
+    /// See the [Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages)
+    /// section of [Internationalizing Queries and Results
+    /// Presentation](https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing)
+    /// for more information, and [Supported Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages)
+    /// for a list of supported languages.
+    pub hl: Option<String>,
+    /// Estimated number of total search results. May not be accurate.
+    #[serde(rename="totalResults")]
+    pub total_results: Option<String>,
+    /// Specifies the starting value for a search range. Use `cse:lowRange` and
+    /// `cse:highrange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
+    #[serde(rename="lowRange")]
+    pub low_range: Option<String>,
+    /// Number of search results returned in this set.
+    pub count: Option<i32>,
+    /// Restricts results to images of a specified size. Supported values are:
+    /// 
+    /// * `icon` (small)
+    /// 
+    /// * `small | medium | large | xlarge` (medium)
+    /// 
+    /// * `xxlarge` (large)
+    /// 
+    /// * `huge` (extra-large)
+    #[serde(rename="imgSize")]
+    pub img_size: Option<String>,
+    /// The language of the search results.
+    pub language: Option<String>,
+    /// Filters based on licensing. Supported values include:
+    /// 
+    /// * `cc_publicdomain`
+    /// 
+    /// * `cc_attribute`
+    /// 
+    /// * `cc_sharealike`
+    /// 
+    /// * `cc_noncommercial`
+    /// 
+    /// * `cc_nonderived`
+    pub rights: Option<String>,
+    /// The index of the current set of search results into the total set of
+    /// results, where the index of the first result is 1.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// Identifies a word or phrase that should not appear in any documents in
+    /// the search results.
+    #[serde(rename="excludeTerms")]
+    pub exclude_terms: Option<String>,
+    /// Activates or deactivates the automatic filtering of Google search
+    /// results. See [Automatic
+    /// Filtering](https://developers.google.com/custom-search/docs/xml_results#automaticFiltering)
+    /// for more information about Google's search results filters. Valid values
+    /// for this parameter are:
+    /// 
+    /// * `0`: Disabled
+    /// 
+    /// * `1`: Enabled (default)
+    /// 
+    /// **Note**: By default, Google applies filtering to all search results to
+    /// improve the quality of those results.
+    pub filter: Option<String>,
+    /// Specifies that all results should contain a link to a specific URL.
+    #[serde(rename="linkSite")]
+    pub link_site: Option<String>,
+    /// Specifies whether to include or exclude results from the site named in
+    /// the `sitesearch` parameter. Supported values are:
+    /// 
+    /// * `i`: include content from site
+    /// 
+    /// * `e`: exclude content from site
+    #[serde(rename="siteSearchFilter")]
+    pub site_search_filter: Option<String>,
+}
+
+impl NestedType for SearchQueriesNextPage {}
+impl Part for SearchQueriesNextPage {}
+
+
+/// OpenSearch template and URL.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchUrl {
-    /// no description provided
+    /// The MIME type of the OpenSearch URL template for the Custom Search API.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// no description provided
+    /// The actual [OpenSearch
+    /// template](http://www.opensearch.org/specifications/opensearch/1.1#opensearch_url_template_syntax)
+    /// for this API.
     pub template: Option<String>,
 }
 
@@ -495,16 +1092,16 @@ impl NestedType for SearchUrl {}
 impl Part for SearchUrl {}
 
 
-/// There is no detailed description.
+/// Spell correction information for a query.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchSpelling {
-    /// no description provided
+    /// The corrected query.
     #[serde(rename="correctedQuery")]
     pub corrected_query: Option<String>,
-    /// no description provided
+    /// The corrected query, formatted in HTML.
     #[serde(rename="htmlCorrectedQuery")]
     pub html_corrected_query: Option<String>,
 }
@@ -513,20 +1110,20 @@ impl NestedType for SearchSpelling {}
 impl Part for SearchSpelling {}
 
 
-/// There is no detailed description.
+/// Block object belonging to a promotion.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionBodyLines {
-    /// no description provided
+    /// The URL of the block object's link, if it has one.
     pub url: Option<String>,
-    /// no description provided
+    /// The block object's text in HTML, if it has text.
     #[serde(rename="htmlTitle")]
     pub html_title: Option<String>,
-    /// no description provided
+    /// The anchor text of the block object's link, if it has a link.
     pub link: Option<String>,
-    /// no description provided
+    /// The block object's text, if it has text.
     pub title: Option<String>,
 }
 
@@ -534,47 +1131,52 @@ impl NestedType for PromotionBodyLines {}
 impl Part for PromotionBodyLines {}
 
 
-/// There is no detailed description.
+/// A custom search result.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultType {
-    /// no description provided
+    /// A unique identifier for the type of current object. For this API, it is
+    /// `customsearch#result.`
     pub kind: Option<String>,
-    /// no description provided
+    /// Encapsulates all information about [refinement
+    /// labels](https://developers.google.com/custom-search/docs/xml_results).
     pub labels: Option<Vec<ResultLabels>>,
-    /// no description provided
+    /// The title of the search result, in plain text.
     pub title: Option<String>,
-    /// no description provided
+    /// An abridged version of this search result’s URL, e.g. www.example.com.
     #[serde(rename="displayLink")]
     pub display_link: Option<String>,
-    /// no description provided
+    /// Indicates the ID of Google's cached version of the search result.
     #[serde(rename="cacheId")]
     pub cache_id: Option<String>,
-    /// no description provided
+    /// The URL displayed after the snippet for each search result.
     #[serde(rename="formattedUrl")]
     pub formatted_url: Option<String>,
-    /// no description provided
+    /// The HTML-formatted URL displayed after the snippet for each search result.
     #[serde(rename="htmlFormattedUrl")]
     pub html_formatted_url: Option<String>,
-    /// no description provided
-    pub pagemap: Option<HashMap<String, Vec<HashMap<String, String>>>>,
-    /// no description provided
+    /// Contains
+    /// [PageMap](https://developers.google.com/custom-search/docs/structured_data#pagemaps)
+    /// information for this search result.
+    pub pagemap: Option<HashMap<String, String>>,
+    /// The file format of the search result.
     #[serde(rename="fileFormat")]
     pub file_format: Option<String>,
-    /// no description provided
+    /// The snippet of the search result, in plain text.
     pub snippet: Option<String>,
-    /// no description provided
+    /// The snippet of the search result, in HTML.
     #[serde(rename="htmlSnippet")]
     pub html_snippet: Option<String>,
-    /// no description provided
+    /// The full URL to which the search result is pointing, e.g.
+    /// http://www.example.com/foo/bar.
     pub link: Option<String>,
-    /// no description provided
+    /// Image belonging to a custom search result.
     pub image: Option<ResultImage>,
-    /// no description provided
+    /// The MIME type of the search result.
     pub mime: Option<String>,
-    /// no description provided
+    /// The title of the search result, in HTML.
     #[serde(rename="htmlTitle")]
     pub html_title: Option<String>,
 }
@@ -582,188 +1184,72 @@ pub struct ResultType {
 impl Part for ResultType {}
 
 
-/// There is no detailed description.
+/// Query metadata for the previous, current, and next pages of results.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Context {
-    /// no description provided
-    pub facets: Option<Vec<Vec<ContextFacets>>>,
-    /// no description provided
-    pub title: Option<String>,
+pub struct SearchQueries {
+    /// Metadata representing the current request.
+    pub request: Option<Vec<SearchQueriesRequest>>,
+    /// Metadata representing the next page of results, if applicable.
+    #[serde(rename="nextPage")]
+    pub next_page: Option<Vec<SearchQueriesNextPage>>,
+    /// Metadata representing the previous page of results, if applicable.
+    #[serde(rename="previousPage")]
+    pub previous_page: Option<Vec<SearchQueriesPreviousPage>>,
 }
 
-impl Part for Context {}
+impl NestedType for SearchQueries {}
+impl Part for SearchQueries {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ContextFacets {
-    /// no description provided
-    pub label_with_op: Option<String>,
-    /// no description provided
-    pub anchor: Option<String>,
-    /// no description provided
-    pub label: Option<String>,
-}
-
-impl NestedType for ContextFacets {}
-impl Part for ContextFacets {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Query {
-    /// no description provided
-    #[serde(rename="dateRestrict")]
-    pub date_restrict: Option<String>,
-    /// no description provided
-    #[serde(rename="inputEncoding")]
-    pub input_encoding: Option<String>,
-    /// no description provided
-    #[serde(rename="orTerms")]
-    pub or_terms: Option<String>,
-    /// no description provided
-    #[serde(rename="highRange")]
-    pub high_range: Option<String>,
-    /// no description provided
-    pub cx: Option<String>,
-    /// no description provided
-    #[serde(rename="startPage")]
-    pub start_page: Option<i32>,
-    /// no description provided
-    #[serde(rename="disableCnTwTranslation")]
-    pub disable_cn_tw_translation: Option<String>,
-    /// no description provided
-    pub cr: Option<String>,
-    /// no description provided
-    #[serde(rename="imgType")]
-    pub img_type: Option<String>,
-    /// no description provided
-    #[serde(rename="relatedSite")]
-    pub related_site: Option<String>,
-    /// no description provided
-    pub gl: Option<String>,
-    /// no description provided
-    #[serde(rename="searchType")]
-    pub search_type: Option<String>,
-    /// no description provided
-    pub title: Option<String>,
-    /// no description provided
-    #[serde(rename="googleHost")]
-    pub google_host: Option<String>,
-    /// no description provided
-    #[serde(rename="fileType")]
-    pub file_type: Option<String>,
-    /// no description provided
-    #[serde(rename="imgDominantColor")]
-    pub img_dominant_color: Option<String>,
-    /// no description provided
-    #[serde(rename="siteSearch")]
-    pub site_search: Option<String>,
-    /// no description provided
-    pub sort: Option<String>,
-    /// no description provided
-    pub hq: Option<String>,
-    /// no description provided
-    #[serde(rename="outputEncoding")]
-    pub output_encoding: Option<String>,
-    /// no description provided
-    pub safe: Option<String>,
-    /// no description provided
-    #[serde(rename="searchTerms")]
-    pub search_terms: Option<String>,
-    /// no description provided
-    #[serde(rename="exactTerms")]
-    pub exact_terms: Option<String>,
-    /// no description provided
-    #[serde(rename="imgColorType")]
-    pub img_color_type: Option<String>,
-    /// no description provided
-    pub hl: Option<String>,
-    /// no description provided
-    #[serde(rename="totalResults")]
-    pub total_results: Option<String>,
-    /// no description provided
-    #[serde(rename="lowRange")]
-    pub low_range: Option<String>,
-    /// no description provided
-    pub count: Option<i32>,
-    /// no description provided
-    #[serde(rename="imgSize")]
-    pub img_size: Option<String>,
-    /// no description provided
-    pub language: Option<String>,
-    /// no description provided
-    pub rights: Option<String>,
-    /// no description provided
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// no description provided
-    #[serde(rename="excludeTerms")]
-    pub exclude_terms: Option<String>,
-    /// no description provided
-    pub filter: Option<String>,
-    /// no description provided
-    #[serde(rename="linkSite")]
-    pub link_site: Option<String>,
-    /// no description provided
-    #[serde(rename="siteSearchFilter")]
-    pub site_search_filter: Option<String>,
-}
-
-impl Part for Query {}
-
-
-/// There is no detailed description.
+/// Promotion result.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Promotion {
-    /// no description provided
+    /// An array of block objects for this promotion. See [Google WebSearch
+    /// Protocol
+    /// reference](https://developers.google.com/custom-search/docs/xml_results)
+    /// for more information.
     #[serde(rename="bodyLines")]
     pub body_lines: Option<Vec<PromotionBodyLines>>,
-    /// no description provided
+    /// The title of the promotion.
     pub title: Option<String>,
-    /// no description provided
+    /// The URL of the promotion.
     pub link: Option<String>,
-    /// no description provided
+    /// An abridged version of this search's result URL, e.g. www.example.com.
     #[serde(rename="displayLink")]
     pub display_link: Option<String>,
-    /// no description provided
+    /// The title of the promotion, in HTML.
     #[serde(rename="htmlTitle")]
     pub html_title: Option<String>,
-    /// no description provided
+    /// Image belonging to a promotion.
     pub image: Option<PromotionImage>,
 }
 
 impl Part for Promotion {}
 
 
-/// There is no detailed description.
+/// Metadata about a search operation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchSearchInformation {
-    /// no description provided
+    /// The time taken for the server to return search results, formatted
+    /// according to locale style.
     #[serde(rename="formattedSearchTime")]
     pub formatted_search_time: Option<String>,
-    /// no description provided
+    /// The total number of search results, formatted according to locale style.
     #[serde(rename="formattedTotalResults")]
     pub formatted_total_results: Option<String>,
-    /// no description provided
+    /// The total number of search results returned by the query.
     #[serde(rename="totalResults")]
     pub total_results: Option<String>,
-    /// no description provided
+    /// The time taken for the server to return search results.
     #[serde(rename="searchTime")]
     pub search_time: Option<f64>,
 }
@@ -772,23 +1258,316 @@ impl NestedType for SearchSearchInformation {}
 impl Part for SearchSearchInformation {}
 
 
-/// There is no detailed description.
+/// Refinement label associated with a custom search result.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultLabels {
-    /// no description provided
+    /// The display name of a refinement label. This is the name you should
+    /// display in your user interface.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// no description provided
+    /// Refinement label and the associated refinement operation.
     pub label_with_op: Option<String>,
-    /// no description provided
+    /// The name of a refinement label, which you can use to refine searches.
+    /// Don't display this in your user interface; instead, use displayName.
     pub name: Option<String>,
 }
 
 impl NestedType for ResultLabels {}
 impl Part for ResultLabels {}
+
+
+/// Custom search request metadata.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchQueriesPreviousPage {
+    /// Restricts results to URLs based on date. Supported values include:
+    /// 
+    /// * `d[number]`: requests results from the specified number of past days.
+    /// 
+    /// * `w[number]`: requests results from the specified number of past weeks.
+    /// 
+    /// * `m[number]`: requests results from the specified number of past months.
+    /// 
+    /// * `y[number]`: requests results from the specified number of past years.
+    #[serde(rename="dateRestrict")]
+    pub date_restrict: Option<String>,
+    /// The character encoding supported for search requests.
+    #[serde(rename="inputEncoding")]
+    pub input_encoding: Option<String>,
+    /// Provides additional search terms to check for in a document, where each
+    /// document in the search results must contain at least one of the
+    /// additional search terms. You can also use the [Boolean
+    /// OR](https://developers.google.com/custom-search/docs/xml_results#BooleanOrqt)
+    /// query term for this type of query.
+    #[serde(rename="orTerms")]
+    pub or_terms: Option<String>,
+    /// Specifies the ending value for a search range. Use `cse:lowRange` and
+    /// `cse:highrange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
+    #[serde(rename="highRange")]
+    pub high_range: Option<String>,
+    /// The identifier of a custom search engine created using the Custom Search
+    /// [Control Panel](https://cse.google.com/). This is a custom property not
+    /// defined in the OpenSearch spec. This parameter is **required**.
+    pub cx: Option<String>,
+    /// The page number of this set of results, where the page length is set by
+    /// the `count` property.
+    #[serde(rename="startPage")]
+    pub start_page: Option<i32>,
+    /// Enables or disables the [Simplified and Traditional Chinese
+    /// Search](https://developers.google.com/custom-search/docs/xml_results#chineseSearch)
+    /// feature.
+    /// 
+    /// Supported values are:
+    /// 
+    /// * `0`: enabled (default)
+    /// 
+    /// * `1`: disabled
+    #[serde(rename="disableCnTwTranslation")]
+    pub disable_cn_tw_translation: Option<String>,
+    /// Restricts search results to documents originating in a particular
+    /// country. You may use [Boolean
+    /// operators](https://developers.google.com/custom-search/docs/xml_results#booleanOperators)
+    /// in the `cr` parameter's value.
+    /// 
+    /// Google WebSearch determines the country of a document by analyzing the
+    /// following:
+    /// 
+    /// * The top-level domain (TLD) of the document's URL.
+    /// 
+    /// * The geographic location of the web server's IP address.
+    /// 
+    /// See [Country (cr) Parameter
+    /// Values](https://developers.google.com/custom-search/docs/xml_results#countryCollections)
+    /// for a list of valid values for this parameter.
+    pub cr: Option<String>,
+    /// Restricts results to images of a specified type. Supported values are:
+    /// 
+    /// * `clipart` (Clip art)
+    /// 
+    /// * `face` (Face)
+    /// 
+    /// * `lineart` (Line drawing)
+    /// 
+    /// * `photo` (Photo)
+    /// 
+    /// * `animated` (Animated)
+    /// 
+    /// * `stock` (Stock)
+    #[serde(rename="imgType")]
+    pub img_type: Option<String>,
+    /// Specifies that all search results should be pages that are related to the
+    /// specified URL. The parameter value should be a URL.
+    #[serde(rename="relatedSite")]
+    pub related_site: Option<String>,
+    /// Boosts search results whose country of origin matches the parameter
+    /// value. See [Country
+    /// Codes](https://developers.google.com/custom-search/docs/xml_results#countryCodes)
+    /// for a list of valid values.
+    /// 
+    /// Specifying a `gl` parameter value in WebSearch requests should improve
+    /// the relevance of results. This is particularly true for international
+    /// customers and, even more specifically, for customers in English-speaking
+    /// countries other than the United States.
+    pub gl: Option<String>,
+    /// Allowed values are `web` or `image`. If unspecified, results are limited
+    /// to webpages.
+    #[serde(rename="searchType")]
+    pub search_type: Option<String>,
+    /// A description of the query.
+    pub title: Option<String>,
+    /// Specifies the Google domain (for example, google.com, google.de, or
+    /// google.fr) to which the search should be limited.
+    #[serde(rename="googleHost")]
+    pub google_host: Option<String>,
+    /// Restricts results to files of a specified extension. Filetypes supported
+    /// by Google include:
+    /// 
+    /// * Adobe Portable Document Format (`pdf`)
+    /// 
+    /// * Adobe PostScript (`ps`)
+    /// 
+    /// * Lotus 1-2-3 (`wk1`, `wk2`, `wk3`, `wk4`, `wk5`, `wki`, `wks`, `wku`)
+    /// 
+    /// * Lotus WordPro (`lwp`)
+    /// 
+    /// * Macwrite (`mw`)
+    /// 
+    /// * Microsoft Excel (`xls`)
+    /// 
+    /// * Microsoft PowerPoint (`ppt`)
+    /// 
+    /// * Microsoft Word (`doc`)
+    /// 
+    /// * Microsoft Works (`wks`, `wps`, `wdb`)
+    /// 
+    /// * Microsoft Write (`wri`)
+    /// 
+    /// * Rich Text Format (`rtf`)
+    /// 
+    /// * Shockwave Flash (`swf`)
+    /// 
+    /// * Text (`ans`, `txt`).
+    /// 
+    /// Additional filetypes may be added in the future. An up-to-date list can
+    /// always be found in Google's [file type
+    /// FAQ](https://support.google.com/webmasters/answer/35287).
+    #[serde(rename="fileType")]
+    pub file_type: Option<String>,
+    /// Restricts results to images with a specific dominant color. Supported
+    /// values are:
+    /// 
+    /// * `red`
+    /// 
+    /// * `orange`
+    /// 
+    /// * `yellow`
+    /// 
+    /// * `green`
+    /// 
+    /// * `teal`
+    /// 
+    /// * `blue`
+    /// 
+    /// * `purple`
+    /// 
+    /// * `pink`
+    /// 
+    /// * `white`
+    /// 
+    /// * `gray`
+    /// 
+    /// * `black`
+    /// 
+    /// * `brown`
+    #[serde(rename="imgDominantColor")]
+    pub img_dominant_color: Option<String>,
+    /// Restricts results to URLs from a specified site.
+    #[serde(rename="siteSearch")]
+    pub site_search: Option<String>,
+    /// Specifies that results should be sorted according to the specified
+    /// expression. For example, sort by date.
+    pub sort: Option<String>,
+    /// Appends the specified query terms to the query, as if they were combined
+    /// with a logical `AND` operator.
+    pub hq: Option<String>,
+    /// The character encoding supported for search results.
+    #[serde(rename="outputEncoding")]
+    pub output_encoding: Option<String>,
+    /// Specifies the [SafeSearch
+    /// level](https://developers.google.com/custom-search/docs/xml_results#safeSearchLevels)
+    /// used for filtering out adult results. This is a custom property not
+    /// defined in the OpenSearch spec. Valid parameter values are:
+    /// 
+    /// * `"off"`: Disable SafeSearch
+    /// 
+    /// * `"active"`: Enable SafeSearch
+    pub safe: Option<String>,
+    /// The search terms entered by the user.
+    #[serde(rename="searchTerms")]
+    pub search_terms: Option<String>,
+    /// Identifies a phrase that all documents in the search results must
+    /// contain.
+    #[serde(rename="exactTerms")]
+    pub exact_terms: Option<String>,
+    /// Restricts results to images of a specified color type. Supported values
+    ///   are:
+    /// 
+    /// * `mono` (black and white)
+    /// 
+    /// * `gray` (grayscale)
+    /// 
+    /// * `color` (color)
+    #[serde(rename="imgColorType")]
+    pub img_color_type: Option<String>,
+    /// Specifies the interface language (host language) of your user interface.
+    /// Explicitly setting this parameter improves the performance and the
+    /// quality of your search results.
+    /// 
+    /// See the [Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages)
+    /// section of [Internationalizing Queries and Results
+    /// Presentation](https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing)
+    /// for more information, and [Supported Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages)
+    /// for a list of supported languages.
+    pub hl: Option<String>,
+    /// Estimated number of total search results. May not be accurate.
+    #[serde(rename="totalResults")]
+    pub total_results: Option<String>,
+    /// Specifies the starting value for a search range. Use `cse:lowRange` and
+    /// `cse:highrange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
+    #[serde(rename="lowRange")]
+    pub low_range: Option<String>,
+    /// Number of search results returned in this set.
+    pub count: Option<i32>,
+    /// Restricts results to images of a specified size. Supported values are:
+    /// 
+    /// * `icon` (small)
+    /// 
+    /// * `small | medium | large | xlarge` (medium)
+    /// 
+    /// * `xxlarge` (large)
+    /// 
+    /// * `huge` (extra-large)
+    #[serde(rename="imgSize")]
+    pub img_size: Option<String>,
+    /// The language of the search results.
+    pub language: Option<String>,
+    /// Filters based on licensing. Supported values include:
+    /// 
+    /// * `cc_publicdomain`
+    /// 
+    /// * `cc_attribute`
+    /// 
+    /// * `cc_sharealike`
+    /// 
+    /// * `cc_noncommercial`
+    /// 
+    /// * `cc_nonderived`
+    pub rights: Option<String>,
+    /// The index of the current set of search results into the total set of
+    /// results, where the index of the first result is 1.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// Identifies a word or phrase that should not appear in any documents in
+    /// the search results.
+    #[serde(rename="excludeTerms")]
+    pub exclude_terms: Option<String>,
+    /// Activates or deactivates the automatic filtering of Google search
+    /// results. See [Automatic
+    /// Filtering](https://developers.google.com/custom-search/docs/xml_results#automaticFiltering)
+    /// for more information about Google's search results filters. Valid values
+    /// for this parameter are:
+    /// 
+    /// * `0`: Disabled
+    /// 
+    /// * `1`: Enabled (default)
+    /// 
+    /// **Note**: By default, Google applies filtering to all search results to
+    /// improve the quality of those results.
+    pub filter: Option<String>,
+    /// Specifies that all results should contain a link to a specific URL.
+    #[serde(rename="linkSite")]
+    pub link_site: Option<String>,
+    /// Specifies whether to include or exclude results from the site named in
+    /// the `sitesearch` parameter. Supported values are:
+    /// 
+    /// * `i`: include content from site
+    /// 
+    /// * `e`: exclude content from site
+    #[serde(rename="siteSearchFilter")]
+    pub site_search_filter: Option<String>,
+}
+
+impl NestedType for SearchQueriesPreviousPage {}
+impl Part for SearchQueriesPreviousPage {}
 
 
 
@@ -837,15 +1616,12 @@ impl<'a, C, A> CseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results. Uses a small set of url patterns.
-    /// 
-    /// # Arguments
-    ///
-    /// * `q` - Query
-    pub fn siterestrict_list(&self, q: &str) -> CseSiterestrictListCall<'a, C, A> {
+    /// Returns metadata about the search performed, metadata about the custom
+    /// search engine used for the search, and the search results. Uses a small set
+    /// of url patterns.
+    pub fn siterestrict_list(&self) -> CseSiterestrictListCall<'a, C, A> {
         CseSiterestrictListCall {
             hub: self.hub,
-            _q: q.to_string(),
             _start: Default::default(),
             _sort: Default::default(),
             _site_search_filter: Default::default(),
@@ -854,6 +1630,7 @@ impl<'a, C, A> CseMethods<'a, C, A> {
             _safe: Default::default(),
             _rights: Default::default(),
             _related_site: Default::default(),
+            _q: Default::default(),
             _or_terms: Default::default(),
             _num: Default::default(),
             _lr: Default::default(),
@@ -883,15 +1660,11 @@ impl<'a, C, A> CseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results.
-    /// 
-    /// # Arguments
-    ///
-    /// * `q` - Query
-    pub fn list(&self, q: &str) -> CseListCall<'a, C, A> {
+    /// Returns metadata about the search performed, metadata about the custom
+    /// search engine used for the search, and the search results.
+    pub fn list(&self) -> CseListCall<'a, C, A> {
         CseListCall {
             hub: self.hub,
-            _q: q.to_string(),
             _start: Default::default(),
             _sort: Default::default(),
             _site_search_filter: Default::default(),
@@ -900,6 +1673,7 @@ impl<'a, C, A> CseMethods<'a, C, A> {
             _safe: Default::default(),
             _rights: Default::default(),
             _related_site: Default::default(),
+            _q: Default::default(),
             _or_terms: Default::default(),
             _num: Default::default(),
             _lr: Default::default(),
@@ -936,7 +1710,9 @@ impl<'a, C, A> CseMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results. Uses a small set of url patterns.
+/// Returns metadata about the search performed, metadata about the custom
+/// search engine used for the search, and the search results. Uses a small set
+/// of url patterns.
 ///
 /// A builder for the *siterestrict.list* method supported by a *cse* resource.
 /// It is not used directly, but through a `CseMethods` instance.
@@ -963,17 +1739,18 @@ impl<'a, C, A> CseMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.cse().siterestrict_list("q")
-///              .start(15)
-///              .sort("invidunt")
-///              .site_search_filter("ea")
-///              .site_search("sadipscing")
-///              .search_type("rebum.")
-///              .safe("dolore")
-///              .rights("nonumy")
-///              .related_site("sed")
+/// let result = hub.cse().siterestrict_list()
+///              .start(74)
+///              .sort("labore")
+///              .site_search_filter("invidunt")
+///              .site_search("ea")
+///              .search_type("sadipscing")
+///              .safe("rebum.")
+///              .rights("dolore")
+///              .related_site("nonumy")
+///              .q("sed")
 ///              .or_terms("aliquyam")
-///              .num(48)
+///              .num(-53)
 ///              .lr("eirmod")
 ///              .low_range("consetetur")
 ///              .link_site("labore")
@@ -1001,7 +1778,6 @@ pub struct CseSiterestrictListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Customsearch<C, A>,
-    _q: String,
     _start: Option<u32>,
     _sort: Option<String>,
     _site_search_filter: Option<String>,
@@ -1010,8 +1786,9 @@ pub struct CseSiterestrictListCall<'a, C, A>
     _safe: Option<String>,
     _rights: Option<String>,
     _related_site: Option<String>,
+    _q: Option<String>,
     _or_terms: Option<String>,
-    _num: Option<u32>,
+    _num: Option<i32>,
     _lr: Option<String>,
     _low_range: Option<String>,
     _link_site: Option<String>,
@@ -1053,7 +1830,6 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         dlg.begin(MethodInfo { id: "search.cse.siterestrict.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(33 + self._additional_params.len());
-        params.push(("q", self._q.to_string()));
         if let Some(value) = self._start {
             params.push(("start", value.to_string()));
         }
@@ -1077,6 +1853,9 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
         if let Some(value) = self._related_site {
             params.push(("relatedSite", value.to_string()));
+        }
+        if let Some(value) = self._q {
+            params.push(("q", value.to_string()));
         }
         if let Some(value) = self._or_terms {
             params.push(("orTerms", value.to_string()));
@@ -1144,7 +1923,7 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._c2coff {
             params.push(("c2coff", value.to_string()));
         }
-        for &field in ["alt", "q", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
+        for &field in ["alt", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "q", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1156,7 +1935,7 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/siterestrict";
+        let mut url = self.hub._base_url.clone() + "customsearch/v1/siterestrict";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1236,136 +2015,299 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Query
-    ///
-    /// Sets the *q* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn q(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
-        self._q = new_value.to_string();
-        self
-    }
-    /// The index of the first result to return
+    /// The index of the first result to return. The default number of results per
+    /// page is 10, so `&start=11` would start at the top of the second page of
+    /// results. **Note**: The JSON API will never return more than 100 results,
+    /// even if more than 100 documents match the query, so setting the sum of
+    /// `start + num` to a number greater than 100 will produce an error. Also note
+    /// that the maximum value for `num` is 10.
     ///
     /// Sets the *start* query property to the given value.
     pub fn start(mut self, new_value: u32) -> CseSiterestrictListCall<'a, C, A> {
         self._start = Some(new_value);
         self
     }
-    /// The sort expression to apply to the results
+    /// The sort expression to apply to the results.
     ///
     /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Controls whether to include or exclude results from the site named in the as_sitesearch parameter
+    /// Controls whether to include or exclude results from the site named in the
+    /// `siteSearch` parameter.
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `"e"`: exclude
+    /// 
+    /// * `"i"`: include
     ///
     /// Sets the *site search filter* query property to the given value.
     pub fn site_search_filter(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._site_search_filter = Some(new_value.to_string());
         self
     }
-    /// Specifies all search results should be pages from a given site
+    /// Specifies a given site which should always be included or excluded from
+    /// results (see `siteSearchFilter` parameter, below).
     ///
     /// Sets the *site search* query property to the given value.
     pub fn site_search(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._site_search = Some(new_value.to_string());
         self
     }
-    /// Specifies the search type: image.
+    /// Specifies the search type: `image`. If unspecified, results are limited to
+    /// webpages.
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `"image"`: custom image search.
     ///
     /// Sets the *search type* query property to the given value.
     pub fn search_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._search_type = Some(new_value.to_string());
         self
     }
-    /// Search safety level
+    /// Search safety level. Acceptable values are:
+    /// 
+    /// * `"active"`: Enables SafeSearch filtering.
+    /// 
+    /// * `"off"`: Disables SafeSearch filtering. (default)
     ///
     /// Sets the *safe* query property to the given value.
     pub fn safe(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._safe = Some(new_value.to_string());
         self
     }
-    /// Filters based on licensing. Supported values include: cc_publicdomain, cc_attribute, cc_sharealike, cc_noncommercial, cc_nonderived and combinations of these.
+    /// Filters based on licensing. Supported values include: `cc_publicdomain`,
+    /// `cc_attribute`, `cc_sharealike`, `cc_noncommercial`, `cc_nonderived` and
+    /// combinations of these. See [typical
+    /// combinations](https://wiki.creativecommons.org/wiki/CC_Search_integration).
     ///
     /// Sets the *rights* query property to the given value.
     pub fn rights(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should be pages that are related to the specified URL
+    /// Specifies that all search results should be pages that are related to the
+    /// specified URL.
     ///
     /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._related_site = Some(new_value.to_string());
         self
     }
-    /// Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms
+    /// Query
+    ///
+    /// Sets the *q* query property to the given value.
+    pub fn q(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
+        self._q = Some(new_value.to_string());
+        self
+    }
+    /// Provides additional search terms to check for in a document, where each
+    /// document in the search results must contain at least one of the additional
+    /// search terms.
     ///
     /// Sets the *or terms* query property to the given value.
     pub fn or_terms(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._or_terms = Some(new_value.to_string());
         self
     }
-    /// Number of search results to return
+    /// Number of search results to return.
+    /// 
+    /// * Valid values are integers between 1 and 10, inclusive.
     ///
     /// Sets the *num* query property to the given value.
-    pub fn num(mut self, new_value: u32) -> CseSiterestrictListCall<'a, C, A> {
+    pub fn num(mut self, new_value: i32) -> CseSiterestrictListCall<'a, C, A> {
         self._num = Some(new_value);
         self
     }
-    /// The language restriction for the search results
+    /// Restricts the search to documents written in a particular language (e.g.,
+    /// `lr=lang_ja`).
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `"lang_ar"`: Arabic
+    /// 
+    /// * `"lang_bg"`: Bulgarian
+    /// 
+    /// * `"lang_ca"`: Catalan
+    /// 
+    /// * `"lang_cs"`: Czech
+    /// 
+    /// * `"lang_da"`: Danish
+    /// 
+    /// * `"lang_de"`: German
+    /// 
+    /// * `"lang_el"`: Greek
+    /// 
+    /// * `"lang_en"`: English
+    /// 
+    /// * `"lang_es"`: Spanish
+    /// 
+    /// * `"lang_et"`: Estonian
+    /// 
+    /// * `"lang_fi"`: Finnish
+    /// 
+    /// * `"lang_fr"`: French
+    /// 
+    /// * `"lang_hr"`: Croatian
+    /// 
+    /// * `"lang_hu"`: Hungarian
+    /// 
+    /// * `"lang_id"`: Indonesian
+    /// 
+    /// * `"lang_is"`: Icelandic
+    /// 
+    /// * `"lang_it"`: Italian
+    /// 
+    /// * `"lang_iw"`: Hebrew
+    /// 
+    /// * `"lang_ja"`: Japanese
+    /// 
+    /// * `"lang_ko"`: Korean
+    /// 
+    /// * `"lang_lt"`: Lithuanian
+    /// 
+    /// * `"lang_lv"`: Latvian
+    /// 
+    /// * `"lang_nl"`: Dutch
+    /// 
+    /// * `"lang_no"`: Norwegian
+    /// 
+    /// * `"lang_pl"`: Polish
+    /// 
+    /// * `"lang_pt"`: Portuguese
+    /// 
+    /// * `"lang_ro"`: Romanian
+    /// 
+    /// * `"lang_ru"`: Russian
+    /// 
+    /// * `"lang_sk"`: Slovak
+    /// 
+    /// * `"lang_sl"`: Slovenian
+    /// 
+    /// * `"lang_sr"`: Serbian
+    /// 
+    /// * `"lang_sv"`: Swedish
+    /// 
+    /// * `"lang_tr"`: Turkish
+    /// 
+    /// * `"lang_zh-CN"`: Chinese (Simplified)
+    /// 
+    /// * `"lang_zh-TW"`: Chinese (Traditional)
     ///
     /// Sets the *lr* query property to the given value.
     pub fn lr(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._lr = Some(new_value.to_string());
         self
     }
-    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
+    /// Specifies the starting value for a search range. Use `lowRange` and
+    /// `highRange` to append an inclusive search range of `lowRange...highRange`
+    /// to the query.
     ///
     /// Sets the *low range* query property to the given value.
     pub fn low_range(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._low_range = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should contain a link to a particular URL
+    /// Specifies that all search results should contain a link to a particular
+    /// URL.
     ///
     /// Sets the *link site* query property to the given value.
     pub fn link_site(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._link_site = Some(new_value.to_string());
         self
     }
-    /// Returns images of a type, which can be one of: clipart, face, lineart, news, and photo.
+    /// Returns images of a type. Acceptable values are:
+    /// 
+    /// * `"clipart"`
+    /// 
+    /// * `"face"`
+    /// 
+    /// * `"lineart"`
+    /// 
+    /// * `"stock"`
+    /// 
+    /// * `"photo"`
+    /// 
+    /// * `"animated"`
     ///
     /// Sets the *img type* query property to the given value.
     pub fn img_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._img_type = Some(new_value.to_string());
         self
     }
-    /// Returns images of a specified size, where size can be one of: icon, small, medium, large, xlarge, xxlarge, and huge.
+    /// Returns images of a specified size. Acceptable values are:
+    /// 
+    /// * `"huge"`
+    /// 
+    /// * `"icon"`
+    /// 
+    /// * `"large"`
+    /// 
+    /// * `"medium"`
+    /// 
+    /// * `"small"`
+    /// 
+    /// * `"xlarge"`
+    /// 
+    /// * `"xxlarge"`
     ///
     /// Sets the *img size* query property to the given value.
     pub fn img_size(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._img_size = Some(new_value.to_string());
         self
     }
-    /// Returns images of a specific dominant color: red, orange, yellow, green, teal, blue, purple, pink, white, gray, black and brown.
+    /// Returns images of a specific dominant color. Acceptable values are:
+    /// 
+    /// * `"black"`
+    /// 
+    /// * `"blue"`
+    /// 
+    /// * `"brown"`
+    /// 
+    /// * `"gray"`
+    /// 
+    /// * `"green"`
+    /// 
+    /// * `"orange"`
+    /// 
+    /// * `"pink"`
+    /// 
+    /// * `"purple"`
+    /// 
+    /// * `"red"`
+    /// 
+    /// * `"teal"`
+    /// 
+    /// * `"white"`
+    /// 
+    /// * `"yellow"`
     ///
     /// Sets the *img dominant color* query property to the given value.
     pub fn img_dominant_color(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._img_dominant_color = Some(new_value.to_string());
         self
     }
-    /// Returns black and white, grayscale, or color images: mono, gray, and color.
+    /// Returns black and white, grayscale, transparent, or color images.
+    /// Acceptable values are:
+    /// 
+    /// * `"color"`
+    /// 
+    /// * `"gray"`
+    /// 
+    /// * `"mono"`: black and white
+    /// 
+    /// * `"trans"`: transparent background
     ///
     /// Sets the *img color type* query property to the given value.
     pub fn img_color_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._img_color_type = Some(new_value.to_string());
         self
     }
-    /// Appends the extra query terms to the query.
+    /// Appends the specified query terms to the query, as if they were combined
+    /// with a logical AND operator.
     ///
     /// Sets the *hq* query property to the given value.
     pub fn hq(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
@@ -1373,20 +2315,37 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// Sets the user interface language.
+    /// 
+    /// * Explicitly setting this parameter improves the performance and the
+    /// quality of your search results.
+    /// 
+    /// * See the [Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages)
+    /// section of [Internationalizing Queries and Results
+    /// Presentation](https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing)
+    /// for more information, and (Supported Interface
+    /// Languages)[https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages]
+    /// for a list of supported languages.
     ///
     /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
+    /// Specifies the ending value for a search range.
+    /// 
+    /// * Use `lowRange` and `highRange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
     ///
     /// Sets the *high range* query property to the given value.
     pub fn high_range(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._high_range = Some(new_value.to_string());
         self
     }
-    /// The local Google domain to use to perform the search.
+    /// **Deprecated**. Use the `gl` parameter for a similar effect.
+    /// 
+    /// The local Google domain (for example, google.com, google.de, or
+    /// google.fr) to use to perform the search.
     ///
     /// Sets the *googlehost* query property to the given value.
     pub fn googlehost(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
@@ -1394,6 +2353,17 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// Geolocation of end user.
+    /// 
+    /// * The `gl` parameter value is a two-letter country code. The `gl` parameter
+    /// boosts search results whose country of origin matches the parameter value.
+    /// See the [Country
+    /// Codes](https://developers.google.com/custom-search/docs/xml_results_appendices#countryCodes)
+    /// page for a list of valid values.
+    /// 
+    /// * Specifying a `gl` parameter value should lead to more relevant results.
+    /// This is particularly true for international customers and, even more
+    /// specifically, for customers in English- speaking countries other than the
+    /// United States.
     ///
     /// Sets the *gl* query property to the given value.
     pub fn gl(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
@@ -1401,55 +2371,101 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// Controls turning on or off the duplicate content filter.
+    /// 
+    /// * See [Automatic
+    /// Filtering](https://developers.google.com/custom-search/docs/xml_results#automaticFiltering)
+    /// for more information about Google's search results filters. Note that host
+    /// crowding filtering applies only to multi-site searches.
+    /// 
+    /// * By default, Google applies filtering to all search results to improve the
+    /// quality of those results.
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `0`: Turns off duplicate content filter.
+    /// 
+    /// * `1`: Turns on duplicate content filter.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Returns images of a specified type. Some of the allowed values are: bmp, gif, png, jpg, svg, pdf, ...
+    /// Restricts results to files of a specified extension. A list of file types
+    /// indexable by Google can be found in Search Console [Help
+    /// Center](https://support.google.com/webmasters/answer/35287).
     ///
     /// Sets the *file type* query property to the given value.
     pub fn file_type(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._file_type = Some(new_value.to_string());
         self
     }
-    /// Identifies a word or phrase that should not appear in any documents in the search results
+    /// Identifies a word or phrase that should not appear in any documents in the
+    /// search results.
     ///
     /// Sets the *exclude terms* query property to the given value.
     pub fn exclude_terms(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._exclude_terms = Some(new_value.to_string());
         self
     }
-    /// Identifies a phrase that all documents in the search results must contain
+    /// Identifies a phrase that all documents in the search results must contain.
     ///
     /// Sets the *exact terms* query property to the given value.
     pub fn exact_terms(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._exact_terms = Some(new_value.to_string());
         self
     }
-    /// Specifies all search results are from a time period
+    /// Restricts results to URLs based on date. Supported values include:
+    /// 
+    /// * `d[number]`: requests results from the specified number of past days.
+    /// 
+    /// * `w[number]`: requests results from the specified number of past weeks.
+    /// 
+    /// * `m[number]`: requests results from the specified number of past months.
+    /// 
+    /// * `y[number]`: requests results from the specified number of past years.
     ///
     /// Sets the *date restrict* query property to the given value.
     pub fn date_restrict(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._date_restrict = Some(new_value.to_string());
         self
     }
-    /// The custom search engine ID to scope this search query
+    /// The custom search engine ID to use for this request.
     ///
     /// Sets the *cx* query property to the given value.
     pub fn cx(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._cx = Some(new_value.to_string());
         self
     }
-    /// Country restrict(s).
+    /// Restricts search results to documents originating in a particular country.
+    /// You may use [Boolean
+    /// operators](https://developers.google.com/custom-search/docs/xml_results_appendices#booleanOperators)
+    /// in the cr parameter's value.
+    /// 
+    /// Google Search determines the country of a document by analyzing:
+    /// 
+    /// * the top-level domain (TLD) of the document's URL
+    /// 
+    /// * the geographic location of the Web server's IP address
+    /// 
+    /// See the [Country Parameter
+    /// Values](https://developers.google.com/custom-search/docs/xml_results_appendices#countryCollections)
+    /// page for a list of valid values for this parameter.
     ///
     /// Sets the *cr* query property to the given value.
     pub fn cr(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
         self._cr = Some(new_value.to_string());
         self
     }
-    /// Turns off the translation between zh-CN and zh-TW.
+    /// Enables or disables [Simplified and Traditional Chinese
+    /// Search](https://developers.google.com/custom-search/docs/xml_results#chineseSearch).
+    /// 
+    /// The default value for this parameter is 0 (zero), meaning that the feature
+    /// is enabled. Supported values are:
+    /// 
+    /// * `1`: Disabled
+    /// 
+    /// * `0`: Enabled (default)
     ///
     /// Sets the *c2coff* query property to the given value.
     pub fn c2coff(mut self, new_value: &str) -> CseSiterestrictListCall<'a, C, A> {
@@ -1476,13 +2492,17 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CseSiterestrictListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1492,7 +2512,8 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results.
+/// Returns metadata about the search performed, metadata about the custom
+/// search engine used for the search, and the search results.
 ///
 /// A builder for the *list* method supported by a *cse* resource.
 /// It is not used directly, but through a `CseMethods` instance.
@@ -1519,17 +2540,18 @@ impl<'a, C, A> CseSiterestrictListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.cse().list("q")
-///              .start(88)
-///              .sort("diam")
-///              .site_search_filter("justo")
-///              .site_search("est")
-///              .search_type("clita")
-///              .safe("invidunt")
-///              .rights("ut")
-///              .related_site("dolores")
+/// let result = hub.cse().list()
+///              .start(78)
+///              .sort("clita")
+///              .site_search_filter("diam")
+///              .site_search("justo")
+///              .search_type("est")
+///              .safe("clita")
+///              .rights("invidunt")
+///              .related_site("ut")
+///              .q("dolores")
 ///              .or_terms("eos")
-///              .num(23)
+///              .num(-78)
 ///              .lr("duo")
 ///              .low_range("sed")
 ///              .link_site("aliquyam")
@@ -1557,7 +2579,6 @@ pub struct CseListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Customsearch<C, A>,
-    _q: String,
     _start: Option<u32>,
     _sort: Option<String>,
     _site_search_filter: Option<String>,
@@ -1566,8 +2587,9 @@ pub struct CseListCall<'a, C, A>
     _safe: Option<String>,
     _rights: Option<String>,
     _related_site: Option<String>,
+    _q: Option<String>,
     _or_terms: Option<String>,
-    _num: Option<u32>,
+    _num: Option<i32>,
     _lr: Option<String>,
     _low_range: Option<String>,
     _link_site: Option<String>,
@@ -1609,7 +2631,6 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         dlg.begin(MethodInfo { id: "search.cse.list",
                                http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(33 + self._additional_params.len());
-        params.push(("q", self._q.to_string()));
         if let Some(value) = self._start {
             params.push(("start", value.to_string()));
         }
@@ -1633,6 +2654,9 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         }
         if let Some(value) = self._related_site {
             params.push(("relatedSite", value.to_string()));
+        }
+        if let Some(value) = self._q {
+            params.push(("q", value.to_string()));
         }
         if let Some(value) = self._or_terms {
             params.push(("orTerms", value.to_string()));
@@ -1700,7 +2724,7 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._c2coff {
             params.push(("c2coff", value.to_string()));
         }
-        for &field in ["alt", "q", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
+        for &field in ["alt", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "q", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1712,7 +2736,7 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1";
+        let mut url = self.hub._base_url.clone() + "customsearch/v1";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -1792,136 +2816,299 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Query
-    ///
-    /// Sets the *q* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn q(mut self, new_value: &str) -> CseListCall<'a, C, A> {
-        self._q = new_value.to_string();
-        self
-    }
-    /// The index of the first result to return
+    /// The index of the first result to return. The default number of results per
+    /// page is 10, so `&start=11` would start at the top of the second page of
+    /// results. **Note**: The JSON API will never return more than 100 results,
+    /// even if more than 100 documents match the query, so setting the sum of
+    /// `start + num` to a number greater than 100 will produce an error. Also note
+    /// that the maximum value for `num` is 10.
     ///
     /// Sets the *start* query property to the given value.
     pub fn start(mut self, new_value: u32) -> CseListCall<'a, C, A> {
         self._start = Some(new_value);
         self
     }
-    /// The sort expression to apply to the results
+    /// The sort expression to apply to the results.
     ///
     /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
-    /// Controls whether to include or exclude results from the site named in the as_sitesearch parameter
+    /// Controls whether to include or exclude results from the site named in the
+    /// `siteSearch` parameter.
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `"e"`: exclude
+    /// 
+    /// * `"i"`: include
     ///
     /// Sets the *site search filter* query property to the given value.
     pub fn site_search_filter(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._site_search_filter = Some(new_value.to_string());
         self
     }
-    /// Specifies all search results should be pages from a given site
+    /// Specifies a given site which should always be included or excluded from
+    /// results (see `siteSearchFilter` parameter, below).
     ///
     /// Sets the *site search* query property to the given value.
     pub fn site_search(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._site_search = Some(new_value.to_string());
         self
     }
-    /// Specifies the search type: image.
+    /// Specifies the search type: `image`. If unspecified, results are limited to
+    /// webpages.
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `"image"`: custom image search.
     ///
     /// Sets the *search type* query property to the given value.
     pub fn search_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._search_type = Some(new_value.to_string());
         self
     }
-    /// Search safety level
+    /// Search safety level. Acceptable values are:
+    /// 
+    /// * `"active"`: Enables SafeSearch filtering.
+    /// 
+    /// * `"off"`: Disables SafeSearch filtering. (default)
     ///
     /// Sets the *safe* query property to the given value.
     pub fn safe(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._safe = Some(new_value.to_string());
         self
     }
-    /// Filters based on licensing. Supported values include: cc_publicdomain, cc_attribute, cc_sharealike, cc_noncommercial, cc_nonderived and combinations of these.
+    /// Filters based on licensing. Supported values include: `cc_publicdomain`,
+    /// `cc_attribute`, `cc_sharealike`, `cc_noncommercial`, `cc_nonderived` and
+    /// combinations of these. See [typical
+    /// combinations](https://wiki.creativecommons.org/wiki/CC_Search_integration).
     ///
     /// Sets the *rights* query property to the given value.
     pub fn rights(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should be pages that are related to the specified URL
+    /// Specifies that all search results should be pages that are related to the
+    /// specified URL.
     ///
     /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._related_site = Some(new_value.to_string());
         self
     }
-    /// Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms
+    /// Query
+    ///
+    /// Sets the *q* query property to the given value.
+    pub fn q(mut self, new_value: &str) -> CseListCall<'a, C, A> {
+        self._q = Some(new_value.to_string());
+        self
+    }
+    /// Provides additional search terms to check for in a document, where each
+    /// document in the search results must contain at least one of the additional
+    /// search terms.
     ///
     /// Sets the *or terms* query property to the given value.
     pub fn or_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._or_terms = Some(new_value.to_string());
         self
     }
-    /// Number of search results to return
+    /// Number of search results to return.
+    /// 
+    /// * Valid values are integers between 1 and 10, inclusive.
     ///
     /// Sets the *num* query property to the given value.
-    pub fn num(mut self, new_value: u32) -> CseListCall<'a, C, A> {
+    pub fn num(mut self, new_value: i32) -> CseListCall<'a, C, A> {
         self._num = Some(new_value);
         self
     }
-    /// The language restriction for the search results
+    /// Restricts the search to documents written in a particular language (e.g.,
+    /// `lr=lang_ja`).
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `"lang_ar"`: Arabic
+    /// 
+    /// * `"lang_bg"`: Bulgarian
+    /// 
+    /// * `"lang_ca"`: Catalan
+    /// 
+    /// * `"lang_cs"`: Czech
+    /// 
+    /// * `"lang_da"`: Danish
+    /// 
+    /// * `"lang_de"`: German
+    /// 
+    /// * `"lang_el"`: Greek
+    /// 
+    /// * `"lang_en"`: English
+    /// 
+    /// * `"lang_es"`: Spanish
+    /// 
+    /// * `"lang_et"`: Estonian
+    /// 
+    /// * `"lang_fi"`: Finnish
+    /// 
+    /// * `"lang_fr"`: French
+    /// 
+    /// * `"lang_hr"`: Croatian
+    /// 
+    /// * `"lang_hu"`: Hungarian
+    /// 
+    /// * `"lang_id"`: Indonesian
+    /// 
+    /// * `"lang_is"`: Icelandic
+    /// 
+    /// * `"lang_it"`: Italian
+    /// 
+    /// * `"lang_iw"`: Hebrew
+    /// 
+    /// * `"lang_ja"`: Japanese
+    /// 
+    /// * `"lang_ko"`: Korean
+    /// 
+    /// * `"lang_lt"`: Lithuanian
+    /// 
+    /// * `"lang_lv"`: Latvian
+    /// 
+    /// * `"lang_nl"`: Dutch
+    /// 
+    /// * `"lang_no"`: Norwegian
+    /// 
+    /// * `"lang_pl"`: Polish
+    /// 
+    /// * `"lang_pt"`: Portuguese
+    /// 
+    /// * `"lang_ro"`: Romanian
+    /// 
+    /// * `"lang_ru"`: Russian
+    /// 
+    /// * `"lang_sk"`: Slovak
+    /// 
+    /// * `"lang_sl"`: Slovenian
+    /// 
+    /// * `"lang_sr"`: Serbian
+    /// 
+    /// * `"lang_sv"`: Swedish
+    /// 
+    /// * `"lang_tr"`: Turkish
+    /// 
+    /// * `"lang_zh-CN"`: Chinese (Simplified)
+    /// 
+    /// * `"lang_zh-TW"`: Chinese (Traditional)
     ///
     /// Sets the *lr* query property to the given value.
     pub fn lr(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._lr = Some(new_value.to_string());
         self
     }
-    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
+    /// Specifies the starting value for a search range. Use `lowRange` and
+    /// `highRange` to append an inclusive search range of `lowRange...highRange`
+    /// to the query.
     ///
     /// Sets the *low range* query property to the given value.
     pub fn low_range(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._low_range = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should contain a link to a particular URL
+    /// Specifies that all search results should contain a link to a particular
+    /// URL.
     ///
     /// Sets the *link site* query property to the given value.
     pub fn link_site(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._link_site = Some(new_value.to_string());
         self
     }
-    /// Returns images of a type, which can be one of: clipart, face, lineart, news, and photo.
+    /// Returns images of a type. Acceptable values are:
+    /// 
+    /// * `"clipart"`
+    /// 
+    /// * `"face"`
+    /// 
+    /// * `"lineart"`
+    /// 
+    /// * `"stock"`
+    /// 
+    /// * `"photo"`
+    /// 
+    /// * `"animated"`
     ///
     /// Sets the *img type* query property to the given value.
     pub fn img_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_type = Some(new_value.to_string());
         self
     }
-    /// Returns images of a specified size, where size can be one of: icon, small, medium, large, xlarge, xxlarge, and huge.
+    /// Returns images of a specified size. Acceptable values are:
+    /// 
+    /// * `"huge"`
+    /// 
+    /// * `"icon"`
+    /// 
+    /// * `"large"`
+    /// 
+    /// * `"medium"`
+    /// 
+    /// * `"small"`
+    /// 
+    /// * `"xlarge"`
+    /// 
+    /// * `"xxlarge"`
     ///
     /// Sets the *img size* query property to the given value.
     pub fn img_size(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_size = Some(new_value.to_string());
         self
     }
-    /// Returns images of a specific dominant color: red, orange, yellow, green, teal, blue, purple, pink, white, gray, black and brown.
+    /// Returns images of a specific dominant color. Acceptable values are:
+    /// 
+    /// * `"black"`
+    /// 
+    /// * `"blue"`
+    /// 
+    /// * `"brown"`
+    /// 
+    /// * `"gray"`
+    /// 
+    /// * `"green"`
+    /// 
+    /// * `"orange"`
+    /// 
+    /// * `"pink"`
+    /// 
+    /// * `"purple"`
+    /// 
+    /// * `"red"`
+    /// 
+    /// * `"teal"`
+    /// 
+    /// * `"white"`
+    /// 
+    /// * `"yellow"`
     ///
     /// Sets the *img dominant color* query property to the given value.
     pub fn img_dominant_color(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_dominant_color = Some(new_value.to_string());
         self
     }
-    /// Returns black and white, grayscale, or color images: mono, gray, and color.
+    /// Returns black and white, grayscale, transparent, or color images.
+    /// Acceptable values are:
+    /// 
+    /// * `"color"`
+    /// 
+    /// * `"gray"`
+    /// 
+    /// * `"mono"`: black and white
+    /// 
+    /// * `"trans"`: transparent background
     ///
     /// Sets the *img color type* query property to the given value.
     pub fn img_color_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_color_type = Some(new_value.to_string());
         self
     }
-    /// Appends the extra query terms to the query.
+    /// Appends the specified query terms to the query, as if they were combined
+    /// with a logical AND operator.
     ///
     /// Sets the *hq* query property to the given value.
     pub fn hq(mut self, new_value: &str) -> CseListCall<'a, C, A> {
@@ -1929,20 +3116,37 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self
     }
     /// Sets the user interface language.
+    /// 
+    /// * Explicitly setting this parameter improves the performance and the
+    /// quality of your search results.
+    /// 
+    /// * See the [Interface
+    /// Languages](https://developers.google.com/custom-search/docs/xml_results#wsInterfaceLanguages)
+    /// section of [Internationalizing Queries and Results
+    /// Presentation](https://developers.google.com/custom-search/docs/xml_results#wsInternationalizing)
+    /// for more information, and (Supported Interface
+    /// Languages)[https://developers.google.com/custom-search/docs/xml_results_appendices#interfaceLanguages]
+    /// for a list of supported languages.
     ///
     /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
-    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
+    /// Specifies the ending value for a search range.
+    /// 
+    /// * Use `lowRange` and `highRange` to append an inclusive search range of
+    /// `lowRange...highRange` to the query.
     ///
     /// Sets the *high range* query property to the given value.
     pub fn high_range(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._high_range = Some(new_value.to_string());
         self
     }
-    /// The local Google domain to use to perform the search.
+    /// **Deprecated**. Use the `gl` parameter for a similar effect.
+    /// 
+    /// The local Google domain (for example, google.com, google.de, or
+    /// google.fr) to use to perform the search.
     ///
     /// Sets the *googlehost* query property to the given value.
     pub fn googlehost(mut self, new_value: &str) -> CseListCall<'a, C, A> {
@@ -1950,6 +3154,17 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self
     }
     /// Geolocation of end user.
+    /// 
+    /// * The `gl` parameter value is a two-letter country code. The `gl` parameter
+    /// boosts search results whose country of origin matches the parameter value.
+    /// See the [Country
+    /// Codes](https://developers.google.com/custom-search/docs/xml_results_appendices#countryCodes)
+    /// page for a list of valid values.
+    /// 
+    /// * Specifying a `gl` parameter value should lead to more relevant results.
+    /// This is particularly true for international customers and, even more
+    /// specifically, for customers in English- speaking countries other than the
+    /// United States.
     ///
     /// Sets the *gl* query property to the given value.
     pub fn gl(mut self, new_value: &str) -> CseListCall<'a, C, A> {
@@ -1957,55 +3172,101 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self
     }
     /// Controls turning on or off the duplicate content filter.
+    /// 
+    /// * See [Automatic
+    /// Filtering](https://developers.google.com/custom-search/docs/xml_results#automaticFiltering)
+    /// for more information about Google's search results filters. Note that host
+    /// crowding filtering applies only to multi-site searches.
+    /// 
+    /// * By default, Google applies filtering to all search results to improve the
+    /// quality of those results.
+    /// 
+    /// Acceptable values are:
+    /// 
+    /// * `0`: Turns off duplicate content filter.
+    /// 
+    /// * `1`: Turns on duplicate content filter.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
-    /// Returns images of a specified type. Some of the allowed values are: bmp, gif, png, jpg, svg, pdf, ...
+    /// Restricts results to files of a specified extension. A list of file types
+    /// indexable by Google can be found in Search Console [Help
+    /// Center](https://support.google.com/webmasters/answer/35287).
     ///
     /// Sets the *file type* query property to the given value.
     pub fn file_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._file_type = Some(new_value.to_string());
         self
     }
-    /// Identifies a word or phrase that should not appear in any documents in the search results
+    /// Identifies a word or phrase that should not appear in any documents in the
+    /// search results.
     ///
     /// Sets the *exclude terms* query property to the given value.
     pub fn exclude_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._exclude_terms = Some(new_value.to_string());
         self
     }
-    /// Identifies a phrase that all documents in the search results must contain
+    /// Identifies a phrase that all documents in the search results must contain.
     ///
     /// Sets the *exact terms* query property to the given value.
     pub fn exact_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._exact_terms = Some(new_value.to_string());
         self
     }
-    /// Specifies all search results are from a time period
+    /// Restricts results to URLs based on date. Supported values include:
+    /// 
+    /// * `d[number]`: requests results from the specified number of past days.
+    /// 
+    /// * `w[number]`: requests results from the specified number of past weeks.
+    /// 
+    /// * `m[number]`: requests results from the specified number of past months.
+    /// 
+    /// * `y[number]`: requests results from the specified number of past years.
     ///
     /// Sets the *date restrict* query property to the given value.
     pub fn date_restrict(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._date_restrict = Some(new_value.to_string());
         self
     }
-    /// The custom search engine ID to scope this search query
+    /// The custom search engine ID to use for this request.
     ///
     /// Sets the *cx* query property to the given value.
     pub fn cx(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cx = Some(new_value.to_string());
         self
     }
-    /// Country restrict(s).
+    /// Restricts search results to documents originating in a particular country.
+    /// You may use [Boolean
+    /// operators](https://developers.google.com/custom-search/docs/xml_results_appendices#booleanOperators)
+    /// in the cr parameter's value.
+    /// 
+    /// Google Search determines the country of a document by analyzing:
+    /// 
+    /// * the top-level domain (TLD) of the document's URL
+    /// 
+    /// * the geographic location of the Web server's IP address
+    /// 
+    /// See the [Country Parameter
+    /// Values](https://developers.google.com/custom-search/docs/xml_results_appendices#countryCollections)
+    /// page for a list of valid values for this parameter.
     ///
     /// Sets the *cr* query property to the given value.
     pub fn cr(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cr = Some(new_value.to_string());
         self
     }
-    /// Turns off the translation between zh-CN and zh-TW.
+    /// Enables or disables [Simplified and Traditional Chinese
+    /// Search](https://developers.google.com/custom-search/docs/xml_results#chineseSearch).
+    /// 
+    /// The default value for this parameter is 0 (zero), meaning that the feature
+    /// is enabled. Supported values are:
+    /// 
+    /// * `1`: Disabled
+    /// 
+    /// * `0`: Enabled (default)
     ///
     /// Sets the *c2coff* query property to the given value.
     pub fn c2coff(mut self, new_value: &str) -> CseListCall<'a, C, A> {
@@ -2032,13 +3293,17 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

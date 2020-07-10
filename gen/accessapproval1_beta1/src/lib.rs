@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Approval* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *accessapproval:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Access Approval* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *accessapproval:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Access Approval* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-approval/docs).
@@ -341,7 +341,7 @@ impl<'a, C, A> AccessApproval<C, A>
         AccessApproval {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://accessapproval.googleapis.com/".to_string(),
             _root_url: "https://accessapproval.googleapis.com/".to_string(),
         }
@@ -358,7 +358,7 @@ impl<'a, C, A> AccessApproval<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2657,6 +2657,7 @@ impl<'a, C, A> FolderApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper:
     ///   <li>PENDING: Only pending requests.</li>
     ///   <li>ACTIVE: Only active (i.e. currently approved) requests.</li>
     ///   <li>DISMISSED: Only dismissed (including expired) requests.</li>
+    ///   <li>HISTORY: Active and dismissed (including expired) requests.</li>
     /// </ol>
     ///
     /// Sets the *filter* query property to the given value.
@@ -4364,6 +4365,7 @@ impl<'a, C, A> OrganizationApprovalRequestListCall<'a, C, A> where C: BorrowMut<
     ///   <li>PENDING: Only pending requests.</li>
     ///   <li>ACTIVE: Only active (i.e. currently approved) requests.</li>
     ///   <li>DISMISSED: Only dismissed (including expired) requests.</li>
+    ///   <li>HISTORY: Active and dismissed (including expired) requests.</li>
     /// </ol>
     ///
     /// Sets the *filter* query property to the given value.
@@ -5467,6 +5469,7 @@ impl<'a, C, A> ProjectApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper
     ///   <li>PENDING: Only pending requests.</li>
     ///   <li>ACTIVE: Only active (i.e. currently approved) requests.</li>
     ///   <li>DISMISSED: Only dismissed (including expired) requests.</li>
+    ///   <li>HISTORY: Active and dismissed (including expired) requests.</li>
     /// </ol>
     ///
     /// Sets the *filter* query property to the given value.

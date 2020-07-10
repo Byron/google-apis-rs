@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Control* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Service Control* crate version *1.0.14+20200630*, where *20200630* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Service Control* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-control/).
@@ -333,7 +333,7 @@ impl<'a, C, A> ServiceControl<C, A>
         ServiceControl {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://servicecontrol.googleapis.com/".to_string(),
             _root_url: "https://servicecontrol.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> ServiceControl<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -389,9 +389,10 @@ pub struct CheckError {
     pub detail: Option<String>,
     /// Subject to whom this error applies. See the specific code enum for more
     /// details on this field. For example:
-    /// - “project:<project-id or project-number>”
-    /// - “folder:<folder-id>”
-    /// - “organization:<organization-id>”
+    /// 
+    /// - "project:<project-id or project-number>"
+    /// - "folder:<folder-id>"
+    /// - "organization:<organization-id>"
     pub subject: Option<String>,
 }
 
@@ -1522,12 +1523,14 @@ pub struct Operation {
     /// allowed.
     #[serde(rename="userLabels")]
     pub user_labels: Option<HashMap<String, String>>,
-    /// Represents information to be logged.
-    #[serde(rename="logEntries")]
-    pub log_entries: Option<Vec<LogEntry>>,
+    /// Unimplemented.
+    pub extensions: Option<Vec<HashMap<String, String>>>,
     /// Required. Start time of the operation.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
+    /// Represents information to be logged.
+    #[serde(rename="logEntries")]
+    pub log_entries: Option<Vec<LogEntry>>,
     /// End time of the operation.
     /// Required when the operation is used in ServiceController.Report,
     /// but optional when the operation is used in ServiceController.Check.

@@ -1,0 +1,19 @@
+site_name: Playable Locations v1.0.14+20200707
+site_url: http://byron.github.io/google-apis-rs/google-playablelocations3-cli
+site_description: A complete library to interact with Playable Locations (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/playablelocations3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['methods_log-impressions.md', 'Methods', 'Log Impressions']
+- ['methods_log-player-reports.md', 'Methods', 'Log Player Reports']
+- ['methods_sample-playable-locations.md', 'Methods', 'Sample Playable Locations']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

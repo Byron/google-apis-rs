@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dialogflow* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *dialogflow:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Dialogflow* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *dialogflow:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Dialogflow* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/dialogflow/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Dialogflow.html) ... 
 //! 
 //! * projects
-//!  * [*agent entity types batch delete*](struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](struct.ProjectAgentEntityTypePatchCall.html), [*agent environments users sessions contexts create*](struct.ProjectAgentEnvironmentUserSessionContextCreateCall.html), [*agent environments users sessions contexts delete*](struct.ProjectAgentEnvironmentUserSessionContextDeleteCall.html), [*agent environments users sessions contexts get*](struct.ProjectAgentEnvironmentUserSessionContextGetCall.html), [*agent environments users sessions contexts list*](struct.ProjectAgentEnvironmentUserSessionContextListCall.html), [*agent environments users sessions contexts patch*](struct.ProjectAgentEnvironmentUserSessionContextPatchCall.html), [*agent environments users sessions delete contexts*](struct.ProjectAgentEnvironmentUserSessionDeleteContextCall.html), [*agent environments users sessions detect intent*](struct.ProjectAgentEnvironmentUserSessionDetectIntentCall.html), [*agent environments users sessions entity types create*](struct.ProjectAgentEnvironmentUserSessionEntityTypeCreateCall.html), [*agent environments users sessions entity types delete*](struct.ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall.html), [*agent environments users sessions entity types get*](struct.ProjectAgentEnvironmentUserSessionEntityTypeGetCall.html), [*agent environments users sessions entity types list*](struct.ProjectAgentEnvironmentUserSessionEntityTypeListCall.html), [*agent environments users sessions entity types patch*](struct.ProjectAgentEnvironmentUserSessionEntityTypePatchCall.html), [*agent export*](struct.ProjectAgentExportCall.html), [*agent get fulfillment*](struct.ProjectAgentGetFulfillmentCall.html), [*agent get validation result*](struct.ProjectAgentGetValidationResultCall.html), [*agent import*](struct.ProjectAgentImportCall.html), [*agent intents batch delete*](struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](struct.ProjectAgentIntentGetCall.html), [*agent intents list*](struct.ProjectAgentIntentListCall.html), [*agent intents patch*](struct.ProjectAgentIntentPatchCall.html), [*agent restore*](struct.ProjectAgentRestoreCall.html), [*agent search*](struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](struct.ProjectAgentTrainCall.html), [*agent update fulfillment*](struct.ProjectAgentUpdateFulfillmentCall.html), [*delete agent*](struct.ProjectDeleteAgentCall.html), [*get agent*](struct.ProjectGetAgentCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*set agent*](struct.ProjectSetAgentCall.html)
+//!  * [*agent entity types batch delete*](struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](struct.ProjectAgentEntityTypePatchCall.html), [*agent environments list*](struct.ProjectAgentEnvironmentListCall.html), [*agent environments users sessions contexts create*](struct.ProjectAgentEnvironmentUserSessionContextCreateCall.html), [*agent environments users sessions contexts delete*](struct.ProjectAgentEnvironmentUserSessionContextDeleteCall.html), [*agent environments users sessions contexts get*](struct.ProjectAgentEnvironmentUserSessionContextGetCall.html), [*agent environments users sessions contexts list*](struct.ProjectAgentEnvironmentUserSessionContextListCall.html), [*agent environments users sessions contexts patch*](struct.ProjectAgentEnvironmentUserSessionContextPatchCall.html), [*agent environments users sessions delete contexts*](struct.ProjectAgentEnvironmentUserSessionDeleteContextCall.html), [*agent environments users sessions detect intent*](struct.ProjectAgentEnvironmentUserSessionDetectIntentCall.html), [*agent environments users sessions entity types create*](struct.ProjectAgentEnvironmentUserSessionEntityTypeCreateCall.html), [*agent environments users sessions entity types delete*](struct.ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall.html), [*agent environments users sessions entity types get*](struct.ProjectAgentEnvironmentUserSessionEntityTypeGetCall.html), [*agent environments users sessions entity types list*](struct.ProjectAgentEnvironmentUserSessionEntityTypeListCall.html), [*agent environments users sessions entity types patch*](struct.ProjectAgentEnvironmentUserSessionEntityTypePatchCall.html), [*agent export*](struct.ProjectAgentExportCall.html), [*agent get fulfillment*](struct.ProjectAgentGetFulfillmentCall.html), [*agent get validation result*](struct.ProjectAgentGetValidationResultCall.html), [*agent import*](struct.ProjectAgentImportCall.html), [*agent intents batch delete*](struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](struct.ProjectAgentIntentGetCall.html), [*agent intents list*](struct.ProjectAgentIntentListCall.html), [*agent intents patch*](struct.ProjectAgentIntentPatchCall.html), [*agent restore*](struct.ProjectAgentRestoreCall.html), [*agent search*](struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](struct.ProjectAgentTrainCall.html), [*agent update fulfillment*](struct.ProjectAgentUpdateFulfillmentCall.html), [*delete agent*](struct.ProjectDeleteAgentCall.html), [*get agent*](struct.ProjectGetAgentCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations operations list*](struct.ProjectLocationOperationListCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*set agent*](struct.ProjectSetAgentCall.html)
 //! 
 //! 
 //! 
@@ -345,7 +345,7 @@ impl<'a, C, A> Dialogflow<C, A>
         Dialogflow {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://dialogflow.googleapis.com/".to_string(),
             _root_url: "https://dialogflow.googleapis.com/".to_string(),
         }
@@ -356,7 +356,7 @@ impl<'a, C, A> Dialogflow<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -407,6 +407,7 @@ pub struct GoogleCloudDialogflowV2FulfillmentGenericWebService {
     /// Optional. The password for HTTP Basic authentication.
     pub password: Option<String>,
     /// Required. The fulfillment URI for receiving POST requests.
+    /// It must use https protocol.
     pub uri: Option<String>,
 }
 
@@ -624,6 +625,10 @@ pub struct GoogleCloudDialogflowV2DetectIntentResponse {
     /// multiple default text responses exist, they will be concatenated when
     /// generating audio. If no default platform text responses exist, the
     /// generated audio content will be empty.
+    /// 
+    /// In some scenarios, multiple output audio fields may be present in the
+    /// response structure. In these cases, only the top-most-level audio output
+    /// has content.
     #[serde(rename="outputAudio")]
     pub output_audio: Option<String>,
     /// The config used by the speech synthesizer to generate the output audio.
@@ -829,6 +834,7 @@ pub struct GoogleCloudDialogflowV2SpeechContext {
     /// limits.
     pub phrases: Option<Vec<String>>,
     /// Optional. Boost for this context compared to other contexts:
+    /// 
     /// * If the boost is positive, Dialogflow will increase the probability that
     ///   the phrases in this context are recognized over similar sounding phrases.
     /// * If the boost is unspecified or non-positive, Dialogflow will not apply
@@ -840,6 +846,35 @@ pub struct GoogleCloudDialogflowV2SpeechContext {
 }
 
 impl Part for GoogleCloudDialogflowV2SpeechContext {}
+
+
+/// Represents an agent environment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2Environment {
+    /// Output only. The unique identifier of this agent environment.
+    /// Format: `projects/<Project ID>/agent/environments/<Environment ID>`.
+    /// For Environment ID, "-" is reserved for 'draft' environment.
+    pub name: Option<String>,
+    /// Output only. The state of this environment. This field is read-only, i.e., it cannot be
+    /// set by create and update methods.
+    pub state: Option<String>,
+    /// Optional. The agent version loaded into this environment.
+    /// Format: `projects/<Project ID>/agent/versions/<Version ID>`.
+    #[serde(rename="agentVersion")]
+    pub agent_version: Option<String>,
+    /// Output only. The last update time of this environment. This field is read-only, i.e., it
+    /// cannot be set by create and update methods.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Optional. The developer-provided description for this environment.
+    /// The maximum length is 500 characters. If exceeded, the request is rejected.
+    pub description: Option<String>,
+}
+
+impl Part for GoogleCloudDialogflowV2Environment {}
 
 
 /// Represents the output of agent validation.
@@ -1001,8 +1036,16 @@ pub struct GoogleCloudDialogflowV2InputAudioConfig {
 impl Part for GoogleCloudDialogflowV2InputAudioConfig {}
 
 
-/// The result of sentiment analysis as configured by
-/// `sentiment_analysis_request_config`.
+/// The result of sentiment analysis. Sentiment analysis inspects user input
+/// and identifies the prevailing subjective opinion, especially to determine a
+/// user's attitude as positive, negative, or neutral.
+/// For Participants.AnalyzeContent, it needs to be configured in
+/// DetectIntentRequest.query_params. For
+/// Participants.StreamingAnalyzeContent, it needs to be configured in
+/// StreamingDetectIntentRequest.query_params.
+/// And for Participants.AnalyzeContent and
+/// Participants.StreamingAnalyzeContent, it needs to be configured in
+/// ConversationProfile.human_agent_assistant_config
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1016,103 +1059,21 @@ pub struct GoogleCloudDialogflowV2SentimentAnalysisResult {
 impl Part for GoogleCloudDialogflowV2SentimentAnalysisResult {}
 
 
-/// Represents the result of conversational query or event processing.
+/// The card for presenting a list of options to select from.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2QueryResult {
-    /// The collection of rich messages to present to the user.
-    #[serde(rename="fulfillmentMessages")]
-    pub fulfillment_messages: Option<Vec<GoogleCloudDialogflowV2IntentMessage>>,
-    /// The text to be pronounced to the user or shown on the screen.
-    /// Note: This is a legacy field, `fulfillment_messages` should be preferred.
-    #[serde(rename="fulfillmentText")]
-    pub fulfillment_text: Option<String>,
-    /// This field is set to:
-    /// 
-    /// - `false` if the matched intent has required parameters and not all of
-    ///    the required parameter values have been collected.
-    /// - `true` if all required parameter values have been collected, or if the
-    ///    matched intent doesn't contain any required parameters.
-    #[serde(rename="allRequiredParamsPresent")]
-    pub all_required_params_present: Option<bool>,
-    /// The collection of extracted parameters.
-    pub parameters: Option<HashMap<String, String>>,
-    /// The language that was triggered during intent detection.
-    /// See [Language
-    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
-    /// for a list of the currently supported language codes.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// The Speech recognition confidence between 0.0 and 1.0. A higher number
-    /// indicates an estimated greater likelihood that the recognized words are
-    /// correct. The default of 0.0 is a sentinel value indicating that confidence
-    /// was not set.
-    /// 
-    /// This field is not guaranteed to be accurate or set. In particular this
-    /// field isn't set for StreamingDetectIntent since the streaming endpoint has
-    /// separate confidence estimates per portion of the audio in
-    /// StreamingRecognitionResult.
-    #[serde(rename="speechRecognitionConfidence")]
-    pub speech_recognition_confidence: Option<f32>,
-    /// The intent detection confidence. Values range from 0.0
-    /// (completely uncertain) to 1.0 (completely certain).
-    /// This value is for informational purpose only and is only used to
-    /// help match the best intent within the classification threshold.
-    /// This value may change for the same end-user expression at any time due to a
-    /// model retraining or change in implementation.
-    /// If there are `multiple knowledge_answers` messages, this value is set to
-    /// the greatest `knowledgeAnswers.match_confidence` value in the list.
-    #[serde(rename="intentDetectionConfidence")]
-    pub intent_detection_confidence: Option<f32>,
-    /// The action name from the matched intent.
-    pub action: Option<String>,
-    /// The intent that matched the conversational query. Some, not
-    /// all fields are filled in this message, including but not limited to:
-    /// `name`, `display_name`, `end_interaction` and `is_fallback`.
-    pub intent: Option<GoogleCloudDialogflowV2Intent>,
-    /// The sentiment analysis result, which depends on the
-    /// `sentiment_analysis_request_config` specified in the request.
-    #[serde(rename="sentimentAnalysisResult")]
-    pub sentiment_analysis_result: Option<GoogleCloudDialogflowV2SentimentAnalysisResult>,
-    /// Free-form diagnostic information for the associated detect intent request.
-    /// The fields of this data can change without notice, so you should not write
-    /// code that depends on its structure.
-    /// The data may contain:
-    /// 
-    /// - webhook call latency
-    /// - webhook errors
-    #[serde(rename="diagnosticInfo")]
-    pub diagnostic_info: Option<HashMap<String, String>>,
-    /// The original conversational query text:
-    /// 
-    /// - If natural language text was provided as input, `query_text` contains
-    ///   a copy of the input.
-    /// - If natural language speech audio was provided as input, `query_text`
-    ///   contains the speech recognition result. If speech recognizer produced
-    ///   multiple alternatives, a particular one is picked.
-    /// - If automatic spell correction is enabled, `query_text` will contain the
-    ///   corrected user input.
-    #[serde(rename="queryText")]
-    pub query_text: Option<String>,
-    /// The collection of output contexts. If applicable,
-    /// `output_contexts.parameters` contains entries with name
-    /// `<parameter name>.original` containing the original parameter values
-    /// before the query.
-    #[serde(rename="outputContexts")]
-    pub output_contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
-    /// If the query was fulfilled by a webhook call, this field is set to the
-    /// value of the `source` field returned in the webhook response.
-    #[serde(rename="webhookSource")]
-    pub webhook_source: Option<String>,
-    /// If the query was fulfilled by a webhook call, this field is set to the
-    /// value of the `payload` field returned in the webhook response.
-    #[serde(rename="webhookPayload")]
-    pub webhook_payload: Option<HashMap<String, String>>,
+pub struct GoogleCloudDialogflowV2IntentMessageListSelect {
+    /// Required. List items.
+    pub items: Option<Vec<GoogleCloudDialogflowV2IntentMessageListSelectItem>>,
+    /// Optional. Subtitle of the list.
+    pub subtitle: Option<String>,
+    /// Optional. The overall title of the list.
+    pub title: Option<String>,
 }
 
-impl Part for GoogleCloudDialogflowV2QueryResult {}
+impl Part for GoogleCloudDialogflowV2IntentMessageListSelect {}
 
 
 /// Additional info about the select item for when it is triggered in a
@@ -1190,21 +1151,117 @@ pub struct GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject {
 impl Part for GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject {}
 
 
-/// The card for presenting a list of options to select from.
+/// Represents the result of conversational query or event processing.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2IntentMessageListSelect {
-    /// Required. List items.
-    pub items: Option<Vec<GoogleCloudDialogflowV2IntentMessageListSelectItem>>,
-    /// Optional. Subtitle of the list.
-    pub subtitle: Option<String>,
-    /// Optional. The overall title of the list.
-    pub title: Option<String>,
+pub struct GoogleCloudDialogflowV2QueryResult {
+    /// The collection of rich messages to present to the user.
+    #[serde(rename="fulfillmentMessages")]
+    pub fulfillment_messages: Option<Vec<GoogleCloudDialogflowV2IntentMessage>>,
+    /// The text to be pronounced to the user or shown on the screen.
+    /// Note: This is a legacy field, `fulfillment_messages` should be preferred.
+    #[serde(rename="fulfillmentText")]
+    pub fulfillment_text: Option<String>,
+    /// This field is set to:
+    /// 
+    /// - `false` if the matched intent has required parameters and not all of
+    ///    the required parameter values have been collected.
+    /// - `true` if all required parameter values have been collected, or if the
+    ///    matched intent doesn't contain any required parameters.
+    #[serde(rename="allRequiredParamsPresent")]
+    pub all_required_params_present: Option<bool>,
+    /// The collection of extracted parameters.
+    /// 
+    /// Depending on your protocol or client library language, this is a
+    /// map, associative array, symbol table, dictionary, or JSON object
+    /// composed of a collection of (MapKey, MapValue) pairs:
+    /// 
+    /// * MapKey type: string
+    /// * MapKey value: parameter name
+    /// * MapValue type:
+    ///   * If parameter's entity type is a composite entity: map
+    ///   * Else: string or number, depending on parameter value type
+    /// * MapValue value:
+    ///   * If parameter's entity type is a composite entity:
+    ///     map from composite entity property names to property values
+    ///   * Else: parameter value
+    pub parameters: Option<HashMap<String, String>>,
+    /// The language that was triggered during intent detection.
+    /// See [Language
+    /// Support](https://cloud.google.com/dialogflow/docs/reference/language)
+    /// for a list of the currently supported language codes.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// The Speech recognition confidence between 0.0 and 1.0. A higher number
+    /// indicates an estimated greater likelihood that the recognized words are
+    /// correct. The default of 0.0 is a sentinel value indicating that confidence
+    /// was not set.
+    /// 
+    /// This field is not guaranteed to be accurate or set. In particular this
+    /// field isn't set for StreamingDetectIntent since the streaming endpoint has
+    /// separate confidence estimates per portion of the audio in
+    /// StreamingRecognitionResult.
+    #[serde(rename="speechRecognitionConfidence")]
+    pub speech_recognition_confidence: Option<f32>,
+    /// The intent detection confidence. Values range from 0.0
+    /// (completely uncertain) to 1.0 (completely certain).
+    /// This value is for informational purpose only and is only used to
+    /// help match the best intent within the classification threshold.
+    /// This value may change for the same end-user expression at any time due to a
+    /// model retraining or change in implementation.
+    /// If there are `multiple knowledge_answers` messages, this value is set to
+    /// the greatest `knowledgeAnswers.match_confidence` value in the list.
+    #[serde(rename="intentDetectionConfidence")]
+    pub intent_detection_confidence: Option<f32>,
+    /// The action name from the matched intent.
+    pub action: Option<String>,
+    /// The intent that matched the conversational query. Some, not
+    /// all fields are filled in this message, including but not limited to:
+    /// `name`, `display_name`, `end_interaction` and `is_fallback`.
+    pub intent: Option<GoogleCloudDialogflowV2Intent>,
+    /// The sentiment analysis result, which depends on the
+    /// `sentiment_analysis_request_config` specified in the request.
+    #[serde(rename="sentimentAnalysisResult")]
+    pub sentiment_analysis_result: Option<GoogleCloudDialogflowV2SentimentAnalysisResult>,
+    /// Free-form diagnostic information for the associated detect intent request.
+    /// The fields of this data can change without notice, so you should not write
+    /// code that depends on its structure.
+    /// The data may contain:
+    /// 
+    /// - webhook call latency
+    /// - webhook errors
+    #[serde(rename="diagnosticInfo")]
+    pub diagnostic_info: Option<HashMap<String, String>>,
+    /// The original conversational query text:
+    /// 
+    /// - If natural language text was provided as input, `query_text` contains
+    ///   a copy of the input.
+    /// - If natural language speech audio was provided as input, `query_text`
+    ///   contains the speech recognition result. If speech recognizer produced
+    ///   multiple alternatives, a particular one is picked.
+    /// - If automatic spell correction is enabled, `query_text` will contain the
+    ///   corrected user input.
+    #[serde(rename="queryText")]
+    pub query_text: Option<String>,
+    /// The collection of output contexts. If applicable,
+    /// `output_contexts.parameters` contains entries with name
+    /// `<parameter name>.original` containing the original parameter values
+    /// before the query.
+    #[serde(rename="outputContexts")]
+    pub output_contexts: Option<Vec<GoogleCloudDialogflowV2Context>>,
+    /// If the query was fulfilled by a webhook call, this field is set to the
+    /// value of the `source` field returned in the webhook response.
+    #[serde(rename="webhookSource")]
+    pub webhook_source: Option<String>,
+    /// If the query was fulfilled by a webhook call, this field is set to the
+    /// value of the `payload` field returned in the webhook response.
+    #[serde(rename="webhookPayload")]
+    pub webhook_payload: Option<HashMap<String, String>>,
 }
 
-impl Part for GoogleCloudDialogflowV2IntentMessageListSelect {}
+impl Part for GoogleCloudDialogflowV2QueryResult {}
 
 
 /// The basic card message. Useful for displaying information.
@@ -1259,7 +1316,16 @@ pub struct GoogleCloudDialogflowV2IntentMessageMediaContent {
 impl Part for GoogleCloudDialogflowV2IntentMessageMediaContent {}
 
 
-/// Represents a conversational agent.
+/// A Dialogflow agent is a virtual agent that handles conversations with your
+/// end-users. It is a natural language understanding module that understands the
+/// nuances of human language. Dialogflow translates end-user text or audio
+/// during a conversation to structured data that your apps and services can
+/// understand. You design and build a Dialogflow agent to handle the types of
+/// conversations required for your system.
+/// 
+/// For more information about agents, see the
+/// [Agents
+/// documentation](https://cloud.google.com/dialogflow/docs/agents-overview).
 /// 
 /// # Activities
 /// 
@@ -1726,6 +1792,7 @@ pub struct GoogleCloudDialogflowV2IntentParameter {
     #[serde(rename="entityTypeDisplayName")]
     pub entity_type_display_name: Option<String>,
     /// Optional. The definition of the parameter value. It can be:
+    /// 
     /// - a constant string,
     /// - a parameter value defined as `$parameter_name`,
     /// - an original parameter value defined as `$parameter_name.original`,
@@ -1856,7 +1923,7 @@ pub struct GoogleCloudDialogflowV2Context {
     /// * MapKey value: parameter name
     /// * MapValue type:
     ///   * If parameter's entity type is a composite entity: map
-    ///   * Else: string
+    ///   * Else: string or number, depending on parameter value type
     /// * MapValue value:
     ///   * If parameter's entity type is a composite entity:
     ///     map from composite entity property names to property values
@@ -2194,10 +2261,47 @@ pub struct GoogleCloudDialogflowV2EventInput {
     /// Required. The unique identifier of the event.
     pub name: Option<String>,
     /// The collection of parameters associated with the event.
+    /// 
+    /// Depending on your protocol or client library language, this is a
+    /// map, associative array, symbol table, dictionary, or JSON object
+    /// composed of a collection of (MapKey, MapValue) pairs:
+    /// 
+    /// * MapKey type: string
+    /// * MapKey value: parameter name
+    /// * MapValue type:
+    ///   * If parameter's entity type is a composite entity: map
+    ///   * Else: string or number, depending on parameter value type
+    /// * MapValue value:
+    ///   * If parameter's entity type is a composite entity:
+    ///     map from composite entity property names to property values
+    ///   * Else: parameter value
     pub parameters: Option<HashMap<String, String>>,
 }
 
 impl Part for GoogleCloudDialogflowV2EventInput {}
+
+
+/// The response message for Environments.ListEnvironments.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [agent environments list projects](struct.ProjectAgentEnvironmentListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2ListEnvironmentsResponse {
+    /// Token to retrieve the next page of results, or empty if there are no
+    /// more results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of agent environments. There will be a maximum number of items
+    /// returned based on the page_size field in the request.
+    pub environments: Option<Vec<GoogleCloudDialogflowV2Environment>>,
+}
+
+impl ResponseResult for GoogleCloudDialogflowV2ListEnvironmentsResponse {}
 
 
 /// The card response message.
@@ -2220,38 +2324,44 @@ pub struct GoogleCloudDialogflowV2IntentMessageCard {
 impl Part for GoogleCloudDialogflowV2IntentMessageCard {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-/// ````text
-/// service Foo {
-///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-/// }
-/// ````
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// Represents an entity type.
+/// Entity types serve as a tool for extracting parameter values from natural
+/// language queries.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
-/// * [agent environments users sessions contexts delete projects](struct.ProjectAgentEnvironmentUserSessionContextDeleteCall.html) (response)
-/// * [agent environments users sessions entity types delete projects](struct.ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall.html) (response)
-/// * [agent sessions delete contexts projects](struct.ProjectAgentSessionDeleteContextCall.html) (response)
-/// * [delete agent projects](struct.ProjectDeleteAgentCall.html) (response)
-/// * [agent entity types delete projects](struct.ProjectAgentEntityTypeDeleteCall.html) (response)
-/// * [agent sessions contexts delete projects](struct.ProjectAgentSessionContextDeleteCall.html) (response)
-/// * [agent sessions entity types delete projects](struct.ProjectAgentSessionEntityTypeDeleteCall.html) (response)
-/// * [agent intents delete projects](struct.ProjectAgentIntentDeleteCall.html) (response)
-/// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
-/// * [agent environments users sessions delete contexts projects](struct.ProjectAgentEnvironmentUserSessionDeleteContextCall.html) (response)
+/// * [agent entity types get projects](struct.ProjectAgentEntityTypeGetCall.html) (response)
+/// * [agent entity types patch projects](struct.ProjectAgentEntityTypePatchCall.html) (request|response)
+/// * [agent entity types create projects](struct.ProjectAgentEntityTypeCreateCall.html) (request|response)
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
+pub struct GoogleCloudDialogflowV2EntityType {
+    /// Optional. Indicates whether the entity type can be automatically
+    /// expanded.
+    #[serde(rename="autoExpansionMode")]
+    pub auto_expansion_mode: Option<String>,
+    /// Optional. The collection of entity entries associated with the entity type.
+    pub entities: Option<Vec<GoogleCloudDialogflowV2EntityTypeEntity>>,
+    /// Required. Indicates the kind of entity type.
+    pub kind: Option<String>,
+    /// Required. The name of the entity type.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Optional. Enables fuzzy entity extraction during classification.
+    #[serde(rename="enableFuzzyExtraction")]
+    pub enable_fuzzy_extraction: Option<bool>,
+    /// The unique identifier of the entity type.
+    /// Required for EntityTypes.UpdateEntityType and
+    /// EntityTypes.BatchUpdateEntityTypes methods.
+    /// Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
+    pub name: Option<String>,
+}
 
-impl ResponseResult for GoogleProtobufEmpty {}
+impl RequestValue for GoogleCloudDialogflowV2EntityType {}
+impl ResponseResult for GoogleCloudDialogflowV2EntityType {}
 
 
 /// Cell of TableCardRow.
@@ -2366,44 +2476,38 @@ pub struct GoogleLongrunningListOperationsResponse {
 impl ResponseResult for GoogleLongrunningListOperationsResponse {}
 
 
-/// Represents an entity type.
-/// Entity types serve as a tool for extracting parameter values from natural
-/// language queries.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [agent entity types get projects](struct.ProjectAgentEntityTypeGetCall.html) (response)
-/// * [agent entity types patch projects](struct.ProjectAgentEntityTypePatchCall.html) (request|response)
-/// * [agent entity types create projects](struct.ProjectAgentEntityTypeCreateCall.html) (request|response)
-/// 
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
+/// * [agent environments users sessions contexts delete projects](struct.ProjectAgentEnvironmentUserSessionContextDeleteCall.html) (response)
+/// * [agent environments users sessions entity types delete projects](struct.ProjectAgentEnvironmentUserSessionEntityTypeDeleteCall.html) (response)
+/// * [agent sessions delete contexts projects](struct.ProjectAgentSessionDeleteContextCall.html) (response)
+/// * [delete agent projects](struct.ProjectDeleteAgentCall.html) (response)
+/// * [agent entity types delete projects](struct.ProjectAgentEntityTypeDeleteCall.html) (response)
+/// * [agent sessions contexts delete projects](struct.ProjectAgentSessionContextDeleteCall.html) (response)
+/// * [agent sessions entity types delete projects](struct.ProjectAgentSessionEntityTypeDeleteCall.html) (response)
+/// * [agent intents delete projects](struct.ProjectAgentIntentDeleteCall.html) (response)
+/// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
+/// * [agent environments users sessions delete contexts projects](struct.ProjectAgentEnvironmentUserSessionDeleteContextCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudDialogflowV2EntityType {
-    /// Optional. Indicates whether the entity type can be automatically
-    /// expanded.
-    #[serde(rename="autoExpansionMode")]
-    pub auto_expansion_mode: Option<String>,
-    /// Optional. The collection of entity entries associated with the entity type.
-    pub entities: Option<Vec<GoogleCloudDialogflowV2EntityTypeEntity>>,
-    /// Required. Indicates the kind of entity type.
-    pub kind: Option<String>,
-    /// Required. The name of the entity type.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Optional. Enables fuzzy entity extraction during classification.
-    #[serde(rename="enableFuzzyExtraction")]
-    pub enable_fuzzy_extraction: Option<bool>,
-    /// The unique identifier of the entity type.
-    /// Required for EntityTypes.UpdateEntityType and
-    /// EntityTypes.BatchUpdateEntityTypes methods.
-    /// Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
-    pub name: Option<String>,
-}
+pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 
-impl RequestValue for GoogleCloudDialogflowV2EntityType {}
-impl ResponseResult for GoogleCloudDialogflowV2EntityType {}
+impl ResponseResult for GoogleProtobufEmpty {}
 
 
 /// The image response message.
@@ -2677,7 +2781,7 @@ impl Part for GoogleCloudDialogflowV2IntentMessageLinkOutSuggestion {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_environments_users_sessions_contexts_create(...)`, `agent_environments_users_sessions_contexts_delete(...)`, `agent_environments_users_sessions_contexts_get(...)`, `agent_environments_users_sessions_contexts_list(...)`, `agent_environments_users_sessions_contexts_patch(...)`, `agent_environments_users_sessions_delete_contexts(...)`, `agent_environments_users_sessions_detect_intent(...)`, `agent_environments_users_sessions_entity_types_create(...)`, `agent_environments_users_sessions_entity_types_delete(...)`, `agent_environments_users_sessions_entity_types_get(...)`, `agent_environments_users_sessions_entity_types_list(...)`, `agent_environments_users_sessions_entity_types_patch(...)`, `agent_export(...)`, `agent_get_fulfillment(...)`, `agent_get_validation_result(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `agent_update_fulfillment(...)`, `delete_agent(...)`, `get_agent(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `set_agent(...)`
+/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_environments_list(...)`, `agent_environments_users_sessions_contexts_create(...)`, `agent_environments_users_sessions_contexts_delete(...)`, `agent_environments_users_sessions_contexts_get(...)`, `agent_environments_users_sessions_contexts_list(...)`, `agent_environments_users_sessions_contexts_patch(...)`, `agent_environments_users_sessions_delete_contexts(...)`, `agent_environments_users_sessions_detect_intent(...)`, `agent_environments_users_sessions_entity_types_create(...)`, `agent_environments_users_sessions_entity_types_delete(...)`, `agent_environments_users_sessions_entity_types_get(...)`, `agent_environments_users_sessions_entity_types_list(...)`, `agent_environments_users_sessions_entity_types_patch(...)`, `agent_export(...)`, `agent_get_fulfillment(...)`, `agent_get_validation_result(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `agent_update_fulfillment(...)`, `delete_agent(...)`, `get_agent(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `set_agent(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2978,9 +3082,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Restores the specified agent from a ZIP file.
     /// 
     /// Replaces the current agent version with a new one. All the intents and
-    /// entity types in the older version are deleted.
+    /// entity types in the older version are deleted. After the restore, the
+    /// restored draft agent will be trained automatically (unless disabled in
+    /// agent settings). However, once the restore is done, training may not be
+    /// completed yet. Please call TrainAgent and wait for the operation it
+    /// returns in order to train explicitly.
     /// 
     /// Operation <response: google.protobuf.Empty>
+    /// An operation which tracks when restoring is complete. It only tracks
+    /// when the draft agent is updated not when it is done training.
     /// 
     /// # Arguments
     ///
@@ -3696,6 +3806,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns the list of all non-draft environments of the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The agent to list all environments from.
+    ///              Format: `projects/<Project ID>/agent`.
+    pub fn agent_environments_list(&self, parent: &str) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        ProjectAgentEnvironmentListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the specified context.
     /// 
     /// # Arguments
@@ -3801,9 +3931,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Uploads new intents and entity types without deleting the existing ones.
     /// Intents and entity types with the same name are replaced with the new
-    /// versions from ImportAgentRequest.
+    /// versions from ImportAgentRequest. After the import, the imported draft
+    /// agent will be trained automatically (unless disabled in agent settings).
+    /// However, once the import is done, training may not be completed yet. Please
+    /// call TrainAgent and wait for the operation it returns in order to train
+    /// explicitly.
     /// 
     /// Operation <response: google.protobuf.Empty>
+    /// An operation which tracks when importing is complete. It only tracks
+    /// when the draft agent is updated not when it is done training.
     /// 
     /// # Arguments
     ///
@@ -7458,9 +7594,15 @@ impl<'a, C, A> ProjectAgentGetValidationResultCall<'a, C, A> where C: BorrowMut<
 /// Restores the specified agent from a ZIP file.
 /// 
 /// Replaces the current agent version with a new one. All the intents and
-/// entity types in the older version are deleted.
+/// entity types in the older version are deleted. After the restore, the
+/// restored draft agent will be trained automatically (unless disabled in
+/// agent settings). However, once the restore is done, training may not be
+/// completed yet. Please call TrainAgent and wait for the operation it
+/// returns in order to train explicitly.
 /// 
 /// Operation <response: google.protobuf.Empty>
+/// An operation which tracks when restoring is complete. It only tracks
+/// when the draft agent is updated not when it is done training.
 ///
 /// A builder for the *agent.restore* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -15761,6 +15903,286 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
 }
 
 
+/// Returns the list of all non-draft environments of the specified agent.
+///
+/// A builder for the *agent.environments.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dialogflow2::Dialogflow;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dialogflow::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().agent_environments_list("parent")
+///              .page_token("vero")
+///              .page_size(-28)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectAgentEnvironmentListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dialogflow<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectAgentEnvironmentListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectAgentEnvironmentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudDialogflowV2ListEnvironmentsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dialogflow.projects.agent.environments.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/environments";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The agent to list all environments from.
+    /// Format: `projects/<Project ID>/agent`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of items to return in a single page. By default 100 and
+    /// at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAgentEnvironmentListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentEnvironmentListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentEnvironmentListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the specified context.
 ///
 /// A builder for the *agent.sessions.contexts.patch* method supported by a *project* resource.
@@ -15795,7 +16217,7 @@ impl<'a, C, A> ProjectAgentEntityTypeEntityBatchDeleteCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_contexts_patch(req, "name")
-///              .update_mask("vero")
+///              .update_mask("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -16108,7 +16530,7 @@ impl<'a, C, A> ProjectAgentSessionContextPatchCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_update_fulfillment(req, "name")
-///              .update_mask("rebum.")
+///              .update_mask("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -16899,9 +17321,15 @@ impl<'a, C, A> ProjectAgentSessionDeleteContextCall<'a, C, A> where C: BorrowMut
 /// 
 /// Uploads new intents and entity types without deleting the existing ones.
 /// Intents and entity types with the same name are replaced with the new
-/// versions from ImportAgentRequest.
+/// versions from ImportAgentRequest. After the import, the imported draft
+/// agent will be trained automatically (unless disabled in agent settings).
+/// However, once the import is done, training may not be completed yet. Please
+/// call TrainAgent and wait for the operation it returns in order to train
+/// explicitly.
 /// 
 /// Operation <response: google.protobuf.Empty>
+/// An operation which tracks when importing is complete. It only tracks
+/// when the draft agent is updated not when it is done training.
 ///
 /// A builder for the *agent.import* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -17726,8 +18154,8 @@ impl<'a, C, A> ProjectDeleteAgentCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_get("name")
-///              .language_code("dolore")
-///              .intent_view("duo")
+///              .language_code("Lorem")
+///              .intent_view("et")
 ///              .doit();
 /// # }
 /// ```
@@ -18848,9 +19276,9 @@ impl<'a, C, A> ProjectAgentExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-58)
-///              .language_code("nonumy")
+///              .page_token("kasd")
+///              .page_size(-7)
+///              .language_code("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -19414,8 +19842,8 @@ impl<'a, C, A> ProjectAgentSessionEntityTypeDeleteCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_search("parent")
-///              .page_token("takimata")
-///              .page_size(-27)
+///              .page_token("invidunt")
+///              .page_size(-66)
 ///              .doit();
 /// # }
 /// ```
@@ -19956,8 +20384,8 @@ impl<'a, C, A> ProjectAgentIntentDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_create(req, "parent")
-///              .language_code("ea")
-///              .intent_view("sadipscing")
+///              .language_code("dolore")
+///              .intent_view("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -20273,9 +20701,9 @@ impl<'a, C, A> ProjectAgentIntentCreateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("dolore")
-///              .page_size(-41)
-///              .filter("sed")
+///              .page_token("aliquyam")
+///              .page_size(-53)
+///              .filter("eirmod")
 ///              .doit();
 /// # }
 /// ```

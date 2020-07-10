@@ -70,9 +70,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["language-code", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["language-code", "package-name", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -105,7 +106,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -121,7 +122,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -207,12 +207,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Playcustomapp::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -237,7 +240,7 @@ fn main() {
     let arg_data = [
         ("accounts", "methods: 'custom-apps-create'", vec![
             ("custom-apps-create",
-                    Some(r##"Create and publish a new custom app."##),
+                    Some(r##"Creates a new custom app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_playcustomapp1_cli/accounts_custom-apps-create",
                   vec![
                     (Some(r##"account"##),
@@ -254,7 +257,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -276,8 +279,8 @@ fn main() {
     
     let mut app = App::new("playcustomapp1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20170622")
-           .about("An API to publish custom Android apps.")
+           .version("1.0.14+20200707")
+           .about("API to create and publish custom Android apps")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playcustomapp1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

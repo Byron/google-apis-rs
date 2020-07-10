@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.13+20200325
+site_name: Android Enterprise v1.0.14+20200707
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -72,13 +72,11 @@ pages:
 - ['storelayoutpages_update.md', 'Storelayoutpages', 'Update']
 - ['users_delete.md', 'Users', 'Delete']
 - ['users_generate-authentication-token.md', 'Users', 'Generate Authentication Token']
-- ['users_generate-token.md', 'Users', 'Generate Token']
 - ['users_get.md', 'Users', 'Get']
 - ['users_get-available-product-set.md', 'Users', 'Get Available Product Set']
 - ['users_insert.md', 'Users', 'Insert']
 - ['users_list.md', 'Users', 'List']
 - ['users_revoke-device-access.md', 'Users', 'Revoke Device Access']
-- ['users_revoke-token.md', 'Users', 'Revoke Token']
 - ['users_set-available-product-set.md', 'Users', 'Set Available Product Set']
 - ['users_update.md', 'Users', 'Update']
 - ['webapps_delete.md', 'Webapps', 'Delete']

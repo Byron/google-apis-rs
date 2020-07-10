@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Fusion* API at revision *20200318*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Data Fusion* API at revision *20200609*. The CLI is at version *1.0.14*.
 
 ```bash
 datafusion1-beta1 [options]
@@ -46,6 +46,7 @@ datafusion1-beta1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-versions-list <parent> [-p <v>]... [-o <out>]
   datafusion1-beta1 --help
 
 Configuration:

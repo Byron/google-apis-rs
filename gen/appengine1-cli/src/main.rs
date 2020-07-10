@@ -497,19 +497,20 @@ impl<'n> Engine<'n> {
                     "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "feature-settings.use-container-optimized-os" => Some(("featureSettings.useContainerOptimizedOs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "feature-settings.split-health-checks" => Some(("featureSettings.splitHealthChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-type" => Some(("databaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcr-domain" => Some(("gcrDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "feature-settings", "gcr-domain", "iap", "id", "location-id", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256", "serving-status", "split-health-checks", "use-container-optimized-os"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "database-type", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "feature-settings", "gcr-domain", "iap", "id", "location-id", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256", "serving-status", "split-health-checks", "use-container-optimized-os"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1656,19 +1657,20 @@ impl<'n> Engine<'n> {
                     "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "feature-settings.use-container-optimized-os" => Some(("featureSettings.useContainerOptimizedOs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "feature-settings.split-health-checks" => Some(("featureSettings.splitHealthChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-type" => Some(("databaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcr-domain" => Some(("gcrDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "feature-settings", "gcr-domain", "iap", "id", "location-id", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256", "serving-status", "split-health-checks", "use-container-optimized-os"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "database-type", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "feature-settings", "gcr-domain", "iap", "id", "location-id", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256", "serving-status", "split-health-checks", "use-container-optimized-os"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4198,7 +4200,7 @@ fn main() {
     
     let mut app = App::new("appengine1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200403")
+           .version("1.0.14+20200701")
            .about("Provisions and manages developers' App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container Analysis* crate version *1.0.13+20200327*, where *20200327* is the exact revision of the *containeranalysis:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Container Analysis* crate version *1.0.14+20200704*, where *20200704* is the exact revision of the *containeranalysis:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Container Analysis* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-analysis/api/reference/rest/).
@@ -334,7 +334,7 @@ impl<'a, C, A> ContainerAnalysis<C, A>
         ContainerAnalysis {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://containeranalysis.googleapis.com/".to_string(),
             _root_url: "https://containeranalysis.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> ContainerAnalysis<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -428,52 +428,19 @@ pub struct Basis {
 impl Part for Basis {}
 
 
-/// Identifies all appearances of this vulnerability in the package for a
-/// specific distro/location. For example: glibc in
-/// cpe:/o:debian:debian_linux:8 for versions 2.1 - 2.2
+/// Defines an object for the byproducts field in in-toto links. The suggested
+/// fields are "stderr", "stdout", and "return-value".
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Detail {
-    /// The severity (eg: distro assigned severity) for this vulnerability.
-    #[serde(rename="severityName")]
-    pub severity_name: Option<String>,
-    /// Required. The CPE URI in
-    /// [cpe format](https://cpe.mitre.org/specification/) in which the
-    /// vulnerability manifests. Examples include distro or storage location for
-    /// vulnerable jar.
-    #[serde(rename="cpeUri")]
-    pub cpe_uri: Option<String>,
-    /// A vendor-specific description of this note.
-    pub description: Option<String>,
-    /// The min version of the package in which the vulnerability exists.
-    #[serde(rename="minAffectedVersion")]
-    pub min_affected_version: Option<Version>,
-    /// Required. The name of the package where the vulnerability was found.
-    pub package: Option<String>,
-    /// Whether this detail is obsolete. Occurrences are expected not to point to
-    /// obsolete details.
-    #[serde(rename="isObsolete")]
-    pub is_obsolete: Option<bool>,
-    /// The type of package; whether native or non native(ruby gems, node.js
-    /// packages etc).
-    #[serde(rename="packageType")]
-    pub package_type: Option<String>,
-    /// The time this information was last changed at the source. This is an
-    /// upstream timestamp from the underlying information source - e.g. Ubuntu
-    /// security tracker.
-    #[serde(rename="sourceUpdateTime")]
-    pub source_update_time: Option<String>,
-    /// The max version of the package in which the vulnerability exists.
-    #[serde(rename="maxAffectedVersion")]
-    pub max_affected_version: Option<Version>,
-    /// The fix for this specific package version.
-    #[serde(rename="fixedLocation")]
-    pub fixed_location: Option<VulnerabilityLocation>,
+pub struct ByProducts {
+    /// no description provided
+    #[serde(rename="customValues")]
+    pub custom_values: Option<HashMap<String, String>>,
 }
 
-impl Part for Detail {}
+impl Part for ByProducts {}
 
 
 /// Metadata for any related URL information.
@@ -662,6 +629,41 @@ pub struct Hash {
 impl Part for Hash {}
 
 
+/// This defines the format used to record keys used in the software supply
+/// chain. An in-toto link is attested using one or more keys defined in the
+/// in-toto layout. An example of this is:
+/// {
+///   "key_id": "776a00e29f3559e0141b3b096f696abc6cfb0c657ab40f441132b345b0...",
+///   "key_type": "rsa",
+///   "public_key_value": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0B...",
+///   "key_scheme": "rsassa-pss-sha256"
+/// }
+/// The format for in-toto's key definition can be found in section 4.2 of the
+/// in-toto specification.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SigningKey {
+    /// This field identifies the specific signing method. Eg: "rsa", "ed25519",
+    /// and "ecdsa".
+    #[serde(rename="keyType")]
+    pub key_type: Option<String>,
+    /// key_id is an identifier for the signing key.
+    #[serde(rename="keyId")]
+    pub key_id: Option<String>,
+    /// This field contains the corresponding signature scheme.
+    /// Eg: "rsassa-pss-sha256".
+    #[serde(rename="keyScheme")]
+    pub key_scheme: Option<String>,
+    /// This field contains the actual public key.
+    #[serde(rename="publicKeyValue")]
+    pub public_key_value: Option<String>,
+}
+
+impl Part for SigningKey {}
+
+
 /// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
@@ -682,6 +684,39 @@ pub struct SetIamPolicyRequest {
 }
 
 impl RequestValue for SetIamPolicyRequest {}
+
+
+/// This contains the fields corresponding to the definition of a software supply
+/// chain step in an in-toto layout. This information goes into a Grafeas note.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InToto {
+    /// The following fields contain in-toto artifact rules identifying the
+    /// artifacts that enter this supply chain step, and exit the supply chain
+    /// step, i.e. materials and products of the step.
+    #[serde(rename="expectedMaterials")]
+    pub expected_materials: Option<Vec<ArtifactRule>>,
+    /// This field contains a value that indicates the minimum number of keys that
+    /// need to be used to sign the step's in-toto link.
+    pub threshold: Option<String>,
+    /// no description provided
+    #[serde(rename="expectedProducts")]
+    pub expected_products: Option<Vec<ArtifactRule>>,
+    /// This field identifies the name of the step in the supply chain.
+    #[serde(rename="stepName")]
+    pub step_name: Option<String>,
+    /// This field contains the expected command used to perform the step.
+    #[serde(rename="expectedCommand")]
+    pub expected_command: Option<Vec<String>>,
+    /// This field contains the public keys that can be used to verify the
+    /// signatures on the step metadata.
+    #[serde(rename="signingKeys")]
+    pub signing_keys: Option<Vec<SigningKey>>,
+}
+
+impl Part for InToto {}
 
 
 /// A GitSourceContext denotes a particular revision in a third party Git
@@ -740,6 +775,55 @@ pub struct Fingerprint {
 impl Part for Fingerprint {}
 
 
+/// This corresponds to an in-toto link.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Link {
+    /// This is a field that can be used to capture information about the
+    /// environment. It is suggested for this field to contain information that
+    /// details environment variables, filesystem information, and the present
+    /// working directory. The recommended structure of this field is:
+    /// "environment": {
+    /// "custom_values": {
+    /// "variables": "<ENV>",
+    /// "filesystem": "<FS>",
+    /// "workdir": "<CWD>",
+    /// "<ANY OTHER RELEVANT FIELDS>": "..."
+    /// }
+    /// }
+    pub environment: Option<Environment>,
+    /// This field contains the full command executed for the step. This can also
+    /// be empty if links are generated for operations that aren't directly mapped
+    /// to a specific command. Each term in the command is an independent string
+    /// in the list. An example of a command in the in-toto metadata field is:
+    /// "command": ["git", "clone", "https://github.com/in-toto/demo-project.git"]
+    pub command: Option<Vec<String>>,
+    /// Materials are the supply chain artifacts that go into the step and are used
+    /// for the operation performed. The key of the map is the path of the artifact
+    /// and the structure contains the recorded hash information. An example is:
+    /// "materials": [
+    /// {
+    /// "resource_uri": "foo/bar",
+    /// "hashes": {
+    /// "sha256": "ebebf...",
+    /// <OTHER HASH ALGORITHMS>: <HASH VALUE>
+    /// }
+    /// }
+    /// ]
+    pub materials: Option<Vec<GrafeasV1beta1IntotoArtifact>>,
+    /// Products are the supply chain artifacts generated as a result of the step.
+    /// The structure is identical to that of materials.
+    pub products: Option<Vec<GrafeasV1beta1IntotoArtifact>>,
+    /// ByProducts are data generated as part of a software supply chain step, but
+    /// are not the actual result of the step.
+    pub byproducts: Option<ByProducts>,
+}
+
+impl Part for Link {}
+
+
 /// Response for listing scan configurations.
 /// 
 /// # Activities
@@ -777,7 +861,7 @@ impl ResponseResult for ListScanConfigsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
     /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
-    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    /// `GetIamPolicy`.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -837,43 +921,6 @@ pub struct BatchCreateOccurrencesResponse {
 impl ResponseResult for BatchCreateOccurrencesResponse {}
 
 
-/// A CloudRepoSourceContext denotes a particular revision in a Google Cloud
-/// Source Repo.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CloudRepoSourceContext {
-    /// An alias, which may be a branch or tag.
-    #[serde(rename="aliasContext")]
-    pub alias_context: Option<AliasContext>,
-    /// A revision ID.
-    #[serde(rename="revisionId")]
-    pub revision_id: Option<String>,
-    /// The ID of the repo.
-    #[serde(rename="repoId")]
-    pub repo_id: Option<RepoId>,
-}
-
-impl Part for CloudRepoSourceContext {}
-
-
-/// A unique identifier for a Cloud Repo.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepoId {
-    /// A combination of a project ID and a repo name.
-    #[serde(rename="projectRepoId")]
-    pub project_repo_id: Option<ProjectRepoId>,
-    /// A server-assigned, globally unique identifier.
-    pub uid: Option<String>,
-}
-
-impl Part for RepoId {}
-
-
 /// A type of analysis that can be done for a resource.
 /// 
 /// # Activities
@@ -923,6 +970,8 @@ pub struct Note {
     /// A note describing an attestation role.
     #[serde(rename="attestationAuthority")]
     pub attestation_authority: Option<Authority>,
+    /// A note describing an in-toto link.
+    pub intoto: Option<InToto>,
     /// A note describing build provenance for a verifiable build.
     pub build: Option<Build>,
     /// A note describing a base image.
@@ -937,6 +986,106 @@ pub struct Note {
 
 impl RequestValue for Note {}
 impl ResponseResult for Note {}
+
+
+/// Identifies all appearances of this vulnerability in the package for a
+/// specific distro/location. For example: glibc in
+/// cpe:/o:debian:debian_linux:8 for versions 2.1 - 2.2
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Detail {
+    /// The severity (eg: distro assigned severity) for this vulnerability.
+    #[serde(rename="severityName")]
+    pub severity_name: Option<String>,
+    /// Required. The CPE URI in
+    /// [cpe format](https://cpe.mitre.org/specification/) in which the
+    /// vulnerability manifests. Examples include distro or storage location for
+    /// vulnerable jar.
+    #[serde(rename="cpeUri")]
+    pub cpe_uri: Option<String>,
+    /// A vendor-specific description of this note.
+    pub description: Option<String>,
+    /// The min version of the package in which the vulnerability exists.
+    #[serde(rename="minAffectedVersion")]
+    pub min_affected_version: Option<Version>,
+    /// Required. The name of the package where the vulnerability was found.
+    pub package: Option<String>,
+    /// Whether this detail is obsolete. Occurrences are expected not to point to
+    /// obsolete details.
+    #[serde(rename="isObsolete")]
+    pub is_obsolete: Option<bool>,
+    /// The type of package; whether native or non native(ruby gems, node.js
+    /// packages etc).
+    #[serde(rename="packageType")]
+    pub package_type: Option<String>,
+    /// The time this information was last changed at the source. This is an
+    /// upstream timestamp from the underlying information source - e.g. Ubuntu
+    /// security tracker.
+    #[serde(rename="sourceUpdateTime")]
+    pub source_update_time: Option<String>,
+    /// The max version of the package in which the vulnerability exists.
+    #[serde(rename="maxAffectedVersion")]
+    pub max_affected_version: Option<Version>,
+    /// The fix for this specific package version.
+    #[serde(rename="fixedLocation")]
+    pub fixed_location: Option<VulnerabilityLocation>,
+}
+
+impl Part for Detail {}
+
+
+/// A CloudRepoSourceContext denotes a particular revision in a Google Cloud
+/// Source Repo.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CloudRepoSourceContext {
+    /// An alias, which may be a branch or tag.
+    #[serde(rename="aliasContext")]
+    pub alias_context: Option<AliasContext>,
+    /// A revision ID.
+    #[serde(rename="revisionId")]
+    pub revision_id: Option<String>,
+    /// The ID of the repo.
+    #[serde(rename="repoId")]
+    pub repo_id: Option<RepoId>,
+}
+
+impl Part for CloudRepoSourceContext {}
+
+
+/// A unique identifier for a Cloud Repo.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RepoId {
+    /// A combination of a project ID and a repo name.
+    #[serde(rename="projectRepoId")]
+    pub project_repo_id: Option<ProjectRepoId>,
+    /// A server-assigned, globally unique identifier.
+    pub uid: Option<String>,
+}
+
+impl Part for RepoId {}
+
+
+/// Defines an object for the environment field in in-toto links. The suggested
+/// fields are "variables", "filesystem", and "workdir".
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Environment {
+    /// no description provided
+    #[serde(rename="customValues")]
+    pub custom_values: Option<HashMap<String, String>>,
+}
+
+impl Part for Environment {}
 
 
 /// Layer holds metadata specific to a layer of a Docker image.
@@ -1019,6 +1168,24 @@ pub struct GrafeasV1beta1VulnerabilityDetails {
 impl Part for GrafeasV1beta1VulnerabilityDetails {}
 
 
+/// Selects a repo using a Google Cloud Platform project ID (e.g.,
+/// winged-cargo-31) and a repo name within that project.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProjectRepoId {
+    /// The ID of the project.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The name of the repo. Leave empty for the default repo.
+    #[serde(rename="repoName")]
+    pub repo_name: Option<String>,
+}
+
+impl Part for ProjectRepoId {}
+
+
 /// Associates `members` with a `role`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1029,9 +1196,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1219,17 +1394,22 @@ pub struct BuildProvenance {
 impl Part for BuildProvenance {}
 
 
-/// Details of an attestation occurrence.
+/// Note holding the version of the provider's builder and the signature of the
+/// provenance message in the build details occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Details {
-    /// Required. Attestation for the resource.
-    pub attestation: Option<Attestation>,
+pub struct Build {
+    /// Required. Immutable. Version of the builder which produced this build.
+    #[serde(rename="builderVersion")]
+    pub builder_version: Option<String>,
+    /// Signature of the build in occurrences pointing to this build note
+    /// containing build details.
+    pub signature: Option<BuildSignature>,
 }
 
-impl Part for Details {}
+impl Part for Build {}
 
 
 /// Details of a deployment occurrence.
@@ -1352,22 +1532,18 @@ pub struct VulnerabilityOccurrencesSummary {
 impl ResponseResult for VulnerabilityOccurrencesSummary {}
 
 
-/// Selects a repo using a Google Cloud Platform project ID (e.g.,
-/// winged-cargo-31) and a repo name within that project.
+/// Defines an object to declare an in-toto artifact rule
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProjectRepoId {
-    /// The ID of the project.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The name of the repo. Leave empty for the default repo.
-    #[serde(rename="repoName")]
-    pub repo_name: Option<String>,
+pub struct ArtifactRule {
+    /// no description provided
+    #[serde(rename="artifactRule")]
+    pub artifact_rule: Option<Vec<String>>,
 }
 
-impl Part for ProjectRepoId {}
+impl Part for ArtifactRule {}
 
 
 /// Source describes the location of the source used for the build.
@@ -1424,22 +1600,17 @@ pub struct Version {
 impl Part for Version {}
 
 
-/// Note holding the version of the provider's builder and the signature of the
-/// provenance message in the build details occurrence.
+/// Details of an attestation occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Build {
-    /// Required. Immutable. Version of the builder which produced this build.
-    #[serde(rename="builderVersion")]
-    pub builder_version: Option<String>,
-    /// Signature of the build in occurrences pointing to this build note
-    /// containing build details.
-    pub signature: Option<BuildSignature>,
+pub struct Details {
+    /// Required. Attestation for the resource.
+    pub attestation: Option<Attestation>,
 }
 
-impl Part for Build {}
+impl Part for Details {}
 
 
 /// An Identity and Access Management (IAM) policy, which specifies access
@@ -1451,10 +1622,12 @@ impl Part for Build {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -1472,7 +1645,9 @@ impl Part for Build {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -1558,6 +1733,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -1618,6 +1796,19 @@ pub struct GrafeasV1beta1ImageDetails {
 impl Part for GrafeasV1beta1ImageDetails {}
 
 
+/// Defines a hash object for use in Materials and Products.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArtifactHashes {
+    /// no description provided
+    pub sha256: Option<String>,
+}
+
+impl Part for ArtifactHashes {}
+
+
 /// Details of a package occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1650,6 +1841,23 @@ pub struct SourceContext {
 }
 
 impl Part for SourceContext {}
+
+
+/// This corresponds to a signed in-toto link - it is made up of one or more
+/// signatures and the in-toto link itself. This is used for occurrences of a
+/// Grafeas in-toto note.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GrafeasV1beta1IntotoDetails {
+    /// no description provided
+    pub signatures: Option<Vec<GrafeasV1beta1IntotoSignature>>,
+    /// no description provided
+    pub signed: Option<Link>,
+}
+
+impl Part for GrafeasV1beta1IntotoDetails {}
 
 
 /// Derived describes the derived image portion (Occurrence) of the DockerImage
@@ -1764,6 +1972,22 @@ pub struct Deployment {
 }
 
 impl Part for Deployment {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GrafeasV1beta1IntotoArtifact {
+    /// no description provided
+    #[serde(rename="resourceUri")]
+    pub resource_uri: Option<String>,
+    /// no description provided
+    pub hashes: Option<ArtifactHashes>,
+}
+
+impl Part for GrafeasV1beta1IntotoArtifact {}
 
 
 /// Message encapsulating the signature of the verified build.
@@ -2066,7 +2290,7 @@ pub struct Signature {
     /// The identifier for the public key that verifies this signature.
     /// 
     /// * The `public_key_id` is required.
-    /// * The `public_key_id` MUST be an RFC3986 conformant URI.
+    /// * The `public_key_id` SHOULD be an RFC3986 conformant URI.
     /// * When possible, the `public_key_id` SHOULD be an immutable reference,
     ///   such as a cryptographic digest.
     /// 
@@ -2172,6 +2396,21 @@ pub struct Location {
 impl Part for Location {}
 
 
+/// A signature object consists of the KeyID used and the signature itself.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GrafeasV1beta1IntotoSignature {
+    /// no description provided
+    pub keyid: Option<String>,
+    /// no description provided
+    pub sig: Option<String>,
+}
+
+impl Part for GrafeasV1beta1IntotoSignature {}
+
+
 /// Common Vulnerability Scoring System version 3.
 /// For details, see https://www.first.org/cvss/specification-document
 /// 
@@ -2248,6 +2487,8 @@ pub struct Occurrence {
     pub discovered: Option<GrafeasV1beta1DiscoveryDetails>,
     /// Describes an attestation of an artifact.
     pub attestation: Option<Details>,
+    /// Describes a specific in-toto link.
+    pub intoto: Option<GrafeasV1beta1IntotoDetails>,
     /// Describes a verifiable build.
     pub build: Option<GrafeasV1beta1BuildDetails>,
     /// Describes the deployment of an artifact on a runtime.
@@ -2288,6 +2529,10 @@ pub struct GetPolicyOptions {
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }

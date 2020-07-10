@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20200407*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Logging* API at revision *20200624*. The CLI is at version *1.0.14*.
 
 ```bash
 logging2 [options]

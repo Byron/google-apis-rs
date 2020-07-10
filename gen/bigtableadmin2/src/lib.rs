@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Bigtable Admin* crate version *1.0.13+20200211*, where *20200211* is the exact revision of the *bigtableadmin:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Bigtable Admin* crate version *1.0.14+20200609*, where *20200609* is the exact revision of the *bigtableadmin:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Bigtable Admin* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigtable/).
@@ -365,7 +365,7 @@ impl<'a, C, A> BigtableAdmin<C, A>
         BigtableAdmin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://bigtableadmin.googleapis.com/".to_string(),
             _root_url: "https://bigtableadmin.googleapis.com/".to_string(),
         }
@@ -379,7 +379,7 @@ impl<'a, C, A> BigtableAdmin<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -477,8 +477,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -509,9 +509,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -608,8 +616,7 @@ pub struct Instance {
     /// to avoid confusion.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// (`OutputOnly`)
-    /// The current state of the instance.
+    /// Output only. The current state of the instance.
     pub state: Option<String>,
     /// Required. Labels are a flexible and lightweight mechanism for organizing cloud
     /// resources into groups that reflect a customer's organizational needs and
@@ -626,7 +633,6 @@ pub struct Instance {
     /// Required. The type of the instance. Defaults to `PRODUCTION`.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Required. (`OutputOnly`)
     /// The unique name of the instance. Values are of the form
     /// `projects/{project}/instances/a-z+[a-z0-9]`.
     pub name: Option<String>,
@@ -831,10 +837,12 @@ impl Part for Status {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -852,7 +860,9 @@ impl Part for Status {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -943,6 +953,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -964,8 +977,7 @@ impl ResponseResult for Policy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Cluster {
-    /// (`CreationOnly`)
-    /// The type of storage used by this cluster to serve its
+    /// Immutable. The type of storage used by this cluster to serve its
     /// parent instance's tables, unless explicitly overridden.
     #[serde(rename="defaultStorageType")]
     pub default_storage_type: Option<String>,
@@ -973,18 +985,15 @@ pub struct Cluster {
     /// throughput and more consistent performance.
     #[serde(rename="serveNodes")]
     pub serve_nodes: Option<i32>,
-    /// (`CreationOnly`)
-    /// The location where this cluster's nodes and storage reside. For best
+    /// Immutable. The location where this cluster's nodes and storage reside. For best
     /// performance, clients should be located as close as possible to this
     /// cluster. Currently only zones are supported, so values should be of the
     /// form `projects/{project}/locations/{zone}`.
     pub location: Option<String>,
-    /// Required. (`OutputOnly`)
     /// The unique name of the cluster. Values are of the form
     /// `projects/{project}/instances/{instance}/clusters/a-z*`.
     pub name: Option<String>,
-    /// (`OutputOnly`)
-    /// The current state of the cluster.
+    /// Output only. The current state of the cluster.
     pub state: Option<String>,
 }
 
@@ -1096,7 +1105,7 @@ impl Part for Intersection {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1135,7 +1144,7 @@ impl Part for AuditLogConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
     /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
-    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    /// `GetIamPolicy`.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -1410,11 +1419,10 @@ pub struct AppProfile {
     /// Use a single-cluster routing policy.
     #[serde(rename="singleClusterRouting")]
     pub single_cluster_routing: Option<SingleClusterRouting>,
-    /// Optional long form description of the use case for this AppProfile.
+    /// Long form description of the use case for this AppProfile.
     pub description: Option<String>,
-    /// (`OutputOnly`)
     /// The unique name of the app profile. Values are of the form
-    /// `projects/<project>/instances/<instance>/appProfiles/_a-zA-Z0-9*`.
+    /// `projects/{project}/instances/{instance}/appProfiles/_a-zA-Z0-9*`.
     pub name: Option<String>,
 }
 
@@ -1456,6 +1464,10 @@ pub struct GetPolicyOptions {
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -1514,7 +1526,7 @@ impl Part for ClusterState {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1523,18 +1535,18 @@ impl Part for ClusterState {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -1604,18 +1616,16 @@ pub struct Table {
     /// Views: `REPLICATION_VIEW`, `FULL`
     #[serde(rename="clusterStates")]
     pub cluster_states: Option<HashMap<String, ClusterState>>,
-    /// (`CreationOnly`)
     /// The column families configured for this table, mapped by column family ID.
     /// Views: `SCHEMA_VIEW`, `FULL`
     #[serde(rename="columnFamilies")]
     pub column_families: Option<HashMap<String, ColumnFamily>>,
-    /// Output only. The unique name of the table. Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/_a-zA-Z0-9*`.
+    /// The unique name of the table. Values are of the form
+    /// `projects/{project}/instances/{instance}/tables/_a-zA-Z0-9*`.
     /// Views: `NAME_ONLY`, `SCHEMA_VIEW`, `REPLICATION_VIEW`, `FULL`
     pub name: Option<String>,
-    /// (`CreationOnly`)
-    /// The granularity (i.e. `MILLIS`) at which timestamps are stored in
-    /// this table. Timestamps not matching the granularity will be rejected.
+    /// Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored in this
+    /// table. Timestamps not matching the granularity will be rejected.
     /// If unspecified at creation time, the value will be set to `MILLIS`.
     /// Views: `SCHEMA_VIEW`, `FULL`.
     pub granularity: Option<String>,
@@ -2051,9 +2061,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - (`OutputOnly`)
-    ///            The unique name of the app profile. Values are of the form
-    ///            `projects/<project>/instances/<instance>/appProfiles/_a-zA-Z0-9*`.
+    /// * `name` - The unique name of the app profile. Values are of the form
+    ///            `projects/{project}/instances/{instance}/appProfiles/_a-zA-Z0-9*`.
     pub fn instances_app_profiles_patch(&self, request: AppProfile, name: &str) -> ProjectInstanceAppProfilePatchCall<'a, C, A> {
         ProjectInstanceAppProfilePatchCall {
             hub: self.hub,
@@ -2097,8 +2106,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. (`OutputOnly`)
-    ///            The unique name of the cluster. Values are of the form
+    /// * `name` - The unique name of the cluster. Values are of the form
     ///            `projects/{project}/instances/{instance}/clusters/a-z*`.
     pub fn instances_clusters_update(&self, request: Cluster, name: &str) -> ProjectInstanceClusterUpdateCall<'a, C, A> {
         ProjectInstanceClusterUpdateCall {
@@ -2218,7 +2226,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a Table or Backup resource.
+    /// Gets the access control policy for a Table resource.
     /// Returns an empty policy if the resource exists but does not have a policy
     /// set.
     /// 
@@ -2276,7 +2284,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a Table or Backup resource.
+    /// Gets the access control policy for a Table resource.
     /// Returns an empty policy if the resource exists but does not have a policy
     /// set.
     /// 
@@ -2365,8 +2373,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. (`OutputOnly`)
-    ///            The unique name of the instance. Values are of the form
+    /// * `name` - The unique name of the instance. Values are of the form
     ///            `projects/{project}/instances/a-z+[a-z0-9]`.
     pub fn instances_partial_update_instance(&self, request: Instance, name: &str) -> ProjectInstancePartialUpdateInstanceCall<'a, C, A> {
         ProjectInstancePartialUpdateInstanceCall {
@@ -2407,8 +2414,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. (`OutputOnly`)
-    ///            The unique name of the instance. Values are of the form
+    /// * `name` - The unique name of the instance. Values are of the form
     ///            `projects/{project}/instances/a-z+[a-z0-9]`.
     pub fn instances_update(&self, request: Instance, name: &str) -> ProjectInstanceUpdateCall<'a, C, A> {
         ProjectInstanceUpdateCall {
@@ -2489,7 +2495,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on a Table or Backup resource.
+    /// Sets the access control policy on a Table resource.
     /// Replaces any existing policy.
     /// 
     /// # Arguments
@@ -2567,7 +2573,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on a Table or Backup resource.
+    /// Sets the access control policy on a Table resource.
     /// Replaces any existing policy.
     /// 
     /// # Arguments
@@ -6137,9 +6143,8 @@ impl<'a, C, A> ProjectInstanceAppProfilePatchCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// (`OutputOnly`)
     /// The unique name of the app profile. Values are of the form
-    /// `projects/<project>/instances/<instance>/appProfiles/_a-zA-Z0-9*`.
+    /// `projects/{project}/instances/{instance}/appProfiles/_a-zA-Z0-9*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6729,7 +6734,6 @@ impl<'a, C, A> ProjectInstanceClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// Required. (`OutputOnly`)
     /// The unique name of the cluster. Values are of the form
     /// `projects/{project}/instances/{instance}/clusters/a-z*`.
     ///
@@ -8243,7 +8247,7 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Gets the access control policy for a Table or Backup resource.
+/// Gets the access control policy for a Table resource.
 /// Returns an empty policy if the resource exists but does not have a policy
 /// set.
 ///
@@ -9041,7 +9045,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Gets the access control policy for a Table or Backup resource.
+/// Gets the access control policy for a Table resource.
 /// Returns an empty policy if the resource exists but does not have a policy
 /// set.
 ///
@@ -10390,7 +10394,6 @@ impl<'a, C, A> ProjectInstancePartialUpdateInstanceCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// Required. (`OutputOnly`)
     /// The unique name of the instance. Values are of the form
     /// `projects/{project}/instances/a-z+[a-z0-9]`.
     ///
@@ -10942,7 +10945,6 @@ impl<'a, C, A> ProjectInstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Required. (`OutputOnly`)
     /// The unique name of the instance. Values are of the form
     /// `projects/{project}/instances/a-z+[a-z0-9]`.
     ///
@@ -11887,7 +11889,7 @@ impl<'a, C, A> ProjectInstanceTableModifyColumnFamilyCall<'a, C, A> where C: Bor
 }
 
 
-/// Sets the access control policy on a Table or Backup resource.
+/// Sets the access control policy on a Table resource.
 /// Replaces any existing policy.
 ///
 /// A builder for the *instances.tables.setIamPolicy* method supported by a *project* resource.
@@ -12971,7 +12973,7 @@ impl<'a, C, A> ProjectInstanceTableDeleteCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Sets the access control policy on a Table or Backup resource.
+/// Sets the access control policy on a Table resource.
 /// Replaces any existing policy.
 ///
 /// A builder for the *instances.clusters.backups.setIamPolicy* method supported by a *project* resource.

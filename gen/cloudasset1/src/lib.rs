@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Asset* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *cloudasset:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Asset* crate version *1.0.14+20200613*, where *20200613* is the exact revision of the *cloudasset:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Asset* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/asset-inventory/docs/quickstart).
@@ -339,7 +339,7 @@ impl<'a, C, A> CloudAsset<C, A>
         CloudAsset {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://cloudasset.googleapis.com/".to_string(),
             _root_url: "https://cloudasset.googleapis.com/".to_string(),
         }
@@ -356,7 +356,7 @@ impl<'a, C, A> CloudAsset<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -430,7 +430,7 @@ impl Part for GoogleCloudOrgpolicyV1RestoreDefault {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportAssetsRequest {
-    /// A list of asset types of which to take a snapshot for. For example:
+    /// A list of asset types of which to take a snapshot for. Example:
     /// "compute.googleapis.com/Disk". If specified, only matching assets will be
     /// returned. See [Introduction to Cloud Asset
     /// Inventory](https://cloud.google.com/asset-inventory/docs/overview)
@@ -441,8 +441,7 @@ pub struct ExportAssetsRequest {
     /// returned.
     #[serde(rename="contentType")]
     pub content_type: Option<String>,
-    /// Required. Output configuration indicating where the results will be output
-    /// to. All results will be in newline delimited JSON format.
+    /// Required. Output configuration indicating where the results will be output to.
     #[serde(rename="outputConfig")]
     pub output_config: Option<OutputConfig>,
     /// Timestamp to take an asset snapshot. This can only be set to a timestamp
@@ -457,7 +456,7 @@ pub struct ExportAssetsRequest {
 impl RequestValue for ExportAssetsRequest {}
 
 
-/// A time window specified by its "start_time" and "end_time".
+/// A time window specified by its `start_time` and `end_time`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -544,19 +543,26 @@ impl Part for GoogleIdentityAccesscontextmanagerV1Condition {}
 /// [resource
 /// hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
 /// a resource outside the Google Cloud resource hierarchy (such as Google
-/// Kubernetes Engine clusters and objects), or a Cloud IAM policy.
+/// Kubernetes Engine clusters and objects), or a policy (e.g. Cloud IAM policy).
+/// See [Supported asset
+/// types](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
+/// for more information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Asset {
-    /// The type of the asset. For example: "compute.googleapis.com/Disk"
+    /// The type of the asset. Example: `compute.googleapis.com/Disk`
     /// 
     /// See [Supported asset
     /// types](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
     /// for more information.
     #[serde(rename="assetType")]
     pub asset_type: Option<String>,
+    /// The last update timestamp of an asset. update_time is updated when
+    /// create/update/delete operation is performed.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
     /// The ancestry path of an asset in Google Cloud [resource
     /// hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
     /// represented as a list of relative resource names. An ancestry path starts
@@ -564,12 +570,12 @@ pub struct Asset {
     /// is a project, folder, or organization, the ancestry path starts from the
     /// asset itself.
     /// 
-    /// For example: `["projects/123456789", "folders/5432", "organizations/1234"]`
+    /// Example: `["projects/123456789", "folders/5432", "organizations/1234"]`
     pub ancestors: Option<Vec<String>>,
     /// A representation of the resource.
     pub resource: Option<ResourceType>,
-    /// The full name of the asset. For example:
-    /// "//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1"
+    /// The full name of the asset. Example:
+    /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`
     /// 
     /// See [Resource
     /// names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
@@ -581,10 +587,12 @@ pub struct Asset {
     /// set on a given resource.
     #[serde(rename="orgPolicy")]
     pub org_policy: Option<Vec<GoogleCloudOrgpolicyV1Policy>>,
-    /// no description provided
+    /// Please also refer to the [access policy user
+    /// guide](https://cloud.google.com/access-context-manager/docs/overview#access-policies).
     #[serde(rename="accessPolicy")]
     pub access_policy: Option<GoogleIdentityAccesscontextmanagerV1AccessPolicy>,
-    /// no description provided
+    /// Please also refer to the [service perimeter user
+    /// guide](https://cloud.google.com/vpc-service-controls/docs/overview).
     #[serde(rename="servicePerimeter")]
     pub service_perimeter: Option<GoogleIdentityAccesscontextmanagerV1ServicePerimeter>,
     /// A representation of the Cloud IAM policy set on a Google Cloud resource.
@@ -598,7 +606,8 @@ pub struct Asset {
     /// more information.
     #[serde(rename="iamPolicy")]
     pub iam_policy: Option<Policy>,
-    /// no description provided
+    /// Please also refer to the [access level user
+    /// guide](https://cloud.google.com/access-context-manager/docs/overview#access-levels).
     #[serde(rename="accessLevel")]
     pub access_level: Option<GoogleIdentityAccesscontextmanagerV1AccessLevel>,
 }
@@ -615,10 +624,12 @@ impl Part for Asset {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -636,7 +647,9 @@ impl Part for Asset {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -717,6 +730,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -773,7 +789,7 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// A BigQuery destination.
+/// A BigQuery destination for exporting assets to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -917,9 +933,7 @@ impl Part for GoogleIdentityAccesscontextmanagerV1OsConstraint {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OutputConfig {
     /// Destination on BigQuery. The output table stores the fields in asset
-    /// proto as columns in BigQuery. The resource/iam_policy field is converted
-    /// to a record with each field to a column, except metadata to a single JSON
-    /// string.
+    /// proto as columns in BigQuery.
     #[serde(rename="bigqueryDestination")]
     pub bigquery_destination: Option<BigQueryDestination>,
     /// Destination on Cloud Storage.
@@ -962,10 +976,10 @@ impl RequestValue for CreateFeedRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GcsDestination {
-    /// The uri prefix of all generated Cloud Storage objects. For example:
+    /// The uri prefix of all generated Cloud Storage objects. Example:
     /// "gs://bucket_name/object_name_prefix". Each object uri is in format:
     /// "gs://bucket_name/object_name_prefix/<asset type>/<shard number> and only
-    /// contains assets for that type. <shard number> starts from 0. For example:
+    /// contains assets for that type. <shard number> starts from 0. Example:
     /// "gs://bucket_name/object_name_prefix/compute.googleapis.com/Disk/0" is
     /// the first shard of output objects containing all
     /// compute.googleapis.com/Disk assets. An INVALID_ARGUMENT error will be
@@ -974,7 +988,7 @@ pub struct GcsDestination {
     #[serde(rename="uriPrefix")]
     pub uri_prefix: Option<String>,
     /// The uri of the Cloud Storage object. It's the same uri that is used by
-    /// gsutil. For example: "gs://bucket_name/object_name". See [Viewing and
+    /// gsutil. Example: "gs://bucket_name/object_name". See [Viewing and
     /// Editing Object
     /// Metadata](https://cloud.google.com/storage/docs/viewing-editing-metadata)
     /// for more information.
@@ -1055,7 +1069,7 @@ impl Part for GoogleIdentityAccesscontextmanagerV1ServicePerimeter {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1120,15 +1134,18 @@ impl Part for GoogleIdentityAccesscontextmanagerV1ServicePerimeterConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceType {
-    /// The API version. For example: "v1"
+    /// The API version. Example: `v1`
     pub version: Option<String>,
     /// The REST URL for accessing the resource. An HTTP `GET` request using this
-    /// URL returns the resource itself. For example:
-    /// "https://cloudresourcemanager.googleapis.com/v1/projects/my-project-123"
+    /// URL returns the resource itself. Example:
+    /// `https://cloudresourcemanager.googleapis.com/v1/projects/my-project-123`
     /// 
     /// This value is unspecified for resources without a REST API.
     #[serde(rename="resourceUrl")]
     pub resource_url: Option<String>,
+    /// The location of the resource in Google Cloud, such as its zone and region.
+    /// For more information, see https://cloud.google.com/about/locations/.
+    pub location: Option<String>,
     /// The full name of the immediate parent of this resource. See
     /// [Resource
     /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
@@ -1137,14 +1154,14 @@ pub struct ResourceType {
     /// For Google Cloud assets, this value is the parent resource defined in the
     /// [Cloud IAM policy
     /// hierarchy](https://cloud.google.com/iam/docs/overview#policy_hierarchy).
-    /// For example:
-    /// "//cloudresourcemanager.googleapis.com/projects/my_project_123"
+    /// Example:
+    /// `//cloudresourcemanager.googleapis.com/projects/my_project_123`
     /// 
     /// For third-party assets, this field may be set differently.
     pub parent: Option<String>,
     /// The URL of the discovery document containing the resource's JSON schema.
-    /// For example:
-    /// "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest"
+    /// Example:
+    /// `https://www.googleapis.com/discovery/v1/apis/compute/v1/rest`
     /// 
     /// This value is unspecified for resources that do not have an API based on a
     /// discovery document, such as Cloud Bigtable.
@@ -1153,8 +1170,8 @@ pub struct ResourceType {
     /// The content of the resource, in which some sensitive fields are removed
     /// and may not be present.
     pub data: Option<HashMap<String, String>>,
-    /// The JSON schema name listed in the discovery document. For example:
-    /// "Project"
+    /// The JSON schema name listed in the discovery document. Example:
+    /// `Project`
     /// 
     /// This value is unspecified for resources that do not have an API based on a
     /// discovery document, such as Cloud Bigtable.
@@ -1233,7 +1250,7 @@ impl Part for Expr {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PubsubDestination {
     /// The name of the Pub/Sub topic to publish to.
-    /// For example: `projects/PROJECT_ID/topics/TOPIC_ID`.
+    /// Example: `projects/PROJECT_ID/topics/TOPIC_ID`.
     pub topic: Option<String>,
 }
 
@@ -1292,7 +1309,7 @@ pub struct GoogleCloudOrgpolicyV1ListPolicy {
     pub allowed_values: Option<Vec<String>>,
     /// Determines the inheritance behavior for this `Policy`.
     /// 
-    /// By default, a `ListPolicy` set at a resource supercedes any `Policy` set
+    /// By default, a `ListPolicy` set at a resource supersedes any `Policy` set
     /// anywhere up the resource hierarchy. However, if `inherit_from_parent` is
     /// set to `true`, then the values from the effective `Policy` of the parent
     /// resource are inherited, meaning the values set in this `Policy` are
@@ -1482,8 +1499,8 @@ impl Part for GoogleIdentityAccesscontextmanagerV1BasicLevel {}
 pub struct Feed {
     /// A list of types of the assets to receive updates. You must specify either
     /// or both of asset_names and asset_types. Only asset updates matching
-    /// specified asset_names and asset_types are exported to the feed.
-    /// For example: `"compute.googleapis.com/Disk"`
+    /// specified asset_names or asset_types are exported to the feed.
+    /// Example: `"compute.googleapis.com/Disk"`
     /// 
     /// See [this
     /// topic](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
@@ -1492,8 +1509,8 @@ pub struct Feed {
     pub asset_types: Option<Vec<String>>,
     /// A list of the full names of the assets to receive updates. You must specify
     /// either or both of asset_names and asset_types. Only asset updates matching
-    /// specified asset_names and asset_types are exported to the feed. For
-    /// example:
+    /// specified asset_names or asset_types are exported to the feed.
+    /// Example:
     /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
     /// See [Resource
     /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
@@ -1603,6 +1620,10 @@ pub struct GoogleCloudOrgpolicyV1Policy {
     /// The name of the `Constraint` the `Policy` is configuring, for example,
     /// `constraints/serviceuser.services`.
     /// 
+    /// A [list of available
+    /// constraints](/resource-manager/docs/organization-policy/org-policy-constraints)
+    /// is available.
+    /// 
     /// Immutable after creation.
     pub constraint: Option<String>,
     /// Restores the default behavior of the constraint; independent of
@@ -1630,9 +1651,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1718,7 +1747,7 @@ impl ResponseResult for BatchGetAssetsHistoryResponse {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1727,18 +1756,18 @@ impl ResponseResult for BatchGetAssetsHistoryResponse {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -2115,10 +2144,10 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Batch gets the update history of assets that overlap a time window.
-    /// For RESOURCE content, this API outputs history with asset in both
-    /// non-delete or deleted status.
     /// For IAM_POLICY content, this API outputs history when the asset and its
     /// attached IAM POLICY both exist. This can create gaps in the output history.
+    /// Otherwise, this API outputs history with asset in both non-delete or
+    /// deleted status.
     /// If a specified asset does not exist, this API returns an INVALID_ARGUMENT
     /// error.
     /// 
@@ -2144,9 +2173,15 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Exports assets with time and resource types to a given Cloud Storage
-    /// location. The output format is newline-delimited JSON.
-    /// This API implements the google.longrunning.Operation API allowing you
-    /// to keep track of the export.
+    /// location/BigQuery table. For Cloud Storage location destinations, the
+    /// output format is newline-delimited JSON. Each line represents a
+    /// google.cloud.asset.v1.Asset in the JSON format; for BigQuery table
+    /// destinations, the output table stores the fields in asset proto as columns.
+    /// This API implements the google.longrunning.Operation API
+    /// , which allows you to keep track of the export. We recommend intervals of
+    /// at least 2 seconds with exponential retry to poll the export operation
+    /// result. For regular-size resource parent, the export operation usually
+    /// finishes within 5 minutes.
     /// 
     /// # Arguments
     ///
@@ -3783,10 +3818,10 @@ impl<'a, C, A> FeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
 
 /// Batch gets the update history of assets that overlap a time window.
-/// For RESOURCE content, this API outputs history with asset in both
-/// non-delete or deleted status.
 /// For IAM_POLICY content, this API outputs history when the asset and its
 /// attached IAM POLICY both exist. This can create gaps in the output history.
+/// Otherwise, this API outputs history with asset in both non-delete or
+/// deleted status.
 /// If a specified asset does not exist, this API returns an INVALID_ARGUMENT
 /// error.
 ///
@@ -4025,13 +4060,11 @@ impl<'a, C, A> MethodBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hype
         self._content_type = Some(new_value.to_string());
         self
     }
-    /// A list of the full names of the assets. For example:
+    /// A list of the full names of the assets.
+    /// See: https://cloud.google.com/asset-inventory/docs/resource-name-format
+    /// Example:
+    /// 
     /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.
-    /// See [Resource
-    /// Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
-    /// and [Resource Name
-    /// Format](https://cloud.google.com/asset-inventory/docs/resource-name-format)
-    /// for more info.
     /// 
     /// The request becomes a no-op if the asset name list is empty, and the max
     /// size of the asset name list is 100 in one request.
@@ -4106,9 +4139,15 @@ impl<'a, C, A> MethodBatchGetAssetsHistoryCall<'a, C, A> where C: BorrowMut<hype
 
 
 /// Exports assets with time and resource types to a given Cloud Storage
-/// location. The output format is newline-delimited JSON.
-/// This API implements the google.longrunning.Operation API allowing you
-/// to keep track of the export.
+/// location/BigQuery table. For Cloud Storage location destinations, the
+/// output format is newline-delimited JSON. Each line represents a
+/// google.cloud.asset.v1.Asset in the JSON format; for BigQuery table
+/// destinations, the output table stores the fields in asset proto as columns.
+/// This API implements the google.longrunning.Operation API
+/// , which allows you to keep track of the export. We recommend intervals of
+/// at least 2 seconds with exponential retry to poll the export operation
+/// result. For regular-size resource parent, the export operation usually
+/// finishes within 5 minutes.
 ///
 /// A builder for the *exportAssets* method.
 /// It is not used directly, but through a `MethodMethods` instance.

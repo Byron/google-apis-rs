@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Drive Activity* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Drive Activity* crate version *1.0.14+20200707*, where *20200707* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Drive Activity* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/activity/).
@@ -333,7 +333,7 @@ impl<'a, C, A> DriveActivityHub<C, A>
         DriveActivityHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://driveactivity.googleapis.com/".to_string(),
             _root_url: "https://driveactivity.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> DriveActivityHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1133,19 +1133,23 @@ pub struct QueryDriveActivityRequest {
     ///   Examples:
     ///   
     ///   * <tt>detail.action_detail_case: RENAME</tt>
-    ///   * <tt>detail.action_detail_case:(CREATE UPLOAD)</tt>
+    ///   * <tt>detail.action_detail_case:(CREATE EDIT)</tt>
     ///   * <tt>-detail.action_detail_case:MOVE</tt>
     pub filter: Option<String>,
-    /// The next_page_token value returned from a previous QueryDriveActivity
-    /// request, if any.
+    /// The token identifying which page of results to return. Set this to the
+    /// next_page_token value returned from a previous query to obtain the
+    /// following page of results. If not set, the first page of results will be
+    /// returned.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// Details on how to consolidate related actions that make up the activity. If
-    /// not set, then related actions will not be consolidated.
+    /// not set, then related actions are not consolidated.
     #[serde(rename="consolidationStrategy")]
     pub consolidation_strategy: Option<ConsolidationStrategy>,
-    /// The requested number of activity to return. If not set, a default value
-    /// will be used.
+    /// The miminum number of activities desired in the response; the server will
+    /// attempt to return at least this quanitity. The server may also return fewer
+    /// activities if it has a partial response ready before the request times out.
+    /// If not set, a default value is used.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// Return activities for this Drive folder and all children and descendants.

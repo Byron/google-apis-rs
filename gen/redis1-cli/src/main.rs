@@ -1208,11 +1208,9 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudRedis::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "alt", "callback", "fields", "key", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
-                    ("access-token", "access_token"),
-                    ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
                     ("upload-type", "uploadType"),
@@ -1265,7 +1263,7 @@ fn main() {
                     Some(r##"Creates a Redis instance based on the specified tier and memory size.
         
         By default, the instance is accessible from the project's
-        [default network](/compute/docs/networks-and-firewalls#networks).
+        [default network](https://cloud.google.com/vpc/docs/vpc).
         
         The creation is executed asynchronously and callers may check the returned
         operation to track its progress. Once the operation is completed the Redis
@@ -1696,7 +1694,7 @@ fn main() {
     
     let mut app = App::new("redis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200402")
+           .version("1.0.14+20200623")
            .about("Creates and manages Redis instances on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_redis1_cli")
            .arg(Arg::with_name("url")

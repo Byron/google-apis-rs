@@ -4,7 +4,7 @@
 [package]
 
 name = "google-consumersurveys2-cli"
-version = "1.0.13+20170407"
+version = "1.0.14+20170407"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Consumer Surveys (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/consumersurveys2-cli"
@@ -41,4 +41,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-consumersurveys2]
 path = "../consumersurveys2"
-version = "1.0.13+20170407"
+version = "1.0.14+20170407"

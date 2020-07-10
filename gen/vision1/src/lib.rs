@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Vision* crate version *1.0.13+20200329*, where *20200329* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Vision* crate version *1.0.14+20200619*, where *20200619* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Vision* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/vision/).
@@ -349,7 +349,7 @@ impl<'a, C, A> Vision<C, A>
         Vision {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://vision.googleapis.com/".to_string(),
             _root_url: "https://vision.googleapis.com/".to_string(),
         }
@@ -372,7 +372,7 @@ impl<'a, C, A> Vision<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2281,7 +2281,7 @@ pub struct ImageContext {
     /// setting a hint will help get better results (although it will be a
     /// significant hindrance if the hint is wrong). Text detection returns an
     /// error if one or more of the specified languages is not one of the
-    /// [supported languages](/vision/docs/languages).
+    /// [supported languages](https://cloud.google.com/vision/docs/languages).
     #[serde(rename="languageHints")]
     pub language_hints: Option<Vec<String>>,
     /// Parameters for product search.
@@ -2374,6 +2374,10 @@ impl Part for Page {}
 /// that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB,
 /// DCI-P3, BT.2020, etc.). By default, applications SHOULD assume the sRGB color
 /// space.
+/// 
+/// Note: when color equality needs to be decided, implementations, unless
+/// documented otherwise, will treat two colors to be equal if all their red,
+/// green, blue and alpha values each differ by at most 1e-5.
 /// 
 /// Example (Java):
 /// 

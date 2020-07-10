@@ -2430,7 +2430,7 @@ fn main() {
         <br>
         <br>Since a FirebaseProject is actually also a GCP `Project`, a
         `FirebaseProject` uses underlying GCP identifiers (most importantly,
-        the `projectId`) as its own for easy interop with GCP APIs.
+        the `PROJECT_NUMBER`) as its own for easy interop with GCP APIs.
         <br>
         <br>The result of this call is an [`Operation`](../../v1beta1/operations).
         Poll the `Operation` to track the provisioning process by calling
@@ -2448,18 +2448,21 @@ fn main() {
         <br>This method does not modify any billing account information on the
         underlying GCP `Project`.
         <br>
-        <br>To call `AddFirebase`, a member must be an Editor or Owner for the
-        existing GCP `Project`. Service accounts cannot call `AddFirebase`."##),
+        <br>To call `AddFirebase`, a project member or service account must have
+        the following permissions (the IAM roles of Editor and Owner contain these
+        permissions):
+        `firebase.projects.update`, `resourcemanager.projects.get`,
+        `serviceusage.services.enable`, and `serviceusage.services.get`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_add-firebase",
                   vec![
                     (Some(r##"project"##),
                      None,
                      Some(r##"The resource name of the GCP `Project` to which Firebase resources will be
         added, in the format:
-        <br><code>projects/<var>projectId</var></code>
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>
         After calling `AddFirebase`, the
-        [`projectId`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
-        of the GCP `Project` is also the `projectId` of the FirebaseProject."##),
+        [`project_id`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
+        of the GCP `Project` is also the `project_id` of the FirebaseProject."##),
                      Some(true),
                      Some(false)),
         
@@ -2541,7 +2544,7 @@ fn main() {
                      None,
                      Some(r##"The parent `FirebaseProject` to link to an existing Google Analytics
         account, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2574,7 +2577,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project in which to create an App, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2603,10 +2606,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name of the App, in the format:
-        <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>appId</var></code>"##),
+        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2630,10 +2633,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the App configuration to download, in the format:
-        <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/config</code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/config</code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>appId</var></code>"##),
+        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2660,7 +2663,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2713,10 +2716,10 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent App to which a SHA certificate will be added, in the format:
-        <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>appId</var></code>"##),
+        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2745,7 +2748,7 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name of the `sha-key`, in the format:
-        <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>/sha/<var>shaId</var></code>
+        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/sha/<var>SHA_ID</var></code>
         <br>You can obtain the full name from the response of
         [`ListShaCertificates`](../projects.androidApps.sha/list) or the original
         [`CreateShaCertificate`](../projects.androidApps.sha/create)."##),
@@ -2772,10 +2775,10 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent App for which to list SHA certificates, in the format:
-        <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>appId</var></code>"##),
+        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2807,9 +2810,8 @@ fn main() {
         restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
         for the specified Project and, thus, might return a subset of all possible
         GCP resource locations. To list all GCP resource locations (regardless of
-        any restrictions), call the endpoint without specifying a `projectId` (that
-        is, `/v1beta1/{parent=projects/-}/listAvailableLocations`).
-        <br>
+        any restrictions), call the endpoint without specifying a `PROJECT_NUMBER`
+        (that is, `/v1beta1/{parent=projects/-}/listAvailableLocations`). <br>
         <br>To call `ListAvailableLocations` with a specified project, a member
         must be at minimum a Viewer of the project. Calls without a specified
         project do not require any specific project permissions."##),
@@ -2818,7 +2820,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The Project for which to list GCP resource locations, in the format:
-        <br><code>projects/<var>projectId</var></code>
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>
         <br>If no project is specified (that is, `projects/-`), the returned list
         does not take into account org-specific or project-specific location
         restrictions."##),
@@ -2882,7 +2884,7 @@ fn main() {
                      None,
                      Some(r##"The resource name of the Project for which the default GCP resource
         location will be set, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2911,7 +2913,7 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name of the Project, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2938,7 +2940,7 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name of the Project, in the format:
-        <br><code>projects/<var>projectId</var>/adminSdkConfig</code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var>/adminSdkConfig</code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2965,7 +2967,7 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name, in the format:
-        <br><code>projects/<var>projectId</var>/analyticsDetails</code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var>/analyticsDetails</code>"##),
                      Some(true),
                      Some(false)),
         
@@ -2992,7 +2994,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project in which to create an App, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3021,10 +3023,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name of the App, in the format:
-        <code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var></code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/iosApps/<var>appId</var></code>"##),
+        <br><code>projects/-/iosApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3047,10 +3049,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the App configuration to download, in the format:
-        <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var>/config</code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var>/config</code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/iosApps/<var>appId</var></code>"##),
+        <br><code>projects/-/iosApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3077,7 +3079,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3208,7 +3210,7 @@ fn main() {
                      None,
                      Some(r##"The parent `FirebaseProject` to unlink from its Google Analytics account,
         in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3242,7 +3244,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3269,7 +3271,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project in which to create an App, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3298,10 +3300,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The fully qualified resource name of the App, in the format:
-        <br><code>projects/<var>projectId</var>/webApps/<var>appId</var></code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var></code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/webApps/<var>appId</var></code>"##),
+        <br><code>projects/-/webApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3324,10 +3326,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the App configuration to download, in the format:
-        <br><code>projects/<var>projectId</var>/webApps/<var>appId</var>/config</code>
-        <br>As an <var>appId</var> is a unique identifier, the Unique Resource
+        <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var>/config</code>
+        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
         from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/webApps/<var>appId</var></code>"##),
+        <br><code>projects/-/webApps/<var>APP_ID</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3354,7 +3356,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
                      Some(true),
                      Some(false)),
         
@@ -3406,7 +3408,7 @@ fn main() {
     
     let mut app = App::new("firebase1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200407")
+           .version("1.0.14+20200707")
            .about("The Firebase Management API enables programmatic setup and management of Firebase projects, including a project's Firebase resources and Firebase apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli")
            .arg(Arg::with_name("url")

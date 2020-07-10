@@ -1819,8 +1819,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project. Overwrites
-        any existing policy.
+                    Some(r##"Sets the IAM access control policy for the specified Project.
+        
+        CAUTION: This method will replace the existing policy, and cannot be used
+        to append additional IAM settings.
+        
+        NOTE: Removing service accounts from policies or changing their roles can
+        render services completely inoperable. It is important to understand how
+        the service account is being used before removing or updating its roles.
         
         The following constraints apply when using `setIamPolicy()`:
         
@@ -1855,13 +1861,8 @@ fn main() {
         IAM policies will be rejected until the lack of a ToS-accepting owner is
         rectified.
         
-        + This method will replace the existing policy, and cannot be used to
-        append additional IAM settings.
-        
-        Note: Removing service accounts from policies or changing their roles
-        can render services completely inoperable. It is important to understand
-        how the service account is being used before removing or updating its
-        roles."##),
+        Authorization requires the Google IAM permission
+        `resourcemanager.projects.setIamPolicy` on the project"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1993,7 +1994,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200408")
+           .version("1.0.14+20200629")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-redis1-cli"
-version = "1.0.13+20200402"
+version = "1.0.14+20200623"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Redis (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/redis1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-redis1]
 path = "../redis1"
-version = "1.0.13+20200402"
+version = "1.0.14+20200623"

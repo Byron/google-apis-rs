@@ -1756,7 +1756,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a deployment and all of the resources described by the deployment manifest. This method supports patch semantics."##),
+                    Some(r##"Patches a deployment and all of the resources described by the deployment manifest."##),
                     "Details at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli/deployments_patch",
                   vec![
                     (Some(r##"project"##),
@@ -2139,7 +2139,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20181207")
+           .version("1.0.14+20200512")
            .about("Declares, configures, and deploys complex solutions on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")

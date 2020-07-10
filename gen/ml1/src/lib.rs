@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.13+20200328*, where *20200328* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.14+20200703*, where *20200703* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
@@ -343,7 +343,7 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
         CloudMachineLearningEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://ml.googleapis.com/".to_string(),
             _root_url: "https://ml.googleapis.com/".to_string(),
         }
@@ -354,7 +354,7 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -409,7 +409,7 @@ impl Part for GoogleCloudMlV1__BuiltInAlgorithmOutput {}
 
 /// Attributes credit by computing the Aumann-Shapley value taking advantage
 /// of the model's fully differentiable structure. Refer to this paper for
-/// more details: http://proceedings.mlr.press/v70/sundararajan17a.html
+/// more details: https://arxiv.org/abs/1703.01365
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -460,13 +460,14 @@ pub struct GoogleCloudMlV1__SetDefaultVersionRequest { _never_set: Option<bool> 
 impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
 
 
-/// A message representing a Measurement.
+/// A message representing a measurement.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__Measurement {
-    /// Time that the Trial has been running at the point of this Measurement.
+    /// Output only. Time that the trial has been running at the point of
+    /// this measurement.
     #[serde(rename="elapsedTime")]
     pub elapsed_time: Option<String>,
     /// Provides a list of metrics that act as inputs into the objective
@@ -487,6 +488,34 @@ impl Part for GoogleCloudMlV1__Measurement {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__ReplicaConfig {
+    /// Arguments to the entrypoint command.
+    /// The following rules apply for container_command and container_args:
+    /// - If you do not supply command or args:
+    ///   The defaults defined in the Docker image are used.
+    /// - If you supply a command but no args:
+    ///   The default EntryPoint and the default Cmd defined in the Docker image
+    ///   are ignored. Your command is run without any arguments.
+    /// - If you supply only args:
+    ///   The default Entrypoint defined in the Docker image is run with the args
+    ///   that you supplied.
+    /// - If you supply a command and args:
+    ///   The default Entrypoint and the default Cmd defined in the Docker image
+    ///   are ignored. Your command is run with your args.
+    /// It cannot be set if custom container image is
+    /// not provided.
+    /// Note that this field and [TrainingInput.args] are mutually exclusive, i.e.,
+    /// both cannot be set at the same time.
+    #[serde(rename="containerArgs")]
+    pub container_args: Option<Vec<String>>,
+    /// The command with which the replica's custom container is run.
+    /// If provided, it will override default ENTRYPOINT of the docker image.
+    /// If not provided, the docker image's ENTRYPOINT is used.
+    /// It cannot be set if custom container image is
+    /// not provided.
+    /// Note that this field and [TrainingInput.args] are mutually exclusive, i.e.,
+    /// both cannot be set at the same time.
+    #[serde(rename="containerCommand")]
+    pub container_command: Option<Vec<String>>,
     /// The AI Platform runtime version that includes a TensorFlow version matching
     /// the one used in the custom container. This field is required if the replica
     /// is a TPU worker that uses a custom container. Otherwise, do not specify
@@ -805,7 +834,7 @@ impl Part for GoogleCloudMlV1__ParameterSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__CompleteTrialRequest {
-    /// Optional. A human readable reason why the Trial was infeasible. This should
+    /// Optional. A human readable reason why the trial was infeasible. This should
     /// only be provided if `trial_infeasible` is true.
     #[serde(rename="infeasibleReason")]
     pub infeasible_reason: Option<String>,
@@ -911,12 +940,11 @@ pub struct GoogleCloudMlV1__TrainingInput {
     pub master_type: Option<String>,
     /// Optional. The set of Hyperparameters to tune.
     pub hyperparameters: Option<GoogleCloudMlV1__HyperparameterSpec>,
-    /// Optional. Arguments passed to the training.
-    /// - If it is a python package training:
-    ///   It will be passed as command line argument to the program.
-    /// - If it is a custom container training,
-    ///   It will be passed as an argument to the custom container
-    ///   image.
+    /// Optional. Command-line arguments passed to the training application when it
+    /// starts. If your job uses a custom container, then the arguments are passed
+    /// to the container's <a class="external" target="_blank"
+    /// href="https://docs.docker.com/engine/reference/builder/#entrypoint">
+    /// `ENTRYPOINT`</a> command.
     pub args: Option<Vec<String>>,
     /// Required. The Python module name to run after installing the packages.
     #[serde(rename="pythonModule")]
@@ -938,9 +966,14 @@ pub struct GoogleCloudMlV1__TrainingInput {
     pub worker_count: Option<String>,
     /// Optional. Scheduling options for a training job.
     pub scheduling: Option<GoogleCloudMlV1__Scheduling>,
-    /// Custom encryption key options for a training job. If this is set,
-    /// then all resources created by the training job will be encrypted with the
-    /// provided encryption key.
+    /// Optional. Options for using customer-managed encryption keys (CMEK) to
+    /// protect resources created by a training job, instead of using Google's
+    /// default encryption. If this is set, then all resources created by the
+    /// training job will be encrypted with the customer-managed encryption key
+    /// that you specify.
+    /// 
+    /// [Learn how and when to use CMEK with AI Platform
+    /// Training](/ai-platform/training/docs/cmek).
     #[serde(rename="encryptionConfig")]
     pub encryption_config: Option<GoogleCloudMlV1__EncryptionConfig>,
     /// Optional. The number of parameter server replicas to use for the training
@@ -990,11 +1023,21 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// 
     /// Set `parameterServerConfig.imageUri` only if you build a custom image for
     /// your parameter server. If `parameterServerConfig.imageUri` has not been
-    /// set, AI Platform uses the value of `masterConfig.imageUri` .
-    /// Learn more about [configuring custom
+    /// set, AI Platform uses the value of `masterConfig.imageUri`. Learn more about [configuring custom
     /// containers](/ai-platform/training/docs/distributed-training-containers).
     #[serde(rename="parameterServerConfig")]
     pub parameter_server_config: Option<GoogleCloudMlV1__ReplicaConfig>,
+    /// Optional. The full name of the Google Compute Engine
+    /// [network](/compute/docs/networks-and-firewalls#networks) to which the Job
+    /// is peered. For example, projects/12345/global/networks/myVPC. Format is of
+    /// the form projects/{project}/global/networks/{network}. Where {project} is a
+    /// project number, as in '12345', and {network} is network name.".
+    /// 
+    /// Private services access must already be configured for the network. If left
+    /// unspecified, the Job is not peered with any network. Learn more -
+    /// Connecting Job to user network over private
+    /// IP.
+    pub network: Option<String>,
     /// Required. Specifies the machine types, the number of replicas for workers
     /// and parameter servers.
     #[serde(rename="scaleTier")]
@@ -1002,6 +1045,11 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// Required. The region to run the training job in. See the [available
     /// regions](/ai-platform/training/docs/regions) for AI Platform Training.
     pub region: Option<String>,
+    /// Optional. Specifies the service account for workload run-as account.
+    /// Users submitting jobs must have act-as permission on this run-as account.
+    /// If not specified, then CMLE P4SA will be used by default.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
     /// Optional. The version of Python used in training. You must either specify
     /// this field or specify `masterConfig.imageUri`.
     /// 
@@ -1032,8 +1080,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// 
     /// Set `workerConfig.imageUri` only if you build a custom image for your
     /// worker. If `workerConfig.imageUri` has not been set, AI Platform uses
-    /// the value of `masterConfig.imageUri` .
-    /// Learn more about [configuring custom
+    /// the value of `masterConfig.imageUri`. Learn more about [configuring custom
     /// containers](/ai-platform/training/docs/distributed-training-containers).
     #[serde(rename="workerConfig")]
     pub worker_config: Option<GoogleCloudMlV1__ReplicaConfig>,
@@ -1046,8 +1093,7 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// 
     /// Set `evaluatorConfig.imageUri` only if you build a custom image for
     /// your evaluator. If `evaluatorConfig.imageUri` has not been
-    /// set, AI Platform uses the value of `masterConfig.imageUri` .
-    /// Learn more about [configuring custom
+    /// set, AI Platform uses the value of `masterConfig.imageUri`. Learn more about [configuring custom
     /// containers](/ai-platform/training/docs/distributed-training-containers).
     #[serde(rename="evaluatorConfig")]
     pub evaluator_config: Option<GoogleCloudMlV1__ReplicaConfig>,
@@ -1158,7 +1204,7 @@ impl Part for GoogleCloudMlV1__AcceleratorConfig {}
 /// There are two feature attribution methods supported for TensorFlow models:
 /// integrated gradients and sampled Shapley.
 /// [Learn more about feature
-/// attributions.](/ml-engine/docs/ai-explanations/overview)
+/// attributions.](/ai-platform/prediction/docs/ai-explanations/overview)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1207,9 +1253,10 @@ impl RequestValue for GoogleCloudMlV1__CancelJobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__EncryptionConfig {
-    /// The Cloud KMS resource identifier of the customer managed encryption key
-    /// used to protect a resource, such as a training job. Has the form:
-    /// `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`.
+    /// The Cloud KMS resource identifier of the customer-managed encryption key
+    /// used to protect a resource, such as a training job. It has the following
+    /// format:
+    /// `projects/{PROJECT_ID}/locations/{REGION}/keyRings/{KEY_RING_NAME}/cryptoKeys/{KEY_NAME}`
     #[serde(rename="kmsKeyName")]
     pub kms_key_name: Option<String>,
 }
@@ -1274,8 +1321,8 @@ pub struct GoogleIamV1__SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -1293,9 +1340,17 @@ pub struct GoogleIamV1__Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<GoogleType__Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1384,7 +1439,7 @@ impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteVal
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig {
-    /// True if measurement.elapsed_time is used as the x-axis of each
+    /// If true, measurement.elapsed_time is used as the x-axis of each
     /// Trials Decay Curve. Otherwise, Measurement.steps will be used as the
     /// x-axis.
     #[serde(rename="useElapsedTime")]
@@ -1865,10 +1920,11 @@ impl Part for GoogleCloudMlV1__AutoScaling {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig {
-    /// True if median automated stopping rule applies on
-    /// measurement.use_elapsed_time. it means that elapsed_time field of
-    /// latest measurement of current trial is used to compute median objective
-    /// value for each completed trials.
+    /// If true, the median automated stopping rule applies to
+    /// measurement.use_elapsed_time, which means the elapsed_time field of
+    /// the current trial's
+    /// latest measurement is used to compute the median objective
+    /// value for each completed trial.
     #[serde(rename="useElapsedTime")]
     pub use_elapsed_time: Option<bool>,
 }
@@ -1960,7 +2016,7 @@ impl ResponseResult for GoogleCloudMlV1__Location {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__StudyConfig {
-    /// no description provided
+    /// Metric specs for the study.
     pub metrics: Option<Vec<GoogleCloudMlV1_StudyConfig_MetricSpec>>,
     /// Configuration for automated stopping of unpromising Trials.
     #[serde(rename="automatedStoppingConfig")]
@@ -1997,10 +2053,12 @@ impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategorical
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -2018,7 +2076,9 @@ impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategorical
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -2107,6 +2167,9 @@ pub struct GoogleIamV1__Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -2281,8 +2344,8 @@ impl ResponseResult for GoogleCloudMlV1__Job {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__Scheduling {
     /// Optional. The maximum job running time, expressed in seconds. The field can
-    /// contain up to nine fractional digits, terminated by `s`. By default there
-    /// is no limit to the running time.
+    /// contain up to nine fractional digits, terminated by `s`. If not specified,
+    /// this field defaults to `604800s` (seven days).
     /// 
     /// If the training job is still running after this duration, AI Platform
     /// Training cancels it.
@@ -2305,6 +2368,9 @@ pub struct GoogleCloudMlV1__Scheduling {
     /// ````
     #[serde(rename="maxRunningTime")]
     pub max_running_time: Option<String>,
+    /// no description provided
+    #[serde(rename="maxWaitTime")]
+    pub max_wait_time: Option<String>,
 }
 
 impl Part for GoogleCloudMlV1__Scheduling {}
@@ -2348,7 +2414,7 @@ impl RequestValue for GoogleIamV1__TestIamPermissionsRequest {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -2357,18 +2423,18 @@ impl RequestValue for GoogleIamV1__TestIamPermissionsRequest {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -2555,7 +2621,7 @@ impl ResponseResult for GoogleCloudMlV1__ListTrialsResponse {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -2595,7 +2661,8 @@ pub struct GoogleCloudMlV1_Measurement_Metric {
 impl Part for GoogleCloudMlV1_Measurement_Metric {}
 
 
-/// A message representing a parameter to be tuned.
+/// A message representing a parameter to be tuned. Contains the name of
+/// the parameter and the suggested value to use for this trial.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2760,7 +2827,7 @@ pub struct GoogleLongrunning__Operation {
 impl ResponseResult for GoogleLongrunning__Operation {}
 
 
-/// A message representing a Trial.
+/// A message representing a trial.
 /// 
 /// # Activities
 /// 
@@ -2775,16 +2842,16 @@ impl ResponseResult for GoogleLongrunning__Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__Trial {
-    /// Output only. A human readable string describing why the Trial is
+    /// Output only. A human readable string describing why the trial is
     /// infeasible. This should only be set if trial_infeasible is true.
     #[serde(rename="infeasibleReason")]
     pub infeasible_reason: Option<String>,
-    /// The final Measurement containing the objective value.
+    /// The final measurement containing the objective value.
     #[serde(rename="finalMeasurement")]
     pub final_measurement: Option<GoogleCloudMlV1__Measurement>,
     /// Output only. Name of the trial assigned by the service.
     pub name: Option<String>,
-    /// The parameters of the Trial.
+    /// The parameters of the trial.
     pub parameters: Option<Vec<GoogleCloudMlV1_Trial_Parameter>>,
     /// A list of measurements that are strictly lexicographically
     /// ordered by their induced tuples (steps, elapsed_time).
@@ -2795,13 +2862,13 @@ pub struct GoogleCloudMlV1__Trial {
     pub client_id: Option<String>,
     /// The detailed state of a trial.
     pub state: Option<String>,
-    /// Output only. Time the Trial was started.
+    /// Output only. Time at which the trial was started.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Output only. Time the Trial's status changed to COMPLETED.
+    /// Output only. Time at which the trial's status changed to COMPLETED.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// Output only. True if the parameters in this trial should not be attempted again.
+    /// Output only. If true, the parameters in this trial are not attempted again.
     #[serde(rename="trialInfeasible")]
     pub trial_infeasible: Option<bool>,
 }
@@ -2821,7 +2888,7 @@ impl ResponseResult for GoogleCloudMlV1__Trial {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__ListStudiesResponse {
-    /// The Studies associated with the project.
+    /// The studies associated with the project.
     pub studies: Option<Vec<GoogleCloudMlV1__Study>>,
 }
 
@@ -2989,7 +3056,7 @@ pub struct GoogleCloudMlV1__Study {
     pub inactive_reason: Option<String>,
     /// Output only. The detailed state of a study.
     pub state: Option<String>,
-    /// Output only. Time that the study was created.
+    /// Output only. Time at which the study was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
     /// Required. Configuration of the study.
@@ -3119,8 +3186,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a measurement of the objective metrics to a Trial. This measurement
-    /// is assumed to have been taken before the Trial is complete.
+    /// Adds a measurement of the objective metrics to a trial. This measurement
+    /// is assumed to have been taken before the trial is complete.
     /// 
     /// # Arguments
     ///
@@ -3142,7 +3209,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -3230,7 +3297,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -3254,7 +3321,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the trials associated with a Study.
+    /// Lists the trials associated with a study.
     /// 
     /// # Arguments
     ///
@@ -3271,7 +3338,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Trial.
+    /// Gets a trial.
     /// 
     /// # Arguments
     ///
@@ -3363,7 +3430,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -3383,8 +3450,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a long-running operation associated with the generation of trial
-    /// suggestions.
+    /// Adds one or more trials to a study, with parameter values
+    /// suggested by AI Platform Optimizer. Returns a long-running
+    /// operation associated with the generation of trial suggestions.
+    /// When this long-running operation succeeds, it will contain
+    /// a SuggestTrialsResponse.
     /// 
     /// # Arguments
     ///
@@ -3424,12 +3494,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks a Trial as complete.
+    /// Marks a trial as complete.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The trial name.
+    /// * `name` - Required. The trial name.metat
     pub fn locations_studies_trials_complete(&self, request: GoogleCloudMlV1__CompleteTrialRequest, name: &str) -> ProjectLocationStudyTrialCompleteCall<'a, C, A> {
         ProjectLocationStudyTrialCompleteCall {
             hub: self.hub,
@@ -3560,8 +3630,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Performs explanation on the data in the request.
-    /// AI Platform implements a custom `explain` verb on top of an HTTP POST
-    /// method.
+    /// 
+    /// <div>{% dynamic include "/ai-platform/includes/___explain-request" %}</div>
     /// 
     /// # Arguments
     ///
@@ -3581,7 +3651,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Trial.
+    /// Deletes a trial.
     /// 
     /// # Arguments
     ///
@@ -3685,7 +3755,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a user provided trial to a Study.
+    /// Adds a user provided trial to a study.
     /// 
     /// # Arguments
     ///
@@ -3763,7 +3833,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -3952,7 +4022,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks whether a trial should stop or not.
+    /// Checks  whether a trial should stop or not. Returns a
+    /// long-running operation. When the operation is successful,
+    /// it will contain a
+    /// CheckTrialEarlyStoppingStateResponse.
     /// 
     /// # Arguments
     ///
@@ -4090,8 +4163,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Adds a measurement of the objective metrics to a Trial. This measurement
-/// is assumed to have been taken before the Trial is complete.
+/// Adds a measurement of the objective metrics to a trial. This measurement
+/// is assumed to have been taken before the trial is complete.
 ///
 /// A builder for the *locations.studies.trials.addMeasurement* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4379,7 +4452,7 @@ impl<'a, C, A> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> where C: Bo
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *jobs.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5503,7 +5576,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -5793,7 +5866,7 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Lists the trials associated with a Study.
+/// Lists the trials associated with a study.
 ///
 /// A builder for the *locations.studies.trials.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6047,7 +6120,7 @@ impl<'a, C, A> ProjectLocationStudyTrialListCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Gets a Trial.
+/// Gets a trial.
 ///
 /// A builder for the *locations.studies.trials.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7211,7 +7284,7 @@ impl<'a, C, A> ProjectLocationStudyCreateCall<'a, C, A> where C: BorrowMut<hyper
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *models.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7497,8 +7570,11 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Returns a long-running operation associated with the generation of trial
-/// suggestions.
+/// Adds one or more trials to a study, with parameter values
+/// suggested by AI Platform Optimizer. Returns a long-running
+/// operation associated with the generation of trial suggestions.
+/// When this long-running operation succeeds, it will contain
+/// a SuggestTrialsResponse.
 ///
 /// A builder for the *locations.studies.trials.suggest* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7990,6 +8066,10 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectJobGetIamPolicyCall<'a, C, A> {
@@ -8059,7 +8139,7 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Marks a Trial as complete.
+/// Marks a trial as complete.
 ///
 /// A builder for the *locations.studies.trials.complete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8271,7 +8351,7 @@ impl<'a, C, A> ProjectLocationStudyTrialCompleteCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// Required. The trial name.
+    /// Required. The trial name.metat
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9912,8 +9992,8 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 
 
 /// Performs explanation on the data in the request.
-/// AI Platform implements a custom `explain` verb on top of an HTTP POST
-/// method.
+/// 
+/// <div>{% dynamic include "/ai-platform/includes/___explain-request" %}</div>
 ///
 /// A builder for the *explain* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10200,7 +10280,7 @@ impl<'a, C, A> ProjectExplainCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Deletes a Trial.
+/// Deletes a trial.
 ///
 /// A builder for the *locations.studies.trials.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11604,7 +11684,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Adds a user provided trial to a Study.
+/// Adds a user provided trial to a study.
 ///
 /// A builder for the *locations.studies.trials.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12717,7 +12797,7 @@ impl<'a, C, A> ProjectLocationStudyTrialStopCall<'a, C, A> where C: BorrowMut<hy
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -13805,6 +13885,10 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectModelGetIamPolicyCall<'a, C, A> {
@@ -14951,7 +15035,10 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Checks whether a trial should stop or not.
+/// Checks  whether a trial should stop or not. Returns a
+/// long-running operation. When the operation is successful,
+/// it will contain a
+/// CheckTrialEarlyStoppingStateResponse.
 ///
 /// A builder for the *locations.studies.trials.checkEarlyStoppingState* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

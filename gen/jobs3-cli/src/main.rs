@@ -1981,7 +1981,7 @@ fn main() {
     
     let mut app = App::new("jobs3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200409")
+           .version("1.0.14+20200604")
            .about("Cloud Talent Solution provides the capability to create, read, update, and delete job postings, as well as search jobs based on keywords and filters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_jobs3_cli")

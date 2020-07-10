@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.14+20200629*, where *20200629* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -350,7 +350,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
         CloudResourceManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
             _root_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
         }
@@ -373,7 +373,7 @@ impl<'a, C, A> CloudResourceManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -447,8 +447,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -539,10 +539,12 @@ impl Part for RestoreDefault {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -560,7 +562,9 @@ impl Part for RestoreDefault {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -649,6 +653,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -766,7 +773,7 @@ pub struct ListConstraint {
 impl Part for ListConstraint {}
 
 
-/// The response returned from the ListAvailableOrgPolicyConstraints method.
+/// The response returned from the `ListAvailableOrgPolicyConstraints` method.
 /// Returns all `Constraints` that could be set at this level of the hierarchy
 /// (contrast with the response from `ListPolicies`, which returns all policies
 /// which are set).
@@ -847,7 +854,7 @@ pub struct ListPolicy {
     pub allowed_values: Option<Vec<String>>,
     /// Determines the inheritance behavior for this `Policy`.
     /// 
-    /// By default, a `ListPolicy` set at a resource supercedes any `Policy` set
+    /// By default, a `ListPolicy` set at a resource supersedes any `Policy` set
     /// anywhere up the resource hierarchy. However, if `inherit_from_parent` is
     /// set to `true`, then the values from the effective `Policy` of the parent
     /// resource are inherited, meaning the values set in this `Policy` are
@@ -1109,7 +1116,7 @@ impl RequestValue for SetOrgPolicyRequest {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1147,7 +1154,7 @@ impl Part for AuditLogConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
     /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
-    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    /// `GetIamPolicy`.
     pub options: Option<GetPolicyOptions>,
 }
 
@@ -1180,12 +1187,12 @@ impl RequestValue for TestIamPermissionsRequest {}
 /// restricted. For example, it controls which cloud services can be activated
 /// across an organization, or whether a Compute Engine instance can have
 /// serial port connections established. `Constraints` can be configured by the
-/// organization's policy adminstrator to fit the needs of the organzation by
+/// organization's policy administrator to fit the needs of the organzation by
 /// setting Policies for `Constraints` at different locations in the
 /// organization's resource hierarchy. Policies are inherited down the resource
 /// hierarchy from higher levels, but can also be overridden. For details about
 /// the inheritance rules please read about
-/// Policies.
+/// [Policies](/resource-manager/reference/rest/v1/Policy).
 /// 
 /// `Constraints` have a default behavior determined by the `constraint_default`
 /// field, which is the enforcement behavior that is used in the absence of a
@@ -1195,7 +1202,7 @@ impl RequestValue for TestIamPermissionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Constraint {
-    /// The evaluation behavior of this constraint in the absense of 'Policy'.
+    /// The evaluation behavior of this constraint in the absence of 'Policy'.
     #[serde(rename="constraintDefault")]
     pub constraint_default: Option<String>,
     /// Version of the `Constraint`. Default version is 0;
@@ -1238,7 +1245,9 @@ pub struct BooleanConstraint { _never_set: Option<bool> }
 impl Part for BooleanConstraint {}
 
 
-/// Response from the GetAncestry method.
+/// Response from the
+/// projects.getAncestry
+/// method.
 /// 
 /// # Activities
 /// 
@@ -1315,11 +1324,10 @@ pub struct Project {
     /// The labels associated with this Project.
     /// 
     /// Label keys must be between 1 and 63 characters long and must conform
-    /// to the following regular expression: \[a-z\](\[-a-z0-9\]*\[a-z0-9\])?.
+    /// to the following regular expression: a-z{0,62}.
     /// 
     /// Label values must be between 0 and 63 characters long and must conform
-    /// to the regular expression (\[a-z\](\[-a-z0-9\]*\[a-z0-9\])?)?. A label
-    /// value can be empty.
+    /// to the regular expression [a-z0-9_-]{0,63}. A label value can be empty.
     /// 
     /// No more than 256 labels can be associated with a given resource.
     /// 
@@ -1498,8 +1506,8 @@ pub struct GetOrgPolicyRequest {
 impl RequestValue for GetOrgPolicyRequest {}
 
 
-/// The request sent to the [ListAvailableOrgPolicyConstraints]
-/// google.cloud.OrgPolicy.v1.ListAvailableOrgPolicyConstraints] method.
+/// The request sent to the `ListAvailableOrgPolicyConstraints` method on the
+/// project, folder, or organization.
 /// 
 /// # Activities
 /// 
@@ -1583,6 +1591,10 @@ pub struct GetPolicyOptions {
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -1622,9 +1634,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1692,7 +1712,7 @@ impl Part for Binding {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1701,18 +1721,18 @@ impl Part for Binding {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -1745,7 +1765,7 @@ pub struct AuditConfig {
 impl Part for AuditConfig {}
 
 
-/// The response returned from the ListOrgPolicies method. It will be empty
+/// The response returned from the `ListOrgPolicies` method. It will be empty
 /// if no `Policies` are set on the resource.
 /// 
 /// # Activities
@@ -1919,6 +1939,10 @@ pub struct OrgPolicy {
     pub etag: Option<String>,
     /// The name of the `Constraint` the `Policy` is configuring, for example,
     /// `constraints/serviceuser.services`.
+    /// 
+    /// A [list of available
+    /// constraints](/resource-manager/docs/organization-policy/org-policy-constraints)
+    /// is available.
     /// 
     /// Immutable after creation.
     pub constraint: Option<String>,
@@ -2625,8 +2649,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Authorization requires the Google IAM permission
     /// `resourcemanager.projects.getIamPolicy` on the project.
     /// 
-    /// For additional information about resource structure and identification,
-    /// see [Resource Names](/apis/design/resource_names).
+    /// For additional information about `resource` (e.g. my-project-id) structure
+    /// and identification, see [Resource Names](/apis/design/resource_names).
     /// 
     /// # Arguments
     ///
@@ -2790,6 +2814,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified Project.
     /// 
+    /// For additional information about `resource` (e.g. my-project-id) structure
+    /// and identification, see [Resource Names](/apis/design/resource_names).
+    /// 
     /// There are no permissions required for making this API call.
     /// 
     /// # Arguments
@@ -2880,8 +2907,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the IAM access control policy for the specified Project. Overwrites
-    /// any existing policy.
+    /// Sets the IAM access control policy for the specified Project.
+    /// 
+    /// CAUTION: This method will replace the existing policy, and cannot be used
+    /// to append additional IAM settings.
+    /// 
+    /// NOTE: Removing service accounts from policies or changing their roles can
+    /// render services completely inoperable. It is important to understand how
+    /// the service account is being used before removing or updating its roles.
+    /// 
+    /// For additional information about `resource` (e.g. my-project-id) structure
+    /// and identification, see [Resource Names](/apis/design/resource_names).
     /// 
     /// The following constraints apply when using `setIamPolicy()`:
     /// 
@@ -2918,14 +2954,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// projects that no longer have owners who have accepted the ToS. Edits to
     /// IAM policies will be rejected until the lack of a ToS-accepting owner is
     /// rectified.
-    /// 
-    /// + This method will replace the existing policy, and cannot be used to
-    /// append additional IAM settings.
-    /// 
-    /// Note: Removing service accounts from policies or changing their roles
-    /// can render services completely inoperable. It is important to understand
-    /// how the service account is being used before removing or updating its
-    /// roles.
     /// 
     /// Authorization requires the Google IAM permission
     /// `resourcemanager.projects.setIamPolicy` on the project
@@ -9224,8 +9252,8 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// Authorization requires the Google IAM permission
 /// `resourcemanager.projects.getIamPolicy` on the project.
 /// 
-/// For additional information about resource structure and identification,
-/// see [Resource Names](/apis/design/resource_names).
+/// For additional information about `resource` (e.g. my-project-id) structure
+/// and identification, see [Resource Names](/apis/design/resource_names).
 ///
 /// A builder for the *getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11209,6 +11237,9 @@ impl<'a, C, A> ProjectListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 /// Returns permissions that a caller has on the specified Project.
 /// 
+/// For additional information about `resource` (e.g. my-project-id) structure
+/// and identification, see [Resource Names](/apis/design/resource_names).
+/// 
 /// There are no permissions required for making this API call.
 ///
 /// A builder for the *testIamPermissions* method supported by a *project* resource.
@@ -12237,15 +12268,16 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self
     }
     /// An expression for filtering the results of the request.  Filter rules are
-    /// case insensitive. The fields eligible for filtering are:
+    /// case insensitive. Some eligible fields for filtering are:
     /// 
     /// + `name`
     /// + `id`
     /// + `labels.<key>` (where *key* is the name of a label)
     /// + `parent.type`
     /// + `parent.id`
+    /// + `lifecycleState`
     /// 
-    /// Some examples of using labels as filters:
+    /// Some examples of filter strings:
     /// 
     /// | Filter           | Description                                         |
     /// |------------------|-----------------------------------------------------|
@@ -12255,8 +12287,12 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// | NAME:howl        | Equivalent to above.                                |
     /// | labels.color:*   | The project has the label `color`.                  |
     /// | labels.color:red | The project's label `color` has the value `red`.    |
-    /// | labels.color:red&nbsp;labels.size:big |The project's label `color` has
-    ///   the value `red` and its label `size` has the value `big`.              |
+    /// | labels.color:red&nbsp;labels.size:big | The project's label `color`    |
+    /// :                                       : has the value `red` and its    :
+    /// :                                       : label`size` has the value      :
+    /// :                                       : `big`.                         :
+    /// | lifecycleState:DELETE_REQUESTED       | Only show projects that are    |
+    /// :                                       : pending deletion.              :
     /// 
     /// If no filter is specified, the call will return projects for which the user
     /// has the `resourcemanager.projects.get` permission.
@@ -12338,8 +12374,17 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Sets the IAM access control policy for the specified Project. Overwrites
-/// any existing policy.
+/// Sets the IAM access control policy for the specified Project.
+/// 
+/// CAUTION: This method will replace the existing policy, and cannot be used
+/// to append additional IAM settings.
+/// 
+/// NOTE: Removing service accounts from policies or changing their roles can
+/// render services completely inoperable. It is important to understand how
+/// the service account is being used before removing or updating its roles.
+/// 
+/// For additional information about `resource` (e.g. my-project-id) structure
+/// and identification, see [Resource Names](/apis/design/resource_names).
 /// 
 /// The following constraints apply when using `setIamPolicy()`:
 /// 
@@ -12376,14 +12421,6 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// projects that no longer have owners who have accepted the ToS. Edits to
 /// IAM policies will be rejected until the lack of a ToS-accepting owner is
 /// rectified.
-/// 
-/// + This method will replace the existing policy, and cannot be used to
-/// append additional IAM settings.
-/// 
-/// Note: Removing service accounts from policies or changing their roles
-/// can render services completely inoperable. It is important to understand
-/// how the service account is being used before removing or updating its
-/// roles.
 /// 
 /// Authorization requires the Google IAM permission
 /// `resourcemanager.projects.setIamPolicy` on the project

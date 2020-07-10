@@ -371,7 +371,7 @@ fn main() {
     
     let mut app = App::new("digitalassetlinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200702")
            .about("Discovers relationships between online assets such as websites or mobile apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_digitalassetlinks1_cli")
            .arg(Arg::with_name("folder")

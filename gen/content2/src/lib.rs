@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.13+20200310*, where *20200310* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.14+20200617*, where *20200617* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -380,7 +380,7 @@ impl<'a, C, A> ShoppingContent<C, A>
         ShoppingContent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://www.googleapis.com/content/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -433,7 +433,7 @@ impl<'a, C, A> ShoppingContent<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -467,16 +467,17 @@ impl<'a, C, A> ShoppingContent<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryUpdateShipment {
-    /// Date on which the shipment has been delivered, in ISO 8601 format. Optional and can be provided only if status is delivered.
+    /// Date on which the shipment has been delivered, in ISO 8601 format. Optional and can be provided only if `status` is `delivered`.
     #[serde(rename="deliveryDate")]
     pub delivery_date: Option<String>,
     /// New status for the shipment. Not updated if missing.
     /// 
     /// Acceptable values are:  
-    /// - "delivered" 
-    /// - "undeliverable"
+    /// - "`delivered`" 
+    /// - "`undeliverable`" 
+    /// - "`readyForPickup`"
     pub status: Option<String>,
-    /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    /// The carrier handling the shipment. Not updated if missing. See `shipments[].carrier` in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// The tracking ID for the shipment. Not updated if missing.
     #[serde(rename="trackingId")]
@@ -498,11 +499,11 @@ pub struct ProductsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#productsCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors defined if and only if the request failed.
     pub errors: Option<Errors>,
-    /// The inserted product. Only defined if the method is insert and if the request was successful.
+    /// The inserted product. Only defined if the method is `insert` and if the request was successful.
     pub product: Option<Product>,
 }
 
@@ -580,18 +581,18 @@ impl Part for AccountUser {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsCustomBatchRequestEntryLinkRequest {
-    /// Action to perform for this link. The "request" action is only available to select merchants.
+    /// Action to perform for this link. The `"request"` action is only available to select merchants.
     /// 
     /// Acceptable values are:  
-    /// - "approve" 
-    /// - "remove" 
-    /// - "request"
+    /// - "`approve`" 
+    /// - "`remove`" 
+    /// - "`request`"
     pub action: Option<String>,
     /// Type of the link between the two accounts.
     /// 
     /// Acceptable values are:  
-    /// - "channelPartner" 
-    /// - "eCommercePlatform"
+    /// - "`channelPartner`" 
+    /// - "`eCommercePlatform`"
     #[serde(rename="linkType")]
     pub link_type: Option<String>,
     /// The ID of the linked account.
@@ -600,6 +601,23 @@ pub struct AccountsCustomBatchRequestEntryLinkRequest {
 }
 
 impl Part for AccountsCustomBatchRequestEntryLinkRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderShipmentScheduledDeliveryDetails {
+    /// The date a shipment is scheduled for delivery, in ISO 8601 format.
+    #[serde(rename="scheduledDate")]
+    pub scheduled_date: Option<String>,
+    /// The phone number of the carrier fulfilling the delivery.
+    #[serde(rename="carrierPhoneNumber")]
+    pub carrier_phone_number: Option<String>,
+}
+
+impl Part for OrderShipmentScheduledDeliveryDetails {}
 
 
 /// There is no detailed description.
@@ -653,7 +671,7 @@ pub struct ProductStatus {
     /// Date on which the item has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productStatus".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#productStatus`"
     pub kind: Option<String>,
     /// DEPRECATED - never populated
     #[serde(rename="dataQualityIssues")]
@@ -750,9 +768,9 @@ pub struct OrderLineItemProduct {
     /// Condition or state of the item.
     /// 
     /// Acceptable values are:  
-    /// - "new" 
-    /// - "refurbished" 
-    /// - "used"
+    /// - "`new`" 
+    /// - "`refurbished`" 
+    /// - "`used`"
     pub condition: Option<String>,
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
@@ -770,8 +788,8 @@ pub struct OrderLineItemProduct {
     /// The item's channel (online or local).
     /// 
     /// Acceptable values are:  
-    /// - "local" 
-    /// - "online"
+    /// - "`local`" 
+    /// - "`online`"
     pub channel: Option<String>,
 }
 
@@ -790,16 +808,16 @@ pub struct LiaInventorySettings {
     /// The status of the inventory verification process.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "inactive" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`inactive`" 
+    /// - "`pending`"
     pub status: Option<String>,
     /// The status of the verification contact.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "inactive" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`inactive`" 
+    /// - "`pending`"
     #[serde(rename="inventoryVerificationContactStatus")]
     pub inventory_verification_contact_status: Option<String>,
     /// The name of the contact for the inventory verification process.
@@ -832,11 +850,11 @@ pub struct Account {
     /// [DEPRECATED] This field is never returned and will be ignored if provided.
     #[serde(rename="reviewsUrl")]
     pub reviews_url: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#account".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#account`"
     pub kind: Option<String>,
     /// Required. Display name for the account.
     pub name: Option<String>,
-    /// List of linked YouTube channels that are active or pending approval. To create a new link request, add a new link with status active to the list. It will remain in a pending state until approved or rejected in the YT Creator Studio interface. To delete an active link, or to cancel a link request, remove it from the list.
+    /// List of linked YouTube channels that are active or pending approval. To create a new link request, add a new link with status `active` to the list. It will remain in a `pending` state until approved or rejected in the YT Creator Studio interface. To delete an active link, or to cancel a link request, remove it from the list.
     #[serde(rename="youtubeChannelLinks")]
     pub youtube_channel_links: Option<Vec<AccountYouTubeChannelLink>>,
     /// Indicates whether the merchant sells adult content.
@@ -856,7 +874,7 @@ pub struct Account {
     /// Client-specific, locally-unique, internal ID for the child account.
     #[serde(rename="sellerId")]
     pub seller_id: Option<String>,
-    /// List of linked AdWords accounts that are active or pending approval. To create a new link request, add a new link with status active to the list. It will remain in a pending state until approved or rejected either in the AdWords interface or through the  AdWords API. To delete an active link, or to cancel a link request, remove it from the list.
+    /// List of linked AdWords accounts that are active or pending approval. To create a new link request, add a new link with status `active` to the list. It will remain in a `pending` state until approved or rejected either in the AdWords interface or through the  AdWords API. To delete an active link, or to cancel a link request, remove it from the list.
     #[serde(rename="adwordsLinks")]
     pub adwords_links: Option<Vec<AccountAdwordsLink>>,
     /// Users with access to the account. Every account (except for subaccounts) must have at least one admin user.
@@ -900,19 +918,19 @@ pub struct OrdersCustomBatchRequestEntryReturnLineItem {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -936,17 +954,17 @@ impl Part for OrdersCustomBatchRequestEntryReturnLineItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderCustomerMarketingRightsInfo {
-    /// Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected granted in their most recent order, they can be subscribed to marketing emails. Customers who have chosen denied must not be subscribed, or must be unsubscribed if already opted-in.
+    /// Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected `granted` in their most recent order, they can be subscribed to marketing emails. Customers who have chosen `denied` must not be subscribed, or must be unsubscribed if already opted-in.
     /// 
     /// Acceptable values are:  
-    /// - "denied" 
-    /// - "granted"
+    /// - "`denied`" 
+    /// - "`granted`"
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<String>,
     /// Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.
     #[serde(rename="lastUpdatedTimestamp")]
     pub last_updated_timestamp: Option<String>,
-    /// Email address that can be used for marketing purposes. The field may be empty even if explicitMarketingPreference is 'granted'. This happens when retrieving an old order from the customer who deleted their account.
+    /// Email address that can be used for marketing purposes. The field may be empty even if `explicitMarketingPreference` is 'granted'. This happens when retrieving an old order from the customer who deleted their account.
     #[serde(rename="marketingEmailAddress")]
     pub marketing_email_address: Option<String>,
 }
@@ -960,7 +978,7 @@ impl Part for OrderCustomerMarketingRightsInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransitTableTransitTimeRowTransitTimeValue {
-    /// Must be greater than or equal to minTransitTimeInDays.
+    /// Must be greater than or equal to `minTransitTimeInDays`.
     #[serde(rename="maxTransitTimeInDays")]
     pub max_transit_time_in_days: Option<u32>,
     /// Transit time range (min-max) in business days. 0 means same day delivery, 1 means next day delivery.
@@ -971,22 +989,22 @@ pub struct TransitTableTransitTimeRowTransitTimeValue {
 impl Part for TransitTableTransitTimeRowTransitTimeValue {}
 
 
-/// A non-empty list of row or column headers for a table. Exactly one of prices, weights, numItems, postalCodeGroupNames, or location must be set.
+/// A non-empty list of row or column headers for a table. Exactly one of `prices`, `weights`, `numItems`, `postalCodeGroupNames`, or `location` must be set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Headers {
-    /// A list of inclusive order price upper bounds. The last price's value can be "infinity". For example [{"value": "10", "currency": "USD"}, {"value": "500", "currency": "USD"}, {"value": "infinity", "currency": "USD"}] represents the headers "<= $10", " $500". All prices within a service must have the same currency. Must be non-empty. Can only be set if all other fields are not set.
+    /// A list of inclusive order price upper bounds. The last price's value can be `"infinity"`. For example `[{"value": "10", "currency": "USD"}, {"value": "500", "currency": "USD"}, {"value": "infinity", "currency": "USD"}]` represents the headers "<= $10", " $500". All prices within a service must have the same currency. Must be non-empty. Can only be set if all other fields are not set.
     pub prices: Option<Vec<Price>>,
-    /// A list of postal group names. The last value can be "all other locations". Example: ["zone 1", "zone 2", "all other locations"]. The referred postal code groups must match the delivery country of the service. Must be non-empty. Can only be set if all other fields are not set.
+    /// A list of postal group names. The last value can be `"all other locations"`. Example: `["zone 1", "zone 2", "all other locations"]`. The referred postal code groups must match the delivery country of the service. Must be non-empty. Can only be set if all other fields are not set.
     #[serde(rename="postalCodeGroupNames")]
     pub postal_code_group_names: Option<Vec<String>>,
-    /// A list of inclusive order weight upper bounds. The last weight's value can be "infinity". For example [{"value": "10", "unit": "kg"}, {"value": "50", "unit": "kg"}, {"value": "infinity", "unit": "kg"}] represents the headers "<= 10kg", " 50kg". All weights within a service must have the same unit. Must be non-empty. Can only be set if all other fields are not set.
+    /// A list of inclusive order weight upper bounds. The last weight's value can be `"infinity"`. For example `[{"value": "10", "unit": "kg"}, {"value": "50", "unit": "kg"}, {"value": "infinity", "unit": "kg"}]` represents the headers "<= 10kg", " 50kg". All weights within a service must have the same unit. Must be non-empty. Can only be set if all other fields are not set.
     pub weights: Option<Vec<Weight>>,
     /// A list of location ID sets. Must be non-empty. Can only be set if all other fields are not set.
     pub locations: Option<Vec<LocationIdSet>>,
-    /// A list of inclusive number of items upper bounds. The last value can be "infinity". For example ["10", "50", "infinity"] represents the headers "<= 10 items", " 50 items". Must be non-empty. Can only be set if all other fields are not set.
+    /// A list of inclusive number of items upper bounds. The last value can be `"infinity"`. For example `["10", "50", "infinity"]` represents the headers "<= 10 items", " 50 items". Must be non-empty. Can only be set if all other fields are not set.
     #[serde(rename="numberOfItems")]
     pub number_of_items: Option<Vec<String>>,
 }
@@ -1067,7 +1085,7 @@ pub struct LiasettingsGetAccessibleGmbAccountsResponse {
     pub gmb_accounts: Option<Vec<GmbAccountsGmbAccount>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#liasettingsGetAccessibleGmbAccountsResponse".
     pub kind: Option<String>,
-    /// The ID of the account.
+    /// The ID of the Merchant Center account.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
@@ -1113,22 +1131,22 @@ pub struct OrdersCustomBatchRequestEntryRefund {
     /// The reason for the refund.
     /// 
     /// Acceptable values are:  
-    /// - "adjustment" 
-    /// - "courtesyAdjustment" 
-    /// - "customerCanceled" 
-    /// - "customerDiscretionaryReturn" 
-    /// - "deliveredLateByCarrier" 
-    /// - "feeAdjustment" 
-    /// - "lateShipmentCredit" 
-    /// - "noInventory" 
-    /// - "other" 
-    /// - "priceError" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "shippingCostAdjustment" 
-    /// - "taxAdjustment" 
-    /// - "undeliverableShippingAddress" 
-    /// - "wrongProductShipped"
+    /// - "`adjustment`" 
+    /// - "`courtesyAdjustment`" 
+    /// - "`customerCanceled`" 
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`deliveredLateByCarrier`" 
+    /// - "`feeAdjustment`" 
+    /// - "`lateShipmentCredit`" 
+    /// - "`noInventory`" 
+    /// - "`other`" 
+    /// - "`priceError`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`shippingCostAdjustment`" 
+    /// - "`taxAdjustment`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// Deprecated. Please use amountPretax and amountTax instead.
     pub amount: Option<Price>,
@@ -1202,7 +1220,7 @@ pub struct InvoiceSummaryAdditionalChargeSummary {
     /// [required] Type of the additional charge.
     /// 
     /// Acceptable values are:  
-    /// - "shipping"
+    /// - "`shipping`"
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1225,21 +1243,21 @@ pub struct TestOrderPaymentMethod {
     /// The card expiration year (4-digit, e.g. 2015).
     #[serde(rename="expirationYear")]
     pub expiration_year: Option<i32>,
-    /// The type of instrument. Note that real orders might have different values than the four values accepted by createTestOrder.
+    /// The type of instrument. Note that real orders might have different values than the four values accepted by `createTestOrder`.
     /// 
     /// Acceptable values are:  
-    /// - "AMEX" 
-    /// - "DISCOVER" 
-    /// - "MASTERCARD" 
-    /// - "VISA"
+    /// - "`AMEX`" 
+    /// - "`DISCOVER`" 
+    /// - "`MASTERCARD`" 
+    /// - "`VISA`"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The billing address.
     /// 
     /// Acceptable values are:  
-    /// - "dwight" 
-    /// - "jim" 
-    /// - "pam"
+    /// - "`dwight`" 
+    /// - "`jim`" 
+    /// - "`pam`"
     #[serde(rename="predefinedBillingAddress")]
     pub predefined_billing_address: Option<String>,
 }
@@ -1253,28 +1271,28 @@ impl Part for TestOrderPaymentMethod {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InventoryPickup {
-    /// Whether store pickup is available for this offer and whether the pickup option should be shown as buy, reserve, or not supported. Only supported for local inventory. Unless the value is "not supported", must be submitted together with pickupSla.
+    /// Whether store pickup is available for this offer and whether the pickup option should be shown as buy, reserve, or not supported. Only supported for local inventory. Unless the value is "not supported", must be submitted together with `pickupSla`.
     /// 
     /// Acceptable values are:  
-    /// - "buy" 
-    /// - "not supported" 
-    /// - "reserve" 
-    /// - "ship to store"
+    /// - "`buy`" 
+    /// - "`not supported`" 
+    /// - "`reserve`" 
+    /// - "`ship to store`"
     #[serde(rename="pickupMethod")]
     pub pickup_method: Option<String>,
-    /// The expected date that an order will be ready for pickup, relative to when the order is placed. Only supported for local inventory. Must be submitted together with pickupMethod.
+    /// The expected date that an order will be ready for pickup, relative to when the order is placed. Only supported for local inventory. Must be submitted together with `pickupMethod`.
     /// 
     /// Acceptable values are:  
-    /// - "five day" 
-    /// - "four day" 
-    /// - "multi day" 
-    /// - "multi week" 
-    /// - "next day" 
-    /// - "same day" 
-    /// - "seven day" 
-    /// - "six day" 
-    /// - "three day" 
-    /// - "two day"
+    /// - "`five day`" 
+    /// - "`four day`" 
+    /// - "`multi day`" 
+    /// - "`multi week`" 
+    /// - "`next day`" 
+    /// - "`same day`" 
+    /// - "`seven day`" 
+    /// - "`six day`" 
+    /// - "`three day`" 
+    /// - "`two day`"
     #[serde(rename="pickupSla")]
     pub pickup_sla: Option<String>,
 }
@@ -1296,7 +1314,7 @@ pub struct PosSaleResponse {
     /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a `storeCode` inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posSaleResponse".
@@ -1332,18 +1350,19 @@ pub struct ReturnShipment {
     /// Type of the return method.
     /// 
     /// Acceptable values are:  
-    /// - "byMail" 
-    /// - "contactCustomerSupport" 
-    /// - "returnless"
+    /// - "`byMail`" 
+    /// - "`contactCustomerSupport`" 
+    /// - "`returnless`"
     #[serde(rename="returnMethodType")]
     pub return_method_type: Option<String>,
     /// State of the shipment.
     /// 
     /// Acceptable values are:  
-    /// - "completed" 
-    /// - "new" 
-    /// - "shipped" 
-    /// - "undeliverable"
+    /// - "`completed`" 
+    /// - "`new`" 
+    /// - "`shipped`" 
+    /// - "`undeliverable`" 
+    /// - "`pending`"
     pub state: Option<String>,
     /// Tracking information of the shipment. One return shipment might be handled by several shipping carriers sequentially.
     #[serde(rename="shipmentTrackingInfos")]
@@ -1376,23 +1395,23 @@ impl Part for ReturnShipment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCreateTestOrderRequest {
-    /// The  CLDR territory code of the country of the test order to create. Affects the currency and addresses of orders created via template_name, or the addresses of orders created via test_order.
+    /// The  CLDR territory code of the country of the test order to create. Affects the currency and addresses of orders created via `template_name`, or the addresses of orders created via `test_order`.
     /// 
     /// Acceptable values are:  
-    /// - "US" 
-    /// - "FR"  Defaults to US.
+    /// - "`US`" 
+    /// - "`FR`"  Defaults to `US`.
     pub country: Option<String>,
     /// The test order to create.
     #[serde(rename="testOrder")]
     pub test_order: Option<TestOrder>,
-    /// The test order template to use. Specify as an alternative to testOrder as a shortcut for retrieving a template and then creating an order using that template.
+    /// The test order template to use. Specify as an alternative to `testOrder` as a shortcut for retrieving a template and then creating an order using that template.
     /// 
     /// Acceptable values are:  
-    /// - "template1" 
-    /// - "template1a" 
-    /// - "template1b" 
-    /// - "template2" 
-    /// - "template3"
+    /// - "`template1`" 
+    /// - "`template1a`" 
+    /// - "`template1b`" 
+    /// - "`template2`" 
+    /// - "`template3`"
     #[serde(rename="templateName")]
     pub template_name: Option<String>,
 }
@@ -1414,9 +1433,9 @@ pub struct OrdersCancelTestOrderByCustomerRequest {
     /// The reason for the cancellation.
     /// 
     /// Acceptable values are:  
-    /// - "changedMind" 
-    /// - "orderedWrongItem" 
-    /// - "other"
+    /// - "`changedMind`" 
+    /// - "`orderedWrongItem`" 
+    /// - "`other`"
     pub reason: Option<String>,
 }
 
@@ -1452,29 +1471,29 @@ pub struct AccountsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The account to create or update. Only defined if the method is insert or update.
+    /// The account to create or update. Only defined if the method is `insert` or `update`.
     pub account: Option<Account>,
-    /// Whether the account should be deleted if the account has offers. Only applicable if the method is delete.
+    /// Whether the account should be deleted if the account has offers. Only applicable if the method is `delete`.
     pub force: Option<bool>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// Details about the link request.
+    /// Details about the `link` request.
     #[serde(rename="linkRequest")]
     pub link_request: Option<AccountsCustomBatchRequestEntryLinkRequest>,
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "claimWebsite" 
-    /// - "delete" 
-    /// - "get" 
-    /// - "insert" 
-    /// - "link" 
-    /// - "update"
+    /// - "`claimWebsite`" 
+    /// - "`delete`" 
+    /// - "`get`" 
+    /// - "`insert`" 
+    /// - "`link`" 
+    /// - "`update`"
     pub method: Option<String>,
-    /// Only applicable if the method is claimwebsite. Indicates whether or not to take the claim from another account in case there is a conflict.
+    /// Only applicable if the method is `claimwebsite`. Indicates whether or not to take the claim from another account in case there is a conflict.
     pub overwrite: Option<bool>,
-    /// The ID of the targeted account. Only defined if the method is not insert.
+    /// The ID of the targeted account. Only defined if the method is not `insert`.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
@@ -1541,8 +1560,8 @@ pub struct AccountStatusProducts {
     /// The channel the data applies to.
     /// 
     /// Acceptable values are:  
-    /// - "local" 
-    /// - "online"
+    /// - "`local`" 
+    /// - "`online`"
     pub channel: Option<String>,
     /// Aggregated product statistics.
     pub statistics: Option<AccountStatusStatistics>,
@@ -1565,7 +1584,7 @@ pub struct PosInventoryResponse {
     /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a `storeCode` inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posInventoryResponse".
@@ -1605,8 +1624,8 @@ pub struct OrdersReturnRefundLineItemResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -1633,7 +1652,7 @@ pub struct DatafeedstatusesCustomBatchResponseEntry {
 impl Part for DatafeedstatusesCustomBatchResponseEntry {}
 
 
-/// There is no detailed description.
+/// (== resource_for v2.inventory ==)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1668,20 +1687,20 @@ pub struct Inventory {
     /// Custom label 0 for custom grouping of items in a Shopping campaign. Only supported for online products.
     #[serde(rename="customLabel0")]
     pub custom_label0: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#inventory`"
     pub kind: Option<String>,
     /// Number and amount of installments to pay for an item. Brazil only.
     pub installment: Option<Installment>,
     /// The availability of the product.
     /// 
     /// Acceptable values are:  
-    /// - "in stock" 
-    /// - "out of stock" 
-    /// - "preorder"
+    /// - "`in stock`" 
+    /// - "`out of stock`" 
+    /// - "`preorder`"
     pub availability: Option<String>,
-    /// Store pickup information. Only supported for local inventory. Not setting pickup means "don't update" while setting it to the empty value ({} in JSON) means "delete". Otherwise, pickupMethod and pickupSla must be set together, unless pickupMethod is "not supported".
+    /// Store pickup information. Only supported for local inventory. Not setting `pickup` means "don't update" while setting it to the empty value (`{}` in JSON) means "delete". Otherwise, `pickupMethod` and `pickupSla` must be set together, unless `pickupMethod` is "not supported".
     pub pickup: Option<InventoryPickup>,
-    /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
+    /// The sale price of the product. Mandatory if `sale_price_effective_date` is defined.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
     /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.
@@ -1705,7 +1724,7 @@ pub struct OrdersShipLineItemsRequest {
     /// Line items to ship.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
-    /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See `shipments[].carrier` in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// Deprecated. Please use shipmentInfo instead. The tracking ID for the shipment.
     #[serde(rename="trackingId")]
@@ -1771,11 +1790,11 @@ impl Part for ProductAmount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CarriersCarrier {
-    /// A list of supported services (e.g., "ground") for that carrier. Contains at least one service.
+    /// A list of supported services (e.g., `"ground"`) for that carrier. Contains at least one service.
     pub services: Option<Vec<String>>,
     /// The CLDR country code of the carrier (e.g., "US"). Always present.
     pub country: Option<String>,
-    /// The name of the carrier (e.g., "UPS"). Always present.
+    /// The name of the carrier (e.g., `"UPS"`). Always present.
     pub name: Option<String>,
 }
 
@@ -1872,34 +1891,34 @@ pub struct OrderCancellation {
     /// The reason for the cancellation. Orders that are canceled with a noInventory reason will lead to the removal of the product from Shopping Actions until you make an update to that product. This will not affect your Shopping ads.
     /// 
     /// Acceptable values are:  
-    /// - "autoPostInternal" 
-    /// - "autoPostInvalidBillingAddress" 
-    /// - "autoPostNoInventory" 
-    /// - "autoPostPriceError" 
-    /// - "autoPostUndeliverableShippingAddress" 
-    /// - "couponAbuse" 
-    /// - "customerCanceled" 
-    /// - "customerInitiatedCancel" 
-    /// - "customerSupportRequested" 
-    /// - "failToPushOrderGoogleError" 
-    /// - "failToPushOrderMerchantError" 
-    /// - "failToPushOrderMerchantFulfillmentError" 
-    /// - "failToPushOrderToMerchant" 
-    /// - "failToPushOrderToMerchantOutOfStock" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "merchantDidNotShipOnTime" 
-    /// - "noInventory" 
-    /// - "orderTimeout" 
-    /// - "other" 
-    /// - "paymentAbuse" 
-    /// - "paymentDeclined" 
-    /// - "priceError" 
-    /// - "returnRefundAbuse" 
-    /// - "shippingPriceError" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress"
+    /// - "`autoPostInternal`" 
+    /// - "`autoPostInvalidBillingAddress`" 
+    /// - "`autoPostNoInventory`" 
+    /// - "`autoPostPriceError`" 
+    /// - "`autoPostUndeliverableShippingAddress`" 
+    /// - "`couponAbuse`" 
+    /// - "`customerCanceled`" 
+    /// - "`customerInitiatedCancel`" 
+    /// - "`customerSupportRequested`" 
+    /// - "`failToPushOrderGoogleError`" 
+    /// - "`failToPushOrderMerchantError`" 
+    /// - "`failToPushOrderMerchantFulfillmentError`" 
+    /// - "`failToPushOrderToMerchant`" 
+    /// - "`failToPushOrderToMerchantOutOfStock`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`merchantDidNotShipOnTime`" 
+    /// - "`noInventory`" 
+    /// - "`orderTimeout`" 
+    /// - "`other`" 
+    /// - "`paymentAbuse`" 
+    /// - "`paymentDeclined`" 
+    /// - "`priceError`" 
+    /// - "`returnRefundAbuse`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`"
     pub reason: Option<String>,
     /// Date on which the cancellation has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
@@ -1907,12 +1926,12 @@ pub struct OrderCancellation {
     /// The actor that created the cancellation.
     /// 
     /// Acceptable values are:  
-    /// - "customer" 
-    /// - "googleBot" 
-    /// - "googleCustomerService" 
-    /// - "googlePayments" 
-    /// - "googleSabre" 
-    /// - "merchant"
+    /// - "`customer`" 
+    /// - "`googleBot`" 
+    /// - "`googleCustomerService`" 
+    /// - "`googlePayments`" 
+    /// - "`googleSabre`" 
+    /// - "`merchant`"
     pub actor: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -1928,44 +1947,44 @@ impl Part for OrderCancellation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntry {
-    /// The ID of the order. Required for all methods beside getByMerchantOrderId.
+    /// The ID of the order. Required for all methods beside `getByMerchantOrderId`.
     #[serde(rename="orderId")]
     pub order_id: Option<String>,
-    /// Required for rejectReturnLineItem method.
+    /// Required for `rejectReturnLineItem` method.
     #[serde(rename="rejectReturnLineItem")]
     pub reject_return_line_item: Option<OrdersCustomBatchRequestEntryRejectReturnLineItem>,
-    /// Required for updateLineItemShippingDate method.
+    /// Required for `updateLineItemShippingDate` method.
     #[serde(rename="updateLineItemShippingDetails")]
     pub update_line_item_shipping_details: Option<OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails>,
-    /// Required for inStoreReturnLineItem method.
+    /// Required for `inStoreReturnLineItem` method.
     #[serde(rename="inStoreRefundLineItem")]
     pub in_store_refund_line_item: Option<OrdersCustomBatchRequestEntryInStoreRefundLineItem>,
-    /// Required for updateShipment method.
+    /// Required for `updateShipment` method.
     #[serde(rename="updateShipment")]
     pub update_shipment: Option<OrdersCustomBatchRequestEntryUpdateShipment>,
-    /// Required for cancelLineItem method.
+    /// Required for `cancelLineItem` method.
     #[serde(rename="cancelLineItem")]
     pub cancel_line_item: Option<OrdersCustomBatchRequestEntryCancelLineItem>,
-    /// Required for refund method.
+    /// Required for `refund` method.
     pub refund: Option<OrdersCustomBatchRequestEntryRefund>,
-    /// Required for cancel method.
+    /// Required for `cancel` method.
     pub cancel: Option<OrdersCustomBatchRequestEntryCancel>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// Required for returnLineItem method.
+    /// Required for `returnLineItem` method.
     #[serde(rename="returnLineItem")]
     pub return_line_item: Option<OrdersCustomBatchRequestEntryReturnLineItem>,
-    /// The merchant order ID. Required for updateMerchantOrderId and getByMerchantOrderId methods.
+    /// The merchant order ID. Required for `updateMerchantOrderId` and `getByMerchantOrderId` methods.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
-    /// Required for returnRefundLineItem method.
+    /// Required for `returnRefundLineItem` method.
     #[serde(rename="returnRefundLineItem")]
     pub return_refund_line_item: Option<OrdersCustomBatchRequestEntryReturnRefundLineItem>,
-    /// Required for shipLineItems method.
+    /// Required for `shipLineItems` method.
     #[serde(rename="shipLineItems")]
     pub ship_line_items: Option<OrdersCustomBatchRequestEntryShipLineItems>,
-    /// Required for setLineItemMetadata method.
+    /// Required for `setLineItemMetadata` method.
     #[serde(rename="setLineItemMetadata")]
     pub set_line_item_metadata: Option<OrdersCustomBatchRequestEntrySetLineItemMetadata>,
     /// An entry ID, unique within the batch request.
@@ -1974,23 +1993,23 @@ pub struct OrdersCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "acknowledge" 
-    /// - "cancel" 
-    /// - "cancelLineItem" 
-    /// - "get" 
-    /// - "getByMerchantOrderId" 
-    /// - "inStoreRefundLineItem" 
-    /// - "refund" 
-    /// - "rejectReturnLineItem" 
-    /// - "returnLineItem" 
-    /// - "returnRefundLineItem" 
-    /// - "setLineItemMetadata" 
-    /// - "shipLineItems" 
-    /// - "updateLineItemShippingDetails" 
-    /// - "updateMerchantOrderId" 
-    /// - "updateShipment"
+    /// - "`acknowledge`" 
+    /// - "`cancel`" 
+    /// - "`cancelLineItem`" 
+    /// - "`get`" 
+    /// - "`getByMerchantOrderId`" 
+    /// - "`inStoreRefundLineItem`" 
+    /// - "`refund`" 
+    /// - "`rejectReturnLineItem`" 
+    /// - "`returnLineItem`" 
+    /// - "`returnRefundLineItem`" 
+    /// - "`setLineItemMetadata`" 
+    /// - "`shipLineItems`" 
+    /// - "`updateLineItemShippingDetails`" 
+    /// - "`updateMerchantOrderId`" 
+    /// - "`updateShipment`"
     pub method: Option<String>,
-    /// The ID of the operation. Unique across all operations for a given order. Required for all methods beside get and getByMerchantOrderId.
+    /// The ID of the operation. Unique across all operations for a given order. Required for all methods beside `get` and `getByMerchantOrderId`.
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
 }
@@ -2080,16 +2099,16 @@ pub struct OrdersCancelLineItemRequest {
     /// The reason for the cancellation.
     /// 
     /// Acceptable values are:  
-    /// - "customerInitiatedCancel" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "noInventory" 
-    /// - "other" 
-    /// - "priceError" 
-    /// - "shippingPriceError" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress"
+    /// - "`customerInitiatedCancel`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`noInventory`" 
+    /// - "`other`" 
+    /// - "`priceError`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`"
     pub reason: Option<String>,
     /// Tax amount that corresponds to cancellation amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
@@ -2118,7 +2137,7 @@ pub struct PosInventoryRequest {
     /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a `storeCode` inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Required. The CLDR territory code for the item.
@@ -2149,10 +2168,10 @@ pub struct ProductDestination {
     /// Whether the destination is required, excluded or should be validated.
     /// 
     /// Acceptable values are:  
-    /// - "default" 
-    /// - "excluded" 
-    /// - "optional" 
-    /// - "required"
+    /// - "`default`" 
+    /// - "`excluded`" 
+    /// - "`optional`" 
+    /// - "`required`"
     pub intention: Option<String>,
     /// The name of the destination.
     #[serde(rename="destinationName")]
@@ -2168,32 +2187,32 @@ impl Part for ProductDestination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosCustomBatchRequestEntry {
-    /// The store code. Set this only if the method is delete or get.
+    /// The store code. Set this only if the method is `delete` or `get`.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// The ID of the account for which to get/submit data.
     #[serde(rename="targetMerchantId")]
     pub target_merchant_id: Option<String>,
-    /// The sale information to submit. Set this only if the method is sale.
+    /// The sale information to submit. Set this only if the method is `sale`.
     pub sale: Option<PosSale>,
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "delete" 
-    /// - "get" 
-    /// - "insert" 
-    /// - "inventory" 
-    /// - "sale"
+    /// - "`delete`" 
+    /// - "`get`" 
+    /// - "`insert`" 
+    /// - "`inventory`" 
+    /// - "`sale`"
     pub method: Option<String>,
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The inventory to submit. Set this only if the method is inventory.
+    /// The inventory to submit. Set this only if the method is `inventory`.
     pub inventory: Option<PosInventory>,
     /// The ID of the POS data provider.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// The store information to submit. Set this only if the method is insert.
+    /// The store information to submit. Set this only if the method is `insert`.
     pub store: Option<PosStore>,
 }
 
@@ -2223,19 +2242,19 @@ pub struct OrdersCustomBatchRequestEntryInStoreRefundLineItem {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
     #[serde(rename="productId")]
@@ -2280,13 +2299,13 @@ pub struct DatafeedFetchSchedule {
     /// The day of the week the feed file should be fetched.
     /// 
     /// Acceptable values are:  
-    /// - "monday" 
-    /// - "tuesday" 
-    /// - "wednesday" 
-    /// - "thursday" 
-    /// - "friday" 
-    /// - "saturday" 
-    /// - "sunday"
+    /// - "`monday`" 
+    /// - "`tuesday`" 
+    /// - "`wednesday`" 
+    /// - "`thursday`" 
+    /// - "`friday`" 
+    /// - "`saturday`" 
+    /// - "`sunday`"
     pub weekday: Option<String>,
     /// Time zone used for schedule. UTC by default. E.g., "America/Los_Angeles".
     #[serde(rename="timeZone")]
@@ -2319,7 +2338,7 @@ pub struct LiaSettings {
     /// The LIA settings for each country.
     #[serde(rename="countrySettings")]
     pub country_settings: Option<Vec<LiaCountrySettings>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#liaSettings".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#liaSettings`"
     pub kind: Option<String>,
     /// The ID of the account to which these LIA settings belong. Ignored upon update, always present in get request responses.
     #[serde(rename="accountId")]
@@ -2362,8 +2381,8 @@ pub struct OrderLegacyPromotionBenefit {
     /// Describes whether the promotion applies to products (e.g. 20% off) or to shipping (e.g. Free Shipping).
     /// 
     /// Acceptable values are:  
-    /// - "product" 
-    /// - "shipping"
+    /// - "`product`" 
+    /// - "`shipping`"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The impact on tax when the promotion is applied.
@@ -2372,20 +2391,20 @@ pub struct OrderLegacyPromotionBenefit {
     /// Further describes the benefit of the promotion. Note that we will expand on this enumeration as we support new promotion sub-types.
     /// 
     /// Acceptable values are:  
-    /// - "buyMGetMoneyOff" 
-    /// - "buyMGetNMoneyOff" 
-    /// - "buyMGetNPercentOff" 
-    /// - "buyMGetPercentOff" 
-    /// - "freeGift" 
-    /// - "freeGiftWithItemId" 
-    /// - "freeGiftWithValue" 
-    /// - "freeOvernightShipping" 
-    /// - "freeShipping" 
-    /// - "freeTwoDayShipping" 
-    /// - "moneyOff" 
-    /// - "percentageOff" 
-    /// - "rewardPoints" 
-    /// - "salePrice"
+    /// - "`buyMGetMoneyOff`" 
+    /// - "`buyMGetNMoneyOff`" 
+    /// - "`buyMGetNPercentOff`" 
+    /// - "`buyMGetPercentOff`" 
+    /// - "`freeGift`" 
+    /// - "`freeGiftWithItemId`" 
+    /// - "`freeGiftWithValue`" 
+    /// - "`freeOvernightShipping`" 
+    /// - "`freeShipping`" 
+    /// - "`freeTwoDayShipping`" 
+    /// - "`moneyOff`" 
+    /// - "`percentageOff`" 
+    /// - "`rewardPoints`" 
+    /// - "`salePrice`"
     #[serde(rename="subType")]
     pub sub_type: Option<String>,
 }
@@ -2411,7 +2430,7 @@ pub struct AccountstatusesCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "get"
+    /// - "`get`"
     pub method: Option<String>,
     /// If set, only issues for the specified destinations are returned, otherwise only issues for the Shopping destination.
     pub destinations: Option<Vec<String>>,
@@ -2429,10 +2448,10 @@ pub struct PosSale {
     /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a `storeCode` inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#posSale".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#posSale`"
     pub kind: Option<String>,
     /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
@@ -2465,11 +2484,11 @@ pub struct OrdersCustomBatchRequestEntryRejectReturnLineItem {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "damagedOrUsed" 
-    /// - "missingComponent" 
-    /// - "notEligible" 
-    /// - "other" 
-    /// - "outOfReturnWindow"
+    /// - "`damagedOrUsed`" 
+    /// - "`missingComponent`" 
+    /// - "`notEligible`" 
+    /// - "`other`" 
+    /// - "`outOfReturnWindow`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -2493,10 +2512,10 @@ impl Part for OrdersCustomBatchRequestEntryRejectReturnLineItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PickupCarrierService {
-    /// The name of the pickup service (e.g., "Access point"). Required.
+    /// The name of the pickup service (e.g., `"Access point"`). Required.
     #[serde(rename="serviceName")]
     pub service_name: Option<String>,
-    /// The name of the pickup carrier (e.g., "UPS"). Required.
+    /// The name of the pickup carrier (e.g., `"UPS"`). Required.
     #[serde(rename="carrierName")]
     pub carrier_name: Option<String>,
 }
@@ -2558,60 +2577,60 @@ pub struct OrderRefund {
     /// The reason for the refund.
     /// 
     /// Acceptable values are:  
-    /// - "adjustment" 
-    /// - "autoPostInternal" 
-    /// - "autoPostInvalidBillingAddress" 
-    /// - "autoPostNoInventory" 
-    /// - "autoPostPriceError" 
-    /// - "autoPostUndeliverableShippingAddress" 
-    /// - "couponAbuse" 
-    /// - "courtesyAdjustment" 
-    /// - "customerCanceled" 
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "customerSupportRequested" 
-    /// - "deliveredLateByCarrier" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "failToPushOrderGoogleError" 
-    /// - "failToPushOrderMerchantError" 
-    /// - "failToPushOrderMerchantFulfillmentError" 
-    /// - "failToPushOrderToMerchant" 
-    /// - "failToPushOrderToMerchantOutOfStock" 
-    /// - "feeAdjustment" 
-    /// - "invalidCoupon" 
-    /// - "lateShipmentCredit" 
-    /// - "malformedShippingAddress" 
-    /// - "merchantDidNotShipOnTime" 
-    /// - "noInventory" 
-    /// - "orderTimeout" 
-    /// - "other" 
-    /// - "paymentAbuse" 
-    /// - "paymentDeclined" 
-    /// - "priceAdjustment" 
-    /// - "priceError" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "promoReallocation" 
-    /// - "qualityNotAsExpected" 
-    /// - "returnRefundAbuse" 
-    /// - "shippingCostAdjustment" 
-    /// - "shippingPriceError" 
-    /// - "taxAdjustment" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`adjustment`" 
+    /// - "`autoPostInternal`" 
+    /// - "`autoPostInvalidBillingAddress`" 
+    /// - "`autoPostNoInventory`" 
+    /// - "`autoPostPriceError`" 
+    /// - "`autoPostUndeliverableShippingAddress`" 
+    /// - "`couponAbuse`" 
+    /// - "`courtesyAdjustment`" 
+    /// - "`customerCanceled`" 
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`customerSupportRequested`" 
+    /// - "`deliveredLateByCarrier`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`failToPushOrderGoogleError`" 
+    /// - "`failToPushOrderMerchantError`" 
+    /// - "`failToPushOrderMerchantFulfillmentError`" 
+    /// - "`failToPushOrderToMerchant`" 
+    /// - "`failToPushOrderToMerchantOutOfStock`" 
+    /// - "`feeAdjustment`" 
+    /// - "`invalidCoupon`" 
+    /// - "`lateShipmentCredit`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`merchantDidNotShipOnTime`" 
+    /// - "`noInventory`" 
+    /// - "`orderTimeout`" 
+    /// - "`other`" 
+    /// - "`paymentAbuse`" 
+    /// - "`paymentDeclined`" 
+    /// - "`priceAdjustment`" 
+    /// - "`priceError`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`promoReallocation`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`returnRefundAbuse`" 
+    /// - "`shippingCostAdjustment`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxAdjustment`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The actor that created the refund.
     /// 
     /// Acceptable values are:  
-    /// - "customer" 
-    /// - "googleBot" 
-    /// - "googleCustomerService" 
-    /// - "googlePayments" 
-    /// - "googleSabre" 
-    /// - "merchant"
+    /// - "`customer`" 
+    /// - "`googleBot`" 
+    /// - "`googleCustomerService`" 
+    /// - "`googlePayments`" 
+    /// - "`googleSabre`" 
+    /// - "`merchant`"
     pub actor: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -2630,18 +2649,18 @@ pub struct RateGroup {
     /// A list of shipping labels defining the products to which this rate group applies to. This is a disjunction: only one of the labels has to match for the rate group to apply. May only be empty for the last rate group of a service. Required.
     #[serde(rename="applicableShippingLabels")]
     pub applicable_shipping_labels: Option<Vec<String>>,
-    /// A list of carrier rates that can be referred to by mainTable or singleValue.
+    /// A list of carrier rates that can be referred to by `mainTable` or `singleValue`.
     #[serde(rename="carrierRates")]
     pub carrier_rates: Option<Vec<CarrierRate>>,
-    /// A table defining the rate group, when singleValue is not expressive enough. Can only be set if singleValue is not set.
+    /// A table defining the rate group, when `singleValue` is not expressive enough. Can only be set if `singleValue` is not set.
     #[serde(rename="mainTable")]
     pub main_table: Option<Table>,
     /// Name of the rate group. Optional. If set has to be unique within shipping service.
     pub name: Option<String>,
-    /// The value of the rate group (e.g. flat rate $10). Can only be set if mainTable and subtables are not set.
+    /// The value of the rate group (e.g. flat rate $10). Can only be set if `mainTable` and `subtables` are not set.
     #[serde(rename="singleValue")]
     pub single_value: Option<Value>,
-    /// A list of subtables referred to by mainTable. Can only be set if mainTable is set.
+    /// A list of subtables referred to by `mainTable`. Can only be set if `mainTable` is set.
     pub subtables: Option<Vec<Table>>,
 }
 
@@ -2657,7 +2676,7 @@ pub struct PosCustomBatchResponseEntry {
     /// The ID of the request entry to which this entry responds.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#posCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#posCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors defined if, and only if, the request failed.
     pub errors: Option<Errors>,
@@ -2683,7 +2702,7 @@ impl Part for PosCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedStatus {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedStatus".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#datafeedStatus`"
     pub kind: Option<String>,
     /// The list of errors occurring in the feed.
     pub errors: Option<Vec<DatafeedStatusError>>,
@@ -2692,10 +2711,10 @@ pub struct DatafeedStatus {
     /// The processing status of the feed.
     /// 
     /// Acceptable values are:  
-    /// - ""failure": The feed could not be processed or all items had errors." 
-    /// - "in progress": The feed is being processed. 
-    /// - "none": The feed has not yet been processed. For example, a feed that has never been uploaded will have this processing status. 
-    /// - "success": The feed was processed successfully, though some items might have had errors.
+    /// - "`"`failure`": The feed could not be processed or all items had errors.`" 
+    /// - "`in progress`": The feed is being processed. 
+    /// - "`none`": The feed has not yet been processed. For example, a feed that has never been uploaded will have this processing status. 
+    /// - "`success`": The feed was processed successfully, though some items might have had errors.
     #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The number of items in the feed that were processed.
@@ -2728,8 +2747,8 @@ pub struct TestOrderCustomerMarketingRightsInfo {
     /// Last know user use selection regards marketing preferences. In certain cases selection might not be known, so this field would be empty.
     /// 
     /// Acceptable values are:  
-    /// - "denied" 
-    /// - "granted"
+    /// - "`denied`" 
+    /// - "`granted`"
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<String>,
     /// Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.
@@ -2749,15 +2768,15 @@ pub struct UnitInvoiceTaxLine {
     /// [required] Type of the tax.
     /// 
     /// Acceptable values are:  
-    /// - "otherFee" 
-    /// - "otherFeeTax" 
-    /// - "sales"
+    /// - "`otherFee`" 
+    /// - "`otherFeeTax`" 
+    /// - "`sales`"
     #[serde(rename="taxType")]
     pub tax_type: Option<String>,
     /// [required] Tax amount for the tax type.
     #[serde(rename="taxAmount")]
     pub tax_amount: Option<Price>,
-    /// Optional name of the tax type. This should only be provided if taxType is otherFeeTax.
+    /// Optional name of the tax type. This should only be provided if `taxType` is `otherFeeTax`.
     #[serde(rename="taxName")]
     pub tax_name: Option<String>,
 }
@@ -2817,11 +2836,11 @@ pub struct OrdersRejectReturnLineItemRequest {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "damagedOrUsed" 
-    /// - "missingComponent" 
-    /// - "notEligible" 
-    /// - "other" 
-    /// - "outOfReturnWindow"
+    /// - "`damagedOrUsed`" 
+    /// - "`missingComponent`" 
+    /// - "`notEligible`" 
+    /// - "`other`" 
+    /// - "`outOfReturnWindow`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -2854,7 +2873,7 @@ pub struct OrderCustomer {
     /// Full name of the customer.
     #[serde(rename="fullName")]
     pub full_name: Option<String>,
-    /// Email address for the merchant to send value-added tax or invoice documentation of the order. This documentation is made available to the customer.
+    /// Email address for the merchant to send value-added tax or invoice documentation of the order. Only the last document sent is made available to the customer. For more information, see  About automated VAT invoicing for Shopping Actions.
     #[serde(rename="invoiceReceivingEmail")]
     pub invoice_receiving_email: Option<String>,
     /// Deprecated.
@@ -2936,8 +2955,8 @@ pub struct OrdersRejectReturnLineItemResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -2961,8 +2980,8 @@ pub struct OrdersInStoreRefundLineItemResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -3052,8 +3071,8 @@ pub struct OrdersRefundResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -3086,19 +3105,19 @@ pub struct AccountsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The retrieved, created, or updated account. Not defined if the method was delete, claimwebsite or link.
+    /// The retrieved, created, or updated account. Not defined if the method was `delete`, `claimwebsite` or `link`.
     pub account: Option<Account>,
     /// A list of errors defined if and only if the request failed.
     pub errors: Option<Errors>,
     /// Deprecated. This field is never set.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "inactive" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`inactive`" 
+    /// - "`pending`"
     #[serde(rename="linkStatus")]
     pub link_status: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#accountsCustomBatchResponseEntry`"
     pub kind: Option<String>,
 }
 
@@ -3114,8 +3133,8 @@ pub struct AccountGoogleMyBusinessLink {
     /// Status of the link between this Merchant Center account and the GMB account.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`pending`"
     pub status: Option<String>,
     /// The GMB email address of which a specific account within a GMB account. A sample account within a GMB account could be a business account with set of locations, managed under the GMB account.
     #[serde(rename="gmbEmail")]
@@ -3142,19 +3161,19 @@ impl Part for AccountGoogleMyBusinessLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Datafeed {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeed".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#datafeed`"
     pub kind: Option<String>,
     /// Required. The type of data feed. For product inventory feeds, only feeds for local stores, not online stores, are supported.
     /// 
     /// Acceptable values are:  
-    /// - "local products" 
-    /// - "product inventory" 
-    /// - "products"
+    /// - "`local products`" 
+    /// - "`product inventory`" 
+    /// - "`products`"
     #[serde(rename="contentType")]
     pub content_type: Option<String>,
     /// Required for insert. A descriptive name of the data feed.
     pub name: Option<String>,
-    /// [DEPRECATED] Please use targets[].language instead. The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targetCountry.
+    /// [DEPRECATED] Please use targets[].language instead. The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for `targetCountry`.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// Format of the feed file.
@@ -3168,7 +3187,7 @@ pub struct Datafeed {
     /// Required. The filename of the feed. All feeds must have a unique file name.
     #[serde(rename="fileName")]
     pub file_name: Option<String>,
-    /// [DEPRECATED] Please use targets[].includedDestinations instead. The list of intended destinations (corresponds to checked check boxes in Merchant Center).
+    /// [DEPRECATED] Please use  targets[].includedDestinations instead. The list of intended destinations (corresponds to checked check boxes in Merchant Center).
     #[serde(rename="intendedDestinations")]
     pub intended_destinations: Option<Vec<String>>,
     /// Required for update. The ID of the data feed.
@@ -3211,24 +3230,20 @@ pub struct TestOrder {
     pub customer: Option<TestOrderCustomer>,
     /// Deprecated. Ignored if provided.
     pub promotions: Option<Vec<OrderLegacyPromotion>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#testOrder".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#testOrder`"
     pub kind: Option<String>,
     /// Required. Line items that are ordered. At least one line item must be provided.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<TestOrderLineItem>>,
-    /// Determines if test order must be pulled by merchant or pushed to merchant via push integration.
-    /// 
-    /// Acceptable values are:  
-    /// - "checkoutIntegration" 
-    /// - "merchantPull"
+    /// Restricted. Do not use.
     #[serde(rename="notificationMode")]
     pub notification_mode: Option<String>,
     /// Required. Identifier of one of the predefined delivery addresses for the delivery.
     /// 
     /// Acceptable values are:  
-    /// - "dwight" 
-    /// - "jim" 
-    /// - "pam"
+    /// - "`dwight`" 
+    /// - "`jim`" 
+    /// - "`pam`"
     #[serde(rename="predefinedDeliveryAddress")]
     pub predefined_delivery_address: Option<String>,
     /// Required. The price of shipping for all items. Shipping tax is automatically calculated for orders where marketplace facilitator tax laws are applicable. Otherwise, tax settings from Merchant Center are applied. Note that shipping is not taxed in certain states.
@@ -3237,12 +3252,12 @@ pub struct TestOrder {
     /// Required. The requested shipping option.
     /// 
     /// Acceptable values are:  
-    /// - "economy" 
-    /// - "expedited" 
-    /// - "oneDay" 
-    /// - "sameDay" 
-    /// - "standard" 
-    /// - "twoDay"
+    /// - "`economy`" 
+    /// - "`expedited`" 
+    /// - "`oneDay`" 
+    /// - "`sameDay`" 
+    /// - "`standard`" 
+    /// - "`twoDay`"
     #[serde(rename="shippingOption")]
     pub shipping_option: Option<String>,
     /// Whether the orderinvoices service should support this order.
@@ -3254,12 +3269,12 @@ pub struct TestOrder {
     /// The details of the payment method.
     #[serde(rename="paymentMethod")]
     pub payment_method: Option<TestOrderPaymentMethod>,
-    /// Identifier of one of the predefined pickup details. Required for orders containing line items with shipping type pickup.
+    /// Identifier of one of the predefined pickup details. Required for orders containing line items with shipping type `pickup`.
     /// 
     /// Acceptable values are:  
-    /// - "dwight" 
-    /// - "jim" 
-    /// - "pam"
+    /// - "`dwight`" 
+    /// - "`jim`" 
+    /// - "`pam`"
     #[serde(rename="predefinedPickupDetails")]
     pub predefined_pickup_details: Option<String>,
 }
@@ -3276,7 +3291,7 @@ pub struct OrderLineItemShippingDetailsMethod {
     /// Required. Minimum transit time.
     #[serde(rename="minDaysInTransit")]
     pub min_days_in_transit: Option<u32>,
-    /// The carrier for the shipping. Optional. See shipments[].carrier for a list of acceptable values.
+    /// The carrier for the shipping. Optional. See `shipments[].carrier` for a list of acceptable values.
     pub carrier: Option<String>,
     /// Required. The name of the shipping method.
     #[serde(rename="methodName")]
@@ -3351,7 +3366,7 @@ impl Part for ProductUnitPricingMeasure {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountStatus {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#accountStatus`"
     pub kind: Option<String>,
     /// Whether the account's website is claimed or not.
     #[serde(rename="websiteClaimed")]
@@ -3404,7 +3419,7 @@ pub struct PosSaleRequest {
     /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a `storeCode` inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Required. The CLDR territory code for the item.
@@ -3448,19 +3463,19 @@ pub struct OrdersReturnRefundLineItemRequest {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -3491,50 +3506,50 @@ pub struct RefundReason {
     /// Code of the refund reason.
     /// 
     /// Acceptable values are:  
-    /// - "adjustment" 
-    /// - "autoPostInternal" 
-    /// - "autoPostInvalidBillingAddress" 
-    /// - "autoPostNoInventory" 
-    /// - "autoPostPriceError" 
-    /// - "autoPostUndeliverableShippingAddress" 
-    /// - "couponAbuse" 
-    /// - "courtesyAdjustment" 
-    /// - "customerCanceled" 
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "customerSupportRequested" 
-    /// - "deliveredLateByCarrier" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "failToPushOrderGoogleError" 
-    /// - "failToPushOrderMerchantError" 
-    /// - "failToPushOrderMerchantFulfillmentError" 
-    /// - "failToPushOrderToMerchant" 
-    /// - "failToPushOrderToMerchantOutOfStock" 
-    /// - "feeAdjustment" 
-    /// - "invalidCoupon" 
-    /// - "lateShipmentCredit" 
-    /// - "malformedShippingAddress" 
-    /// - "merchantDidNotShipOnTime" 
-    /// - "noInventory" 
-    /// - "orderTimeout" 
-    /// - "other" 
-    /// - "paymentAbuse" 
-    /// - "paymentDeclined" 
-    /// - "priceAdjustment" 
-    /// - "priceError" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "promoReallocation" 
-    /// - "qualityNotAsExpected" 
-    /// - "returnRefundAbuse" 
-    /// - "shippingCostAdjustment" 
-    /// - "shippingPriceError" 
-    /// - "taxAdjustment" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`adjustment`" 
+    /// - "`autoPostInternal`" 
+    /// - "`autoPostInvalidBillingAddress`" 
+    /// - "`autoPostNoInventory`" 
+    /// - "`autoPostPriceError`" 
+    /// - "`autoPostUndeliverableShippingAddress`" 
+    /// - "`couponAbuse`" 
+    /// - "`courtesyAdjustment`" 
+    /// - "`customerCanceled`" 
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`customerSupportRequested`" 
+    /// - "`deliveredLateByCarrier`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`failToPushOrderGoogleError`" 
+    /// - "`failToPushOrderMerchantError`" 
+    /// - "`failToPushOrderMerchantFulfillmentError`" 
+    /// - "`failToPushOrderToMerchant`" 
+    /// - "`failToPushOrderToMerchantOutOfStock`" 
+    /// - "`feeAdjustment`" 
+    /// - "`invalidCoupon`" 
+    /// - "`lateShipmentCredit`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`merchantDidNotShipOnTime`" 
+    /// - "`noInventory`" 
+    /// - "`orderTimeout`" 
+    /// - "`other`" 
+    /// - "`paymentAbuse`" 
+    /// - "`paymentDeclined`" 
+    /// - "`priceAdjustment`" 
+    /// - "`priceError`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`promoReallocation`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`returnRefundAbuse`" 
+    /// - "`shippingCostAdjustment`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxAdjustment`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     #[serde(rename="reasonCode")]
     pub reason_code: Option<String>,
     /// Description of the reason.
@@ -3600,18 +3615,18 @@ pub struct CarrierRate {
     /// Shipping origin for this carrier rate. Required.
     #[serde(rename="originPostalCode")]
     pub origin_postal_code: Option<String>,
-    /// Additive shipping rate modifier. Can be negative. For example { "value": "1", "currency" : "USD" } adds $1 to the rate, { "value": "-3", "currency" : "USD" } removes $3 from the rate. Optional.
+    /// Additive shipping rate modifier. Can be negative. For example `{ "value": "1", "currency" : "USD" }` adds $1 to the rate, `{ "value": "-3", "currency" : "USD" }` removes $3 from the rate. Optional.
     #[serde(rename="flatAdjustment")]
     pub flat_adjustment: Option<Price>,
     /// Name of the carrier rate. Must be unique per rate group. Required.
     pub name: Option<String>,
-    /// Carrier service, such as "UPS" or "Fedex". The list of supported carriers can be retrieved via the getSupportedCarriers method. Required.
+    /// Carrier service, such as `"UPS"` or `"Fedex"`. The list of supported carriers can be retrieved via the `getSupportedCarriers` method. Required.
     #[serde(rename="carrierName")]
     pub carrier_name: Option<String>,
-    /// Carrier service, such as "ground" or "2 days". The list of supported services for a carrier can be retrieved via the getSupportedCarriers method. Required.
+    /// Carrier service, such as `"ground"` or `"2 days"`. The list of supported services for a carrier can be retrieved via the `getSupportedCarriers` method. Required.
     #[serde(rename="carrierService")]
     pub carrier_service: Option<String>,
-    /// Multiplicative shipping rate modifier as a number in decimal notation. Can be negative. For example "5.4" increases the rate by 5.4%, "-3" decreases the rate by 3%. Optional.
+    /// Multiplicative shipping rate modifier as a number in decimal notation. Can be negative. For example `"5.4"` increases the rate by 5.4%, `"-3"` decreases the rate by 3%. Optional.
     #[serde(rename="percentageAdjustment")]
     pub percentage_adjustment: Option<String>,
 }
@@ -3628,11 +3643,11 @@ pub struct OrderLineItemShippingDetails {
     /// Required. The delivery by date, in ISO 8601 format.
     #[serde(rename="deliverByDate")]
     pub deliver_by_date: Option<String>,
-    /// Type of shipment. Indicates whether deliveryDetails or pickupDetails is applicable for this shipment.
+    /// Type of shipment. Indicates whether `deliveryDetails` or `pickupDetails` is applicable for this shipment.
     /// 
     /// Acceptable values are:  
-    /// - "delivery" 
-    /// - "pickup"
+    /// - "`delivery`" 
+    /// - "`pickup`"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Required. Details of the shipping method.
@@ -3659,7 +3674,7 @@ impl Part for OrderLineItemShippingDetails {}
 pub struct ShippingSettings {
     /// The target account's list of services. Optional.
     pub services: Option<Vec<Service>>,
-    /// A list of postal code groups that can be referred to in services. Optional.
+    /// A list of postal code groups that can be referred to in `services`. Optional.
     #[serde(rename="postalCodeGroups")]
     pub postal_code_groups: Option<Vec<PostalCodeGroup>>,
     /// The ID of the account to which these account shipping settings belong. Ignored upon update, always present in get request responses.
@@ -3671,7 +3686,7 @@ impl RequestValue for ShippingSettings {}
 impl ResponseResult for ShippingSettings {}
 
 
-/// Order disbursement. All methods require the payment analyst role.
+/// Order disbursement. All methods require the payment analyst role. (== resource_for v2.orderreports ==) (== resource_for v2.1.orderreports ==)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -3703,7 +3718,7 @@ impl Part for OrderReportDisbursement {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo {
-    /// The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    /// The carrier handling the shipment. See `shipments[].carrier` in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
@@ -3730,19 +3745,19 @@ pub struct OrdersReturnLineItemRequest {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -3842,7 +3857,7 @@ pub struct OrdersCustomBatchRequestEntrySetLineItemMetadata {
 impl Part for OrdersCustomBatchRequestEntrySetLineItemMetadata {}
 
 
-/// The single value of a rate group or the value of a rate group table's cell. Exactly one of noShipping, flatRate, pricePercentage, carrierRateName, subtableName must be set.
+/// The single value of a rate group or the value of a rate group table's cell. Exactly one of `noShipping`, `flatRate`, `pricePercentage`, `carrierRateName`, `subtableName` must be set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -3854,7 +3869,7 @@ pub struct Value {
     /// If true, then the product can't ship. Must be true when set, can only be set if all other fields are not set.
     #[serde(rename="noShipping")]
     pub no_shipping: Option<bool>,
-    /// A percentage of the price represented as a number in decimal notation (e.g., "5.4"). Can only be set if all other fields are not set.
+    /// A percentage of the price represented as a number in decimal notation (e.g., `"5.4"`). Can only be set if all other fields are not set.
     #[serde(rename="pricePercentage")]
     pub price_percentage: Option<String>,
     /// A flat rate. Can only be set if all other fields are not set.
@@ -3884,14 +3899,14 @@ pub struct HolidaysHoliday {
     /// The holiday type. Always present.
     /// 
     /// Acceptable values are:  
-    /// - "Christmas" 
-    /// - "Easter" 
-    /// - "Father's Day" 
-    /// - "Halloween" 
-    /// - "Independence Day (USA)" 
-    /// - "Mother's Day" 
-    /// - "Thanksgiving" 
-    /// - "Valentine's Day"
+    /// - "`Christmas`" 
+    /// - "`Easter`" 
+    /// - "`Father's Day`" 
+    /// - "`Halloween`" 
+    /// - "`Independence Day (USA)`" 
+    /// - "`Mother's Day`" 
+    /// - "`Thanksgiving`" 
+    /// - "`Valentine's Day`"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Hour of the day in the delivery location's timezone on the guaranteed delivery date by which the order has to arrive at the customer's. Possible values are: 0 (midnight), 1, ..., 12 (noon), 13, ..., 23. Always present.
@@ -3914,20 +3929,20 @@ pub struct CustomerReturnReason {
     /// Code of the return reason.
     /// 
     /// Acceptable values are:  
-    /// - "betterPriceFound" 
-    /// - "changedMind" 
-    /// - "damagedOrDefectiveItem" 
-    /// - "didNotMatchDescription" 
-    /// - "doesNotFit" 
-    /// - "expiredItem" 
-    /// - "incorrectItemReceived" 
-    /// - "noLongerNeeded" 
-    /// - "notSpecified" 
-    /// - "orderedWrongItem" 
-    /// - "other" 
-    /// - "qualityNotExpected" 
-    /// - "receivedTooLate" 
-    /// - "undeliverable"
+    /// - "`betterPriceFound`" 
+    /// - "`changedMind`" 
+    /// - "`damagedOrDefectiveItem`" 
+    /// - "`didNotMatchDescription`" 
+    /// - "`doesNotFit`" 
+    /// - "`expiredItem`" 
+    /// - "`incorrectItemReceived`" 
+    /// - "`noLongerNeeded`" 
+    /// - "`notSpecified`" 
+    /// - "`orderedWrongItem`" 
+    /// - "`other`" 
+    /// - "`qualityNotExpected`" 
+    /// - "`receivedTooLate`" 
+    /// - "`undeliverable`"
     #[serde(rename="reasonCode")]
     pub reason_code: Option<String>,
     /// Description of the reason.
@@ -3957,11 +3972,11 @@ pub struct DatafeedsCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "delete" 
-    /// - "fetchNow" 
-    /// - "get" 
-    /// - "insert" 
-    /// - "update"
+    /// - "`delete`" 
+    /// - "`fetchNow`" 
+    /// - "`get`" 
+    /// - "`insert`" 
+    /// - "`update`"
     pub method: Option<String>,
 }
 
@@ -3991,7 +4006,7 @@ pub struct OrderreturnsListResponse {
 impl ResponseResult for OrderreturnsListResponse {}
 
 
-/// Order. Production access (all methods) requires the order manager role. Sandbox access does not.
+/// Order. Production access (all methods) requires the order manager role. Sandbox access does not. (== resource_for v2.orders ==) (== resource_for v2.1.orders ==)
 /// 
 /// # Activities
 /// 
@@ -4028,37 +4043,37 @@ pub struct Order {
     /// The status of the order.
     /// 
     /// Acceptable values are:  
-    /// - "canceled" 
-    /// - "delivered" 
-    /// - "inProgress" 
-    /// - "partiallyDelivered" 
-    /// - "partiallyReturned" 
-    /// - "partiallyShipped" 
-    /// - "pendingShipment" 
-    /// - "returned" 
-    /// - "shipped"
+    /// - "`canceled`" 
+    /// - "`delivered`" 
+    /// - "`inProgress`" 
+    /// - "`partiallyDelivered`" 
+    /// - "`partiallyReturned`" 
+    /// - "`partiallyShipped`" 
+    /// - "`pendingShipment`" 
+    /// - "`returned`" 
+    /// - "`shipped`"
     pub status: Option<String>,
     /// The party responsible for collecting and remitting taxes.
     /// 
     /// Acceptable values are:  
-    /// - "marketplaceFacilitator" 
-    /// - "merchant"
+    /// - "`marketplaceFacilitator`" 
+    /// - "`merchant`"
     #[serde(rename="taxCollector")]
     pub tax_collector: Option<String>,
     /// The status of the payment.
     /// 
     /// Acceptable values are:  
-    /// - "paymentCaptured" 
-    /// - "paymentRejected" 
-    /// - "paymentSecured" 
-    /// - "pendingAuthorization"
+    /// - "`paymentCaptured`" 
+    /// - "`paymentRejected`" 
+    /// - "`paymentSecured`" 
+    /// - "`pendingAuthorization`"
     #[serde(rename="paymentStatus")]
     pub payment_status: Option<String>,
     /// Deprecated.
     /// 
     /// Acceptable values are:  
-    /// - "googleExpress" 
-    /// - "purchasesOnGoogle"
+    /// - "`googleExpress`" 
+    /// - "`purchasesOnGoogle`"
     #[serde(rename="channelType")]
     pub channel_type: Option<String>,
     /// The net amount for the order. For example, if an order was originally for a grand total of $100 and a refund was issued for $20, the net amount will be $80.
@@ -4068,18 +4083,18 @@ pub struct Order {
     pub id: Option<String>,
     /// The details of the customer who placed the order.
     pub customer: Option<OrderCustomer>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#order".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#order`"
     pub kind: Option<String>,
     /// Line items that are ordered.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderLineItem>>,
     /// The details of the merchant provided promotions applied to the order.
     /// 
-    /// To determine which promotions apply to which products, check the Promotions[].Benefits[].OfferIds field against the LineItems[].Product.OfferId field for each promotion. If a promotion is applied to more than 1 offerId, divide the discount value by the number of affected offers to determine how much discount to apply to each offerId.
+    /// To determine which promotions apply to which products, check the `Promotions[].Benefits[].OfferIds` field against the `LineItems[].Product.OfferId` field for each promotion. If a promotion is applied to more than 1 `offerId`, divide the discount value by the number of affected offers to determine how much discount to apply to each `offerId`.
     /// 
     /// Examples:  
-    /// - To calculate the line item level discount for a single specific item: For each promotion, subtract the Promotions[].Benefits[].Discount.value amount from the LineItems[].Price.value. 
-    /// - To calculate the line item level discount for multiple quantity of a specific item: For each promotion, divide the Promotions[].Benefits[].Discount.value by the quantity of products and substract it from LineItems[].Product.Price.value for each quantity item.  
+    /// - To calculate the line item level discount for a single specific item: For each promotion, subtract the `Promotions[].Benefits[].Discount.value` amount from the `LineItems[].Price.value`. 
+    /// - To calculate the line item level discount for multiple quantity of a specific item: For each promotion, divide the `Promotions[].Benefits[].Discount.value` by the quantity of products and substract it from `LineItems[].Product.Price.value` for each quantity item.  
     /// 
     /// Only 1 promotion can be applied to an offerId in a given order. To refund an item which had a promotion applied to it, make sure to refund the amount after first subtracting the promotion discount from the item price.
     /// 
@@ -4090,12 +4105,12 @@ pub struct Order {
     /// Deprecated. Shipping details are provided with line items instead.
     /// 
     /// Acceptable values are:  
-    /// - "economy" 
-    /// - "expedited" 
-    /// - "oneDay" 
-    /// - "sameDay" 
-    /// - "standard" 
-    /// - "twoDay"
+    /// - "`economy`" 
+    /// - "`expedited`" 
+    /// - "`oneDay`" 
+    /// - "`sameDay`" 
+    /// - "`standard`" 
+    /// - "`twoDay`"
     #[serde(rename="shippingOption")]
     pub shipping_option: Option<String>,
     /// Whether the order was acknowledged.
@@ -4109,10 +4124,10 @@ pub struct Order {
     /// Merchant-provided ID of the order.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
-    /// Pickup details for shipments of type pickup.
+    /// Pickup details for shipments of type `pickup`.
     #[serde(rename="pickupDetails")]
     pub pickup_details: Option<OrderPickupDetails>,
-    /// Delivery details for shipments of type delivery.
+    /// Delivery details for shipments of type `delivery`.
     #[serde(rename="deliveryDetails")]
     pub delivery_details: Option<OrderDeliveryDetails>,
     /// The date when the order was placed, in ISO 8601 format.
@@ -4146,8 +4161,8 @@ pub struct OrdersCancelResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4171,8 +4186,8 @@ pub struct OrdersReturnLineItemResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4196,8 +4211,8 @@ pub struct OrdersAcknowledgeResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4214,7 +4229,7 @@ pub struct OrdersCustomBatchRequestEntryShipLineItems {
     /// Line items to ship.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
-    /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See `shipments[].carrier` in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// Deprecated. Please use shipmentInfo instead. The tracking ID for the shipment.
     #[serde(rename="trackingId")]
@@ -4245,7 +4260,7 @@ pub struct ShipmentInvoice {
     /// [required] Invoice details per line item.
     #[serde(rename="lineItemInvoices")]
     pub line_item_invoices: Option<Vec<ShipmentInvoiceLineItemInvoice>>,
-    /// [required] ID of the shipment group. It is assigned by the merchant in the shipLineItems method and is used to group multiple line items that have the same kind of shipping charges.
+    /// [required] ID of the shipment group. It is assigned by the merchant in the `shipLineItems` method and is used to group multiple line items that have the same kind of shipping charges.
     #[serde(rename="shipmentGroupId")]
     pub shipment_group_id: Option<String>,
 }
@@ -4286,7 +4301,7 @@ pub struct AccounttaxCustomBatchResponseEntry {
     pub account_tax: Option<AccountTax>,
     /// A list of errors defined if and only if the request failed.
     pub errors: Option<Errors>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#accounttaxCustomBatchResponseEntry`"
     pub kind: Option<String>,
 }
 
@@ -4307,16 +4322,16 @@ pub struct OrdersCancelRequest {
     /// The reason for the cancellation.
     /// 
     /// Acceptable values are:  
-    /// - "customerInitiatedCancel" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "noInventory" 
-    /// - "other" 
-    /// - "priceError" 
-    /// - "shippingPriceError" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress"
+    /// - "`customerInitiatedCancel`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`noInventory`" 
+    /// - "`other`" 
+    /// - "`priceError`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -4358,10 +4373,11 @@ pub struct OrdersUpdateShipmentRequest {
     /// New status for the shipment. Not updated if missing.
     /// 
     /// Acceptable values are:  
-    /// - "delivered" 
-    /// - "undeliverable"
+    /// - "`delivered`" 
+    /// - "`undeliverable`" 
+    /// - "`readyForPickup`"
     pub status: Option<String>,
-    /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
+    /// The carrier handling the shipment. Not updated if missing. See `shipments[].carrier` in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
     /// The tracking ID for the shipment. Not updated if missing.
     #[serde(rename="trackingId")]
@@ -4369,7 +4385,7 @@ pub struct OrdersUpdateShipmentRequest {
     /// The ID of the shipment.
     #[serde(rename="shipmentId")]
     pub shipment_id: Option<String>,
-    /// Date on which the shipment has been delivered, in ISO 8601 format. Optional and can be provided only if status is delivered.
+    /// Date on which the shipment has been delivered, in ISO 8601 format. Optional and can be provided only if `status` is `delivered`.
     #[serde(rename="deliveryDate")]
     pub delivery_date: Option<String>,
     /// The ID of the operation. Unique across all operations for a given order.
@@ -4389,7 +4405,7 @@ pub struct Table {
     /// Headers of the table's rows. Required.
     #[serde(rename="rowHeaders")]
     pub row_headers: Option<Headers>,
-    /// The list of rows that constitute the table. Must have the same length as rowHeaders. Required.
+    /// The list of rows that constitute the table. Must have the same length as `rowHeaders`. Required.
     pub rows: Option<Vec<Row>>,
     /// Headers of the table's columns. Optional: if not set then the table has only one dimension.
     #[serde(rename="columnHeaders")]
@@ -4456,9 +4472,9 @@ impl Part for InvoiceSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Errors {
-    /// The message of the first error in errors.
+    /// The message of the first error in `errors`.
     pub message: Option<String>,
-    /// The HTTP status of the first error in errors.
+    /// The HTTP status of the first error in `errors`.
     pub code: Option<u32>,
     /// A list of errors.
     pub errors: Option<Vec<ErrorType>>,
@@ -4481,14 +4497,14 @@ pub struct Service {
     /// Eligibility for this service.
     /// 
     /// Acceptable values are:  
-    /// - "All scenarios" 
-    /// - "All scenarios except Shopping Actions" 
-    /// - "Shopping Actions"
+    /// - "`All scenarios`" 
+    /// - "`All scenarios except Shopping Actions`" 
+    /// - "`Shopping Actions`"
     pub eligibility: Option<String>,
     /// The CLDR territory code of the country to which the service applies. Required.
     #[serde(rename="deliveryCountry")]
     pub delivery_country: Option<String>,
-    /// Shipping rate group definitions. Only the last one is allowed to have an empty applicableShippingLabels, which means "everything else". The other applicableShippingLabels must not overlap.
+    /// Shipping rate group definitions. Only the last one is allowed to have an empty `applicableShippingLabels`, which means "everything else". The other `applicableShippingLabels` must not overlap.
     #[serde(rename="rateGroups")]
     pub rate_groups: Option<Vec<RateGroup>>,
     /// The CLDR code of the currency to which this service applies. Must match that of the prices in rate groups.
@@ -4496,16 +4512,19 @@ pub struct Service {
     /// Type of locations this service ships orders to.
     /// 
     /// Acceptable values are:  
-    /// - "delivery" 
-    /// - "pickup"
+    /// - "`delivery`" 
+    /// - "`pickup`"
     #[serde(rename="shipmentType")]
     pub shipment_type: Option<String>,
-    /// The carrier-service pair delivering items to collection points. The list of supported pickup services can be retrieved via the getSupportedPickupServices method. Required if and only if the service delivery type is pickup.
+    /// The carrier-service pair delivering items to collection points. The list of supported pickup services can be retrieved via the `getSupportedPickupServices` method. Required if and only if the service delivery type is `pickup`.
     #[serde(rename="pickupService")]
     pub pickup_service: Option<PickupCarrierService>,
+    /// Table of per store minimum order values for the pickup fulfillment type. Cannot be set together with minimum_order_value.
+    #[serde(rename="minimumOrderValueTable")]
+    pub minimum_order_value_table: Option<MinimumOrderValueTable>,
     /// A boolean exposing the active status of the shipping service. Required.
     pub active: Option<bool>,
-    /// Minimum order value for this service. If set, indicates that customers will have to spend at least this amount. All prices within a service must have the same currency.
+    /// Minimum order value for this service. If set, indicates that customers will have to spend at least this amount. All prices within a service must have the same currency. Cannot be set together with minimum_order_value_table.
     #[serde(rename="minimumOrderValue")]
     pub minimum_order_value: Option<Price>,
 }
@@ -4611,8 +4630,8 @@ pub struct OrderinvoicesCreateRefundInvoiceResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4687,10 +4706,10 @@ pub struct OrderinvoicesCreateRefundInvoiceRequest {
     /// [required] The ID of the invoice.
     #[serde(rename="invoiceId")]
     pub invoice_id: Option<String>,
-    /// Option to create an invoice for a refund and mark all items within the invoice as returned. Exactly one of refundOnlyOption or returnOption must be provided.
+    /// Option to create an invoice for a refund and mark all items within the invoice as returned. Exactly one of `refundOnlyOption` or `returnOption` must be provided.
     #[serde(rename="returnOption")]
     pub return_option: Option<OrderinvoicesCustomBatchRequestEntryCreateRefundInvoiceReturnOption>,
-    /// Option to create a refund-only invoice. Exactly one of refundOnlyOption or returnOption must be provided.
+    /// Option to create a refund-only invoice. Exactly one of `refundOnlyOption` or `returnOption` must be provided.
     #[serde(rename="refundOnlyOption")]
     pub refund_only_option: Option<OrderinvoicesCustomBatchRequestEntryCreateRefundInvoiceRefundOption>,
 }
@@ -4788,15 +4807,15 @@ pub struct CustomAttribute {
     /// The type of the attribute.
     /// 
     /// Acceptable values are:  
-    /// - "boolean" 
-    /// - "datetimerange" 
-    /// - "float" 
-    /// - "group" 
-    /// - "int" 
-    /// - "price" 
-    /// - "text" 
-    /// - "time" 
-    /// - "url"
+    /// - "`boolean`" 
+    /// - "`datetimerange`" 
+    /// - "`float`" 
+    /// - "`group`" 
+    /// - "`int`" 
+    /// - "`price`" 
+    /// - "`text`" 
+    /// - "`time`" 
+    /// - "`url`"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
@@ -4823,9 +4842,9 @@ pub struct TestOrderCustomer {
     /// Required. Email address of the customer.
     /// 
     /// Acceptable values are:  
-    /// - "pog.dwight.schrute@gmail.com" 
-    /// - "pog.jim.halpert@gmail.com" 
-    /// - "penpog.pam.beesly@gmail.comding"
+    /// - "`pog.dwight.schrute@gmail.com`" 
+    /// - "`pog.jim.halpert@gmail.com`" 
+    /// - "`penpog.pam.beesly@gmail.comding`"
     pub email: Option<String>,
     /// Customer's marketing preferences.
     #[serde(rename="marketingRightsInfo")]
@@ -4924,6 +4943,20 @@ impl ResponseResult for OrdersListResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MinimumOrderValueTable {
+    /// no description provided
+    #[serde(rename="storeCodeSetWithMovs")]
+    pub store_code_set_with_movs: Option<Vec<MinimumOrderValueTableStoreCodeSetWithMov>>,
+}
+
+impl Part for MinimumOrderValueTable {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShipping {
     /// The numeric ID of a location that the shipping rate applies to as defined in the AdWords API.
     #[serde(rename="locationId")]
@@ -4963,8 +4996,8 @@ pub struct OrdersSetLineItemMetadataResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4981,7 +5014,7 @@ pub struct ProductsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The product to insert. Only required if the method is insert.
+    /// The product to insert. Only required if the method is `insert`.
     pub product: Option<Product>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
@@ -4989,11 +5022,11 @@ pub struct ProductsCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "delete" 
-    /// - "get" 
-    /// - "insert"
+    /// - "`delete`" 
+    /// - "`get`" 
+    /// - "`insert`"
     pub method: Option<String>,
-    /// The ID of the product to get or delete. Only defined if the method is get or delete.
+    /// The ID of the product to get or delete. Only defined if the method is `get` or `delete`.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -5055,8 +5088,8 @@ pub struct OrdersShipLineItemsResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -5075,7 +5108,7 @@ pub struct OrderPickupDetails {
     pub location_id: Option<String>,
     /// Collectors authorized to pick up shipment from the pickup location.
     pub collectors: Option<Vec<OrderPickupDetailsCollector>>,
-    /// Address of the pickup location where the shipment should be sent. Note that recipientName in the address is the name of the business at the pickup location.
+    /// Address of the pickup location where the shipment should be sent. Note that `recipientName` in the address is the name of the business at the pickup location.
     pub address: Option<OrderAddress>,
 }
 
@@ -5093,19 +5126,19 @@ pub struct OrderReturn {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// Date on which the item has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
@@ -5113,12 +5146,12 @@ pub struct OrderReturn {
     /// The actor that created the refund.
     /// 
     /// Acceptable values are:  
-    /// - "customer" 
-    /// - "googleBot" 
-    /// - "googleCustomerService" 
-    /// - "googlePayments" 
-    /// - "googleSabre" 
-    /// - "merchant"
+    /// - "`customer`" 
+    /// - "`googleBot`" 
+    /// - "`googleCustomerService`" 
+    /// - "`googlePayments`" 
+    /// - "`googleSabre`" 
+    /// - "`merchant`"
     pub actor: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -5187,6 +5220,22 @@ pub struct TransitTableTransitTimeRow {
 impl Part for TransitTableTransitTimeRow {}
 
 
+/// A list of store code sets sharing the same minimum order value. At least two sets are required and the last one must be empty, which signifies 'MOV for all other stores'. Each store code can only appear once across all the sets. All prices within a service must have the same currency.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MinimumOrderValueTableStoreCodeSetWithMov {
+    /// A list of unique store codes or empty for the catch all.
+    #[serde(rename="storeCodes")]
+    pub store_codes: Option<Vec<String>>,
+    /// The minimum order value for the given stores.
+    pub value: Option<Price>,
+}
+
+impl Part for MinimumOrderValueTableStoreCodeSetWithMov {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -5217,7 +5266,7 @@ pub struct UnitInvoiceAdditionalCharge {
     /// [required] Type of the additional charge.
     /// 
     /// Acceptable values are:  
-    /// - "shipping"
+    /// - "`shipping`"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Deprecated.
@@ -5244,8 +5293,8 @@ pub struct OrdersUpdateLineItemShippingDetailsResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -5264,9 +5313,9 @@ pub struct AccountStatusAccountLevelIssue {
     /// Severity of the issue.
     /// 
     /// Acceptable values are:  
-    /// - "critical" 
-    /// - "error" 
-    /// - "suggestion"
+    /// - "`critical`" 
+    /// - "`error`" 
+    /// - "`suggestion`"
     pub severity: Option<String>,
     /// Short description of the issue.
     pub title: Option<String>,
@@ -5317,8 +5366,8 @@ pub struct OrdersUpdateMerchantOrderIdResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -5390,16 +5439,16 @@ pub struct OrdersCustomBatchRequestEntryCancel {
     /// The reason for the cancellation.
     /// 
     /// Acceptable values are:  
-    /// - "customerInitiatedCancel" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "noInventory" 
-    /// - "other" 
-    /// - "priceError" 
-    /// - "shippingPriceError" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress"
+    /// - "`customerInitiatedCancel`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`noInventory`" 
+    /// - "`other`" 
+    /// - "`priceError`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -5421,36 +5470,36 @@ pub struct ShipmentTrackingInfo {
     /// The shipping carrier that handles the package.
     /// 
     /// Acceptable values are:  
-    /// - "boxtal" 
-    /// - "bpost" 
-    /// - "chronopost" 
-    /// - "colisPrive" 
-    /// - "colissimo" 
-    /// - "cxt" 
-    /// - "deliv" 
-    /// - "dhl" 
-    /// - "dpd" 
-    /// - "dynamex" 
-    /// - "eCourier" 
-    /// - "easypost" 
-    /// - "efw" 
-    /// - "fedex" 
-    /// - "fedexSmartpost" 
-    /// - "geodis" 
-    /// - "gls" 
-    /// - "googleCourier" 
-    /// - "gsx" 
-    /// - "jdLogistics" 
-    /// - "laPoste" 
-    /// - "lasership" 
-    /// - "manual" 
-    /// - "mpx" 
-    /// - "onTrac" 
-    /// - "other" 
-    /// - "tnt" 
-    /// - "uds" 
-    /// - "ups" 
-    /// - "usps"
+    /// - "`boxtal`" 
+    /// - "`bpost`" 
+    /// - "`chronopost`" 
+    /// - "`colisPrive`" 
+    /// - "`colissimo`" 
+    /// - "`cxt`" 
+    /// - "`deliv`" 
+    /// - "`dhl`" 
+    /// - "`dpd`" 
+    /// - "`dynamex`" 
+    /// - "`eCourier`" 
+    /// - "`easypost`" 
+    /// - "`efw`" 
+    /// - "`fedex`" 
+    /// - "`fedexSmartpost`" 
+    /// - "`geodis`" 
+    /// - "`gls`" 
+    /// - "`googleCourier`" 
+    /// - "`gsx`" 
+    /// - "`jdLogistics`" 
+    /// - "`laPoste`" 
+    /// - "`lasership`" 
+    /// - "`manual`" 
+    /// - "`mpx`" 
+    /// - "`onTrac`" 
+    /// - "`other`" 
+    /// - "`tnt`" 
+    /// - "`uds`" 
+    /// - "`ups`" 
+    /// - "`usps`"
     pub carrier: Option<String>,
 }
 
@@ -5518,19 +5567,19 @@ pub struct OrderinvoicesCustomBatchRequestEntryCreateRefundInvoiceReturnOption {
     /// [required] Reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// Optional description of the return reason.
     pub description: Option<String>,
@@ -5619,9 +5668,9 @@ pub struct LiaAboutPageSettings {
     /// The status of the verification process for the About page.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "inactive" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`inactive`" 
+    /// - "`pending`"
     pub status: Option<String>,
     /// The URL for the About page.
     pub url: Option<String>,
@@ -5702,16 +5751,16 @@ pub struct OrdersCustomBatchRequestEntryCancelLineItem {
     /// The reason for the cancellation.
     /// 
     /// Acceptable values are:  
-    /// - "customerInitiatedCancel" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "noInventory" 
-    /// - "other" 
-    /// - "priceError" 
-    /// - "shippingPriceError" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress"
+    /// - "`customerInitiatedCancel`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`noInventory`" 
+    /// - "`other`" 
+    /// - "`priceError`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`"
     pub reason: Option<String>,
     /// Tax amount that corresponds to cancellation amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
@@ -5735,8 +5784,8 @@ pub struct Weight {
     /// Required. The weight unit.
     /// 
     /// Acceptable values are:  
-    /// - "kg" 
-    /// - "lb"
+    /// - "`kg`" 
+    /// - "`lb`"
     pub unit: Option<String>,
     /// Required. The weight represented as a number.
     pub value: Option<String>,
@@ -5751,7 +5800,7 @@ impl Part for Weight {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountYouTubeChannelLink {
-    /// Status of the link between this Merchant Center account and the YouTube channel. Upon retrieval, it represents the actual status of the link and can be either active if it was approved in YT Creator Studio or pending if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status active when it's still pending or with status pending when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status inactive is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.
+    /// Status of the link between this Merchant Center account and the YouTube channel. Upon retrieval, it represents the actual status of the link and can be either `active` if it was approved in YT Creator Studio or `pending` if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status `active` when it's still pending or with status `pending` when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status `inactive` is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.
     pub status: Option<String>,
     /// Channel ID.
     #[serde(rename="channelId")]
@@ -5770,7 +5819,7 @@ pub struct GmbAccounts {
     /// A list of GMB accounts which are available to the merchant.
     #[serde(rename="gmbAccounts")]
     pub gmb_accounts: Option<Vec<GmbAccountsGmbAccount>>,
-    /// The ID of the account.
+    /// The ID of the Merchant Center account.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
@@ -5819,19 +5868,19 @@ pub struct OrdersCustomBatchRequestEntryReturnRefundLineItem {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
     #[serde(rename="productId")]
@@ -5861,7 +5910,7 @@ impl Part for BusinessDayConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Row {
-    /// The list of cells that constitute the row. Must have the same length as columnHeaders for two-dimensional tables, a length of 1 for one-dimensional tables. Required.
+    /// The list of cells that constitute the row. Must have the same length as `columnHeaders` for two-dimensional tables, a length of 1 for one-dimensional tables. Required.
     pub cells: Option<Vec<Value>>,
 }
 
@@ -5874,12 +5923,12 @@ impl Part for Row {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductAspect {
-    /// Whether the aspect is required, excluded or should be validated.
+    /// Deprecated.
     pub intention: Option<String>,
-    /// The name of the aspect.
+    /// Deprecated.
     #[serde(rename="aspectName")]
     pub aspect_name: Option<String>,
-    /// The name of the destination. Leave out to apply to all destinations.
+    /// Deprecated.
     #[serde(rename="destinationName")]
     pub destination_name: Option<String>,
 }
@@ -5899,10 +5948,10 @@ pub struct DeliveryTime {
     /// The business days during which orders can be handled. If not provided, Monday to Friday business days will be assumed.
     #[serde(rename="handlingBusinessDayConfig")]
     pub handling_business_day_config: Option<BusinessDayConfig>,
-    /// Maximum number of business days spent before an order is shipped. 0 means same day shipped, 1 means next day shipped. Must be greater than or equal to minHandlingTimeInDays.
+    /// Maximum number of business days spent before an order is shipped. 0 means same day shipped, 1 means next day shipped. Must be greater than or equal to `minHandlingTimeInDays`.
     #[serde(rename="maxHandlingTimeInDays")]
     pub max_handling_time_in_days: Option<u32>,
-    /// Transit time table, number of business days spent in transit based on row and column dimensions. Either {min,max}TransitTimeInDays or transitTimeTable can be set, but not both.
+    /// Transit time table, number of business days spent in transit based on row and column dimensions. Either `{min,max}TransitTimeInDays` or `transitTimeTable` can be set, but not both.
     #[serde(rename="transitTimeTable")]
     pub transit_time_table: Option<TransitTable>,
     /// The business days during which orders can be in-transit. If not provided, Monday to Friday business days will be assumed.
@@ -5911,10 +5960,10 @@ pub struct DeliveryTime {
     /// Business days cutoff time definition. If not configured the cutoff time will be defaulted to 8AM PST.
     #[serde(rename="cutoffTime")]
     pub cutoff_time: Option<CutoffTime>,
-    /// Maximum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Must be greater than or equal to minTransitTimeInDays.
+    /// Maximum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Must be greater than or equal to `minTransitTimeInDays`.
     #[serde(rename="maxTransitTimeInDays")]
     pub max_transit_time_in_days: Option<u32>,
-    /// Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either {min,max}TransitTimeInDays or transitTimeTable must be set, but not both.
+    /// Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either `{min,max}TransitTimeInDays` or `transitTimeTable` must be set, but not both.
     #[serde(rename="minTransitTimeInDays")]
     pub min_transit_time_in_days: Option<u32>,
     /// Holiday cutoff definitions. If configured, they specify order cutoff times for holiday-specific shipping.
@@ -5969,26 +6018,26 @@ pub struct DatafeedFormat {
     /// Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.
     /// 
     /// Acceptable values are:  
-    /// - "latin-1" 
-    /// - "utf-16be" 
-    /// - "utf-16le" 
-    /// - "utf-8" 
-    /// - "windows-1252"
+    /// - "`latin-1`" 
+    /// - "`utf-16be`" 
+    /// - "`utf-16le`" 
+    /// - "`utf-8`" 
+    /// - "`windows-1252`"
     #[serde(rename="fileEncoding")]
     pub file_encoding: Option<String>,
     /// Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.
     /// 
     /// Acceptable values are:  
-    /// - "normal character" 
-    /// - "value quoting"
+    /// - "`normal character`" 
+    /// - "`value quoting`"
     #[serde(rename="quotingMode")]
     pub quoting_mode: Option<String>,
     /// Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.
     /// 
     /// Acceptable values are:  
-    /// - "pipe" 
-    /// - "tab" 
-    /// - "tilde"
+    /// - "`pipe`" 
+    /// - "`tab`" 
+    /// - "`tilde`"
     #[serde(rename="columnDelimiter")]
     pub column_delimiter: Option<String>,
 }
@@ -6042,10 +6091,10 @@ impl ResponseResult for ShippingsettingsCustomBatchResponse {}
 pub struct TransitTable {
     /// no description provided
     pub rows: Option<Vec<TransitTableTransitTimeRow>>,
-    /// A list of postal group names. The last value can be "all other locations". Example: ["zone 1", "zone 2", "all other locations"]. The referred postal code groups must match the delivery country of the service.
+    /// A list of postal group names. The last value can be `"all other locations"`. Example: `["zone 1", "zone 2", "all other locations"]`. The referred postal code groups must match the delivery country of the service.
     #[serde(rename="postalCodeGroupNames")]
     pub postal_code_group_names: Option<Vec<String>>,
-    /// A list of transit time labels. The last value can be "all other labels". Example: ["food", "electronics", "all other labels"].
+    /// A list of transit time labels. The last value can be `"all other labels"`. Example: `["food", "electronics", "all other labels"]`.
     #[serde(rename="transitTimeLabels")]
     pub transit_time_labels: Option<Vec<String>>,
 }
@@ -6069,8 +6118,8 @@ pub struct OrdersUpdateShipmentResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -6097,19 +6146,19 @@ pub struct OrdersInStoreRefundLineItemRequest {
     /// The reason for the return.
     /// 
     /// Acceptable values are:  
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "invalidCoupon" 
-    /// - "malformedShippingAddress" 
-    /// - "other" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "qualityNotAsExpected" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`invalidCoupon`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`other`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -6142,18 +6191,18 @@ impl RequestValue for OrdersInStoreRefundLineItemRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsLinkRequest {
-    /// Action to perform for this link. The "request" action is only available to select merchants.
+    /// Action to perform for this link. The `"request"` action is only available to select merchants.
     /// 
     /// Acceptable values are:  
-    /// - "approve" 
-    /// - "remove" 
-    /// - "request"
+    /// - "`approve`" 
+    /// - "`remove`" 
+    /// - "`request`"
     pub action: Option<String>,
     /// Type of the link between the two accounts.
     /// 
     /// Acceptable values are:  
-    /// - "channelPartner" 
-    /// - "eCommercePlatform"
+    /// - "`channelPartner`" 
+    /// - "`eCommercePlatform`"
     #[serde(rename="linkType")]
     pub link_type: Option<String>,
     /// The ID of the linked account.
@@ -6184,7 +6233,7 @@ pub struct ProductstatusesCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "get"
+    /// - "`get`"
     pub method: Option<String>,
     /// The ID of the product whose status to get.
     #[serde(rename="productId")]
@@ -6217,7 +6266,7 @@ pub struct LiasettingsCustomBatchRequestEntry {
     /// Inventory validation contact email. Required only for SetInventoryValidationContact.
     #[serde(rename="contactEmail")]
     pub contact_email: Option<String>,
-    /// The account Lia settings to update. Only defined if the method is update.
+    /// The account Lia settings to update. Only defined if the method is `update`.
     #[serde(rename="liaSettings")]
     pub lia_settings: Option<LiaSettings>,
     /// The ID of the managing account.
@@ -6229,14 +6278,14 @@ pub struct LiasettingsCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "get" 
-    /// - "getAccessibleGmbAccounts" 
-    /// - "requestGmbAccess" 
-    /// - "requestInventoryVerification" 
-    /// - "setInventoryVerificationContact" 
-    /// - "update"
+    /// - "`get`" 
+    /// - "`getAccessibleGmbAccounts`" 
+    /// - "`requestGmbAccess`" 
+    /// - "`requestInventoryVerification`" 
+    /// - "`setInventoryVerificationContact`" 
+    /// - "`update`"
     pub method: Option<String>,
-    /// The ID of the account for which to get/update account shipping settings.
+    /// The ID of the account for which to get/update account LIA settings.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
@@ -6266,7 +6315,7 @@ pub struct DatafeedstatusesCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "get"
+    /// - "`get`"
     pub method: Option<String>,
 }
 
@@ -6282,7 +6331,7 @@ pub struct LiasettingsCustomBatchResponseEntry {
     /// The ID of the request entry to which this entry responds.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#liasettingsCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#liasettingsCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors defined if, and only if, the request failed.
     pub errors: Option<Errors>,
@@ -6395,7 +6444,7 @@ pub struct InventoryCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#inventoryCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors defined if and only if the request failed.
     pub errors: Option<Errors>,
@@ -6420,8 +6469,8 @@ pub struct OrdersCancelLineItemResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -6469,14 +6518,14 @@ pub struct OrderLegacyPromotion {
     /// Indicates that the promotion is valid online.
     /// 
     /// Acceptable values are:  
-    /// - "online"
+    /// - "`online`"
     #[serde(rename="redemptionChannel")]
     pub redemption_channel: Option<String>,
     /// Whether the promotion is applicable to all products or only specific products.
     /// 
     /// Acceptable values are:  
-    /// - "allProducts" 
-    /// - "specificProducts"
+    /// - "`allProducts`" 
+    /// - "`specificProducts`"
     #[serde(rename="productApplicability")]
     pub product_applicability: Option<String>,
     /// The date and time frame when the promotion is active and ready for validation review. Note that the promotion live time may be delayed for a few hours due to the validation review.
@@ -6528,22 +6577,22 @@ pub struct OrdersRefundRequest {
     /// The reason for the refund.
     /// 
     /// Acceptable values are:  
-    /// - "adjustment" 
-    /// - "courtesyAdjustment" 
-    /// - "customerCanceled" 
-    /// - "customerDiscretionaryReturn" 
-    /// - "deliveredLateByCarrier" 
-    /// - "feeAdjustment" 
-    /// - "lateShipmentCredit" 
-    /// - "noInventory" 
-    /// - "other" 
-    /// - "priceError" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "shippingCostAdjustment" 
-    /// - "taxAdjustment" 
-    /// - "undeliverableShippingAddress" 
-    /// - "wrongProductShipped"
+    /// - "`adjustment`" 
+    /// - "`courtesyAdjustment`" 
+    /// - "`customerCanceled`" 
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`deliveredLateByCarrier`" 
+    /// - "`feeAdjustment`" 
+    /// - "`lateShipmentCredit`" 
+    /// - "`noInventory`" 
+    /// - "`other`" 
+    /// - "`priceError`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`shippingCostAdjustment`" 
+    /// - "`taxAdjustment`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
@@ -6729,9 +6778,9 @@ pub struct LiaOnDisplayToOrderSettings {
     /// The status of the ?On display to order? feature.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "inactive" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`inactive`" 
+    /// - "`pending`"
     pub status: Option<String>,
     /// Shipping cost and policy URL.
     #[serde(rename="shippingCostPolicyUrl")]
@@ -6750,10 +6799,10 @@ pub struct PosInventory {
     /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a `storeCode` inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#posInventory".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#posInventory`"
     pub kind: Option<String>,
     /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
@@ -6867,9 +6916,9 @@ pub struct AccountStatusDataQualityIssue {
     #[serde(rename="displayedValue")]
     pub displayed_value: Option<String>,
     /// Acceptable values are:  
-    /// - "critical" 
-    /// - "error" 
-    /// - "suggestion"
+    /// - "`critical`" 
+    /// - "`error`" 
+    /// - "`suggestion`"
     pub severity: Option<String>,
     /// no description provided
     #[serde(rename="lastChecked")]
@@ -6912,17 +6961,17 @@ pub struct ProductStatusDestinationStatus {
     /// The destination's approval status.
     /// 
     /// Acceptable values are:  
-    /// - "approved" 
-    /// - "disapproved"
+    /// - "`approved`" 
+    /// - "`disapproved`"
     #[serde(rename="approvalStatus")]
     pub approval_status: Option<String>,
     /// Provided for backward compatibility only. Always set to "required".
     /// 
     /// Acceptable values are:  
-    /// - "default" 
-    /// - "excluded" 
-    /// - "optional" 
-    /// - "required"
+    /// - "`default`" 
+    /// - "`excluded`" 
+    /// - "`optional`" 
+    /// - "`required`"
     pub intention: Option<String>,
 }
 
@@ -6938,7 +6987,7 @@ pub struct InventoryCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
+    /// The code of the store for which to update price and availability. Use `online` to update price and availability of an online product.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// The ID of the managing account.
@@ -6963,64 +7012,67 @@ pub struct OrderShipment {
     /// The status of the shipment.
     /// 
     /// Acceptable values are:  
-    /// - "delivered" 
-    /// - "readyForPickup" 
-    /// - "shipped" 
-    /// - "undeliverable"
+    /// - "`delivered`" 
+    /// - "`readyForPickup`" 
+    /// - "`shipped`" 
+    /// - "`undeliverable`"
     pub status: Option<String>,
-    /// Date on which the shipment has been created, in ISO 8601 format.
-    #[serde(rename="creationDate")]
-    pub creation_date: Option<String>,
+    /// The line items that are shipped.
+    #[serde(rename="lineItems")]
+    pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
+    /// Delivery details of the shipment if scheduling is needed.
+    #[serde(rename="scheduledDeliveryDetails")]
+    pub scheduled_delivery_details: Option<OrderShipmentScheduledDeliveryDetails>,
     /// The carrier handling the shipment.
     /// 
     /// For supported carriers, Google includes the carrier name and tracking URL in emails to customers. For select supported carriers, Google also automatically updates the shipment status based on the provided shipment ID. Note: You can also use unsupported carriers, but emails to customers will not include the carrier name or tracking URL, and there will be no automatic order status updates. 
     /// Supported carriers for US are:  
-    /// - "ups" (United Parcel Service) automatic status updates 
-    /// - "usps" (United States Postal Service) automatic status updates 
-    /// - "fedex" (FedEx) automatic status updates  
-    /// - "dhl" (DHL eCommerce) automatic status updates (US only) 
-    /// - "ontrac" (OnTrac) automatic status updates  
-    /// - "dhl express" (DHL Express)
-    /// - "deliv" (Deliv) 
-    /// - "dynamex" (TForce) 
-    /// - "lasership" (LaserShip) 
-    /// - "mpx" (Military Parcel Xpress) 
-    /// - "uds" (United Delivery Service) 
-    /// - "efw" (Estes Forwarding Worldwide) 
-    /// - "jd logistics" (JD Logistics) 
-    /// - "yunexpress" (YunExpress) 
-    /// - "china post" (China Post) 
-    /// - "china ems" (China Post Express Mail Service) 
-    /// - "singapore post" (Singapore Post) 
-    /// - "pos malaysia" (Pos Malaysia) 
-    /// - "postnl" (PostNL) 
-    /// - "ptt" (PTT Turkish Post) 
-    /// - "eub" (ePacket) 
-    /// - "chukou1" (Chukou1 Logistics)  
+    /// - "`ups`" (United Parcel Service) automatic status updates 
+    /// - "`usps`" (United States Postal Service) automatic status updates 
+    /// - "`fedex`" (FedEx) automatic status updates  
+    /// - "`dhl`" (DHL eCommerce) automatic status updates (US only) 
+    /// - "`ontrac`" (OnTrac) automatic status updates  
+    /// - "`dhl express`" (DHL Express)
+    /// - "`deliv`" (Deliv) 
+    /// - "`dynamex`" (TForce) 
+    /// - "`lasership`" (LaserShip) 
+    /// - "`mpx`" (Military Parcel Xpress) 
+    /// - "`uds`" (United Delivery Service) 
+    /// - "`efw`" (Estes Forwarding Worldwide) 
+    /// - "`jd logistics`" (JD Logistics) 
+    /// - "`yunexpress`" (YunExpress) 
+    /// - "`china post`" (China Post) 
+    /// - "`china ems`" (China Post Express Mail Service) 
+    /// - "`singapore post`" (Singapore Post) 
+    /// - "`pos malaysia`" (Pos Malaysia) 
+    /// - "`postnl`" (PostNL) 
+    /// - "`ptt`" (PTT Turkish Post) 
+    /// - "`eub`" (ePacket) 
+    /// - "`chukou1`" (Chukou1 Logistics)  
     /// Supported carriers for FR are:  
-    /// - "la poste" (La Poste) automatic status updates  
-    /// - "colissimo" (Colissimo by La Poste) automatic status updates 
-    /// - "ups" (United Parcel Service) automatic status updates  
-    /// - "chronopost" (Chronopost by La Poste) 
-    /// - "gls" (General Logistics Systems France) 
-    /// - "dpd" (DPD Group by GeoPost) 
-    /// - "bpost" (Belgian Post Group) 
-    /// - "colis prive" (Colis Privé) 
-    /// - "boxtal" (Boxtal) 
-    /// - "geodis" (GEODIS) 
-    /// - "tnt" (TNT) 
-    /// - "db schenker" (DB Schenker) 
-    /// - "aramex" (Aramex)
+    /// - "`la poste`" (La Poste) automatic status updates  
+    /// - "`colissimo`" (Colissimo by La Poste) automatic status updates 
+    /// - "`ups`" (United Parcel Service) automatic status updates  
+    /// - "`chronopost`" (Chronopost by La Poste) 
+    /// - "`gls`" (General Logistics Systems France) 
+    /// - "`dpd`" (DPD Group by GeoPost) 
+    /// - "`bpost`" (Belgian Post Group) 
+    /// - "`colis prive`" (Colis Privé) 
+    /// - "`boxtal`" (Boxtal) 
+    /// - "`geodis`" (GEODIS) 
+    /// - "`tnt`" (TNT) 
+    /// - "`db schenker`" (DB Schenker) 
+    /// - "`aramex`" (Aramex)
     pub carrier: Option<String>,
     /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
-    /// Date on which the shipment has been delivered, in ISO 8601 format. Present only if status is delivered
+    /// Date on which the shipment has been delivered, in ISO 8601 format. Present only if `status` is `delivered`
     #[serde(rename="deliveryDate")]
     pub delivery_date: Option<String>,
-    /// The line items that are shipped.
-    #[serde(rename="lineItems")]
-    pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
+    /// Date on which the shipment has been created, in ISO 8601 format.
+    #[serde(rename="creationDate")]
+    pub creation_date: Option<String>,
     /// The ID of the shipment.
     pub id: Option<String>,
 }
@@ -7062,7 +7114,7 @@ pub struct AccounttaxCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The account tax settings to update. Only defined if the method is update.
+    /// The account tax settings to update. Only defined if the method is `update`.
     #[serde(rename="accountTax")]
     pub account_tax: Option<AccountTax>,
     /// The ID of the account for which to get/update account tax settings.
@@ -7074,8 +7126,8 @@ pub struct AccounttaxCustomBatchRequestEntry {
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "get" 
-    /// - "update"
+    /// - "`get`" 
+    /// - "`update`"
     pub method: Option<String>,
 }
 
@@ -7098,8 +7150,8 @@ pub struct OrderinvoicesCreateChargeInvoiceResponse {
     /// The status of the execution.
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -7180,50 +7232,50 @@ pub struct OrderinvoicesCustomBatchRequestEntryCreateRefundInvoiceRefundOption {
     /// [required] Reason for the refund.
     /// 
     /// Acceptable values are:  
-    /// - "adjustment" 
-    /// - "autoPostInternal" 
-    /// - "autoPostInvalidBillingAddress" 
-    /// - "autoPostNoInventory" 
-    /// - "autoPostPriceError" 
-    /// - "autoPostUndeliverableShippingAddress" 
-    /// - "couponAbuse" 
-    /// - "courtesyAdjustment" 
-    /// - "customerCanceled" 
-    /// - "customerDiscretionaryReturn" 
-    /// - "customerInitiatedMerchantCancel" 
-    /// - "customerSupportRequested" 
-    /// - "deliveredLateByCarrier" 
-    /// - "deliveredTooLate" 
-    /// - "expiredItem" 
-    /// - "failToPushOrderGoogleError" 
-    /// - "failToPushOrderMerchantError" 
-    /// - "failToPushOrderMerchantFulfillmentError" 
-    /// - "failToPushOrderToMerchant" 
-    /// - "failToPushOrderToMerchantOutOfStock" 
-    /// - "feeAdjustment" 
-    /// - "invalidCoupon" 
-    /// - "lateShipmentCredit" 
-    /// - "malformedShippingAddress" 
-    /// - "merchantDidNotShipOnTime" 
-    /// - "noInventory" 
-    /// - "orderTimeout" 
-    /// - "other" 
-    /// - "paymentAbuse" 
-    /// - "paymentDeclined" 
-    /// - "priceAdjustment" 
-    /// - "priceError" 
-    /// - "productArrivedDamaged" 
-    /// - "productNotAsDescribed" 
-    /// - "promoReallocation" 
-    /// - "qualityNotAsExpected" 
-    /// - "returnRefundAbuse" 
-    /// - "shippingCostAdjustment" 
-    /// - "shippingPriceError" 
-    /// - "taxAdjustment" 
-    /// - "taxError" 
-    /// - "undeliverableShippingAddress" 
-    /// - "unsupportedPoBoxAddress" 
-    /// - "wrongProductShipped"
+    /// - "`adjustment`" 
+    /// - "`autoPostInternal`" 
+    /// - "`autoPostInvalidBillingAddress`" 
+    /// - "`autoPostNoInventory`" 
+    /// - "`autoPostPriceError`" 
+    /// - "`autoPostUndeliverableShippingAddress`" 
+    /// - "`couponAbuse`" 
+    /// - "`courtesyAdjustment`" 
+    /// - "`customerCanceled`" 
+    /// - "`customerDiscretionaryReturn`" 
+    /// - "`customerInitiatedMerchantCancel`" 
+    /// - "`customerSupportRequested`" 
+    /// - "`deliveredLateByCarrier`" 
+    /// - "`deliveredTooLate`" 
+    /// - "`expiredItem`" 
+    /// - "`failToPushOrderGoogleError`" 
+    /// - "`failToPushOrderMerchantError`" 
+    /// - "`failToPushOrderMerchantFulfillmentError`" 
+    /// - "`failToPushOrderToMerchant`" 
+    /// - "`failToPushOrderToMerchantOutOfStock`" 
+    /// - "`feeAdjustment`" 
+    /// - "`invalidCoupon`" 
+    /// - "`lateShipmentCredit`" 
+    /// - "`malformedShippingAddress`" 
+    /// - "`merchantDidNotShipOnTime`" 
+    /// - "`noInventory`" 
+    /// - "`orderTimeout`" 
+    /// - "`other`" 
+    /// - "`paymentAbuse`" 
+    /// - "`paymentDeclined`" 
+    /// - "`priceAdjustment`" 
+    /// - "`priceError`" 
+    /// - "`productArrivedDamaged`" 
+    /// - "`productNotAsDescribed`" 
+    /// - "`promoReallocation`" 
+    /// - "`qualityNotAsExpected`" 
+    /// - "`returnRefundAbuse`" 
+    /// - "`shippingCostAdjustment`" 
+    /// - "`shippingPriceError`" 
+    /// - "`taxAdjustment`" 
+    /// - "`taxError`" 
+    /// - "`undeliverableShippingAddress`" 
+    /// - "`unsupportedPoBoxAddress`" 
+    /// - "`wrongProductShipped`"
     pub reason: Option<String>,
     /// Optional description of the refund reason.
     pub description: Option<String>,
@@ -7267,11 +7319,11 @@ pub struct MerchantOrderReturnItem {
     /// State of the item.
     /// 
     /// Acceptable values are:  
-    /// - "canceled" 
-    /// - "new" 
-    /// - "received" 
-    /// - "refunded" 
-    /// - "rejected"
+    /// - "`canceled`" 
+    /// - "`new`" 
+    /// - "`received`" 
+    /// - "`refunded`" 
+    /// - "`rejected`"
     pub state: Option<String>,
     /// IDs of the return shipments that this return item belongs to.
     #[serde(rename="returnShipmentIds")]
@@ -7289,10 +7341,10 @@ impl Part for MerchantOrderReturnItem {}
 pub struct PickupServicesPickupService {
     /// The CLDR country code of the carrier (e.g., "US"). Always present.
     pub country: Option<String>,
-    /// The name of the pickup service (e.g., "Access point"). Always present.
+    /// The name of the pickup service (e.g., `"Access point"`). Always present.
     #[serde(rename="serviceName")]
     pub service_name: Option<String>,
-    /// The name of the carrier (e.g., "UPS"). Always present.
+    /// The name of the carrier (e.g., `"UPS"`). Always present.
     #[serde(rename="carrierName")]
     pub carrier_name: Option<String>,
 }
@@ -7312,8 +7364,8 @@ pub struct TestOrderLineItemProduct {
     /// Required. The two-letter ISO 639-1 language code for the item.
     /// 
     /// Acceptable values are:  
-    /// - "en" 
-    /// - "fr"
+    /// - "`en`" 
+    /// - "`fr`"
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// Required. The title of the product.
@@ -7339,7 +7391,7 @@ pub struct TestOrderLineItemProduct {
     /// Required. Condition or state of the item.
     /// 
     /// Acceptable values are:  
-    /// - "new"
+    /// - "`new`"
     pub condition: Option<String>,
     /// Fees for the item. Optional.
     pub fees: Option<Vec<OrderLineItemProductFee>>,
@@ -7348,7 +7400,7 @@ pub struct TestOrderLineItemProduct {
     /// Deprecated.
     /// 
     /// Acceptable values are:  
-    /// - "online"
+    /// - "`online`"
     pub channel: Option<String>,
 }
 
@@ -7489,9 +7541,9 @@ pub struct DatafeedTarget {
     /// The list of destinations to exclude for this target (corresponds to unchecked check boxes in Merchant Center).
     #[serde(rename="excludedDestinations")]
     pub excluded_destinations: Option<Vec<String>>,
-    /// The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targets[].country.
+    /// The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for `targets[].country`.
     pub language: Option<String>,
-    /// The list of destinations to include for this target (corresponds to checked check boxes in Merchant Center). Default destinations are always included unless provided in excludedDestinations.
+    /// The list of destinations to include for this target (corresponds to checked check boxes in Merchant Center). Default destinations are always included unless provided in `excludedDestinations`.
     /// 
     /// List of supported destinations (if available to the account):  
     /// - DisplayAds 
@@ -7532,9 +7584,9 @@ pub struct InventorySetRequest {
     /// The quantity of the product that is available for selling on Google. Supported only for online products.
     #[serde(rename="sellOnGoogleQuantity")]
     pub sell_on_google_quantity: Option<u32>,
-    /// Store pickup information. Only supported for local inventory. Not setting pickup means "don't update" while setting it to the empty value ({} in JSON) means "delete". Otherwise, pickupMethod and pickupSla must be set together, unless pickupMethod is "not supported".
+    /// Store pickup information. Only supported for local inventory. Not setting `pickup` means "don't update" while setting it to the empty value (`{}` in JSON) means "delete". Otherwise, `pickupMethod` and `pickupSla` must be set together, unless `pickupMethod` is "not supported".
     pub pickup: Option<InventoryPickup>,
-    /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
+    /// The sale price of the product. Mandatory if `sale_price_effective_date` is defined.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
     /// The instore product location. Supported only for local products.
@@ -7552,9 +7604,9 @@ pub struct InventorySetRequest {
     /// The availability of the product.
     /// 
     /// Acceptable values are:  
-    /// - "in stock" 
-    /// - "out of stock" 
-    /// - "preorder"
+    /// - "`in stock`" 
+    /// - "`out of stock`" 
+    /// - "`preorder`"
     pub availability: Option<String>,
     /// Loyalty points that users receive after purchasing the item. Japan only.
     #[serde(rename="loyaltyPoints")]
@@ -7604,7 +7656,7 @@ pub struct OrderinvoicesCreateChargeInvoiceRequest {
     /// [required] Invoice details per line item.
     #[serde(rename="lineItemInvoices")]
     pub line_item_invoices: Option<Vec<ShipmentInvoiceLineItemInvoice>>,
-    /// [required] ID of the shipment group. It is assigned by the merchant in the shipLineItems method and is used to group multiple line items that have the same kind of shipping charges.
+    /// [required] ID of the shipment group. It is assigned by the merchant in the `shipLineItems` method and is used to group multiple line items that have the same kind of shipping charges.
     #[serde(rename="shipmentGroupId")]
     pub shipment_group_id: Option<String>,
     /// [required] The ID of the operation, unique across all operations for a given order.
@@ -7621,10 +7673,10 @@ impl RequestValue for OrderinvoicesCreateChargeInvoiceRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostalCodeRange {
-    /// A postal code or a pattern of the form prefix* denoting the inclusive lower bound of the range defining the area. Examples values: "94108", "9410*", "9*". Required.
+    /// A postal code or a pattern of the form `prefix*` denoting the inclusive lower bound of the range defining the area. Examples values: `"94108"`, `"9410*"`, `"9*"`. Required.
     #[serde(rename="postalCodeRangeBegin")]
     pub postal_code_range_begin: Option<String>,
-    /// A postal code or a pattern of the form prefix* denoting the inclusive upper bound of the range defining the area. It must have the same length as postalCodeRangeBegin: if postalCodeRangeBegin is a postal code then postalCodeRangeEnd must be a postal code too; if postalCodeRangeBegin is a pattern then postalCodeRangeEnd must be a pattern with the same prefix length. Optional: if not set, then the area is defined as being all the postal codes matching postalCodeRangeBegin.
+    /// A postal code or a pattern of the form `prefix*` denoting the inclusive upper bound of the range defining the area. It must have the same length as `postalCodeRangeBegin`: if `postalCodeRangeBegin` is a postal code then `postalCodeRangeEnd` must be a postal code too; if `postalCodeRangeBegin` is a pattern then `postalCodeRangeEnd` must be a pattern with the same prefix length. Optional: if not set, then the area is defined as being all the postal codes matching `postalCodeRangeBegin`.
     #[serde(rename="postalCodeRangeEnd")]
     pub postal_code_range_end: Option<String>,
 }
@@ -7647,7 +7699,7 @@ pub struct PosStore {
     /// Required. The street address of the store.
     #[serde(rename="storeAddress")]
     pub store_address: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#posStore".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#posStore`"
     pub kind: Option<String>,
     /// Required. A store identifier that is unique for the given merchant.
     #[serde(rename="storeCode")]
@@ -7664,11 +7716,11 @@ impl ResponseResult for PosStore {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAdwordsLink {
-    /// Status of the link between this Merchant Center account and the AdWords account. Upon retrieval, it represents the actual status of the link and can be either active if it was approved in Google AdWords or pending if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status active when it's still pending or with status pending when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status inactive is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.
+    /// Status of the link between this Merchant Center account and the AdWords account. Upon retrieval, it represents the actual status of the link and can be either `active` if it was approved in Google AdWords or `pending` if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status `active` when it's still pending or with status `pending` when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status `inactive` is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.
     /// 
     /// Acceptable values are:  
-    /// - "active" 
-    /// - "pending"
+    /// - "`active`" 
+    /// - "`pending`"
     pub status: Option<String>,
     /// Customer ID of the AdWords account.
     #[serde(rename="adwordsId")]
@@ -7699,13 +7751,13 @@ pub struct OrderPaymentMethod {
     /// The type of instrument.
     /// 
     /// Acceptable values are:  
-    /// - "AMEX" 
-    /// - "DISCOVER" 
-    /// - "JCB" 
-    /// - "MASTERCARD" 
-    /// - "UNIONPAY" 
-    /// - "VISA" 
-    /// - ""
+    /// - "`AMEX`" 
+    /// - "`DISCOVER`" 
+    /// - "`JCB`" 
+    /// - "`MASTERCARD`" 
+    /// - "`UNIONPAY`" 
+    /// - "`VISA`" 
+    /// - "``"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The last four digits of the card number.
@@ -7725,7 +7777,7 @@ pub struct ProductstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#productstatusesCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors, if the request failed.
     pub errors: Option<Errors>,
@@ -7737,6 +7789,10 @@ pub struct ProductstatusesCustomBatchResponseEntry {
 impl Part for ProductstatusesCustomBatchResponseEntry {}
 
 
+/// Required product attributes are primarily defined by the products data specification. See the  Products Data Specification Help Center article for information.
+/// 
+/// Some attributes are country-specific, so make sure you select the appropriate country in the drop-down selector at the top of the page.  
+/// 
 /// Product data. After inserting, updating, or deleting a product, it may take several minutes before changes take effect.
 /// 
 /// # Activities
@@ -7763,15 +7819,15 @@ pub struct Product {
     /// Shared identifier for all variants of the same product.
     #[serde(rename="itemGroupId")]
     pub item_group_id: Option<String>,
-    /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in productstatuses as googleExpirationDate and might be earlier if expirationDate is too far in the future.
+    /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in `productstatuses` as `googleExpirationDate` and might be earlier if `expirationDate` is too far in the future.
     #[serde(rename="expirationDate")]
     pub expiration_date: Option<String>,
     /// Availability status of the item.
     /// 
     /// Acceptable values are:  
-    /// - "in stock" 
-    /// - "out of stock" 
-    /// - "preorder"
+    /// - "`in stock`" 
+    /// - "`out of stock`" 
+    /// - "`preorder`"
     pub availability: Option<String>,
     /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.
     #[serde(rename="adwordsGrouping")]
@@ -7787,9 +7843,9 @@ pub struct Product {
     /// The source of the offer, i.e., how the offer was created.
     /// 
     /// Acceptable values are:  
-    /// - "api" 
-    /// - "crawl" 
-    /// - "feed"
+    /// - "`api`" 
+    /// - "`crawl`" 
+    /// - "`feed`"
     pub source: Option<String>,
     /// Additional categories of the item (formatted as in products data specification).
     #[serde(rename="additionalProductTypes")]
@@ -7797,19 +7853,19 @@ pub struct Product {
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
     /// 
     /// Acceptable values are:  
-    /// - "A" 
-    /// - "A+" 
-    /// - "A++" 
-    /// - "A+++" 
-    /// - "B" 
-    /// - "C" 
-    /// - "D" 
-    /// - "E" 
-    /// - "F" 
-    /// - "G"
+    /// - "`A`" 
+    /// - "`A+`" 
+    /// - "`A++`" 
+    /// - "`A+++`" 
+    /// - "`B`" 
+    /// - "`C`" 
+    /// - "`D`" 
+    /// - "`E`" 
+    /// - "`F`" 
+    /// - "`G`"
     #[serde(rename="minEnergyEfficiencyClass")]
     pub min_energy_efficiency_class: Option<String>,
-    /// Deprecated. Whether an item is available for purchase only online.
+    /// Deprecated.
     #[serde(rename="onlineOnly")]
     pub online_only: Option<bool>,
     /// Link to a mobile-optimized version of the landing page.
@@ -7844,43 +7900,43 @@ pub struct Product {
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
     /// 
     /// Acceptable values are:  
-    /// - "A" 
-    /// - "A+" 
-    /// - "A++" 
-    /// - "A+++" 
-    /// - "B" 
-    /// - "C" 
-    /// - "D" 
-    /// - "E" 
-    /// - "F" 
-    /// - "G"
+    /// - "`A`" 
+    /// - "`A+`" 
+    /// - "`A++`" 
+    /// - "`A+++`" 
+    /// - "`B`" 
+    /// - "`C`" 
+    /// - "`D`" 
+    /// - "`E`" 
+    /// - "`F`" 
+    /// - "`G`"
     #[serde(rename="energyEfficiencyClass")]
     pub energy_efficiency_class: Option<String>,
     /// System in which the size is specified. Recommended for apparel items.
     /// 
     /// Acceptable values are:  
-    /// - "AU" 
-    /// - "BR" 
-    /// - "CN" 
-    /// - "DE" 
-    /// - "EU" 
-    /// - "FR" 
-    /// - "IT" 
-    /// - "JP" 
-    /// - "MEX" 
-    /// - "UK" 
-    /// - "US"
+    /// - "`AU`" 
+    /// - "`BR`" 
+    /// - "`CN`" 
+    /// - "`DE`" 
+    /// - "`EU`" 
+    /// - "`FR`" 
+    /// - "`IT`" 
+    /// - "`JP`" 
+    /// - "`MEX`" 
+    /// - "`UK`" 
+    /// - "`US`"
     #[serde(rename="sizeSystem")]
     pub size_system: Option<String>,
     /// The cut of the item. Recommended for apparel items.
     /// 
     /// Acceptable values are:  
-    /// - "big and tall" 
-    /// - "maternity" 
-    /// - "oversize" 
-    /// - "petite" 
-    /// - "plus" 
-    /// - "regular"
+    /// - "`big and tall`" 
+    /// - "`maternity`" 
+    /// - "`oversize`" 
+    /// - "`petite`" 
+    /// - "`plus`" 
+    /// - "`regular`"
     #[serde(rename="sizeType")]
     pub size_type: Option<String>,
     /// Custom label 3 for custom grouping of items in a Shopping campaign.
@@ -7892,45 +7948,48 @@ pub struct Product {
     /// Condition or state of the item.
     /// 
     /// Acceptable values are:  
-    /// - "local" 
-    /// - "online"
+    /// - "`local`" 
+    /// - "`online`"
     pub condition: Option<String>,
     /// Custom label 0 for custom grouping of items in a Shopping campaign.
     #[serde(rename="customLabel0")]
     pub custom_label0: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#product".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#product`"
     pub kind: Option<String>,
-    /// Number and amount of installments to pay for an item. Brazil only.
+    /// Number and amount of installments to pay for an item.
     pub installment: Option<Installment>,
-    /// Size of the item. Only one value is allowed. For variants with different sizes, insert a separate product for each size with the same itemGroupId value (see size definition).
+    /// Size of the item. Only one value is allowed. For variants with different sizes, insert a separate product for each size with the same `itemGroupId` value (see size definition).
     pub sizes: Option<Vec<String>>,
     /// Target gender of the item.
     /// 
     /// Acceptable values are:  
-    /// - "female" 
-    /// - "male" 
-    /// - "unisex"
+    /// - "`female`" 
+    /// - "`male`" 
+    /// - "`unisex`"
     pub gender: Option<String>,
     /// Tax information.
     pub taxes: Option<Vec<ProductTax>>,
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
     /// 
     /// Acceptable values are:  
-    /// - "A" 
-    /// - "A+" 
-    /// - "A++" 
-    /// - "A+++" 
-    /// - "B" 
-    /// - "C" 
-    /// - "D" 
-    /// - "E" 
-    /// - "F" 
-    /// - "G"
+    /// - "`A`" 
+    /// - "`A+`" 
+    /// - "`A++`" 
+    /// - "`A+++`" 
+    /// - "`B`" 
+    /// - "`C`" 
+    /// - "`D`" 
+    /// - "`E`" 
+    /// - "`F`" 
+    /// - "`G`"
     #[serde(rename="maxEnergyEfficiencyClass")]
     pub max_energy_efficiency_class: Option<String>,
     /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.
     #[serde(rename="identifierExists")]
     pub identifier_exists: Option<bool>,
+    /// Link to the canonical version of the landing page.
+    #[serde(rename="canonicalLink")]
+    pub canonical_link: Option<String>,
     /// Advertised sale price of the item.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
@@ -7946,12 +8005,12 @@ pub struct Product {
     /// Target age group of the item.
     /// 
     /// Acceptable values are:  
-    /// - "adult" 
-    /// - "infant" 
-    /// - "kids" 
-    /// - "newborn" 
-    /// - "toddler" 
-    /// - "youngAdult"
+    /// - "`adult`" 
+    /// - "`infant`" 
+    /// - "`kids`" 
+    /// - "`newborn`" 
+    /// - "`toddler`" 
+    /// - "`youngAdult`"
     #[serde(rename="ageGroup")]
     pub age_group: Option<String>,
     /// Title of an item for dynamic remarketing campaigns.
@@ -7983,8 +8042,8 @@ pub struct Product {
     /// Offer margin for dynamic remarketing campaigns.
     #[serde(rename="displayAdsValue")]
     pub display_ads_value: Option<f64>,
-    /// The REST ID of the product. Content API methods that operate on products take this as their productId parameter.
-    /// The REST ID for a product is of the form channel:contentLanguage:targetCountry:offerId.
+    /// The REST ID of the product. Content API methods that operate on products take this as their `productId` parameter.
+    /// The REST ID for a product is of the form channel:contentLanguage:targetCountry: offerId.
     pub id: Option<String>,
     /// Width of the item for shipping.
     #[serde(rename="shippingWidth")]
@@ -7994,7 +8053,7 @@ pub struct Product {
     /// The measure and dimension of an item.
     #[serde(rename="unitPricingMeasure")]
     pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
-    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API, such as additional attributes used for Shopping Actions.
+    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., `{ "name": "size type", "value": "regular" }`). This is useful for submitting attributes not explicitly exposed by the API, such as additional attributes used for Shopping Actions.
     #[serde(rename="customAttributes")]
     pub custom_attributes: Option<Vec<CustomAttribute>>,
     /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
@@ -8006,8 +8065,8 @@ pub struct Product {
     /// Required. The item's channel (online or local).
     /// 
     /// Acceptable values are:  
-    /// - "local" 
-    /// - "online"
+    /// - "`local`" 
+    /// - "`online`"
     pub channel: Option<String>,
     /// The material of which the item is made.
     pub material: Option<String>,
@@ -8066,19 +8125,19 @@ pub struct OrdersCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#ordersCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors defined if and only if the request failed.
     pub errors: Option<Errors>,
-    /// The retrieved order. Only defined if the method is get and if the request was successful.
+    /// The retrieved order. Only defined if the method is `get` and if the request was successful.
     pub order: Option<Order>,
     /// The status of the execution. Only defined if  
     /// - the request was successful; and 
-    /// - the method is not get, getByMerchantOrderId, or one of the test methods.  
+    /// - the method is not `get`, `getByMerchantOrderId`, or one of the test methods.  
     /// 
     /// Acceptable values are:  
-    /// - "duplicate" 
-    /// - "executed"
+    /// - "`duplicate`" 
+    /// - "`executed`"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -8121,14 +8180,14 @@ pub struct ShippingsettingsCustomBatchRequestEntry {
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// The account shipping settings to update. Only defined if the method is update.
+    /// The account shipping settings to update. Only defined if the method is `update`.
     #[serde(rename="shippingSettings")]
     pub shipping_settings: Option<ShippingSettings>,
     /// The method of the batch entry.
     /// 
     /// Acceptable values are:  
-    /// - "get" 
-    /// - "update"
+    /// - "`get`" 
+    /// - "`update`"
     pub method: Option<String>,
 }
 
@@ -8144,7 +8203,7 @@ pub struct ShippingsettingsCustomBatchResponseEntry {
     /// The ID of the request entry to which this entry responds.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#shippingsettingsCustomBatchResponseEntry".
+    /// Identifies what kind of resource this is. Value: the fixed string "`content#shippingsettingsCustomBatchResponseEntry`"
     pub kind: Option<String>,
     /// A list of errors defined if, and only if, the request failed.
     pub errors: Option<Errors>,
@@ -8373,12 +8432,12 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account.
+    /// Updates the tax settings of the account. Any fields that are not provided are deleted from the resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn update(&self, request: AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxUpdateCall<'a, C, A> {
         AccounttaxUpdateCall {
@@ -8399,7 +8458,7 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccounttaxGetCall<'a, C, A> {
         AccounttaxGetCall {
@@ -8551,7 +8610,7 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> ShippingsettingGetCall<'a, C, A> {
         ShippingsettingGetCall {
@@ -8600,12 +8659,12 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account.
+    /// Updates the shipping settings of the account. Any fields that are not provided are deleted from the resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
     pub fn update(&self, request: ShippingSettings, merchant_id: &str, account_id: &str) -> ShippingsettingUpdateCall<'a, C, A> {
         ShippingsettingUpdateCall {
@@ -8683,7 +8742,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed configuration of your Merchant Center account.
+    /// Updates a datafeed configuration of your Merchant Center account. Any fields that are not provided are deleted from the resource.
     /// 
     /// # Arguments
     ///
@@ -9073,7 +9132,7 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountstatuseGetCall<'a, C, A> {
         AccountstatuseGetCall {
@@ -9143,12 +9202,12 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account.
+    /// Updates a Merchant Center account. Any fields that are not provided are deleted from the resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn update(&self, request: Account, merchant_id: &str, account_id: &str) -> AccountUpdateCall<'a, C, A> {
         AccountUpdateCall {
@@ -9229,7 +9288,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountGetCall<'a, C, A> {
         AccountGetCall {
@@ -9267,7 +9326,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account that should be linked.
     pub fn link(&self, request: AccountsLinkRequest, merchant_id: &str, account_id: &str) -> AccountLinkCall<'a, C, A> {
         AccountLinkCall {
@@ -9287,7 +9346,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account whose website is claimed.
     pub fn claimwebsite(&self, merchant_id: &str, account_id: &str) -> AccountClaimwebsiteCall<'a, C, A> {
         AccountClaimwebsiteCall {
@@ -9345,7 +9404,7 @@ impl<'a, C, A> OrderinvoiceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
+    /// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using `createChargeInvoice`. All amounts (except for the summary) are incremental with respect to the previous invoice.
     /// 
     /// # Arguments
     ///
@@ -9433,7 +9492,7 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `contactEmail` - The email of the inventory verification contact.
     /// * `contactName` - The name of the inventory verification contact.
@@ -9472,7 +9531,7 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get or update LIA settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> LiasettingGetCall<'a, C, A> {
         LiasettingGetCall {
@@ -9487,12 +9546,12 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the LIA settings of the account.
+    /// Updates the LIA settings of the account. Any fields that are not provided are deleted from the resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get or update LIA settings.
     pub fn update(&self, request: LiaSettings, merchant_id: &str, account_id: &str) -> LiasettingUpdateCall<'a, C, A> {
         LiasettingUpdateCall {
@@ -9513,7 +9572,7 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to retrieve accessible Google My Business accounts.
     pub fn getaccessiblegmbaccounts(&self, merchant_id: &str, account_id: &str) -> LiasettingGetaccessiblegmbaccountCall<'a, C, A> {
         LiasettingGetaccessiblegmbaccountCall {
@@ -9532,7 +9591,7 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which GMB access is requested.
     /// * `gmbEmail` - The email of the Google My Business account.
     pub fn requestgmbaccess(&self, merchant_id: &str, account_id: &str, gmb_email: &str) -> LiasettingRequestgmbaccesCall<'a, C, A> {
@@ -9572,7 +9631,7 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `country` - The country for which inventory validation is requested.
     pub fn requestinventoryverification(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingRequestinventoryverificationCall<'a, C, A> {
@@ -9611,7 +9670,7 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to retrieve accessible Google My Business accounts.
     /// * `country` - The country for which the POS data provider is selected.
     pub fn setposdataprovider(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingSetposdataproviderCall<'a, C, A> {
@@ -10308,7 +10367,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
+    /// Sandbox only. Moves a test order from state "`inProgress`" to state "`pendingShipment`".
     /// 
     /// # Arguments
     ///
@@ -10367,7 +10426,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns and refunds a line item. Note that this method can only be called on fully shipped orders.
+    /// Returns and refunds a line item. Note that this method can only be called on fully shipped orders. Please also note that the Orderreturns API is the preferred way to handle returns after you receive a return from a customer. You can use Orderreturns.list or Orderreturns.get to search for the return, and then use Orderreturns.processreturn to issue the refund. If the return cannot be found, then we recommend using this API to issue a refund.
     /// 
     /// # Arguments
     ///
@@ -10532,7 +10591,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    /// * `storeCode` - The code of the store for which to update price and availability. Use online to update price and availability of an online product.
+    /// * `storeCode` - The code of the store for which to update price and availability. Use `online` to update price and availability of an online product.
     /// * `productId` - The REST ID of the product for which to update price and availability.
     pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, C, A> {
         InventorySetCall {
@@ -11721,7 +11780,7 @@ impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Updates the tax settings of the account.
+/// Updates the tax settings of the account. Any fields that are not provided are deleted from the resource.
 ///
 /// A builder for the *update* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -11936,7 +11995,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -12201,7 +12260,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -13757,7 +13816,7 @@ impl<'a, C, A> ShippingsettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -14328,7 +14387,7 @@ impl<'a, C, A> ShippingsettingGetsupportedholidayCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Updates the shipping settings of the account.
+/// Updates the shipping settings of the account. Any fields that are not provided are deleted from the resource.
 ///
 /// A builder for the *update* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -14543,7 +14602,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -14887,7 +14946,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Updates a datafeed configuration of your Merchant Center account.
+/// Updates a datafeed configuration of your Merchant Center account. Any fields that are not provided are deleted from the resource.
 ///
 /// A builder for the *update* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -19205,7 +19264,7 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -19505,7 +19564,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates a Merchant Center account.
+/// Updates a Merchant Center account. Any fields that are not provided are deleted from the resource.
 ///
 /// A builder for the *update* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -19720,7 +19779,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -20815,7 +20874,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -21360,7 +21419,7 @@ impl<'a, C, A> AccountLinkCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -21623,7 +21682,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -21643,7 +21702,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._account_id = new_value.to_string();
         self
     }
-    /// Only available to selected merchants. When set to True, this flag removes any existing claim on the requested website by another account and replaces it with a claim from this account.
+    /// Only available to selected merchants. When set to `True`, this flag removes any existing claim on the requested website by another account and replaces it with a claim from this account.
     ///
     /// Sets the *overwrite* query property to the given value.
     pub fn overwrite(mut self, new_value: bool) -> AccountClaimwebsiteCall<'a, C, A> {
@@ -21709,7 +21768,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
+/// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using `createChargeInvoice`. All amounts (except for the summary) are incremental with respect to the previous invoice.
 ///
 /// A builder for the *createrefundinvoice* method supported by a *orderinvoice* resource.
 /// It is not used directly, but through a `OrderinvoiceMethods` instance.
@@ -22474,7 +22533,7 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -22985,7 +23044,7 @@ impl<'a, C, A> LiasettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -23064,7 +23123,7 @@ impl<'a, C, A> LiasettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates the LIA settings of the account.
+/// Updates the LIA settings of the account. Any fields that are not provided are deleted from the resource.
 ///
 /// A builder for the *update* method supported by a *liasetting* resource.
 /// It is not used directly, but through a `LiasettingMethods` instance.
@@ -23279,7 +23338,7 @@ impl<'a, C, A> LiasettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -23544,7 +23603,7 @@ impl<'a, C, A> LiasettingGetaccessiblegmbaccountCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -23804,7 +23863,7 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -24344,7 +24403,7 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -24880,7 +24939,7 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -29900,7 +29959,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._merchant_id = new_value.to_string();
         self
     }
-    /// Obtains orders that match any of the specified statuses. Please note that active is a shortcut for pendingShipment and partiallyShipped, and completed is a shortcut for shipped, partiallyDelivered, delivered, partiallyReturned, returned, and canceled.
+    /// Obtains orders that match any of the specified statuses. Please note that `active` is a shortcut for `pendingShipment` and `partiallyShipped`, and `completed` is a shortcut for `shipped`, `partiallyDelivered`, `delivered`, `partiallyReturned`, `returned`, and `canceled`.
     ///
     /// Append the given value to the *statuses* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -29948,7 +30007,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self
     }
     /// Obtains orders that match the acknowledgement status. When set to true, obtains orders that have been acknowledged. When false, obtains orders that have not been acknowledged.
-    /// We recommend using this filter set to false, in conjunction with the acknowledge call, such that only un-acknowledged orders are returned.
+    /// We recommend using this filter set to `false`, in conjunction with the `acknowledge` call, such that only un-acknowledged orders are returned.
     ///
     /// Sets the *acknowledged* query property to the given value.
     pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a, C, A> {
@@ -30507,7 +30566,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
         self._template_name = new_value.to_string();
         self
     }
-    /// The country of the template to retrieve. Defaults to US.
+    /// The country of the template to retrieve. Defaults to `US`.
     ///
     /// Sets the *country* query property to the given value.
     pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, C, A> {
@@ -32019,7 +32078,7 @@ impl<'a, C, A> OrderCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
+/// Sandbox only. Moves a test order from state "`inProgress`" to state "`pendingShipment`".
 ///
 /// A builder for the *advancetestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -32843,7 +32902,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns and refunds a line item. Note that this method can only be called on fully shipped orders.
+/// Returns and refunds a line item. Note that this method can only be called on fully shipped orders. Please also note that the Orderreturns API is the preferred way to handle returns after you receive a return from a customer. You can use Orderreturns.list or Orderreturns.get to search for the return, and then use Orderreturns.processreturn to issue the refund. If the return cannot be found, then we recommend using this API to issue a refund.
 ///
 /// A builder for the *returnrefundlineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -34695,7 +34754,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
+    /// The code of the store for which to update price and availability. Use `online` to update price and availability of an online product.
     ///
     /// Sets the *store code* path property to the given value.
     ///

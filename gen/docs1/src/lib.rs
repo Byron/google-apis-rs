@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Docs* crate version *1.0.10+20190627*, where *20190627* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.10*.
+//! This documentation was generated from *Docs* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Docs* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/docs/).
@@ -157,7 +157,7 @@
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
+//! All structures provided by this library are made to be [encodable](trait.RequestValue.html) and 
 //! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 //! are valid.
 //! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
@@ -337,7 +337,7 @@ impl<'a, C, A> Docs<C, A>
         Docs {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.10".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://docs.googleapis.com/".to_string(),
             _root_url: "https://docs.googleapis.com/".to_string(),
         }
@@ -348,7 +348,7 @@ impl<'a, C, A> Docs<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.10`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -493,6 +493,32 @@ pub struct ReplaceAllTextRequest {
 }
 
 impl Part for ReplaceAllTextRequest {}
+
+
+/// Creates a Footer. The new footer is applied to
+/// the SectionStyle at the location of the
+/// SectionBreak if specificed, otherwise
+/// it is applied to the DocumentStyle.
+/// 
+/// If a footer of the specified type already exists, a 400 bad request error
+/// is returned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFooterRequest {
+    /// The type of footer to create.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The location of the SectionBreak
+    /// immediately preceding the section whose SectionStyle this footer should belong to. If this is
+    /// unset or refers to the first section break in the document, the footer
+    /// applies to the document style.
+    #[serde(rename="sectionBreakLocation")]
+    pub section_break_location: Option<Location>,
+}
+
+impl Part for CreateFooterRequest {}
 
 
 /// The crop properties of an image.
@@ -717,6 +743,20 @@ pub struct BatchUpdateDocumentRequest {
 impl RequestValue for BatchUpdateDocumentRequest {}
 
 
+/// The result of creating a footnote.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFootnoteResponse {
+    /// The ID of the created footnote.
+    #[serde(rename="footnoteId")]
+    pub footnote_id: Option<String>,
+}
+
+impl Part for CreateFootnoteResponse {}
+
+
 /// A mask that indicates which of the fields on the base SheetsChartReference have been changed in this
 /// suggestion. For any field set to true, there is a new suggested value.
 /// 
@@ -801,6 +841,35 @@ pub struct HorizontalRule {
 }
 
 impl Part for HorizontalRule {}
+
+
+/// Replaces an existing image with a new image.
+/// 
+/// Replacing an image removes some image effects from the existing image in order to
+/// mirror the behavior of the Docs editor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceImageRequest {
+    /// The ID of the existing image that will be replaced.
+    #[serde(rename="imageObjectId")]
+    pub image_object_id: Option<String>,
+    /// The replacement method.
+    #[serde(rename="imageReplaceMethod")]
+    pub image_replace_method: Option<String>,
+    /// The URI of the new image.
+    /// 
+    /// The image is fetched once at insertion time and a copy is stored for
+    /// display inside the document. Images must be less than 50MB in size, cannot
+    /// exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format.
+    /// 
+    /// The provided URI can be at most 2 kB in length. The URI itself is saved
+    /// with the image, and exposed via the ImageProperties.source_uri field.
+    pub uri: Option<String>,
+}
+
+impl Part for ReplaceImageRequest {}
 
 
 /// Deletes a column from a table.
@@ -979,6 +1048,45 @@ pub struct LinkedContentReference {
 impl Part for LinkedContentReference {}
 
 
+/// Replaces the contents of the specified
+/// NamedRange or
+/// NamedRanges with the given replacement
+/// content.
+/// 
+/// Note that an individual NamedRange may
+/// consist of multiple discontinuous
+/// ranges. In this case, only the
+/// content in the first range will be replaced. The other ranges and their
+/// content will be deleted.
+/// 
+/// In cases where replacing or deleting any ranges would result in an invalid
+/// document structure, a 400 bad request error is returned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplaceNamedRangeContentRequest {
+    /// The ID of the named range whose content will be replaced.
+    /// 
+    /// If there is no named range with the given ID a 400 bad request error is
+    /// returned.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The name of the NamedRanges whose
+    /// content will be replaced.
+    /// 
+    /// If there are multiple named ranges with the given name, then
+    /// the content of each one will be replaced. If there are no named ranges
+    /// with the given name, then the request will be a no-op.
+    #[serde(rename="namedRangeName")]
+    pub named_range_name: Option<String>,
+    /// Replaces the content of the specified named range(s) with the given text.
+    pub text: Option<String>,
+}
+
+impl Part for ReplaceNamedRangeContentRequest {}
+
+
 /// The named styles. Paragraphs in the document can inherit their
 /// TextStyle and
 /// ParagraphStyle from these named styles.
@@ -1002,21 +1110,164 @@ impl Part for NamedStyles {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SectionStyle {
+    /// The ID of the default footer. If unset, the value inherits from the
+    /// previous SectionBreak's SectionStyle.
+    /// If the value is unset in the first SectionBreak, it inherits from
+    /// DocumentStyle's default_footer_id.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="defaultFooterId")]
+    pub default_footer_id: Option<String>,
+    /// The header margin of the section. If unset, uses margin_header from DocumentStyle. If
+    /// updated, use_custom_header_footer_margins is set
+    /// to true on DocumentStyle. The value of use_custom_header_footer_margins on
+    /// DocumentStyle indicates if a header margin is being respected for this
+    /// section.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginHeader")]
+    pub margin_header: Option<Dimension>,
+    /// The footer margin of the section. If unset, uses margin_footer from DocumentStyle. If
+    /// updated, use_custom_header_footer_margins is set
+    /// to true on DocumentStyle. The value of use_custom_header_footer_margins on
+    /// DocumentStyle indicates if a footer margin is being respected for this
+    /// section
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginFooter")]
+    pub margin_footer: Option<Dimension>,
+    /// The ID of the header used only for even pages. If the value of
+    /// DocumentStyle's use_even_page_header_footer is true,
+    /// this value is used for the headers on even pages in the section. If it
+    /// is false, the headers on even pages uses the default_header_id. If unset, the value
+    /// inherits from the previous SectionBreak's SectionStyle. If the value is unset in
+    /// the first SectionBreak, it inherits from DocumentStyle's
+    /// even_page_header_id.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="evenPageHeaderId")]
+    pub even_page_header_id: Option<String>,
+    /// The content direction of this section. If unset, the value defaults to
+    /// LEFT_TO_RIGHT.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="contentDirection")]
+    pub content_direction: Option<String>,
+    /// The right page margin of the section. If unset, uses margin_right from DocumentStyle.
+    /// Updating right margin causes columns in this section to resize. Since
+    /// the margin affects column width, it is applied before column properties.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
     /// The style of column separators.
     /// 
     /// This style can be set even when there is one column in the section.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
     #[serde(rename="columnSeparatorStyle")]
     pub column_separator_style: Option<String>,
+    /// The ID of the footer used only for even pages. If the value of
+    /// DocumentStyle's use_even_page_header_footer is true,
+    /// this value is used for the footers on even pages in the section. If it
+    /// is false, the footers on even pages uses the default_footer_id. If unset, the value
+    /// inherits from the previous SectionBreak's SectionStyle. If the value is unset in
+    /// the first SectionBreak, it inherits from DocumentStyle's
+    /// even_page_footer_id.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="evenPageFooterId")]
+    pub even_page_footer_id: Option<String>,
+    /// The ID of the footer used only for the first page of the section.
+    /// If use_first_page_header_footer is true,
+    /// this value is used for the footer on the first page of the section. If
+    /// it is false, the footer on the first page of the section uses the
+    /// default_footer_id.
+    /// If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in
+    /// the first SectionBreak, it inherits from DocumentStyle's
+    /// first_page_footer_id.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="firstPageFooterId")]
+    pub first_page_footer_id: Option<String>,
+    /// The ID of the default header. If unset, the value inherits from the
+    /// previous SectionBreak's SectionStyle.
+    /// If the value is unset in the first SectionBreak, it inherits from
+    /// DocumentStyle's default_header_id.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="defaultHeaderId")]
+    pub default_header_id: Option<String>,
+    /// The bottom page margin of the section. If unset, uses margin_bottom from DocumentStyle.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginBottom")]
+    pub margin_bottom: Option<Dimension>,
     /// The section's columns properties.
     /// 
     /// If empty, the section contains one column with the default properties in
     /// the Docs editor.
+    /// A section can be updated to have no more than three columns.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property will result in a 400 bad request error.
     #[serde(rename="columnProperties")]
     pub column_properties: Option<Vec<SectionColumnProperties>>,
-    /// The content direction of this section. If unset, the value defaults to
-    /// LEFT_TO_RIGHT.
-    #[serde(rename="contentDirection")]
-    pub content_direction: Option<String>,
+    /// The ID of the header used only for the first page of the section.
+    /// If use_first_page_header_footer is true,
+    /// this value is used for the header on the first page of the section. If
+    /// it is false, the header on the first page of the section uses the
+    /// default_header_id.
+    /// If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in
+    /// the first SectionBreak, it inherits from DocumentStyle's
+    /// first_page_header_id.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="firstPageHeaderId")]
+    pub first_page_header_id: Option<String>,
+    /// Indicates whether to use the first page header / footer IDs for the first
+    /// page of the section. If unset, it inherits from DocumentStyle's
+    /// use_first_page_header_footer for the
+    /// first section. If the value is unset for subsequent sectors, it should be
+    /// interpreted as false.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="useFirstPageHeaderFooter")]
+    pub use_first_page_header_footer: Option<bool>,
+    /// The left page margin of the section. If unset, uses margin_left from DocumentStyle.
+    /// Updating left margin causes columns in this section to resize. Since
+    /// the margin affects column width, it is applied before column properties.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginLeft")]
+    pub margin_left: Option<Dimension>,
+    /// The page number from which to start counting the number of pages for this
+    /// section. If unset, page numbering continues from the previous section.
+    /// If the value is unset in the first
+    /// SectionBreak, refer to DocumentStyle's
+    /// page_number_start.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="pageNumberStart")]
+    pub page_number_start: Option<i32>,
+    /// The top page margin of the section. If unset, uses margin_top from DocumentStyle.
+    /// 
+    /// When updating this property, setting a concrete value is required.
+    /// Unsetting this property results in a 400 bad request error.
+    #[serde(rename="marginTop")]
+    pub margin_top: Option<Dimension>,
+    /// Output only. The type of section.
+    #[serde(rename="sectionType")]
+    pub section_type: Option<String>,
 }
 
 impl Part for SectionStyle {}
@@ -1047,14 +1298,41 @@ pub struct BulletSuggestionState {
 impl Part for BulletSuggestionState {}
 
 
-/// The properties of an embedded drawing.
+/// Merges cells in a Table.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EmbeddedDrawingProperties { _never_set: Option<bool> }
+pub struct MergeTableCellsRequest {
+    /// The table range specifying which cells of the table to merge.
+    /// 
+    /// Any text in the cells being merged will be concatenated and stored in the
+    /// "head" cell of the range. This is the upper-left cell of the range when
+    /// the content direction is left to right, and the upper-right cell of the
+    /// range otherwise.
+    /// 
+    /// If the range is non-rectangular (which can occur in some cases where the
+    /// range covers cells that are already merged or where the table is
+    /// non-rectangular), a 400 bad request error is returned.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
+}
 
-impl Part for EmbeddedDrawingProperties {}
+impl Part for MergeTableCellsRequest {}
+
+
+/// The result of creating a header.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateHeaderResponse {
+    /// The ID of the created header.
+    #[serde(rename="headerId")]
+    pub header_id: Option<String>,
+}
+
+impl Part for CreateHeaderResponse {}
 
 
 /// A mask that indicates which of the fields on the base EmbeddedObject have been changed in this suggestion.
@@ -1119,6 +1397,26 @@ pub struct ReplaceAllTextResponse {
 }
 
 impl Part for ReplaceAllTextResponse {}
+
+
+/// Deletes a Footer from the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteFooterRequest {
+    /// The id of the footer to delete. If this footer is defined on
+    /// DocumentStyle, the reference to
+    /// this footer is removed, resulting in no footer of that type for
+    /// the first section of the document. If this footer is defined on a
+    /// SectionStyle, the reference to this
+    /// footer is removed and the footer of that type is now continued from
+    /// the previous section.
+    #[serde(rename="footerId")]
+    pub footer_id: Option<String>,
+}
+
+impl Part for DeleteFooterRequest {}
 
 
 /// Inserts a table at the specified location.
@@ -1187,6 +1485,34 @@ pub struct AutoText {
 impl Part for AutoText {}
 
 
+/// A List represents the list attributes for a group of paragraphs that all
+/// belong to the same list. A paragraph that is part of a list has a reference
+/// to the list's ID in its bullet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct List {
+    /// The properties of the list.
+    #[serde(rename="listProperties")]
+    pub list_properties: Option<ListProperties>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this list.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested changes to the list properties, keyed by suggestion
+    /// ID.
+    #[serde(rename="suggestedListPropertiesChanges")]
+    pub suggested_list_properties_changes: Option<HashMap<String, SuggestedListProperties>>,
+    /// The suggested insertion ID. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionId")]
+    pub suggested_insertion_id: Option<String>,
+}
+
+impl Part for List {}
+
+
 /// A ParagraphElement that contains
 /// an InlineObject.
 /// 
@@ -1221,6 +1547,36 @@ pub struct InlineObjectElement {
 }
 
 impl Part for InlineObjectElement {}
+
+
+/// Updates the SectionStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSectionStyleRequest {
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `section_style` is
+    /// implied and must not be specified. A single `"*"` can be used as
+    /// short-hand for listing every field.
+    /// 
+    /// For example to update the left margin, set `fields` to `"margin_left"`.
+    pub fields: Option<String>,
+    /// The range overlapping the sections to style.
+    /// 
+    /// Because section breaks can only be inserted inside the body, the segment
+    /// ID field must be empty.
+    pub range: Option<Range>,
+    /// The styles to  be set on the section.
+    /// 
+    /// Certain section style changes may cause other changes in order to mirror
+    /// the behavior of the Docs editor. See the documentation of SectionStyle for more information.
+    #[serde(rename="sectionStyle")]
+    pub section_style: Option<SectionStyle>,
+}
+
+impl Part for UpdateSectionStyleRequest {}
 
 
 /// Inserts text at the specified location.
@@ -1481,6 +1837,31 @@ pub struct ImageProperties {
 impl Part for ImageProperties {}
 
 
+/// Updates the DocumentStyle.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateDocumentStyleRequest {
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `document_style` is
+    /// implied and should not be specified. A single `"*"` can be used as
+    /// short-hand for listing every field.
+    /// 
+    /// For example to update the background, set `fields` to `"background"`.
+    pub fields: Option<String>,
+    /// The styles to set on the document.
+    /// 
+    /// Certain document style changes may cause other changes in order to mirror
+    /// the behavior of the Docs editor. See the documentation of DocumentStyle for more information.
+    #[serde(rename="documentStyle")]
+    pub document_style: Option<DocumentStyle>,
+}
+
+impl Part for UpdateDocumentStyleRequest {}
+
+
 /// A document header.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1608,11 +1989,16 @@ impl Part for OptionalColor {}
 
 /// A border around a table cell.
 /// 
+/// Table cell borders cannot be transparent. To hide a table cell border, make
+/// its width 0.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableCellBorder {
     /// The color of the border.
+    /// 
+    /// This color cannot be transparent.
     pub color: Option<OptionalColor>,
     /// The width of the border.
     pub width: Option<Dimension>,
@@ -1647,6 +2033,8 @@ pub struct UpdateTextStyleRequest {
     /// 
     /// If the range fully contains a paragraph belonging to a list, the
     /// paragraph's bullet is also updated with the matching text style.
+    /// 
+    /// Ranges cannot be inserted inside a relative UpdateTextStyleRequest.
     pub range: Option<Range>,
     /// The styles to set on the text.
     /// 
@@ -1755,6 +2143,33 @@ pub struct NestingLevel {
 }
 
 impl Part for NestingLevel {}
+
+
+/// Creates a Header. The new header is applied to
+/// the SectionStyle at the location of the
+/// SectionBreak if specificed, otherwise
+/// it is applied to the DocumentStyle.
+/// 
+/// If a header of the specified type already exists, a 400 bad request error
+/// is returned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateHeaderRequest {
+    /// The type of header to create.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The location of the SectionBreak
+    /// which begins the section this header should belong to. If
+    /// `section_break_location' is unset or if it refers to the first section
+    /// break in the document body, the header applies to the
+    /// DocumentStyle
+    #[serde(rename="sectionBreakLocation")]
+    pub section_break_location: Option<Location>,
+}
+
+impl Part for CreateHeaderRequest {}
 
 
 /// A criteria that matches a specific string of text in the document.
@@ -1882,74 +2297,6 @@ pub struct EndOfSegmentLocation {
 impl Part for EndOfSegmentLocation {}
 
 
-/// A single update to apply to a document.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Request {
-    /// Inserts text at the specified location.
-    #[serde(rename="insertText")]
-    pub insert_text: Option<InsertTextRequest>,
-    /// Creates bullets for paragraphs.
-    #[serde(rename="createParagraphBullets")]
-    pub create_paragraph_bullets: Option<CreateParagraphBulletsRequest>,
-    /// Updates the row style in a table.
-    #[serde(rename="updateTableRowStyle")]
-    pub update_table_row_style: Option<UpdateTableRowStyleRequest>,
-    /// Updates the paragraph style at the specified range.
-    #[serde(rename="updateParagraphStyle")]
-    pub update_paragraph_style: Option<UpdateParagraphStyleRequest>,
-    /// Replaces all instances of the specified text.
-    #[serde(rename="replaceAllText")]
-    pub replace_all_text: Option<ReplaceAllTextRequest>,
-    /// Inserts an empty column into a table.
-    #[serde(rename="insertTableColumn")]
-    pub insert_table_column: Option<InsertTableColumnRequest>,
-    /// Deletes a row from a table.
-    #[serde(rename="deleteTableRow")]
-    pub delete_table_row: Option<DeleteTableRowRequest>,
-    /// Inserts a page break at the specified location.
-    #[serde(rename="insertPageBreak")]
-    pub insert_page_break: Option<InsertPageBreakRequest>,
-    /// Creates a named range.
-    #[serde(rename="createNamedRange")]
-    pub create_named_range: Option<CreateNamedRangeRequest>,
-    /// Updates the properties of columns in a table.
-    #[serde(rename="updateTableColumnProperties")]
-    pub update_table_column_properties: Option<UpdateTableColumnPropertiesRequest>,
-    /// Deletes content from the document.
-    #[serde(rename="deleteContentRange")]
-    pub delete_content_range: Option<DeleteContentRangeRequest>,
-    /// Deletes bullets from paragraphs.
-    #[serde(rename="deleteParagraphBullets")]
-    pub delete_paragraph_bullets: Option<DeleteParagraphBulletsRequest>,
-    /// Deletes a named range.
-    #[serde(rename="deleteNamedRange")]
-    pub delete_named_range: Option<DeleteNamedRangeRequest>,
-    /// Inserts a table at the specified location.
-    #[serde(rename="insertTable")]
-    pub insert_table: Option<InsertTableRequest>,
-    /// Inserts an empty row into a table.
-    #[serde(rename="insertTableRow")]
-    pub insert_table_row: Option<InsertTableRowRequest>,
-    /// Updates the text style at the specified range.
-    #[serde(rename="updateTextStyle")]
-    pub update_text_style: Option<UpdateTextStyleRequest>,
-    /// Deletes a positioned object from the document.
-    #[serde(rename="deletePositionedObject")]
-    pub delete_positioned_object: Option<DeletePositionedObjectRequest>,
-    /// Deletes a column from a table.
-    #[serde(rename="deleteTableColumn")]
-    pub delete_table_column: Option<DeleteTableColumnRequest>,
-    /// Inserts an inline image at the specified location.
-    #[serde(rename="insertInlineImage")]
-    pub insert_inline_image: Option<InsertInlineImageRequest>,
-}
-
-impl Part for Request {}
-
-
 /// The result of inserting an inline image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2024,12 +2371,63 @@ impl Part for LinkedContentReferenceSuggestionState {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DocumentStyle {
     /// The ID of the default footer. If not set, there is no default footer.
+    /// 
+    /// This property is read-only.
     #[serde(rename="defaultFooterId")]
     pub default_footer_id: Option<String>,
+    /// The size of a page in the document.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<Size>,
+    /// The amount of space between the top of the page and the contents of the
+    /// header.
+    #[serde(rename="marginHeader")]
+    pub margin_header: Option<Dimension>,
+    /// Indicates whether DocumentStyle
+    /// margin_header,
+    /// SectionStyle
+    /// margin_header and
+    /// DocumentStyle
+    /// margin_footer,
+    /// SectionStyle
+    /// margin_footer are
+    /// respected. When false, the default values in the Docs editor for header and
+    /// footer margin are used.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="useCustomHeaderFooterMargins")]
+    pub use_custom_header_footer_margins: Option<bool>,
+    /// The amount of space between the bottom of the page and the contents of the
+    /// footer.
+    #[serde(rename="marginFooter")]
+    pub margin_footer: Option<Dimension>,
+    /// The ID of the header used only for even pages. The value of
+    /// use_even_page_header_footer determines
+    /// whether to use the default_header_id or this value for the
+    /// header on even pages. If not set, there is no even page header.
+    /// 
+    /// This property is read-only.
+    #[serde(rename="evenPageHeaderId")]
+    pub even_page_header_id: Option<String>,
+    /// Indicates whether to use the even page header / footer IDs for the even
+    /// pages.
+    #[serde(rename="useEvenPageHeaderFooter")]
+    pub use_even_page_header_footer: Option<bool>,
+    /// The background of the document. Documents cannot have a transparent
+    /// background color.
+    pub background: Option<Background>,
+    /// The right page margin.
+    /// 
+    /// Updating the right page margin on the document style clears the right page
+    /// margin on all section styles. It may also cause columns to resize in all
+    /// sections.
+    #[serde(rename="marginRight")]
+    pub margin_right: Option<Dimension>,
     /// The ID of the footer used only for even pages. The value of
     /// use_even_page_header_footer determines
     /// whether to use the default_footer_id or this value for the
     /// footer on even pages. If not set, there is no even page footer.
+    /// 
+    /// This property is read-only.
     #[serde(rename="evenPageFooterId")]
     pub even_page_footer_id: Option<String>,
     /// The ID of the footer used only for the first page. If not set then
@@ -2037,15 +2435,19 @@ pub struct DocumentStyle {
     /// use_first_page_header_footer determines
     /// whether to use the default_footer_id or this value for the
     /// footer on the first page. If not set, there is no first page footer.
+    /// 
+    /// This property is read-only.
     #[serde(rename="firstPageFooterId")]
     pub first_page_footer_id: Option<String>,
-    /// The size of a page in the document.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<Size>,
     /// The ID of the default header. If not set, there is no default header.
+    /// 
+    /// This property is read-only.
     #[serde(rename="defaultHeaderId")]
     pub default_header_id: Option<String>,
     /// The bottom page margin.
+    /// 
+    /// Updating the bottom page margin on the document style clears the bottom
+    /// page margin on all section styles.
     #[serde(rename="marginBottom")]
     pub margin_bottom: Option<Dimension>,
     /// The ID of the header used only for the first page. If not set then
@@ -2053,34 +2455,28 @@ pub struct DocumentStyle {
     /// The value of use_first_page_header_footer determines
     /// whether to use the default_header_id or this value for the
     /// header on the first page. If not set, there is no first page header.
+    /// 
+    /// This property is read-only.
     #[serde(rename="firstPageHeaderId")]
     pub first_page_header_id: Option<String>,
-    /// The ID of the header used only for even pages. The value of
-    /// use_even_page_header_footer determines
-    /// whether to use the default_header_id or this value for the
-    /// header on even pages. If not set, there is no even page header.
-    #[serde(rename="evenPageHeaderId")]
-    pub even_page_header_id: Option<String>,
     /// Indicates whether to use the first page header / footer IDs for the first
     /// page.
     #[serde(rename="useFirstPageHeaderFooter")]
     pub use_first_page_header_footer: Option<bool>,
     /// The left page margin.
+    /// 
+    /// Updating the left page margin on the document style clears the left page
+    /// margin on all section styles. It may also cause columns to resize in all
+    /// sections.
     #[serde(rename="marginLeft")]
     pub margin_left: Option<Dimension>,
-    /// Indicates whether to use the even page header / footer IDs for the even
-    /// pages.
-    #[serde(rename="useEvenPageHeaderFooter")]
-    pub use_even_page_header_footer: Option<bool>,
-    /// The background of the document.
-    pub background: Option<Background>,
-    /// The right page margin.
-    #[serde(rename="marginRight")]
-    pub margin_right: Option<Dimension>,
     /// The page number from which to start counting the number of pages.
     #[serde(rename="pageNumberStart")]
     pub page_number_start: Option<i32>,
     /// The top page margin.
+    /// 
+    /// Updating the top page margin on the document style clears the top page
+    /// margin on all section styles.
     #[serde(rename="marginTop")]
     pub margin_top: Option<Dimension>,
 }
@@ -2380,27 +2776,65 @@ pub struct WeightedFontFamily {
 impl Part for WeightedFontFamily {}
 
 
-/// A StructuralElement representing
-/// a table of contents.
+/// The result of inserting an embedded Google Sheets chart.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableOfContents {
-    /// The content of the table of contents.
-    pub content: Option<Vec<StructuralElement>>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this content.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The suggested insertion IDs. A TableOfContents may have multiple insertion IDs if it
-    /// is a nested suggested change. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionIds")]
-    pub suggested_insertion_ids: Option<Vec<String>>,
+pub struct InsertInlineSheetsChartResponse {
+    /// The object ID of the inserted chart.
+    #[serde(rename="objectId")]
+    pub object_id: Option<String>,
 }
 
-impl Part for TableOfContents {}
+impl Part for InsertInlineSheetsChartResponse {}
+
+
+/// Updates the style of a range of table cells.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTableCellStyleRequest {
+    /// The style to set on the table cells.
+    /// 
+    /// When updating borders, if a cell shares a border with an adjacent cell, the
+    /// corresponding border property of the adjacent cell is updated as well.
+    /// Borders that are merged and invisible are not updated.
+    /// 
+    /// Since updating a border shared by adjacent cells in the same request can
+    /// cause conflicting border updates, border updates are applied in the
+    /// following order:
+    /// 
+    /// - `border_right`
+    /// - `border_left`
+    /// - `border_bottom`
+    /// - `border_top`
+    #[serde(rename="tableCellStyle")]
+    pub table_cell_style: Option<TableCellStyle>,
+    /// The fields that should be updated.
+    /// 
+    /// At least one field must be specified. The root `tableCellStyle` is implied
+    /// and should not be specified. A single `"*"` can be used as short-hand for
+    /// listing every field.
+    /// 
+    /// For example to update the table cell background color, set `fields` to
+    /// `"backgroundColor"`.
+    /// 
+    /// To reset a property to its default value, include its field name in the
+    /// field mask but leave the field itself unset.
+    pub fields: Option<String>,
+    /// The table range representing the subset of the table to which the updates
+    /// are applied.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
+    /// The location where the table starts in the document. When specified, the
+    /// updates are applied to all the cells in the table.
+    #[serde(rename="tableStartLocation")]
+    pub table_start_location: Option<Location>,
+}
+
+impl Part for UpdateTableCellStyleRequest {}
 
 
 /// Inserts an InlineObject containing an
@@ -2535,46 +2969,27 @@ impl Part for UpdateTableRowStyleRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DocumentStyleSuggestionState {
-    /// Indicates if there was a suggested change to margin_bottom.
-    #[serde(rename="marginBottomSuggested")]
-    pub margin_bottom_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to even_page_header_id.
-    #[serde(rename="evenPageHeaderIdSuggested")]
-    pub even_page_header_id_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to first_page_header_id.
-    #[serde(rename="firstPageHeaderIdSuggested")]
-    pub first_page_header_id_suggested: Option<bool>,
     /// Indicates if there was a suggested change to margin_right.
     #[serde(rename="marginRightSuggested")]
     pub margin_right_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to page_number_start.
-    #[serde(rename="pageNumberStartSuggested")]
-    pub page_number_start_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to default_header_id.
-    #[serde(rename="defaultHeaderIdSuggested")]
-    pub default_header_id_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to default_footer_id.
-    #[serde(rename="defaultFooterIdSuggested")]
-    pub default_footer_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_header.
+    #[serde(rename="marginHeaderSuggested")]
+    pub margin_header_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_footer.
+    #[serde(rename="marginFooterSuggested")]
+    pub margin_footer_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to margin_bottom.
+    #[serde(rename="marginBottomSuggested")]
+    pub margin_bottom_suggested: Option<bool>,
     /// Indicates if there was a suggested change to margin_left.
     #[serde(rename="marginLeftSuggested")]
     pub margin_left_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to margin_top.
-    #[serde(rename="marginTopSuggested")]
-    pub margin_top_suggested: Option<bool>,
     /// Indicates if there was a suggested change to first_page_footer_id.
     #[serde(rename="firstPageFooterIdSuggested")]
     pub first_page_footer_id_suggested: Option<bool>,
-    /// A mask that indicates which of the fields in size have been changed in this
-    /// suggestion.
-    #[serde(rename="pageSizeSuggestionState")]
-    pub page_size_suggestion_state: Option<SizeSuggestionState>,
-    /// Indicates if there was a suggested change to use_first_page_header_footer.
-    #[serde(rename="useFirstPageHeaderFooterSuggested")]
-    pub use_first_page_header_footer_suggested: Option<bool>,
-    /// Indicates if there was a suggested change to even_page_footer_id.
-    #[serde(rename="evenPageFooterIdSuggested")]
-    pub even_page_footer_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to default_footer_id.
+    #[serde(rename="defaultFooterIdSuggested")]
+    pub default_footer_id_suggested: Option<bool>,
     /// A mask that indicates which of the fields in background have been changed in this
     /// suggestion.
     #[serde(rename="backgroundSuggestionState")]
@@ -2582,23 +2997,61 @@ pub struct DocumentStyleSuggestionState {
     /// Indicates if there was a suggested change to use_even_page_header_footer.
     #[serde(rename="useEvenPageHeaderFooterSuggested")]
     pub use_even_page_header_footer_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to
+    /// use_custom_header_footer_margins.
+    #[serde(rename="useCustomHeaderFooterMarginsSuggested")]
+    pub use_custom_header_footer_margins_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to even_page_header_id.
+    #[serde(rename="evenPageHeaderIdSuggested")]
+    pub even_page_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to first_page_header_id.
+    #[serde(rename="firstPageHeaderIdSuggested")]
+    pub first_page_header_id_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to page_number_start.
+    #[serde(rename="pageNumberStartSuggested")]
+    pub page_number_start_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to default_header_id.
+    #[serde(rename="defaultHeaderIdSuggested")]
+    pub default_header_id_suggested: Option<bool>,
+    /// A mask that indicates which of the fields in size have been changed in this
+    /// suggestion.
+    #[serde(rename="pageSizeSuggestionState")]
+    pub page_size_suggestion_state: Option<SizeSuggestionState>,
+    /// Indicates if there was a suggested change to margin_top.
+    #[serde(rename="marginTopSuggested")]
+    pub margin_top_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to use_first_page_header_footer.
+    #[serde(rename="useFirstPageHeaderFooterSuggested")]
+    pub use_first_page_header_footer_suggested: Option<bool>,
+    /// Indicates if there was a suggested change to even_page_footer_id.
+    #[serde(rename="evenPageFooterIdSuggested")]
+    pub even_page_footer_id_suggested: Option<bool>,
 }
 
 impl Part for DocumentStyleSuggestionState {}
 
 
-/// The result of inserting an embedded Google Sheets chart.
+/// A StructuralElement representing
+/// a table of contents.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InsertInlineSheetsChartResponse {
-    /// The object ID of the inserted chart.
-    #[serde(rename="objectId")]
-    pub object_id: Option<String>,
+pub struct TableOfContents {
+    /// The content of the table of contents.
+    pub content: Option<Vec<StructuralElement>>,
+    /// The suggested deletion IDs. If empty, then there are no suggested deletions
+    /// of this content.
+    #[serde(rename="suggestedDeletionIds")]
+    pub suggested_deletion_ids: Option<Vec<String>>,
+    /// The suggested insertion IDs. A TableOfContents may have multiple insertion IDs if it
+    /// is a nested suggested change. If empty, then this is not a suggested
+    /// insertion.
+    #[serde(rename="suggestedInsertionIds")]
+    pub suggested_insertion_ids: Option<Vec<String>>,
 }
 
-impl Part for InsertInlineSheetsChartResponse {}
+impl Part for TableOfContents {}
 
 
 /// The positioning of a PositionedObject. The positioned object is positioned
@@ -2646,10 +3099,14 @@ pub struct TableCellStyle {
     /// The top padding of the cell.
     #[serde(rename="paddingTop")]
     pub padding_top: Option<Dimension>,
-    /// The row span of the cell. This property is read-only.
+    /// The row span of the cell.
+    /// 
+    /// This property is read-only.
     #[serde(rename="rowSpan")]
     pub row_span: Option<i32>,
-    /// The column span of the cell. This property is read-only.
+    /// The column span of the cell.
+    /// 
+    /// This property is read-only.
     #[serde(rename="columnSpan")]
     pub column_span: Option<i32>,
     /// The background color of the cell.
@@ -2712,12 +3169,21 @@ pub struct Response {
     /// The result of creating a named range.
     #[serde(rename="createNamedRange")]
     pub create_named_range: Option<CreateNamedRangeResponse>,
-    /// The result of inserting an inline Google Sheets chart.
-    #[serde(rename="insertInlineSheetsChart")]
-    pub insert_inline_sheets_chart: Option<InsertInlineSheetsChartResponse>,
+    /// The result of creating a footnote.
+    #[serde(rename="createFootnote")]
+    pub create_footnote: Option<CreateFootnoteResponse>,
+    /// The result of creating a header.
+    #[serde(rename="createHeader")]
+    pub create_header: Option<CreateHeaderResponse>,
+    /// The result of creating a footer.
+    #[serde(rename="createFooter")]
+    pub create_footer: Option<CreateFooterResponse>,
     /// The result of replacing text.
     #[serde(rename="replaceAllText")]
     pub replace_all_text: Option<ReplaceAllTextResponse>,
+    /// The result of inserting an inline Google Sheets chart.
+    #[serde(rename="insertInlineSheetsChart")]
+    pub insert_inline_sheets_chart: Option<InsertInlineSheetsChartResponse>,
     /// The result of inserting an inline image.
     #[serde(rename="insertInlineImage")]
     pub insert_inline_image: Option<InsertInlineImageResponse>,
@@ -2796,7 +3262,9 @@ pub struct ParagraphStyle {
     #[serde(rename="borderLeft")]
     pub border_left: Option<ParagraphBorder>,
     /// The heading ID of the paragraph. If empty, then this paragraph is not a
-    /// heading. This property is read-only.
+    /// heading.
+    /// 
+    /// This property is read-only.
     #[serde(rename="headingId")]
     pub heading_id: Option<String>,
     /// The shading of the paragraph. If unset, the value is inherited from the
@@ -2814,7 +3282,9 @@ pub struct ParagraphStyle {
     #[serde(rename="borderTop")]
     pub border_top: Option<ParagraphBorder>,
     /// A list of the tab stops for this paragraph. The list of tab stops is not
-    /// inherited. This property is read-only.
+    /// inherited.
+    /// 
+    /// This property is read-only.
     #[serde(rename="tabStops")]
     pub tab_stops: Option<Vec<TabStop>>,
     /// The amount of indentation for the first line of the paragraph. If unset,
@@ -2934,6 +3404,42 @@ pub struct Footer {
 impl Part for Footer {}
 
 
+/// A table range represents a reference to a subset of a table.
+/// 
+/// It's important to note that the cells specified by a table range do not
+/// necessarily form a rectangle. For example, let's say we have a 3 x 3 table
+/// where all the cells of the last row are merged together. The table looks
+/// like this:
+/// 
+/// ````text
+///  [             ]
+/// ````
+/// 
+/// A table range with table cell location = (table_start_location, row = 0,
+/// column = 0), row span = 3 and column span = 2 specifies the following cells:
+/// 
+/// ````text
+///   x     x 
+///  [ x    x    x ]
+/// ````
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableRange {
+    /// The column span of the table range.
+    #[serde(rename="columnSpan")]
+    pub column_span: Option<i32>,
+    /// The row span of the table range.
+    #[serde(rename="rowSpan")]
+    pub row_span: Option<i32>,
+    /// The cell location where the table range starts.
+    #[serde(rename="tableCellLocation")]
+    pub table_cell_location: Option<TableCellLocation>,
+}
+
+impl Part for TableRange {}
+
+
 /// A mask that indicates which of the fields on the base NestingLevel have been changed in this suggestion. For
 /// any field set to true, there is a new suggested value.
 /// 
@@ -2976,6 +3482,26 @@ pub struct NestingLevelSuggestionState {
 }
 
 impl Part for NestingLevelSuggestionState {}
+
+
+/// Deletes a Header from the document.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteHeaderRequest {
+    /// The id of the header to delete. If this header is defined on
+    /// DocumentStyle, the reference to
+    /// this header is removed, resulting in no header of that type for
+    /// the first section of the document. If this header is defined on a
+    /// SectionStyle, the reference to this
+    /// header is removed and the header of that type is now continued from
+    /// the previous section.
+    #[serde(rename="headerId")]
+    pub header_id: Option<String>,
+}
+
+impl Part for DeleteHeaderRequest {}
 
 
 /// A suggested change to a
@@ -3069,6 +3595,41 @@ pub struct TableRowStyleSuggestionState {
 impl Part for TableRowStyleSuggestionState {}
 
 
+/// Creates a Footnote segment
+/// and inserts a new FootnoteReference
+/// to it at the given location.
+/// 
+/// The new Footnote segment will contain a
+/// space followed by a newline character.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFootnoteRequest {
+    /// Inserts the footnote reference at the end of the document body.
+    /// 
+    /// Footnote references cannot be inserted inside a header, footer or
+    /// footnote. Since footnote references can only be inserted in the body, the
+    /// segment ID field
+    /// must be empty.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the footnote reference at a specific index in the document.
+    /// 
+    /// The footnote reference must be inserted inside the bounds of an existing
+    /// Paragraph. For instance, it cannot be
+    /// inserted at a table's start index (i.e. between the table and its
+    /// preceding paragraph).
+    /// 
+    /// Footnote references cannot be inserted inside an equation,
+    /// header, footer or footnote. Since footnote references can only be
+    /// inserted in the body, the segment ID field must be empty.
+    pub location: Option<Location>,
+}
+
+impl Part for CreateFootnoteRequest {}
+
+
 /// A collection of Ranges with the same named range
 /// ID.
 /// 
@@ -3121,6 +3682,16 @@ pub struct TableCellLocation {
 }
 
 impl Part for TableCellLocation {}
+
+
+/// The properties of an embedded drawing.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbeddedDrawingProperties { _never_set: Option<bool> }
+
+impl Part for EmbeddedDrawingProperties {}
 
 
 /// A document footnote.
@@ -3230,6 +3801,20 @@ pub struct Size {
 impl Part for Size {}
 
 
+/// The result of creating a footer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateFooterResponse {
+    /// The ID of the created footer.
+    #[serde(rename="footerId")]
+    pub footer_id: Option<String>,
+}
+
+impl Part for CreateFooterResponse {}
+
+
 /// Deletes a NamedRange.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3272,7 +3857,7 @@ impl Part for CreateNamedRangeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SectionColumnProperties {
-    /// The width of the column.
+    /// Output only. The width of the column.
     pub width: Option<Dimension>,
     /// The padding at the end of the column.
     #[serde(rename="paddingEnd")]
@@ -3570,32 +4155,111 @@ pub struct SuggestedPositionedObjectProperties {
 impl Part for SuggestedPositionedObjectProperties {}
 
 
-/// A List represents the list attributes for a group of paragraphs that all
-/// belong to the same list. A paragraph that is part of a list has a reference
-/// to the list's ID in its bullet.
+/// A single update to apply to a document.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct List {
-    /// The properties of the list.
-    #[serde(rename="listProperties")]
-    pub list_properties: Option<ListProperties>,
-    /// The suggested deletion IDs. If empty, then there are no suggested deletions
-    /// of this list.
-    #[serde(rename="suggestedDeletionIds")]
-    pub suggested_deletion_ids: Option<Vec<String>>,
-    /// The suggested changes to the list properties, keyed by suggestion
-    /// ID.
-    #[serde(rename="suggestedListPropertiesChanges")]
-    pub suggested_list_properties_changes: Option<HashMap<String, SuggestedListProperties>>,
-    /// The suggested insertion ID. If empty, then this is not a suggested
-    /// insertion.
-    #[serde(rename="suggestedInsertionId")]
-    pub suggested_insertion_id: Option<String>,
+pub struct Request {
+    /// Inserts text at the specified location.
+    #[serde(rename="insertText")]
+    pub insert_text: Option<InsertTextRequest>,
+    /// Merges cells in a table.
+    #[serde(rename="mergeTableCells")]
+    pub merge_table_cells: Option<MergeTableCellsRequest>,
+    /// Replaces an image in the document.
+    #[serde(rename="replaceImage")]
+    pub replace_image: Option<ReplaceImageRequest>,
+    /// Inserts an empty column into a table.
+    #[serde(rename="insertTableColumn")]
+    pub insert_table_column: Option<InsertTableColumnRequest>,
+    /// Deletes a row from a table.
+    #[serde(rename="deleteTableRow")]
+    pub delete_table_row: Option<DeleteTableRowRequest>,
+    /// Creates a footnote.
+    #[serde(rename="createFootnote")]
+    pub create_footnote: Option<CreateFootnoteRequest>,
+    /// Creates a header.
+    #[serde(rename="createHeader")]
+    pub create_header: Option<CreateHeaderRequest>,
+    /// Updates the style of the document.
+    #[serde(rename="updateDocumentStyle")]
+    pub update_document_style: Option<UpdateDocumentStyleRequest>,
+    /// Deletes bullets from paragraphs.
+    #[serde(rename="deleteParagraphBullets")]
+    pub delete_paragraph_bullets: Option<DeleteParagraphBulletsRequest>,
+    /// Inserts an empty row into a table.
+    #[serde(rename="insertTableRow")]
+    pub insert_table_row: Option<InsertTableRowRequest>,
+    /// Updates the text style at the specified range.
+    #[serde(rename="updateTextStyle")]
+    pub update_text_style: Option<UpdateTextStyleRequest>,
+    /// Deletes a positioned object from the document.
+    #[serde(rename="deletePositionedObject")]
+    pub delete_positioned_object: Option<DeletePositionedObjectRequest>,
+    /// Updates the row style in a table.
+    #[serde(rename="updateTableRowStyle")]
+    pub update_table_row_style: Option<UpdateTableRowStyleRequest>,
+    /// Updates the paragraph style at the specified range.
+    #[serde(rename="updateParagraphStyle")]
+    pub update_paragraph_style: Option<UpdateParagraphStyleRequest>,
+    /// Creates a footer.
+    #[serde(rename="createFooter")]
+    pub create_footer: Option<CreateFooterRequest>,
+    /// Replaces all instances of the specified text.
+    #[serde(rename="replaceAllText")]
+    pub replace_all_text: Option<ReplaceAllTextRequest>,
+    /// Inserts a page break at the specified location.
+    #[serde(rename="insertPageBreak")]
+    pub insert_page_break: Option<InsertPageBreakRequest>,
+    /// Deletes a header from the document.
+    #[serde(rename="deleteHeader")]
+    pub delete_header: Option<DeleteHeaderRequest>,
+    /// Unmerges cells in a table.
+    #[serde(rename="unmergeTableCells")]
+    pub unmerge_table_cells: Option<UnmergeTableCellsRequest>,
+    /// Creates a named range.
+    #[serde(rename="createNamedRange")]
+    pub create_named_range: Option<CreateNamedRangeRequest>,
+    /// Inserts a section break at the specified location.
+    #[serde(rename="insertSectionBreak")]
+    pub insert_section_break: Option<InsertSectionBreakRequest>,
+    /// Deletes a footer from the document.
+    #[serde(rename="deleteFooter")]
+    pub delete_footer: Option<DeleteFooterRequest>,
+    /// Updates the properties of columns in a table.
+    #[serde(rename="updateTableColumnProperties")]
+    pub update_table_column_properties: Option<UpdateTableColumnPropertiesRequest>,
+    /// Updates the style of table cells.
+    #[serde(rename="updateTableCellStyle")]
+    pub update_table_cell_style: Option<UpdateTableCellStyleRequest>,
+    /// Deletes content from the document.
+    #[serde(rename="deleteContentRange")]
+    pub delete_content_range: Option<DeleteContentRangeRequest>,
+    /// Deletes a named range.
+    #[serde(rename="deleteNamedRange")]
+    pub delete_named_range: Option<DeleteNamedRangeRequest>,
+    /// Inserts a table at the specified location.
+    #[serde(rename="insertTable")]
+    pub insert_table: Option<InsertTableRequest>,
+    /// Deletes a column from a table.
+    #[serde(rename="deleteTableColumn")]
+    pub delete_table_column: Option<DeleteTableColumnRequest>,
+    /// Updates the section style of the specified range.
+    #[serde(rename="updateSectionStyle")]
+    pub update_section_style: Option<UpdateSectionStyleRequest>,
+    /// Replaces the content in a named range.
+    #[serde(rename="replaceNamedRangeContent")]
+    pub replace_named_range_content: Option<ReplaceNamedRangeContentRequest>,
+    /// Inserts an inline image at the specified location.
+    #[serde(rename="insertInlineImage")]
+    pub insert_inline_image: Option<InsertInlineImageRequest>,
+    /// Creates bullets for paragraphs.
+    #[serde(rename="createParagraphBullets")]
+    pub create_paragraph_bullets: Option<CreateParagraphBulletsRequest>,
 }
 
-impl Part for List {}
+impl Part for Request {}
 
 
 /// The properties of a list which describe the look
@@ -3769,6 +4433,29 @@ pub struct SuggestedInlineObjectProperties {
 impl Part for SuggestedInlineObjectProperties {}
 
 
+/// Unmerges cells in a Table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnmergeTableCellsRequest {
+    /// The table range specifying which cells of the table to unmerge.
+    /// 
+    /// All merged cells in this range will be unmerged, and cells that are already
+    /// unmerged will not be affected. If the range has no merged cells, the
+    /// request will do nothing.
+    /// 
+    /// If there is text in any of the merged cells, the text will remain in the
+    /// "head" cell of the resulting block of unmerged cells. The "head" cell is
+    /// the upper-left cell when the content direction is from left to right, and
+    /// the upper-right otherwise.
+    #[serde(rename="tableRange")]
+    pub table_range: Option<TableRange>,
+}
+
+impl Part for UnmergeTableCellsRequest {}
+
+
 /// A ParagraphElement describes content within a
 /// Paragraph.
 /// 
@@ -3809,6 +4496,43 @@ pub struct ParagraphElement {
 }
 
 impl Part for ParagraphElement {}
+
+
+/// Inserts a section break at the given location.
+/// 
+/// A newline character will be inserted before the section break.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertSectionBreakRequest {
+    /// Inserts a newline and a section break at the end of the document body.
+    /// 
+    /// Section breaks cannot be inserted inside a footnote, header or footer.
+    /// Because section breaks can only be inserted inside the body, the segment
+    /// ID field must be
+    /// empty.
+    #[serde(rename="endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts a newline and a section break at a specific index in the
+    /// document.
+    /// 
+    /// The section break must be inserted inside the bounds of an existing
+    /// Paragraph. For instance, it cannot be
+    /// inserted at a table's start index (i.e. between the table and its
+    /// preceding paragraph).
+    /// 
+    /// Section breaks cannot be inserted inside a table, equation, footnote,
+    /// header, or footer. Since section breaks can only be inserted inside the
+    /// body, the segment ID field
+    /// must be empty.
+    pub location: Option<Location>,
+    /// The type of section to insert.
+    #[serde(rename="sectionType")]
+    pub section_type: Option<String>,
+}
+
+impl Part for InsertSectionBreakRequest {}
 
 
 /// A suggested change to the DocumentStyle.
@@ -4176,7 +4900,7 @@ pub struct DocumentCreateCall<'a, C, A>
 
     hub: &'a Docs<C, A>,
     _request: Document,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4191,7 +4915,7 @@ impl<'a, C, A> DocumentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4272,9 +4996,15 @@ impl<'a, C, A> DocumentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4319,7 +5049,7 @@ impl<'a, C, A> DocumentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4414,7 +5144,7 @@ pub struct DocumentGetCall<'a, C, A>
     hub: &'a Docs<C, A>,
     _document_id: String,
     _suggestions_view_mode: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4429,7 +5159,7 @@ impl<'a, C, A> DocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4520,9 +5250,15 @@ impl<'a, C, A> DocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4578,7 +5314,7 @@ impl<'a, C, A> DocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4698,7 +5434,7 @@ pub struct DocumentBatchUpdateCall<'a, C, A>
     hub: &'a Docs<C, A>,
     _request: BatchUpdateDocumentRequest,
     _document_id: String,
-    _delegate: Option<&'a mut Delegate>,
+    _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
@@ -4713,7 +5449,7 @@ impl<'a, C, A> DocumentBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
+        let mut dlg: &mut dyn Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
@@ -4816,9 +5552,15 @@ impl<'a, C, A> DocumentBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -4873,7 +5615,7 @@ impl<'a, C, A> DocumentBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DocumentBatchUpdateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DocumentBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }

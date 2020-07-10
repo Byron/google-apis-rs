@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.14+20200709*, where *20200709* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *AdExchangeBuyerII* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
@@ -338,7 +338,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
         AdExchangeBuyerII {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://adexchangebuyer.googleapis.com/".to_string(),
             _root_url: "https://adexchangebuyer.googleapis.com/".to_string(),
         }
@@ -352,7 +352,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1120,7 +1120,8 @@ pub struct Client {
     /// The value of this field is ignored in create and update operations.
     #[serde(rename="clientAccountId")]
     pub client_account_id: Option<String>,
-    /// The type of the client entity: `ADVERTISER`, `BRAND`, or `AGENCY`.
+    /// An optional field for specifying the type of the client entity:
+    /// `ADVERTISER`, `BRAND`, or `AGENCY`.
     #[serde(rename="entityType")]
     pub entity_type: Option<String>,
     /// The name of the entity. This field is automatically fetched based on
@@ -1150,6 +1151,7 @@ pub struct Client {
     /// Numerical identifier of the client entity.
     /// The entity can be an advertiser, a brand, or an agency.
     /// This identifier is unique among all the entities with the same type.
+    /// The value of this field is ignored if the entity type is not provided.
     /// 
     /// A list of all known advertisers with their identifiers is available in the
     /// [advertisers.txt](https://storage.googleapis.com/adx-rtb-dictionaries/advertisers.txt)
@@ -2425,7 +2427,8 @@ impl ResponseResult for ClientUser {}
 /// Note: this resource requires whitelisting for access. Please contact your
 /// account manager for access to Marketplace resources.
 /// 
-/// Represents a publisher profile in Marketplace.
+/// Represents a publisher profile
+/// (https://support.google.com/admanager/answer/6035806?hl=en) in Marketplace.
 /// 
 /// All fields are read only. All string fields are free-form text entered by the
 /// publisher unless noted otherwise.
@@ -2442,6 +2445,36 @@ pub struct PublisherProfile {
     /// URL to a publisher rate card.
     #[serde(rename="rateCardInfoUrl")]
     pub rate_card_info_url: Option<String>,
+    /// Contact information for direct reservation deals. This is free text entered
+    /// by the publisher and may include information like names, phone numbers and
+    /// email addresses.
+    #[serde(rename="directDealsContact")]
+    pub direct_deals_contact: Option<String>,
+    /// Overview of the publisher.
+    pub overview: Option<String>,
+    /// Statement explaining what's unique about publisher's business, and why
+    /// buyers should partner with the publisher.
+    #[serde(rename="buyerPitchStatement")]
+    pub buyer_pitch_statement: Option<String>,
+    /// Indicates if this profile is the parent profile of the seller. A parent
+    /// profile represents all the inventory from the seller, as opposed to child
+    /// profile that is created to brand a portion of inventory. One seller should
+    /// have only one parent publisher profile, and can have multiple child
+    /// profiles. Publisher profiles for the same seller will have same value of
+    /// field google.ads.adexchange.buyer.v2beta1.PublisherProfile.seller.
+    /// See https://support.google.com/admanager/answer/6035806?hl=en for details.
+    #[serde(rename="isParent")]
+    pub is_parent: Option<bool>,
+    /// URL to a sample content page.
+    #[serde(rename="samplePageUrl")]
+    pub sample_page_url: Option<String>,
+    /// Up to three key metrics and rankings. Max 100 characters each.
+    /// For example "#1 Mobile News Site for 20 Straight Months".
+    #[serde(rename="topHeadlines")]
+    pub top_headlines: Option<Vec<String>>,
+    /// Unique ID for publisher profile.
+    #[serde(rename="publisherProfileId")]
+    pub publisher_profile_id: Option<String>,
     /// Description on the publisher's audience.
     #[serde(rename="audienceDescription")]
     pub audience_description: Option<String>,
@@ -2453,32 +2486,14 @@ pub struct PublisherProfile {
     /// email addresses.
     #[serde(rename="programmaticDealsContact")]
     pub programmatic_deals_contact: Option<String>,
-    /// Contact information for direct reservation deals. This is free text entered
-    /// by the publisher and may include information like names, phone numbers and
-    /// email addresses.
-    #[serde(rename="directDealsContact")]
-    pub direct_deals_contact: Option<String>,
     /// URL to additional marketing and sales materials.
     #[serde(rename="mediaKitUrl")]
     pub media_kit_url: Option<String>,
-    /// Overview of the publisher.
-    pub overview: Option<String>,
-    /// Statement explaining what's unique about publisher's business, and why
-    /// buyers should partner with the publisher.
-    #[serde(rename="buyerPitchStatement")]
-    pub buyer_pitch_statement: Option<String>,
     /// Seller of the publisher profile.
     pub seller: Option<Seller>,
     /// URL to publisher's Google+ page.
     #[serde(rename="googlePlusUrl")]
     pub google_plus_url: Option<String>,
-    /// URL to a sample content page.
-    #[serde(rename="samplePageUrl")]
-    pub sample_page_url: Option<String>,
-    /// Up to three key metrics and rankings. Max 100 characters each.
-    /// For example "#1 Mobile News Site for 20 Straight Months".
-    #[serde(rename="topHeadlines")]
-    pub top_headlines: Option<Vec<String>>,
     /// A Google public URL to the logo for this publisher profile. The logo is
     /// stored as a PNG, JPG, or GIF image.
     #[serde(rename="logoUrl")]
@@ -2488,9 +2503,6 @@ pub struct PublisherProfile {
     /// not contain a string like "photos.google.co.uk/123", but will instead
     /// contain "google.co.uk".
     pub domains: Option<Vec<String>>,
-    /// Unique ID for publisher profile.
-    #[serde(rename="publisherProfileId")]
-    pub publisher_profile_id: Option<String>,
 }
 
 impl ResponseResult for PublisherProfile {}
@@ -3176,12 +3188,22 @@ pub struct BidMetricsRow {
     /// The number of bids that won the auction.
     #[serde(rename="impressionsWon")]
     pub impressions_won: Option<MetricValue>,
-    /// The values of all dimensions associated with metric values in this row.
-    #[serde(rename="rowDimensions")]
-    pub row_dimensions: Option<RowDimensions>,
     /// The number of bids for which the buyer was billed.
     #[serde(rename="billedImpressions")]
     pub billed_impressions: Option<MetricValue>,
+    /// The number of bids for which the corresponding impression was measurable
+    /// for viewability (as defined by Active View).
+    #[serde(rename="measurableImpressions")]
+    pub measurable_impressions: Option<MetricValue>,
+    /// The number of bids that Ad Exchange received from the buyer.
+    pub bids: Option<MetricValue>,
+    /// The number of bids that won the auction and also won the mediation
+    /// waterfall (if any).
+    #[serde(rename="reachedQueries")]
+    pub reached_queries: Option<MetricValue>,
+    /// The values of all dimensions associated with metric values in this row.
+    #[serde(rename="rowDimensions")]
+    pub row_dimensions: Option<RowDimensions>,
     /// The number of bids for which the corresponding impression was viewable (as
     /// defined by Active View).
     #[serde(rename="viewableImpressions")]
@@ -3189,12 +3211,6 @@ pub struct BidMetricsRow {
     /// The number of bids that were permitted to compete in the auction.
     #[serde(rename="bidsInAuction")]
     pub bids_in_auction: Option<MetricValue>,
-    /// The number of bids for which the corresponding impression was measurable
-    /// for viewability (as defined by Active View).
-    #[serde(rename="measurableImpressions")]
-    pub measurable_impressions: Option<MetricValue>,
-    /// The number of bids that Ad Exchange received from the buyer.
-    pub bids: Option<MetricValue>,
 }
 
 impl Part for BidMetricsRow {}

@@ -7437,7 +7437,7 @@ fn main() {
         
         ("entries", "methods: 'list' and 'write'", vec![
             ("list",
-                    Some(r##"Lists log entries. Use this method to retrieve log entries that originated from a project/folder/organization/billing account. For ways to export log entries, see Exporting Logs."##),
+                    Some(r##"Lists log entries. Use this method to retrieve log entries that originated from a project/folder/organization/billing account. For ways to export log entries, see Exporting Logs (https://cloud.google.com/logging/docs/export)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_cli/entries_list",
                   vec![
                     (Some(r##"kv"##),
@@ -8252,7 +8252,7 @@ fn main() {
         
         ("methods", "methods: 'get-cmek-settings' and 'update-cmek-settings'", vec![
             ("get-cmek-settings",
-                    Some(r##"Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information."##),
+                    Some(r##"Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_cli/methods_get-cmek-settings",
                   vec![
                     (Some(r##"name"##),
@@ -8279,7 +8279,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update-cmek-settings",
-                    Some(r##"Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information."##),
+                    Some(r##"Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_cli/methods_update-cmek-settings",
                   vec![
                     (Some(r##"name"##),
@@ -8481,7 +8481,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-cmek-settings",
-                    Some(r##"Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router for more information."##),
+                    Some(r##"Gets the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_cli/organizations_get-cmek-settings",
                   vec![
                     (Some(r##"name"##),
@@ -8829,7 +8829,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update-cmek-settings",
-                    Some(r##"Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router for more information."##),
+                    Some(r##"Updates the Logs Router CMEK settings for the given resource.Note: CMEK for the Logs Router can currently only be configured for GCP organizations. Once configured, it applies to all projects and folders in the GCP organization.UpdateCmekSettings will fail if 1) kms_key_name is invalid, or 2) the associated service account does not have the required roles/cloudkms.cryptoKeyEncrypterDecrypter role assigned for the key, or 3) access to the key is disabled.See Enabling CMEK for Logs Router (https://cloud.google.com/logging/docs/routing/managed-encryption) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_cli/organizations_update-cmek-settings",
                   vec![
                     (Some(r##"name"##),
@@ -9620,7 +9620,7 @@ fn main() {
     
     let mut app = App::new("logging2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200407")
+           .version("1.0.14+20200624")
            .about("Writes log entries and manages your Cloud Logging configuration. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the documentation at https://cloud.google.com/logging/docs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_cli")
            .arg(Arg::with_name("url")

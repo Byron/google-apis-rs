@@ -48,7 +48,7 @@ struct Engine<'n> {
 impl<'n> Engine<'n> {
     fn _cse_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.cse().list(opt.value_of("q").unwrap_or(""));
+        let mut call = self.hub.cse().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -75,6 +75,9 @@ impl<'n> Engine<'n> {
                 },
                 "related-site" => {
                     call = call.related_site(value.unwrap_or(""));
+                },
+                "q" => {
+                    call = call.q(value.unwrap_or(""));
                 },
                 "or-terms" => {
                     call = call.or_terms(value.unwrap_or(""));
@@ -155,7 +158,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["date-restrict", "or-terms", "high-range", "num", "cr", "img-type", "related-site", "gl", "search-type", "file-type", "start", "img-dominant-color", "lr", "site-search", "sort", "safe", "c2coff", "googlehost", "hq", "exact-terms", "hl", "low-range", "img-size", "img-color-type", "rights", "exclude-terms", "filter", "link-site", "cx", "site-search-filter"].iter().map(|v|*v));
+                                                                           v.extend(["date-restrict", "or-terms", "high-range", "num", "cr", "img-type", "related-site", "filter", "gl", "search-type", "file-type", "start", "img-dominant-color", "lr", "site-search", "sort", "safe", "c2coff", "googlehost", "hq", "exact-terms", "hl", "low-range", "img-size", "img-color-type", "rights", "exclude-terms", "q", "link-site", "cx", "site-search-filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -188,7 +191,7 @@ impl<'n> Engine<'n> {
 
     fn _cse_siterestrict_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.cse().siterestrict_list(opt.value_of("q").unwrap_or(""));
+        let mut call = self.hub.cse().siterestrict_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -215,6 +218,9 @@ impl<'n> Engine<'n> {
                 },
                 "related-site" => {
                     call = call.related_site(value.unwrap_or(""));
+                },
+                "q" => {
+                    call = call.q(value.unwrap_or(""));
                 },
                 "or-terms" => {
                     call = call.or_terms(value.unwrap_or(""));
@@ -295,7 +301,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["date-restrict", "or-terms", "high-range", "num", "cr", "img-type", "related-site", "gl", "search-type", "file-type", "start", "img-dominant-color", "lr", "site-search", "sort", "safe", "c2coff", "googlehost", "hq", "exact-terms", "hl", "low-range", "img-size", "img-color-type", "rights", "exclude-terms", "filter", "link-site", "cx", "site-search-filter"].iter().map(|v|*v));
+                                                                           v.extend(["date-restrict", "or-terms", "high-range", "num", "cr", "img-type", "related-site", "filter", "gl", "search-type", "file-type", "start", "img-dominant-color", "lr", "site-search", "sort", "safe", "c2coff", "googlehost", "hq", "exact-terms", "hl", "low-range", "img-size", "img-color-type", "rights", "exclude-terms", "q", "link-site", "cx", "site-search-filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -400,12 +406,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Customsearch::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -429,15 +438,10 @@ fn main() {
     let arg_data = [
         ("cse", "methods: 'list' and 'siterestrict-list'", vec![
             ("list",
-                    Some(r##"Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results."##),
+                    Some(r##"Returns metadata about the search performed, metadata about the custom
+        search engine used for the search, and the search results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_customsearch1_cli/cse_list",
                   vec![
-                    (Some(r##"q"##),
-                     None,
-                     Some(r##"Query"##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -451,15 +455,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("siterestrict-list",
-                    Some(r##"Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results. Uses a small set of url patterns."##),
+                    Some(r##"Returns metadata about the search performed, metadata about the custom
+        search engine used for the search, and the search results. Uses a small set
+        of url patterns."##),
                     "Details at http://byron.github.io/google-apis-rs/google_customsearch1_cli/cse_siterestrict-list",
                   vec![
-                    (Some(r##"q"##),
-                     None,
-                     Some(r##"Query"##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -478,7 +478,7 @@ fn main() {
     
     let mut app = App::new("customsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20181001")
+           .version("1.0.14+20200708")
            .about("Searches over a website or collection of websites")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_customsearch1_cli")
            .arg(Arg::with_name("folder")

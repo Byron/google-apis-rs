@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Vault* crate version *1.0.13+20200330*, where *20200330* is the exact revision of the *vault:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Vault* crate version *1.0.14+20200623*, where *20200623* is the exact revision of the *vault:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Vault* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/vault).
@@ -356,7 +356,7 @@ impl<'a, C, A> Vault<C, A>
         Vault {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://vault.googleapis.com/".to_string(),
             _root_url: "https://vault.googleapis.com/".to_string(),
         }
@@ -370,7 +370,7 @@ impl<'a, C, A> Vault<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -417,7 +417,7 @@ impl Part for CloudStorageSink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDriveInfo {
-    /// List of Team Drive ids, as provided by <a
+    /// List of Team Drive IDs, as provided by <a
     /// href="https://developers.google.com/drive">Drive API</a>.
     #[serde(rename="teamDriveIds")]
     pub team_drive_ids: Option<Vec<String>>,
@@ -615,7 +615,7 @@ impl Part for DriveExportOptions {}
 pub struct MatterPermission {
     /// The user's role in this matter.
     pub role: Option<String>,
-    /// The account id, as provided by <a
+    /// The account ID, as provided by <a
     /// href="https://developers.google.com/admin-sdk/">Admin SDK</a>.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
@@ -663,7 +663,10 @@ pub struct CloudStorageFile {
     #[serde(rename="md5Hash")]
     pub md5_hash: Option<String>,
     /// The cloud storage bucket name of this export file.
-    /// Can be used in cloud storage JSON/XML API.
+    /// Can be used in cloud storage JSON/XML API, but not to list the bucket
+    /// contents. Instead, you can <a
+    /// href="https://cloud.google.com/storage/docs/json_api/v1/objects/get">
+    /// get individual export files</a> by object name.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
     /// The cloud storage object name of this export file.
@@ -832,7 +835,7 @@ impl ResponseResult for CloseMatterResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SharedDriveInfo {
-    /// List of Shared drive ids, as provided by <a
+    /// List of Shared drive IDs, as provided by <a
     /// href="https://developers.google.com/drive">Drive API</a>.
     #[serde(rename="sharedDriveIds")]
     pub shared_drive_ids: Option<Vec<String>>,
@@ -894,7 +897,7 @@ impl Part for CorpusQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddHeldAccountsRequest {
-    /// Account ids to identify which accounts to add. Only account_ids or only
+    /// Account IDs to identify which accounts to add. Only account_ids or only
     /// emails should be specified, but not both.
     #[serde(rename="accountIds")]
     pub account_ids: Option<Vec<String>>,
@@ -1117,7 +1120,7 @@ impl Part for Query {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoveHeldAccountsRequest {
-    /// Account ids to identify HeldAccounts to remove.
+    /// Account IDs to identify HeldAccounts to remove.
     #[serde(rename="accountIds")]
     pub account_ids: Option<Vec<String>>,
 }
@@ -1429,7 +1432,7 @@ impl Part for UserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SavedQuery {
-    /// Output only. The matter id of the associated matter.
+    /// Output only. The matter ID of the associated matter.
     /// The server does not look at this field during create and always uses matter
     /// id in the URL.
     #[serde(rename="matterId")]
@@ -1642,9 +1645,9 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter id of the parent matter for which the saved query is to be
+    /// * `matterId` - The matter ID of the parent matter for which the saved query is to be
     ///                deleted.
-    /// * `savedQueryId` - Id of the saved query to be deleted.
+    /// * `savedQueryId` - ID of the saved query to be deleted.
     pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a, C, A> {
         MatterSavedQueryDeleteCall {
             hub: self.hub,
@@ -1679,7 +1682,7 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     ///
     /// Updates the specified matter.
     /// This updates only the name and description of the matter, identified by
-    /// matter id. Changes to any other fields are ignored.
+    /// matter ID. Changes to any other fields are ignored.
     /// Returns the default view of the matter.
     /// 
     /// # Arguments
@@ -1845,7 +1848,7 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter id of the parent matter for which the saved queries are to be
+    /// * `matterId` - The matter ID of the parent matter for which the saved queries are to be
     ///                retrieved.
     pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a, C, A> {
         MatterSavedQueryListCall {
@@ -2105,7 +2108,7 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `matterId` - The matter id of the parent matter for which the saved query is to be
+    /// * `matterId` - The matter ID of the parent matter for which the saved query is to be
     ///                created.
     pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a, C, A> {
         MatterSavedQueryCreateCall {
@@ -2141,9 +2144,9 @@ impl<'a, C, A> MatterMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `matterId` - The matter id of the parent matter for which the saved query is to be
+    /// * `matterId` - The matter ID of the parent matter for which the saved query is to be
     ///                retrieved.
-    /// * `savedQueryId` - Id of the saved query to be retrieved.
+    /// * `savedQueryId` - ID of the saved query to be retrieved.
     pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a, C, A> {
         MatterSavedQueryGetCall {
             hub: self.hub,
@@ -3122,7 +3125,7 @@ impl<'a, C, A> MatterSavedQueryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// The matter id of the parent matter for which the saved query is to be
+    /// The matter ID of the parent matter for which the saved query is to be
     /// deleted.
     ///
     /// Sets the *matter id* path property to the given value.
@@ -3133,7 +3136,7 @@ impl<'a, C, A> MatterSavedQueryDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._matter_id = new_value.to_string();
         self
     }
-    /// Id of the saved query to be deleted.
+    /// ID of the saved query to be deleted.
     ///
     /// Sets the *saved query id* path property to the given value.
     ///
@@ -3489,7 +3492,7 @@ impl<'a, C, A> MatterExportCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Updates the specified matter.
 /// This updates only the name and description of the matter, identified by
-/// matter id. Changes to any other fields are ignored.
+/// matter ID. Changes to any other fields are ignored.
 /// Returns the default view of the matter.
 ///
 /// A builder for the *update* method supported by a *matter* resource.
@@ -5891,7 +5894,7 @@ impl<'a, C, A> MatterSavedQueryListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The matter id of the parent matter for which the saved queries are to be
+    /// The matter ID of the parent matter for which the saved queries are to be
     /// retrieved.
     ///
     /// Sets the *matter id* path property to the given value.
@@ -9513,7 +9516,7 @@ impl<'a, C, A> MatterSavedQueryCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The matter id of the parent matter for which the saved query is to be
+    /// The matter ID of the parent matter for which the saved query is to be
     /// created.
     ///
     /// Sets the *matter id* path property to the given value.
@@ -10016,7 +10019,7 @@ impl<'a, C, A> MatterSavedQueryGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The matter id of the parent matter for which the saved query is to be
+    /// The matter ID of the parent matter for which the saved query is to be
     /// retrieved.
     ///
     /// Sets the *matter id* path property to the given value.
@@ -10027,7 +10030,7 @@ impl<'a, C, A> MatterSavedQueryGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._matter_id = new_value.to_string();
         self
     }
-    /// Id of the saved query to be retrieved.
+    /// ID of the saved query to be retrieved.
     ///
     /// Sets the *saved query id* path property to the given value.
     ///

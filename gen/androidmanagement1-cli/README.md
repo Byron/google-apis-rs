@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Management* API at revision *20200330*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Android Management* API at revision *20200701*. The CLI is at version *1.0.14*.
 
 ```bash
 androidmanagement1 [options]

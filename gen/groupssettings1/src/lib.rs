@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *1.0.13+20190725*, where *20190725* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *groupssettings* crate version *1.0.14+20200702*, where *20200702* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).
@@ -331,7 +331,7 @@ impl<'a, C, A> Groupssettings<C, A>
         Groupssettings {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://www.googleapis.com/groups/v1/groups/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -342,7 +342,7 @@ impl<'a, C, A> Groupssettings<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -594,7 +594,7 @@ pub struct Groups {
     /// - NONE
     #[serde(rename="whoCanUnassignTopic")]
     pub who_can_unassign_topic: Option<String>,
-    /// Specifies who should the default reply go to. Possible values are:  
+    /// Specifies who receives the default reply. Possible values are:  
     /// - REPLY_TO_CUSTOM: For replies to messages, use the group's custom email address.
     /// When the group's ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property holds the custom email address used when replying to a message. If the group's ReplyTo property is set to REPLY_TO_CUSTOM, the customReplyTo property must have a value. Otherwise an error is returned.
     ///  

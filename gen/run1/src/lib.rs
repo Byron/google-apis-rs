@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Run* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *run:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Cloud Run* crate version *1.0.14+20200622*, where *20200622* is the exact revision of the *run:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
 //! 
 //! Everything else about the *Cloud Run* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/run/).
@@ -355,7 +355,7 @@ impl<'a, C, A> CloudRun<C, A>
         CloudRun {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _user_agent: "google-api-rust-client/1.0.14".to_string(),
             _base_url: "https://run.googleapis.com/".to_string(),
             _root_url: "https://run.googleapis.com/".to_string(),
         }
@@ -372,7 +372,7 @@ impl<'a, C, A> CloudRun<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.13`.
+    /// It defaults to `google-api-rust-client/1.0.14`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -728,7 +728,10 @@ pub struct TCPSocketAction {
     /// Number or name of the port to access on the container.
     /// Number must be in the range 1 to 65535.
     /// Name must be an IANA_SVC_NAME.
-    pub port: Option<IntOrString>,
+    /// 
+    /// This field is currently limited to integer types only because of proto's
+    /// inability to properly support the IntOrString golang type.
+    pub port: Option<i32>,
 }
 
 impl Part for TCPSocketAction {}
@@ -759,9 +762,7 @@ pub struct RevisionSpec {
     /// The runtime contract is documented here:
     /// https://github.com/knative/serving/blob/master/docs/runtime-contract.md
     pub containers: Option<Vec<Container>>,
-    /// TimeoutSeconds holds the max duration the instance is allowed for
-    /// responding to a request.
-    /// Not currently used by Cloud Run.
+    /// no description provided
     #[serde(rename="timeoutSeconds")]
     pub timeout_seconds: Option<i32>,
     /// no description provided
@@ -970,29 +971,6 @@ pub struct ListDomainMappingsResponse {
 }
 
 impl ResponseResult for ListDomainMappingsResponse {}
-
-
-/// IntOrString is a type that can hold an int32 or a string.  When used in
-/// JSON or YAML marshalling and unmarshalling, it produces or consumes the
-/// inner type.  This allows you to have, for example, a JSON field that can
-/// accept a name or number.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IntOrString {
-    /// The string value.
-    #[serde(rename="strVal")]
-    pub str_val: Option<String>,
-    /// The type of the value.
-    #[serde(rename="type")]
-    pub type_: Option<i32>,
-    /// The int value.
-    #[serde(rename="intVal")]
-    pub int_val: Option<i32>,
-}
-
-impl Part for IntOrString {}
 
 
 /// Information for connecting over HTTP(s).
@@ -1282,9 +1260,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1679,8 +1665,8 @@ pub struct SetIamPolicyRequest {
     /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
     /// the fields in the mask will be modified. If no mask is provided, the
     /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
+    /// 
+    /// `paths: "bindings, etag"`
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -1758,7 +1744,7 @@ impl Part for ConfigMapVolumeSource {}
 ///       ]
 ///     },
 ///     {
-///       "log_type": "DATA_WRITE",
+///       "log_type": "DATA_WRITE"
 ///     }
 ///   ]
 /// }
@@ -1983,10 +1969,12 @@ impl Part for Location {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -2004,7 +1992,9 @@ impl Part for Location {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -2091,6 +2081,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -2340,6 +2333,13 @@ pub struct DomainMappingStatus {
     /// is True or False.
     #[serde(rename="observedGeneration")]
     pub observed_generation: Option<i32>,
+    /// Cloud Run fully managed: not supported
+    /// 
+    /// Cloud Run on GKE: supported
+    /// 
+    /// Holds the URL that will serve the traffic of the DomainMapping.
+    /// +optional
+    pub url: Option<String>,
     /// Array of observed DomainMappingConditions, indicating the current state
     /// of the DomainMapping.
     pub conditions: Option<Vec<GoogleCloudRunV1Condition>>,
@@ -3087,7 +3087,7 @@ impl Part for SecretVolumeSource {}
 /// {
 ///   "audit_configs": [
 ///     {
-///       "service": "allServices"
+///       "service": "allServices",
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -3096,18 +3096,18 @@ impl Part for SecretVolumeSource {}
 ///           ]
 ///         },
 ///         {
-///           "log_type": "DATA_WRITE",
+///           "log_type": "DATA_WRITE"
 ///         },
 ///         {
-///           "log_type": "ADMIN_READ",
+///           "log_type": "ADMIN_READ"
 ///         }
 ///       ]
 ///     },
 ///     {
-///       "service": "sampleservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com",
 ///       "audit_log_configs": [
 ///         {
-///           "log_type": "DATA_READ",
+///           "log_type": "DATA_READ"
 ///         },
 ///         {
 ///           "log_type": "DATA_WRITE",
@@ -17138,6 +17138,10 @@ impl<'a, C, A> ProjectLocationServiceGetIamPolicyCall<'a, C, A> where C: BorrowM
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationServiceGetIamPolicyCall<'a, C, A> {

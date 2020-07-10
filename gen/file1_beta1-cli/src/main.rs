@@ -875,11 +875,9 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudFilestore::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "alt", "callback", "fields", "key", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
-                    ("access-token", "access_token"),
-                    ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
                     ("upload-type", "uploadType"),
@@ -934,7 +932,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The instance's project and location, in the format
+                     Some(r##"Required. The instance's project and location, in the format
         projects/{project_id}/locations/{location}. In Cloud Filestore,
         locations map to GCP zones, for example **us-west1-b**."##),
                      Some(true),
@@ -964,7 +962,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The instance resource name, in the format
+                     Some(r##"Required. The instance resource name, in the format
         projects/{project_id}/locations/{location}/instances/{instance_id}"##),
                      Some(true),
                      Some(false)),
@@ -987,7 +985,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The instance resource name, in the format
+                     Some(r##"Required. The instance resource name, in the format
         projects/{project_id}/locations/{location}/instances/{instance_id}."##),
                      Some(true),
                      Some(false)),
@@ -1011,7 +1009,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project and location for which to retrieve instance information,
+                     Some(r##"Required. The project and location for which to retrieve instance information,
         in the format projects/{project_id}/locations/{location}. In Cloud
         Filestore, locations map to GCP zones, for example **us-west1-b**. To
         retrieve instance information for all locations, use "-" for the {location}
@@ -1205,7 +1203,7 @@ fn main() {
     
     let mut app = App::new("file1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200406")
+           .version("1.0.14+20200613")
            .about("The Cloud Filestore API is used for creating and managing cloud file servers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_file1_beta1_cli")
            .arg(Arg::with_name("url")

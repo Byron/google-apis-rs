@@ -194,13 +194,14 @@ impl<'n> Engine<'n> {
                     "app-engine-http-queue.app-engine-routing-override.host" => Some(("appEngineHttpQueue.appEngineRoutingOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-queue.app-engine-routing-override.version" => Some(("appEngineHttpQueue.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-queue.app-engine-routing-override.service" => Some(("appEngineHttpQueue.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-retry-duration" => Some(("retryConfig.maxRetryDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-doublings" => Some(("retryConfig.maxDoublings", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "retry-config.max-attempts" => Some(("retryConfig.maxAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "retry-config.max-backoff" => Some(("retryConfig.maxBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.min-backoff" => Some(("retryConfig.minBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "sampling-ratio", "service", "stackdriver-logging-config", "state", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "sampling-ratio", "service", "stackdriver-logging-config", "state", "type", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -545,13 +546,14 @@ impl<'n> Engine<'n> {
                     "app-engine-http-queue.app-engine-routing-override.host" => Some(("appEngineHttpQueue.appEngineRoutingOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-queue.app-engine-routing-override.version" => Some(("appEngineHttpQueue.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-queue.app-engine-routing-override.service" => Some(("appEngineHttpQueue.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-retry-duration" => Some(("retryConfig.maxRetryDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-doublings" => Some(("retryConfig.maxDoublings", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "retry-config.max-attempts" => Some(("retryConfig.maxAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "retry-config.max-backoff" => Some(("retryConfig.maxBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.min-backoff" => Some(("retryConfig.minBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "sampling-ratio", "service", "stackdriver-logging-config", "state", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-queue", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-dispatches", "max-dispatches-per-second", "max-doublings", "max-retry-duration", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "sampling-ratio", "service", "stackdriver-logging-config", "state", "type", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2190,7 +2192,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200331")
+           .version("1.0.14+20200615")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli")
            .arg(Arg::with_name("url")

@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *customsearch* API can be found at the
-[official documentation site](https://developers.google.com/custom-search/v1/using_rest).
+[official documentation site](https://developers.google.com/custom-search/v1/introduction).
 
 # Installation and Source Code
 
@@ -25,13 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *customsearch* API at revision *20181001*. The CLI is at version *1.0.13*.
+This documentation was generated from the *customsearch* API at revision *20200708*. The CLI is at version *1.0.14*.
 
 ```bash
 customsearch1 [options]
         cse
-                list <q> [-p <v>]... [-o <out>]
-                siterestrict-list <q> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                siterestrict-list [-p <v>]... [-o <out>]
   customsearch1 --help
 
 Configuration:

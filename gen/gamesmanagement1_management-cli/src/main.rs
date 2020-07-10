@@ -717,94 +717,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _rooms_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.rooms().reset();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _rooms_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.rooms().reset_for_all_players();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _scores_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.scores().reset(opt.value_of("leaderboard-id").unwrap_or(""));
@@ -1075,94 +987,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _turn_based_matches_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().reset();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _turn_based_matches_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.turn_based_matches().reset_for_all_players();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -1239,20 +1063,6 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("rooms", Some(opt)) => {
-                match opt.subcommand() {
-                    ("reset", Some(opt)) => {
-                        call_result = self._rooms_reset(opt, dry_run, &mut err);
-                    },
-                    ("reset-for-all-players", Some(opt)) => {
-                        call_result = self._rooms_reset_for_all_players(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("rooms".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("scores", Some(opt)) => {
                 match opt.subcommand() {
                     ("reset", Some(opt)) => {
@@ -1272,20 +1082,6 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("scores".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
-            ("turn-based-matches", Some(opt)) => {
-                match opt.subcommand() {
-                    ("reset", Some(opt)) => {
-                        call_result = self._turn_based_matches_reset(opt, dry_run, &mut err);
-                    },
-                    ("reset-for-all-players", Some(opt)) => {
-                        call_result = self._turn_based_matches_reset_for_all_players(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("turn-based-matches".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -1345,12 +1141,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::GamesManagement::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -1374,7 +1173,9 @@ fn main() {
     let arg_data = [
         ("achievements", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets the achievement with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
+                    Some(r##"Resets the achievement with the given ID for the currently authenticated
+        player. This method is only accessible to whitelisted tester accounts for
+        your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -1396,7 +1197,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application."##),
+                    Some(r##"Resets all achievements for the currently authenticated player for your
+        application. This method is only accessible to whitelisted tester accounts
+        for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1412,7 +1215,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets all draft achievements for all players. This method is only available to user accounts for your developer console."##),
+                    Some(r##"Resets all draft achievements for all players. This method is only
+        available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1422,7 +1226,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets the achievement with the given ID for all players. This method is only available to user accounts for your developer console. Only draft achievements can be reset."##),
+                    Some(r##"Resets the achievement with the given ID for all players. This method is
+        only available to user accounts for your developer console. Only draft
+        achievements can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-for-all-players",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -1438,7 +1244,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets achievements with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft achievements may be reset."##),
+                    Some(r##"Resets achievements with the given IDs for all players. This method is only
+        available to user accounts for your developer console. Only draft
+        achievements may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1457,7 +1265,8 @@ fn main() {
         
         ("applications", "methods: 'list-hidden'", vec![
             ("list-hidden",
-                    Some(r##"Get the list of players hidden from the given application. This method is only available to user accounts for your developer console."##),
+                    Some(r##"Get the list of players hidden from the given application. This method is
+        only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/applications_list-hidden",
                   vec![
                     (Some(r##"application-id"##),
@@ -1482,7 +1291,9 @@ fn main() {
         
         ("events", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
+                    Some(r##"Resets all player progress on the event with the given ID for the currently
+        authenticated player. This method is only accessible to whitelisted tester
+        accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset",
                   vec![
                     (Some(r##"event-id"##),
@@ -1498,7 +1309,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
+                    Some(r##"Resets all player progress on all events for the currently authenticated
+        player. This method is only accessible to whitelisted tester accounts for
+        your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1508,7 +1321,8 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets all draft events for all players. This method is only available to user accounts for your developer console."##),
+                    Some(r##"Resets all draft events for all players. This method is only available to
+        user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1518,7 +1332,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset."##),
+                    Some(r##"Resets the event with the given ID for all players. This method is only
+        available to user accounts for your developer console. Only draft events
+        can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-for-all-players",
                   vec![
                     (Some(r##"event-id"##),
@@ -1534,7 +1350,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset."##),
+                    Some(r##"Resets events with the given IDs for all players. This method is only
+        available to user accounts for your developer console. Only draft events
+        may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1553,7 +1371,8 @@ fn main() {
         
         ("players", "methods: 'hide' and 'unhide'", vec![
             ("hide",
-                    Some(r##"Hide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console."##),
+                    Some(r##"Hide the given player's leaderboard scores from the given application. This
+        method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/players_hide",
                   vec![
                     (Some(r##"application-id"##),
@@ -1564,7 +1383,8 @@ fn main() {
         
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the
+        authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -1575,7 +1395,8 @@ fn main() {
                      Some(true)),
                   ]),
             ("unhide",
-                    Some(r##"Unhide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console."##),
+                    Some(r##"Unhide the given player's leaderboard scores from the given application.
+        This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/players_unhide",
                   vec![
                     (Some(r##"application-id"##),
@@ -1586,7 +1407,8 @@ fn main() {
         
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the
+        authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -1598,32 +1420,11 @@ fn main() {
                   ]),
             ]),
         
-        ("rooms", "methods: 'reset' and 'reset-for-all-players'", vec![
-            ("reset",
-                    Some(r##"Reset all rooms for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/rooms_reset",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("reset-for-all-players",
-                    Some(r##"Deletes rooms where the only room participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/rooms_reset-for-all-players",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ]),
-        
         ("scores", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets scores for the leaderboard with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
+                    Some(r##"Resets scores for the leaderboard with the given ID for the currently
+        authenticated player. This method is only accessible to whitelisted tester
+        accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset",
                   vec![
                     (Some(r##"leaderboard-id"##),
@@ -1645,7 +1446,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application."##),
+                    Some(r##"Resets all scores for all leaderboards for the currently authenticated
+        players. This method is only accessible to whitelisted tester accounts for
+        your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1661,7 +1464,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console."##),
+                    Some(r##"Resets scores for all draft leaderboards for all players. This method is
+        only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1671,7 +1475,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets scores for the leaderboard with the given ID for all players. This method is only available to user accounts for your developer console. Only draft leaderboards can be reset."##),
+                    Some(r##"Resets scores for the leaderboard with the given ID for all players. This
+        method is only available to user accounts for your developer console. Only
+        draft leaderboards can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-for-all-players",
                   vec![
                     (Some(r##"leaderboard-id"##),
@@ -1687,7 +1493,9 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets scores for the leaderboards with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft leaderboards may be reset."##),
+                    Some(r##"Resets scores for the leaderboards with the given IDs for all players. This
+        method is only available to user accounts for your developer console. Only
+        draft leaderboards may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1704,35 +1512,13 @@ fn main() {
                   ]),
             ]),
         
-        ("turn-based-matches", "methods: 'reset' and 'reset-for-all-players'", vec![
-            ("reset",
-                    Some(r##"Reset all turn-based match data for a user. This method is only accessible to whitelisted tester accounts for your application."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/turn-based-matches_reset",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("reset-for-all-players",
-                    Some(r##"Deletes turn-based matches where the only match participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/turn-based-matches_reset-for-all-players",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ]),
-        
     ];
     
     let mut app = App::new("gamesmanagement1-management")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200402")
-           .about("The Management API for Google Play Game Services.")
+           .version("1.0.14+20200701")
+           .about("The Google Play Game Management API allows developers to manage resources from the Google
+                Play Game service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

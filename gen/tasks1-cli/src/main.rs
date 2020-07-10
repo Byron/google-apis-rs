@@ -242,7 +242,7 @@ impl<'n> Engine<'n> {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(value.unwrap_or(""));
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 _ => {
                     let mut found = false;
@@ -738,7 +738,7 @@ impl<'n> Engine<'n> {
                     call = call.page_token(value.unwrap_or(""));
                 },
                 "max-results" => {
-                    call = call.max_results(value.unwrap_or(""));
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
                 "due-min" => {
                     call = call.due_min(value.unwrap_or(""));
@@ -1172,12 +1172,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::TasksHub::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -1277,7 +1280,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the authenticated user's specified task list. This method supports patch semantics."##),
+                    Some(r##"Updates the authenticated user's specified task list. This method supports
+        patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasklists_patch",
                   vec![
                     (Some(r##"tasklist"##),
@@ -1336,7 +1340,9 @@ fn main() {
         
         ("tasks", "methods: 'clear', 'delete', 'get', 'insert', 'list', 'move', 'patch' and 'update'", vec![
             ("clear",
-                    Some(r##"Clears all completed tasks from the specified task list. The affected tasks will be marked as 'hidden' and no longer be returned by default when retrieving all tasks for a task list."##),
+                    Some(r##"Clears all completed tasks from the specified task list. The affected tasks
+        will be marked as 'hidden' and no longer be returned by default when
+        retrieving all tasks for a task list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_clear",
                   vec![
                     (Some(r##"tasklist"##),
@@ -1452,7 +1458,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("move",
-                    Some(r##"Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks."##),
+                    Some(r##"Moves the specified task to another position in the task list. This can
+        include putting it as a child task under a new parent and/or move it to a
+        different position among its sibling tasks."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_move",
                   vec![
                     (Some(r##"tasklist"##),
@@ -1553,8 +1561,8 @@ fn main() {
     
     let mut app = App::new("tasks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20190628")
-           .about("Manages your tasks and task lists.")
+           .version("1.0.14+20200704")
+           .about("The Google Tasks API lets you manage your tasks and task lists.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tasks1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
