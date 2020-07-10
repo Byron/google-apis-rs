@@ -202,7 +202,7 @@ help${agsuffix}:
 ${fake_target}: $(PYTHON_BIN)
 	@mkdir -p ${target_dir}
 	@-curl --silent --show-error --fail --retry 3 -o '${target}' '${url}'
-	$(PYTHON) $(SORT_JSON_FILE) --skip-missing-file '${target}'
+	$(PYTHON) $(SORT_JSON_FILE) --skip-missing-file '${target}' || rm ${target}
 % endfor
 
 update-json: ${' '.join(json_api_targets)}
