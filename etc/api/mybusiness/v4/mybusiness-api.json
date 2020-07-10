@@ -13,6 +13,7 @@
     }, 
     "id": "mybusiness:v4", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://mybusiness.mtls.googleapis.com/", 
     "name": "mybusiness", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -2087,10 +2088,6 @@
                     ], 
                     "type": "string"
                 }, 
-                "profilePhotoUrl": {
-                    "description": "Profile photo for the account. This is populated only for the personal\naccount.", 
-                    "type": "string"
-                }, 
                 "role": {
                     "description": "Output only. Specifies the AccountRole\nthe caller has for this account.", 
                     "enum": [
@@ -2609,11 +2606,11 @@
             "id": "Category", 
             "properties": {
                 "categoryId": {
-                    "description": "A stable ID (provided by Google) for this category.\nThe `category_id` must be specified when modifying the category (when\ncreating or updating a location).", 
+                    "description": "@OutputOnly.\nA stable ID (provided by Google) for this category.\nThe `category_id` must be specified when modifying the category (when\ncreating or updating a location).", 
                     "type": "string"
                 }, 
                 "displayName": {
-                    "description": "Output only. The human-readable name of the category. This is set when\nreading the location. When modifying the location, `category_id` must be\nset.", 
+                    "description": "@OutputOnly.\nThe human-readable name of the category. This is set when\nreading the location. When modifying the location, `category_id` must be\nset.", 
                     "type": "string"
                 }
             }, 
@@ -3194,7 +3191,7 @@
             "id": "ListBusinessCategoriesResponse", 
             "properties": {
                 "categories": {
-                    "description": "The categories.", 
+                    "description": "The categories. Categories are BASIC view. They don't contain any\nServiceType information.", 
                     "items": {
                         "$ref": "Category"
                     }, 
@@ -3423,6 +3420,18 @@
             "description": "Represents a [local post](https://support.google.com/business/answer/7662907)\nfor a location.", 
             "id": "LocalPost", 
             "properties": {
+                "alertType": {
+                    "description": "The type of alert the post is created for. This field is only applicable\nfor posts of topic_type Alert, and behaves as a sub-type of Alerts.", 
+                    "enum": [
+                        "ALERT_TYPE_UNSPECIFIED", 
+                        "COVID_19"
+                    ], 
+                    "enumDescriptions": [
+                        "No alert is specified.", 
+                        "Alerts related to the 2019 Coronavirus Disease pandemic. Covid posts only\nsupport a summary field and a call to action field. When these alerts are\nno longer relevant, new Alert post creation for type COVID-19 will be\ndisabled. However, merchant will still be able to manage their existing\nCOVID-19 posts."
+                    ], 
+                    "type": "string"
+                }, 
                 "callToAction": {
                     "$ref": "CallToAction", 
                     "description": "The URL that users are sent to when clicking through the promotion. Ignored\nfor topic type `OFFER`."
@@ -3455,10 +3464,6 @@
                     "$ref": "LocalPostOffer", 
                     "description": "Additional data for offer posts. This should only be set when the\ntopic_type is OFFER."
                 }, 
-                "product": {
-                    "$ref": "LocalPostProduct", 
-                    "description": "Additional data for product posts. This should only be set when the\ntopic_type is PRODUCT."
-                }, 
                 "searchUrl": {
                     "description": "Output only. The link to the local post in Google search. This link can\nbe used to share the post via social media, email, text, etc.", 
                     "type": "string"
@@ -3484,20 +3489,20 @@
                     "type": "string"
                 }, 
                 "topicType": {
-                    "description": "Required. The topic type of the post: standard, event, offer, or product.", 
+                    "description": "Required. The topic type of the post: standard, event, offer, or alert.", 
                     "enum": [
                         "LOCAL_POST_TOPIC_TYPE_UNSPECIFIED", 
                         "STANDARD", 
                         "EVENT", 
                         "OFFER", 
-                        "PRODUCT"
+                        "ALERT"
                     ], 
                     "enumDescriptions": [
                         "No post type is specified.", 
                         "Post contains basic information, like summary and images.", 
                         "Post contains basic information and an event.", 
                         "Post contains basic information, an event and offer related content (e.g.\ncoupon code)", 
-                        "Post contains basic information and product related content (e.g. name,\nprice)."
+                        "High-priority, and timely announcements related to an ongoing event. These\ntypes of posts are not always available for authoring."
                     ], 
                     "type": "string"
                 }, 
@@ -3556,25 +3561,6 @@
                 "termsConditions": {
                     "description": "Optional. Offer terms and conditions.", 
                     "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "LocalPostProduct": {
-            "description": "Specific fields for product posts.", 
-            "id": "LocalPostProduct", 
-            "properties": {
-                "lowerPrice": {
-                    "$ref": "Money", 
-                    "description": "Lower price of the product if the product has a price range, or the price\nfor the product."
-                }, 
-                "productName": {
-                    "description": "Name of the product.", 
-                    "type": "string"
-                }, 
-                "upperPrice": {
-                    "$ref": "Money", 
-                    "description": "Upper price of the product. In case price is not a range, lower_price is\nequal to upper_price."
                 }
             }, 
             "type": "object"
@@ -4297,7 +4283,7 @@
             "id": "Places", 
             "properties": {
                 "placeInfos": {
-                    "description": "The areas represented by place IDs.", 
+                    "description": "The areas represented by place IDs. Limited to a maximum of 20 places.", 
                     "items": {
                         "$ref": "PlaceInfo"
                     }, 
@@ -4957,14 +4943,14 @@
                         "SUNDAY"
                     ], 
                     "enumDescriptions": [
-                        "The unspecified day-of-week.", 
-                        "The day-of-week of Monday.", 
-                        "The day-of-week of Tuesday.", 
-                        "The day-of-week of Wednesday.", 
-                        "The day-of-week of Thursday.", 
-                        "The day-of-week of Friday.", 
-                        "The day-of-week of Saturday.", 
-                        "The day-of-week of Sunday."
+                        "The day of the week is unspecified.", 
+                        "Monday", 
+                        "Tuesday", 
+                        "Wednesday", 
+                        "Thursday", 
+                        "Friday", 
+                        "Saturday", 
+                        "Sunday"
                     ], 
                     "type": "string"
                 }, 
@@ -5046,14 +5032,14 @@
                         "SUNDAY"
                     ], 
                     "enumDescriptions": [
-                        "The unspecified day-of-week.", 
-                        "The day-of-week of Monday.", 
-                        "The day-of-week of Tuesday.", 
-                        "The day-of-week of Wednesday.", 
-                        "The day-of-week of Thursday.", 
-                        "The day-of-week of Friday.", 
-                        "The day-of-week of Saturday.", 
-                        "The day-of-week of Sunday."
+                        "The day of the week is unspecified.", 
+                        "Monday", 
+                        "Tuesday", 
+                        "Wednesday", 
+                        "Thursday", 
+                        "Friday", 
+                        "Saturday", 
+                        "Sunday"
                     ], 
                     "type": "string"
                 }, 
@@ -5074,14 +5060,14 @@
                         "SUNDAY"
                     ], 
                     "enumDescriptions": [
-                        "The unspecified day-of-week.", 
-                        "The day-of-week of Monday.", 
-                        "The day-of-week of Tuesday.", 
-                        "The day-of-week of Wednesday.", 
-                        "The day-of-week of Thursday.", 
-                        "The day-of-week of Friday.", 
-                        "The day-of-week of Saturday.", 
-                        "The day-of-week of Sunday."
+                        "The day of the week is unspecified.", 
+                        "Monday", 
+                        "Tuesday", 
+                        "Wednesday", 
+                        "Thursday", 
+                        "Friday", 
+                        "Saturday", 
+                        "Sunday"
                     ], 
                     "type": "string"
                 }, 

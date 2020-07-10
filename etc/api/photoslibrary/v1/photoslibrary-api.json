@@ -288,6 +288,37 @@
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
                 }, 
+                "patch": {
+                    "description": "Update the album with the specified `id`.\nOnly the `id`, `title` and `cover_photo_media_item_id` fields of the album\nare read. The album must have been created by the developer via the API and\nmust be owned by the user.", 
+                    "flatPath": "v1/albums/{albumsId}", 
+                    "httpMethod": "PATCH", 
+                    "id": "photoslibrary.albums.patch", 
+                    "parameterOrder": [
+                        "id"
+                    ], 
+                    "parameters": {
+                        "id": {
+                            "description": "Identifier for the album. This is a persistent identifier that\ncan be used between sessions to identify this album.", 
+                            "location": "path", 
+                            "pattern": "^[^/]+$", 
+                            "required": true, 
+                            "type": "string"
+                        }, 
+                        "updateMask": {
+                            "description": "Indicate what fields in the provided album to update.\nThe only valid values are `title` and `cover_photo_media_item_id`.", 
+                            "format": "google-fieldmask", 
+                            "location": "query", 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1/albums/{+id}", 
+                    "request": {
+                        "$ref": "Album"
+                    }, 
+                    "response": {
+                        "$ref": "Album"
+                    }
+                }, 
                 "share": {
                     "description": "Marks an album as shared and accessible to other users. This action can\nonly be performed on albums which were created by the developer via the\nAPI.", 
                     "flatPath": "v1/albums/{albumsId}:share", 
@@ -448,6 +479,37 @@
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
                 }, 
+                "patch": {
+                    "description": "Update the media item with the specified `id`.\nOnly the `id` and `description` fields of the media item are read. The\nmedia item must have been created by the developer via the API and must be\nowned by the user.", 
+                    "flatPath": "v1/mediaItems/{mediaItemsId}", 
+                    "httpMethod": "PATCH", 
+                    "id": "photoslibrary.mediaItems.patch", 
+                    "parameterOrder": [
+                        "id"
+                    ], 
+                    "parameters": {
+                        "id": {
+                            "description": "Identifier for the media item. This is a persistent identifier that can be\nused between sessions to identify this media item.", 
+                            "location": "path", 
+                            "pattern": "^[^/]+$", 
+                            "required": true, 
+                            "type": "string"
+                        }, 
+                        "updateMask": {
+                            "description": "Indicate what fields in the provided media item to update.\nThe only valid value is `description`.", 
+                            "format": "google-fieldmask", 
+                            "location": "query", 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1/mediaItems/{+id}", 
+                    "request": {
+                        "$ref": "MediaItem"
+                    }, 
+                    "response": {
+                        "$ref": "MediaItem"
+                    }
+                }, 
                 "search": {
                     "description": "Searches for media items in a user's Google Photos library.\nIf no filters are set, then all media items in the user's library are\nreturned.\nIf an album is set, all media items in the specified album are returned.\nIf filters are specified, media items that match the filters from the\nuser's library are listed. If you set both the album and the filters, the\nrequest results in an error.", 
                     "flatPath": "v1/mediaItems:search", 
@@ -570,7 +632,7 @@
             }
         }
     }, 
-    "revision": "20200329", 
+    "revision": "20200707", 
     "rootUrl": "https://photoslibrary.googleapis.com/", 
     "schemas": {
         "AddEnrichmentToAlbumRequest": {
@@ -612,7 +674,7 @@
                     "type": "string"
                 }, 
                 "id": {
-                    "description": "[Ouput only] Identifier for the album. This is a persistent identifier that\ncan be used between sessions to identify this album.", 
+                    "description": "Identifier for the album. This is a persistent identifier that\ncan be used between sessions to identify this album.", 
                     "type": "string"
                 }, 
                 "isWriteable": {
@@ -1462,8 +1524,12 @@
             "description": "Information about albums that are shared. This information is only included\nif you created the album, it is shared and you have the sharing scope.", 
             "id": "ShareInfo", 
             "properties": {
+                "isJoinable": {
+                    "description": "True if the album can be joined by users.", 
+                    "type": "boolean"
+                }, 
                 "isJoined": {
-                    "description": "True if the user has joined the album. This is always true for the owner\nof the shared album.", 
+                    "description": "True if the user is joined to the album. This is always true for\nthe owner of the album.", 
                     "type": "boolean"
                 }, 
                 "isOwned": {
@@ -1471,16 +1537,16 @@
                     "type": "boolean"
                 }, 
                 "shareToken": {
-                    "description": "A token that can be used by other users to join or leave this shared album\nvia the API.", 
+                    "description": "A token that is used to join, leave, or retrieve the details of a shared\nalbum on behalf of a user who isn't the owner.\n\nA `shareToken` is invalidated if the owner turns off link sharing in the\nGoogle Photos app, or if the album is unshared.", 
                     "type": "string"
                 }, 
                 "shareableUrl": {
-                    "description": "A link to the album that's now shared on the Google Photos website and app.\nAnyone with the link can access this shared album and see all of the items\npresent in the album.", 
+                    "description": "A link to the shared Google Photos album. Anyone with the link can view the\ncontents of the album, so it should be treated with care.\n\nThe `shareableUrl` parameter is only returned if the album has link sharing\nturned on. If a user is already joined to an album that isn't link-shared,\nthey can use the album's\n[`productUrl`](https://developers.google.com/photos/library/reference/rest/v1/albums#Album)\nto access it instead.\n\nA `shareableUrl` is invalidated if the owner turns off link sharing in the\nGoogle Photos app, or if the album is unshared.", 
                     "type": "string"
                 }, 
                 "sharedAlbumOptions": {
                     "$ref": "SharedAlbumOptions", 
-                    "description": "Options that control the sharing of an album."
+                    "description": "Options that control whether someone can add media items to, or comment on\na shared album."
                 }
             }, 
             "type": "object"
@@ -1494,7 +1560,7 @@
                     "type": "boolean"
                 }, 
                 "isCommentable": {
-                    "description": "True if the shared album allows the owner and the collaborators (users\nwho have joined the album) to add comments to the album. Defaults to false.", 
+                    "description": "True if the shared album allows collaborators (users who have joined the\nalbum) to add comments to the album. Defaults to false.", 
                     "type": "boolean"
                 }
             }, 

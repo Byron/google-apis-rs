@@ -49,7 +49,7 @@
     }, 
     "basePath": "", 
     "baseUrl": "https://www.googleapis.com/", 
-    "batchPath": "batch", 
+    "batchPath": "batch/gmail/v1", 
     "canonicalName": "Gmail", 
     "description": "The Gmail API lets you view and manage Gmail mailbox data like\n    threads, messages, and labels.", 
     "discoveryVersion": "v1", 
@@ -245,6 +245,10 @@
                                 ], 
                                 "maxSize": "36700160", 
                                 "protocols": {
+                                    "resumable": {
+                                        "multipart": true, 
+                                        "path": "/resumable/upload/gmail/v1/users/{userId}/drafts"
+                                    }, 
                                     "simple": {
                                         "multipart": true, 
                                         "path": "/upload/gmail/v1/users/{userId}/drafts"
@@ -419,6 +423,10 @@
                                 ], 
                                 "maxSize": "36700160", 
                                 "protocols": {
+                                    "resumable": {
+                                        "multipart": true, 
+                                        "path": "/resumable/upload/gmail/v1/users/{userId}/drafts/send"
+                                    }, 
                                     "simple": {
                                         "multipart": true, 
                                         "path": "/upload/gmail/v1/users/{userId}/drafts/send"
@@ -463,6 +471,10 @@
                                 ], 
                                 "maxSize": "36700160", 
                                 "protocols": {
+                                    "resumable": {
+                                        "multipart": true, 
+                                        "path": "/resumable/upload/gmail/v1/users/{userId}/drafts/{id}"
+                                    }, 
                                     "simple": {
                                         "multipart": true, 
                                         "path": "/upload/gmail/v1/users/{userId}/drafts/{id}"
@@ -925,6 +937,10 @@
                                 ], 
                                 "maxSize": "52428800", 
                                 "protocols": {
+                                    "resumable": {
+                                        "multipart": true, 
+                                        "path": "/resumable/upload/gmail/v1/users/{userId}/messages/import"
+                                    }, 
                                     "simple": {
                                         "multipart": true, 
                                         "path": "/upload/gmail/v1/users/{userId}/messages/import"
@@ -996,6 +1012,10 @@
                                 ], 
                                 "maxSize": "52428800", 
                                 "protocols": {
+                                    "resumable": {
+                                        "multipart": true, 
+                                        "path": "/resumable/upload/gmail/v1/users/{userId}/messages"
+                                    }, 
                                     "simple": {
                                         "multipart": true, 
                                         "path": "/upload/gmail/v1/users/{userId}/messages"
@@ -1148,6 +1168,10 @@
                                 ], 
                                 "maxSize": "36700160", 
                                 "protocols": {
+                                    "resumable": {
+                                        "multipart": true, 
+                                        "path": "/resumable/upload/gmail/v1/users/{userId}/messages/send"
+                                    }, 
                                     "simple": {
                                         "multipart": true, 
                                         "path": "/upload/gmail/v1/users/{userId}/messages/send"
@@ -2258,7 +2282,8 @@
                                                 "https://mail.google.com/", 
                                                 "https://www.googleapis.com/auth/gmail.modify", 
                                                 "https://www.googleapis.com/auth/gmail.readonly", 
-                                                "https://www.googleapis.com/auth/gmail.settings.basic"
+                                                "https://www.googleapis.com/auth/gmail.settings.basic", 
+                                                "https://www.googleapis.com/auth/gmail.settings.sharing"
                                             ]
                                         }, 
                                         "insert": {
@@ -2329,7 +2354,8 @@
                                                 "https://mail.google.com/", 
                                                 "https://www.googleapis.com/auth/gmail.modify", 
                                                 "https://www.googleapis.com/auth/gmail.readonly", 
-                                                "https://www.googleapis.com/auth/gmail.settings.basic"
+                                                "https://www.googleapis.com/auth/gmail.settings.basic", 
+                                                "https://www.googleapis.com/auth/gmail.settings.sharing"
                                             ]
                                         }, 
                                         "setDefault": {
@@ -2625,7 +2651,7 @@
             }
         }
     }, 
-    "revision": "20200406", 
+    "revision": "20200706", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "AutoForwarding": {
@@ -3709,11 +3735,11 @@
                     "type": "string"
                 }, 
                 "responseBodyHtml": {
-                    "description": "Response body in HTML format.  Gmail will sanitize the HTML before\nstoring it.", 
+                    "description": "Response body in HTML format.  Gmail will sanitize the HTML before\nstoring it. If both <code>response_body_plain_text</code> and\n<code>response_body_html</code> are specified,\n<code>response_body_html</code> will be used.", 
                     "type": "string"
                 }, 
                 "responseBodyPlainText": {
-                    "description": "Response body in plain text format.", 
+                    "description": "Response body in plain text format. If both\n<code>response_body_plain_text</code> and <code>response_body_html</code>\nare specified, <code>response_body_html</code> will be used.", 
                     "type": "string"
                 }, 
                 "responseSubject": {

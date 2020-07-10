@@ -550,67 +550,16 @@
             }
         }
     }, 
-    "revision": "20200401", 
+    "revision": "20200707", 
     "rootUrl": "https://cloudidentity.googleapis.com/", 
     "schemas": {
         "AndroidAttributes": {
             "description": "Resource representing the Android specific attributes of a Device.", 
             "id": "AndroidAttributes", 
             "properties": {
-                "basebandVersion": {
-                    "description": "Baseband version of Android device.", 
-                    "type": "string"
-                }, 
-                "bootloaderVersion": {
-                    "description": "Device bootloader version. Example: 0.6.7.", 
-                    "type": "string"
-                }, 
-                "buildNumber": {
-                    "description": "Build number of Android device.", 
-                    "type": "string"
-                }, 
-                "enabledDeveloperOptions": {
-                    "description": "Whether developer options is enabled on device.", 
-                    "type": "boolean"
-                }, 
                 "enabledUnknownSources": {
                     "description": "Whether applications from unknown sources can be installed on device.", 
                     "type": "boolean"
-                }, 
-                "enabledUsbDebugging": {
-                    "description": "Whether adb (USB debugging) is enabled on device.", 
-                    "type": "boolean"
-                }, 
-                "encryptionState": {
-                    "description": "Device encryption state.", 
-                    "enum": [
-                        "ENCRYPTION_STATE_UNSPECIFIED", 
-                        "UNSUPPORTED_BY_DEVICE", 
-                        "ENCRYPTED", 
-                        "NOT_ENCRYPTED"
-                    ], 
-                    "enumDescriptions": [
-                        "Encryption Status is not set.", 
-                        "Device doesn't support encryption.", 
-                        "Device is encrypted.", 
-                        "Device is not encrypted."
-                    ], 
-                    "type": "string"
-                }, 
-                "hardware": {
-                    "description": "Device hardware. Example: Sprout.", 
-                    "type": "string"
-                }, 
-                "kernelVersion": {
-                    "description": "Kernel version of Android device.", 
-                    "type": "string"
-                }, 
-                "otherAccounts": {
-                    "description": "Domain name for Google accounts on device. Type for other accounts on\ndevice. Will only be populated if |ownership_privilege| is\n|PROFILE_OWNER| or |DEVICE_OWNER|. Does not include the account signed in\nto the device policy app if that account's domain has only one account.\nExamples: \"com.example\", \"xyz.com\".", 
-                    "items": {
-                        "type": "string"
-                    }, 
-                    "type": "array"
                 }, 
                 "ownerProfileAccount": {
                     "description": "Whether this account is on an owner/primary profile.\nFor phones, only true for owner profiles. Android 4+ devices\ncan have secondary or restricted user profiles.", 
@@ -630,11 +579,6 @@
                         "Profile Owner privileges.\nThe account is in a managed corporate profile.", 
                         "Device Owner privileges on the device."
                     ], 
-                    "type": "string"
-                }, 
-                "securityPatchTime": {
-                    "description": "OS security patch update time on device.", 
-                    "format": "google-datetime", 
                     "type": "string"
                 }, 
                 "supportsWorkProfile": {
@@ -688,6 +632,135 @@
             }, 
             "type": "object"
         }, 
+        "ClientState": {
+            "description": "Resource representing ClientState and supports updates from API users", 
+            "id": "ClientState", 
+            "properties": {
+                "assetTags": {
+                    "description": "The caller can specify asset tags for this resource", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "complianceState": {
+                    "description": "The compliance state of the resource as specified by the API client.", 
+                    "enum": [
+                        "COMPLIANCE_STATE_UNSPECIFIED", 
+                        "COMPLIANT", 
+                        "NON_COMPLIANT"
+                    ], 
+                    "enumDescriptions": [
+                        "The compliance state of the resource is unknown or unspecified.", 
+                        "Device is compliant with third party policies", 
+                        "Device is not compliant with third party policies"
+                    ], 
+                    "type": "string"
+                }, 
+                "createTime": {
+                    "description": "Output only. The time the client state data was created.", 
+                    "format": "google-datetime", 
+                    "type": "string"
+                }, 
+                "customId": {
+                    "description": "This field may be used to store a unique identifier for the API resource\nwithin which these CustomAttributes are a field.", 
+                    "type": "string"
+                }, 
+                "etag": {
+                    "description": "The token that needs to be passed back for\nconcurrency control in updates. Token needs to be passed back\nin UpdateRequest", 
+                    "type": "string"
+                }, 
+                "healthScore": {
+                    "description": "The Health score of the resource", 
+                    "enum": [
+                        "HEALTH_SCORE_UNSPECIFIED", 
+                        "VERY_POOR", 
+                        "POOR", 
+                        "NEUTRAL", 
+                        "GOOD", 
+                        "VERY_GOOD"
+                    ], 
+                    "enumDescriptions": [
+                        "Default value", 
+                        "The object is in very poor health as defined by the caller.", 
+                        "The object is in poor health as defined by the caller.", 
+                        "The object health is neither good nor poor, as defined by the caller.", 
+                        "The object is in good health as defined by the caller.", 
+                        "The object is in very good health as defined by the caller."
+                    ], 
+                    "type": "string"
+                }, 
+                "keyValuePairs": {
+                    "additionalProperties": {
+                        "$ref": "CustomAttributeValue"
+                    }, 
+                    "description": "The map of key-value attributes stored by callers specific to a\ndevice. The total serialized length of this map may not exceed 10KB. No\nlimit is placed on the number of attributes in a map.", 
+                    "type": "object"
+                }, 
+                "lastUpdateTime": {
+                    "description": "Output only. The time the client state data was last updated.", 
+                    "format": "google-datetime", 
+                    "type": "string"
+                }, 
+                "managed": {
+                    "description": "The management state of the resource as specified by the API client.", 
+                    "enum": [
+                        "MANAGED_STATE_UNSPECIFIED", 
+                        "MANAGED", 
+                        "UNMANAGED"
+                    ], 
+                    "enumDescriptions": [
+                        "The management state of the resource is unknown or unspecified.", 
+                        "The resource is managed.", 
+                        "The resource is not managed."
+                    ], 
+                    "type": "string"
+                }, 
+                "name": {
+                    "description": "Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of\nthe ClientState in format:\n`devices/{device_id}/deviceUsers/{device_user_id}/clientState/{partner_id}`,\nwhere partner_id corresponds to the partner storing the data.", 
+                    "type": "string"
+                }, 
+                "ownerType": {
+                    "description": "Output only. The owner of the ClientState", 
+                    "enum": [
+                        "OWNER_TYPE_UNSPECIFIED", 
+                        "OWNER_TYPE_CUSTOMER", 
+                        "OWNER_TYPE_PARTNER"
+                    ], 
+                    "enumDescriptions": [
+                        "Unknown owner type", 
+                        "Customer is the owner", 
+                        "Partner is the owner"
+                    ], 
+                    "type": "string"
+                }, 
+                "scoreReason": {
+                    "description": "A descriptive cause of the health score.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "CustomAttributeValue": {
+            "description": "Additional custom attribute values may be one of these types", 
+            "id": "CustomAttributeValue", 
+            "properties": {
+                "boolValue": {
+                    "description": "Represents a boolean value.", 
+                    "type": "boolean"
+                }, 
+                "numberValue": {
+                    "description": "Represents a double value.", 
+                    "format": "double", 
+                    "type": "number"
+                }, 
+                "stringValue": {
+                    "description": "Represents a string value.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "Device": {
             "description": "Represents a Device known to Google Cloud, independent of the device\nownership, type, and whether it is assigned or in use by a user.", 
             "id": "Device", 
@@ -700,8 +773,20 @@
                     "description": "Asset tag of the device.", 
                     "type": "string"
                 }, 
+                "basebandVersion": {
+                    "description": "Output only. Baseband version of the device.", 
+                    "type": "string"
+                }, 
+                "bootloaderVersion": {
+                    "description": "Output only. Device bootloader version. Example: 0.6.7.", 
+                    "type": "string"
+                }, 
                 "brand": {
                     "description": "Output only. Device brand. Example: Samsung.", 
+                    "type": "string"
+                }, 
+                "buildNumber": {
+                    "description": "Output only. Build number of the device.", 
                     "type": "string"
                 }, 
                 "compromisedState": {
@@ -747,8 +832,36 @@
                     ], 
                     "type": "string"
                 }, 
+                "enabledDeveloperOptions": {
+                    "description": "Output only. Whether developer options is enabled on device.", 
+                    "type": "boolean"
+                }, 
+                "enabledUsbDebugging": {
+                    "description": "Output only. Whether USB debugging is enabled on device.", 
+                    "type": "boolean"
+                }, 
+                "encryptionState": {
+                    "description": "Output only. Device encryption state.", 
+                    "enum": [
+                        "ENCRYPTION_STATE_UNSPECIFIED", 
+                        "UNSUPPORTED_BY_DEVICE", 
+                        "ENCRYPTED", 
+                        "NOT_ENCRYPTED"
+                    ], 
+                    "enumDescriptions": [
+                        "Encryption Status is not set.", 
+                        "Device doesn't support encryption.", 
+                        "Device is encrypted.", 
+                        "Device is not encrypted."
+                    ], 
+                    "type": "string"
+                }, 
                 "imei": {
                     "description": "Output only. IMEI number of device if GSM device; empty otherwise.", 
+                    "type": "string"
+                }, 
+                "kernelVersion": {
+                    "description": "Output only. Kernel version of the device.", 
                     "type": "string"
                 }, 
                 "lastSyncTime": {
@@ -802,8 +915,15 @@
                     "description": "Output only. OS version of the device. Example: Android 8.1.0.", 
                     "type": "string"
                 }, 
+                "otherAccounts": {
+                    "description": "Output only. Domain name for Google accounts on device. Type for other accounts on\ndevice. On Android, will only be populated if |ownership_privilege| is\n|PROFILE_OWNER| or |DEVICE_OWNER|. Does not include the account signed in\nto the device policy app if that account's domain has only one account.\nExamples: \"com.example\", \"xyz.com\".", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
                 "ownerType": {
-                    "description": "Whether the device is owned by the company or an individual", 
+                    "description": "Output only. Whether the device is owned by the company or an individual", 
                     "enum": [
                         "DEVICE_OWNERSHIP_UNSPECIFIED", 
                         "COMPANY", 
@@ -818,6 +938,11 @@
                 }, 
                 "releaseVersion": {
                     "description": "Output only. OS release version. Example: 6.0.", 
+                    "type": "string"
+                }, 
+                "securityPatchTime": {
+                    "description": "Output only. OS security patch update time on device.", 
+                    "format": "google-datetime", 
                     "type": "string"
                 }, 
                 "serialNumber": {
@@ -850,6 +975,11 @@
                         "Device User Account is compromised.", 
                         "Device User Account is not compromised."
                     ], 
+                    "type": "string"
+                }, 
+                "createTime": {
+                    "description": "When the user first signed in to the device", 
+                    "format": "google-datetime", 
                     "type": "string"
                 }, 
                 "firstSyncTime": {
@@ -1039,6 +1169,24 @@
             }, 
             "type": "object"
         }, 
+        "ListClientStatesResponse": {
+            "description": "Response message that is returned in LRO result of ListClientStates\nOperation.", 
+            "id": "ListClientStatesResponse", 
+            "properties": {
+                "clientStates": {
+                    "description": "Client states meeting the list restrictions.", 
+                    "items": {
+                        "$ref": "ClientState"
+                    }, 
+                    "type": "array"
+                }, 
+                "nextPageToken": {
+                    "description": "Token to retrieve the next page of results. Empty if there are no more\nresults.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "ListDeviceUsersResponse": {
             "description": "Response message that is returned in LRO result of ListDeviceUsers Operation.", 
             "id": "ListDeviceUsersResponse", 
@@ -1200,6 +1348,24 @@
                         "$ref": "MembershipRole"
                     }, 
                     "type": "array"
+                }, 
+                "type": {
+                    "description": "Output only. The type of the membership.", 
+                    "enum": [
+                        "TYPE_UNSPECIFIED", 
+                        "USER", 
+                        "SERVICE_ACCOUNT", 
+                        "GROUP", 
+                        "OTHER"
+                    ], 
+                    "enumDescriptions": [
+                        "Default. Should not be used.", 
+                        "Represents user type.", 
+                        "Represents service account type.", 
+                        "Represents group type.", 
+                        "Represents other type."
+                    ], 
+                    "type": "string"
                 }, 
                 "updateTime": {
                     "description": "Output only. The time when the `Membership` was last updated.", 

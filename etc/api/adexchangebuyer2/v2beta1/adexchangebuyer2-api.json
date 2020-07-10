@@ -2486,7 +2486,7 @@
             }
         }
     }, 
-    "revision": "20200409", 
+    "revision": "20200709", 
     "rootUrl": "https://adexchangebuyer.googleapis.com/", 
     "schemas": {
         "AbsoluteDateRange": {
@@ -2660,6 +2660,10 @@
                     "$ref": "MetricValue", 
                     "description": "The number of bids for which the corresponding impression was measurable\nfor viewability (as defined by Active View)."
                 }, 
+                "reachedQueries": {
+                    "$ref": "MetricValue", 
+                    "description": "The number of bids that won the auction and also won the mediation\nwaterfall (if any)."
+                }, 
                 "rowDimensions": {
                     "$ref": "RowDimensions", 
                     "description": "The values of all dimensions associated with metric values in this row."
@@ -2753,7 +2757,7 @@
                     "type": "string"
                 }, 
                 "entityId": {
-                    "description": "Numerical identifier of the client entity.\nThe entity can be an advertiser, a brand, or an agency.\nThis identifier is unique among all the entities with the same type.\n\nA list of all known advertisers with their identifiers is available in the\n[advertisers.txt](https://storage.googleapis.com/adx-rtb-dictionaries/advertisers.txt)\nfile.\n\nA list of all known brands with their identifiers is available in the\n[brands.txt](https://storage.googleapis.com/adx-rtb-dictionaries/brands.txt)\nfile.\n\nA list of all known agencies with their identifiers is available in the\n[agencies.txt](https://storage.googleapis.com/adx-rtb-dictionaries/agencies.txt)\nfile.", 
+                    "description": "Numerical identifier of the client entity.\nThe entity can be an advertiser, a brand, or an agency.\nThis identifier is unique among all the entities with the same type.\nThe value of this field is ignored if the entity type is not provided.\n\nA list of all known advertisers with their identifiers is available in the\n[advertisers.txt](https://storage.googleapis.com/adx-rtb-dictionaries/advertisers.txt)\nfile.\n\nA list of all known brands with their identifiers is available in the\n[brands.txt](https://storage.googleapis.com/adx-rtb-dictionaries/brands.txt)\nfile.\n\nA list of all known agencies with their identifiers is available in the\n[agencies.txt](https://storage.googleapis.com/adx-rtb-dictionaries/agencies.txt)\nfile.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -2762,7 +2766,7 @@
                     "type": "string"
                 }, 
                 "entityType": {
-                    "description": "The type of the client entity: `ADVERTISER`, `BRAND`, or `AGENCY`.", 
+                    "description": "An optional field for specifying the type of the client entity:\n`ADVERTISER`, `BRAND`, or `AGENCY`.", 
                     "enum": [
                         "ENTITY_TYPE_UNSPECIFIED", 
                         "ADVERTISER", 
@@ -4963,12 +4967,16 @@
                     "enum": [
                         "STATUS_UNSPECIFIED", 
                         "AD_NOT_RENDERED", 
-                        "INVALID_IMPRESSION"
+                        "INVALID_IMPRESSION", 
+                        "FATAL_VAST_ERROR", 
+                        "LOST_IN_MEDIATION"
                     ], 
                     "enumDescriptions": [
                         "A placeholder for an undefined status.\nThis value will never be returned in responses.", 
                         "The buyer was not billed because the ad was not rendered by the\npublisher.", 
-                        "The buyer was not billed because the impression won by the bid was\ndetermined to be invalid."
+                        "The buyer was not billed because the impression won by the bid was\ndetermined to be invalid.", 
+                        "A video impression was served but a fatal error was reported from the\nclient during playback.", 
+                        "The buyer was not billed because the ad was outplaced in the mediation\nwaterfall."
                     ], 
                     "type": "string"
                 }
@@ -5391,7 +5399,7 @@
             "type": "object"
         }, 
         "PublisherProfile": {
-            "description": "Note: this resource requires whitelisting for access. Please contact your\naccount manager for access to Marketplace resources.\n\nRepresents a publisher profile in Marketplace.\n\nAll fields are read only. All string fields are free-form text entered by the\npublisher unless noted otherwise.", 
+            "description": "Note: this resource requires whitelisting for access. Please contact your\naccount manager for access to Marketplace resources.\n\nRepresents a publisher profile\n(https://support.google.com/admanager/answer/6035806?hl=en) in Marketplace.\n\nAll fields are read only. All string fields are free-form text entered by the\npublisher unless noted otherwise.", 
             "id": "PublisherProfile", 
             "properties": {
                 "audienceDescription": {
@@ -5420,6 +5428,10 @@
                 "googlePlusUrl": {
                     "description": "URL to publisher's Google+ page.", 
                     "type": "string"
+                }, 
+                "isParent": {
+                    "description": "Indicates if this profile is the parent profile of the seller. A parent\nprofile represents all the inventory from the seller, as opposed to child\nprofile that is created to brand a portion of inventory. One seller should\nhave only one parent publisher profile, and can have multiple child\nprofiles. Publisher profiles for the same seller will have same value of\nfield google.ads.adexchange.buyer.v2beta1.PublisherProfile.seller.\nSee https://support.google.com/admanager/answer/6035806?hl=en for details.", 
+                    "type": "boolean"
                 }, 
                 "logoUrl": {
                     "description": "A Google public URL to the logo for this publisher profile. The logo is\nstored as a PNG, JPG, or GIF image.", 

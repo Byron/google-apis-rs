@@ -107,6 +107,67 @@
     "resources": {
         "projects": {
             "resources": {
+                "locations": {
+                    "resources": {
+                        "operations": {
+                            "methods": {
+                                "cancel": {
+                                    "description": "Starts asynchronous cancellation on a long-running operation.  The server\nmakes a best effort to cancel the operation, but success is not\nguaranteed.  If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.  Clients can use\nOperations.GetOperation or\nother methods to check whether the cancellation succeeded or whether the\noperation completed despite cancellation. On successful cancellation,\nthe operation is not deleted; instead, it becomes an operation with\nan Operation.error value with a google.rpc.Status.code of 1,\ncorresponding to `Code.CANCELLED`.", 
+                                    "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel", 
+                                    "httpMethod": "POST", 
+                                    "id": "cloudbuild.projects.locations.operations.cancel", 
+                                    "parameterOrder": [
+                                        "name"
+                                    ], 
+                                    "parameters": {
+                                        "name": {
+                                            "description": "The name of the operation resource to be cancelled.", 
+                                            "location": "path", 
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$", 
+                                            "required": true, 
+                                            "type": "string"
+                                        }
+                                    }, 
+                                    "path": "v1alpha2/{+name}:cancel", 
+                                    "request": {
+                                        "$ref": "CancelOperationRequest"
+                                    }, 
+                                    "response": {
+                                        "$ref": "Empty"
+                                    }, 
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                }, 
+                                "get": {
+                                    "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice.", 
+                                    "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}", 
+                                    "httpMethod": "GET", 
+                                    "id": "cloudbuild.projects.locations.operations.get", 
+                                    "parameterOrder": [
+                                        "name"
+                                    ], 
+                                    "parameters": {
+                                        "name": {
+                                            "description": "The name of the operation resource.", 
+                                            "location": "path", 
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$", 
+                                            "required": true, 
+                                            "type": "string"
+                                        }
+                                    }, 
+                                    "path": "v1alpha2/{+name}", 
+                                    "response": {
+                                        "$ref": "Operation"
+                                    }, 
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }, 
                 "workerPools": {
                     "methods": {
                         "create": {
@@ -256,7 +317,7 @@
             }
         }
     }, 
-    "revision": "20200323", 
+    "revision": "20200704", 
     "rootUrl": "https://cloudbuild.googleapis.com/", 
     "schemas": {
         "ArtifactObjects": {
@@ -447,7 +508,7 @@
                     "type": "array"
                 }, 
                 "timeout": {
-                    "description": "Amount of time that this build should be allowed to run, to second\ngranularity. If this amount of time elapses, work on the build will cease\nand the build status will be `TIMEOUT`.\n\nDefault time is ten minutes.", 
+                    "description": "Amount of time that this build should be allowed to run, to second\ngranularity. If this amount of time elapses, work on the build will cease\nand the build status will be `TIMEOUT`.\n\n`timeout` starts ticking from `startTime`.\n\nDefault time is ten minutes.", 
                     "format": "google-duration", 
                     "type": "string"
                 }, 
@@ -481,6 +542,10 @@
                     "format": "int64", 
                     "type": "string"
                 }, 
+                "dynamicSubstitutions": {
+                    "description": "Option to specify whether or not to apply bash style string\noperations to the substitutions.\n\nNOTE: this is always enabled for triggered builds and cannot be\noverridden in the build configuration file.", 
+                    "type": "boolean"
+                }, 
                 "env": {
                     "description": "A list of global environment variable definitions that will exist for all\nbuild steps in this build. If a variable is defined in both globally and in\na build step, the variable will use the build step value.\n\nThe elements are of the form \"KEY=VALUE\" for the environment variable \"KEY\"\nbeing given the value \"VALUE\".", 
                     "items": {
@@ -503,16 +568,20 @@
                     "type": "string"
                 }, 
                 "logging": {
-                    "description": "Option to specify the logging mode, which determines where the logs are\nstored.", 
+                    "description": "Option to specify the logging mode, which determines if and where build\nlogs are stored.", 
                     "enum": [
                         "LOGGING_UNSPECIFIED", 
                         "LEGACY", 
-                        "GCS_ONLY"
+                        "GCS_ONLY", 
+                        "STACKDRIVER_ONLY", 
+                        "NONE"
                     ], 
                     "enumDescriptions": [
                         "The service determines the logging mode. The default is `LEGACY`. Do not\nrely on the default logging behavior as it may change in the future.", 
-                        "Stackdriver logging and Cloud Storage logging are enabled.", 
-                        "Only Cloud Storage logging is enabled."
+                        "Cloud Logging (Stackdriver) and Cloud Storage logging are enabled.", 
+                        "Only Cloud Storage logging is enabled.", 
+                        "Only Cloud Logging (Stackdriver) is enabled. Note that logs for both the\nCloud Console UI and Cloud SDK are based on Cloud Storage logs, so\nneither will provide logs if this option is chosen.", 
+                        "Turn off all logging. No build logs will be captured."
                     ], 
                     "type": "string"
                 }, 
@@ -567,7 +636,7 @@
                     "type": "array"
                 }, 
                 "substitutionOption": {
-                    "description": "Option to specify behavior when there is an error in the substitution\nchecks.", 
+                    "description": "Option to specify behavior when there is an error in the substitution\nchecks.\n\nNOTE: this is always set to ALLOW_LOOSE for triggered builds and cannot\nbe overridden in the build configuration file.", 
                     "enum": [
                         "MUST_MATCH", 
                         "ALLOW_LOOSE"
@@ -708,6 +777,12 @@
             }, 
             "type": "object"
         }, 
+        "CancelOperationRequest": {
+            "description": "The request message for Operations.CancelOperation.", 
+            "id": "CancelOperationRequest", 
+            "properties": {}, 
+            "type": "object"
+        }, 
         "Empty": {
             "description": "A generic empty message that you can re-use to avoid defining duplicated\nempty messages in your APIs. A typical example is to use it as the request\nor the response type of an API method. For instance:\n\n    service Foo {\n      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n    }\n\nThe JSON representation for `Empty` is empty JSON object `{}`.", 
             "id": "Empty", 
@@ -724,6 +799,17 @@
                         "$ref": "Hash"
                     }, 
                     "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "HTTPDelivery": {
+            "description": "HTTPDelivery is the delivery configuration for an HTTP notification.", 
+            "id": "HTTPDelivery", 
+            "properties": {
+                "uri": {
+                    "description": "The URI to which JSON-containing HTTP POST requests should be sent.", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -775,6 +861,154 @@
                 "peeredNetwork": {
                     "description": "Required. Immutable. The network definition that the workers are peered to.\nIf this section is left empty, the workers will be peered to\nWorkerPool.project_id on the default network. Must be in the format\n`projects/{project}/global/networks/{network}`, where {project}\nis a project number, such as `12345`, and {network} is the name of a\nVPC network in the project.", 
                     "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "Notification": {
+            "description": "Notification is the container which holds the data that is relevant to this\nparticular notification.", 
+            "id": "Notification", 
+            "properties": {
+                "filter": {
+                    "description": "The filter string to use for notification filtering.\nCurrently, this is assumed to be a CEL program.\nSee https://opensource.google/projects/cel for more.", 
+                    "type": "string"
+                }, 
+                "httpDelivery": {
+                    "$ref": "HTTPDelivery", 
+                    "description": "Configuration for HTTP delivery."
+                }, 
+                "slackDelivery": {
+                    "$ref": "SlackDelivery", 
+                    "description": "Configuration for Slack delivery."
+                }, 
+                "smtpDelivery": {
+                    "$ref": "SMTPDelivery", 
+                    "description": "Configuration for SMTP (email) delivery."
+                }, 
+                "structDelivery": {
+                    "additionalProperties": {
+                        "description": "Properties of the object.", 
+                        "type": "any"
+                    }, 
+                    "description": "Escape hatch for users to supply custom delivery configs.", 
+                    "type": "object"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "NotifierConfig": {
+            "description": "NotifierConfig is the top-level configuration message.", 
+            "id": "NotifierConfig", 
+            "properties": {
+                "apiVersion": {
+                    "description": "The API version of this configuration format.", 
+                    "type": "string"
+                }, 
+                "kind": {
+                    "description": "The type of notifier to use (e.g. SMTPNotifier).", 
+                    "type": "string"
+                }, 
+                "metadata": {
+                    "$ref": "NotifierMetadata", 
+                    "description": "Metadata for referring to/handling/deploying this notifier."
+                }, 
+                "spec": {
+                    "$ref": "NotifierSpec", 
+                    "description": "The actual configuration for this notifier."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "NotifierMetadata": {
+            "description": "NotifierMetadata contains the data which can be used to reference or describe\nthis notifier.", 
+            "id": "NotifierMetadata", 
+            "properties": {
+                "name": {
+                    "description": "The human-readable and user-given name for the notifier.\nFor example: \"repo-merge-email-notifier\".", 
+                    "type": "string"
+                }, 
+                "notifier": {
+                    "description": "The string representing the name and version of notifier to deploy.\nExpected to be of the form of \"<registry-path>/<name>:<version>\".\nFor example: \"gcr.io/my-project/notifiers/smtp:1.2.34\".", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "NotifierSecret": {
+            "description": "NotifierSecret is the container that maps a secret name (reference) to its\nGoogle Cloud Secret Manager resource path.", 
+            "id": "NotifierSecret", 
+            "properties": {
+                "name": {
+                    "description": "Name is the local name of the secret, such as the verbatim string\n\"my-smtp-password\".", 
+                    "type": "string"
+                }, 
+                "value": {
+                    "description": "Value is interpreted to be a resource path for fetching the actual\n(versioned) secret data for this secret. For example, this would be a\nGoogle Cloud Secret Manager secret version resource path like:\n\"projects/my-project/secrets/my-secret/versions/latest\".", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "NotifierSecretRef": {
+            "description": "NotifierSecretRef contains the reference to a secret stored in the\ncorresponding NotifierSpec.", 
+            "id": "NotifierSecretRef", 
+            "properties": {
+                "secretRef": {
+                    "description": "The value of `secret_ref` should be a `name` that is registered in a\n`Secret` in the `secrets` list of the `Spec`.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "NotifierSpec": {
+            "description": "NotifierSpec is the configuration container for notifications.", 
+            "id": "NotifierSpec", 
+            "properties": {
+                "notification": {
+                    "$ref": "Notification", 
+                    "description": "The configuration of this particular notifier."
+                }, 
+                "secrets": {
+                    "description": "Configurations for secret resources used by this particular notifier.", 
+                    "items": {
+                        "$ref": "NotifierSecret"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "Operation": {
+            "description": "This resource represents a long-running operation that is the result of a\nnetwork API call.", 
+            "id": "Operation", 
+            "properties": {
+                "done": {
+                    "description": "If the value is `false`, it means the operation is still in progress.\nIf `true`, the operation is completed, and either `error` or `response` is\navailable.", 
+                    "type": "boolean"
+                }, 
+                "error": {
+                    "$ref": "Status", 
+                    "description": "The error result of the operation in case of failure or cancellation."
+                }, 
+                "metadata": {
+                    "additionalProperties": {
+                        "description": "Properties of the object. Contains field @type with type URL.", 
+                        "type": "any"
+                    }, 
+                    "description": "Service-specific metadata associated with the operation.  It typically\ncontains progress information and common metadata such as create time.\nSome services might not provide such metadata.  Any method that returns a\nlong-running operation should document the metadata type, if any.", 
+                    "type": "object"
+                }, 
+                "name": {
+                    "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should be a resource name ending with `operations/{unique_id}`.", 
+                    "type": "string"
+                }, 
+                "response": {
+                    "additionalProperties": {
+                        "description": "Properties of the object. Contains field @type with type URL.", 
+                        "type": "any"
+                    }, 
+                    "description": "The normal response of the operation in case of success.  If the original\nmethod returns no data on success, such as `Delete`, the response is\n`google.protobuf.Empty`.  If the original method is standard\n`Get`/`Create`/`Update`, the response should be the resource.  For other\nmethods, the response should have the type `XxxResponse`, where `Xxx`\nis the original method name.  For example, if the original method name\nis `TakeSnapshot()`, the inferred response type is\n`TakeSnapshotResponse`.", 
+                    "type": "object"
                 }
             }, 
             "type": "object"
@@ -863,6 +1097,40 @@
             }, 
             "type": "object"
         }, 
+        "SMTPDelivery": {
+            "description": "SMTPDelivery is the delivery configuration for an SMTP (email) notification.", 
+            "id": "SMTPDelivery", 
+            "properties": {
+                "fromAddress": {
+                    "description": "This is the SMTP account/email that appears in the `From:` of the email.\nIf empty, it is assumed to be sender.", 
+                    "type": "string"
+                }, 
+                "password": {
+                    "$ref": "NotifierSecretRef", 
+                    "description": "The SMTP sender's password."
+                }, 
+                "port": {
+                    "description": "The SMTP port of the server.", 
+                    "type": "string"
+                }, 
+                "recipientAddresses": {
+                    "description": "This is the list of addresses to which we send the email (i.e. in the `To:`\nof the email).", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "senderAddress": {
+                    "description": "This is the SMTP account/email that is used to send the message.", 
+                    "type": "string"
+                }, 
+                "server": {
+                    "description": "The address of the SMTP server.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "Secret": {
             "description": "Pairs a set of secret environment variables containing encrypted\nvalues with the Cloud KMS key to use to decrypt the value.", 
             "id": "Secret", 
@@ -878,6 +1146,17 @@
                     }, 
                     "description": "Map of environment variable name to its encrypted value.\n\nSecret environment variables must be unique across all of a build's\nsecrets, and must be used by at least one build step. Values can be at most\n64 KB in size. There can be at most 100 secret values across all of a\nbuild's secrets.", 
                     "type": "object"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "SlackDelivery": {
+            "description": "SlackDelivery is the delivery configuration for delivering Slack messages via\nwebhooks. See Slack webhook documentation at:\nhttps://api.slack.com/messaging/webhooks.", 
+            "id": "SlackDelivery", 
+            "properties": {
+                "webhookUri": {
+                    "$ref": "NotifierSecretRef", 
+                    "description": "The secret reference for the Slack webhook URI for sending messages to a\nchannel."
                 }
             }, 
             "type": "object"
@@ -915,6 +1194,33 @@
                 "resolvedStorageSource": {
                     "$ref": "StorageSource", 
                     "description": "A copy of the build's `source.storage_source`, if exists, with any\ngenerations resolved."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "Status": {
+            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).", 
+            "id": "Status", 
+            "properties": {
+                "code": {
+                    "description": "The status code, which should be an enum value of google.rpc.Code.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "details": {
+                    "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use.", 
+                    "items": {
+                        "additionalProperties": {
+                            "description": "Properties of the object. Contains field @type with type URL.", 
+                            "type": "any"
+                        }, 
+                        "type": "object"
+                    }, 
+                    "type": "array"
+                }, 
+                "message": {
+                    "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\ngoogle.rpc.Status.details field, or localized by the client.", 
+                    "type": "string"
                 }
             }, 
             "type": "object"

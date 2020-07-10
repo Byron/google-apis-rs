@@ -8,6 +8,7 @@ api:
     acceleratedmobilepageurl:
     - v1
     accessapproval:
+    - v1
     - v1beta1
     accesscontextmanager:
     - v1
@@ -24,6 +25,8 @@ api:
     admin:
     - directory_v1
     - reports_v1
+    admob:
+    - v1
     adsense:
     - v1.4
     adsensehost:
@@ -43,6 +46,8 @@ api:
     androidpublisher:
     - v2
     - v3
+    apigee:
+    - v1
     appengine:
     - v1
     - v1beta4
@@ -51,17 +56,26 @@ api:
     - v1
     appstate:
     - v1
+    artifactregistry:
+    - v1beta1
     audit:
     - v1
     autoscaler:
     - v1beta2
     bigquery:
     - v2
+    bigqueryconnection:
+    - v1beta1
     bigquerydatatransfer:
+    - v1
+    bigqueryreservation:
     - v1
     bigtableadmin:
     - v2
+    billingbudgets:
+    - v1beta1
     binaryauthorization:
+    - v1
     - v1beta1
     blogger:
     - v3
@@ -70,6 +84,8 @@ api:
     calendar:
     - v3
     chat:
+    - v1
+    chromeuxreport:
     - v1
     civicinfo:
     - v2
@@ -144,6 +160,8 @@ api:
     - v1
     customsearch:
     - v1
+    datacatalog:
+    - v1beta1
     dataflow:
     - v1b4
     datafusion:
@@ -161,6 +179,7 @@ api:
     - v3.0
     - v3.2
     - v3.3
+    - v3.4
     dialogflow:
     - v2
     - v2beta1
@@ -168,13 +187,22 @@ api:
     - v1
     discovery:
     - v1
+    displayvideo:
+    - v1
     dlp:
     - v2
     - v2beta1
     dns:
     - v1
+    docs:
+    - v1
+    documentai:
+    - v1beta2
+    domainsrdap:
+    - v1
     doubleclickbidmanager:
     - v1
+    - v1.1
     doubleclicksearch:
     - v2
     drive:
@@ -194,7 +222,10 @@ api:
     firebasedynamiclinks:
     - v1
     firebasehosting:
+    - v1
     - v1beta1
+    firebaseml:
+    - v1
     firebaseremoteconfig:
     - v1
     firebaserules:
@@ -212,6 +243,8 @@ api:
     - v1
     gamesconfiguration:
     - v1configuration
+    gameservices:
+    - v1
     gamesmanagement:
     - v1management
     gan:
@@ -220,12 +253,17 @@ api:
     - v1
     gmail:
     - v1
+    gmailpostmastertools:
+    - v1beta1
     groupsmigration:
     - v1
     groupssettings:
     - v1
     healthcare:
+    - v1
     - v1beta1
+    homegraph:
+    - v1
     iam:
     - v1
     iamcredentials:
@@ -248,15 +286,21 @@ api:
     - v1
     licensing:
     - v1
+    lifesciences:
+    - v2beta
     logging:
     - v2
     - v2beta1
+    managedidentities:
+    - v1
     manager:
     - v1beta2
     manufacturers:
     - v1
     mapsengine:
     - v1
+    memcache:
+    - v1beta2
     mirror:
     - v1
     ml:
@@ -265,10 +309,14 @@ api:
     - v3
     mybusiness:
     - v4
+    networkmanagement:
+    - v1
     oauth2:
     - v2
     osconfig:
+    - v1
     - v1alpha2
+    - v1beta
     oslogin:
     - v1
     - v1beta
@@ -282,6 +330,8 @@ api:
     - v1
     photoslibrary:
     - v1
+    playablelocations:
+    - v3
     playcustomapp:
     - v1
     playmoviespartner:
@@ -290,10 +340,14 @@ api:
     - v1
     plusdomains:
     - v1
+    policytroubleshooter:
+    - v1
     poly:
     - v1
     prediction:
     - v1.6
+    prod_tt_sasportal:
+    - v1alpha1
     proximitybeacon:
     - v1beta1
     pubsub:
@@ -301,6 +355,11 @@ api:
     - v1beta2
     qpxexpress:
     - v1
+    realtimebidding:
+    - v1
+    recommender:
+    - v1
+    - v1beta1
     redis:
     - v1
     remotebuildexecution:
@@ -320,10 +379,15 @@ api:
     - v1beta1
     safebrowsing:
     - v4
+    sasportal:
+    - v1alpha1
     script:
     - v1
     searchconsole:
     - v1
+    secretmanager:
+    - v1
+    - v1beta1
     securitycenter:
     - v1
     servicebroker:
@@ -332,6 +396,9 @@ api:
     - v1
     servicecontrol:
     - v1
+    - v2
+    servicedirectory:
+    - v1beta1
     servicemanagement:
     - v1
     servicenetworking:
@@ -358,6 +425,8 @@ api:
     speech:
     - v1
     - v1beta1
+    sql:
+    - v1beta4
     sqladmin:
     - v1beta4
     storage:
@@ -380,15 +449,23 @@ api:
     texttospeech:
     - v1
     toolresults:
+    - v1
     - v1beta3
     tpu:
     - v1
     - v1alpha1
+    trafficdirector:
+    - v2
     translate:
     - v2
+    - v3
     urlshortener:
     - v1
     vault:
+    - v1
+    vectortile:
+    - v1
+    verifiedaccess:
     - v1
     videointelligence:
     - v1

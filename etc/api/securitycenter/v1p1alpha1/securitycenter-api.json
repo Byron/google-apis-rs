@@ -230,7 +230,7 @@
             }
         }
     }, 
-    "revision": "20200406", 
+    "revision": "20200703", 
     "rootUrl": "https://securitycenter.googleapis.com/", 
     "schemas": {
         "Empty": {
@@ -240,7 +240,7 @@
             "type": "object"
         }, 
         "Finding": {
-            "description": "Security Command Center finding.\n\nA finding is a record of assessment data like security, risk, health, or\nprivacy, that is ingested into Security Command Center for presentation,\nnotification, analysis, policy testing, and enforcement. For example, a\ncross-site scripting (XSS) vulnerability in an App Engine application is a\nfinding.\n\nWhen adding a new field hidden behind a visibility label, ensure it is also\nhidden from Notifications:\nhttp://google3/java/com/google/cloud/security/riskdashboard/notification/actions/streaming/FindingTranslator.java?l=26", 
+            "description": "Security Command Center finding.\n\nA finding is a record of assessment data like security, risk, health, or\nprivacy, that is ingested into Security Command Center for presentation,\nnotification, analysis, policy testing, and enforcement. For example, a\ncross-site scripting (XSS) vulnerability in an App Engine application is a\nfinding.", 
             "id": "Finding", 
             "properties": {
                 "category": {
@@ -311,6 +311,37 @@
                 }, 
                 "notificationConfigName": {
                     "description": "Name of the notification config that generated current notification.", 
+                    "type": "string"
+                }, 
+                "resource": {
+                    "$ref": "GoogleCloudSecuritycenterV1Resource", 
+                    "description": "The Cloud resource tied to this notification's Finding."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "GoogleCloudSecuritycenterV1Resource": {
+            "description": "\nInformation related to the Google Cloud resource.", 
+            "id": "GoogleCloudSecuritycenterV1Resource", 
+            "properties": {
+                "name": {
+                    "description": "The full resource name of the resource. See:\nhttps://cloud.google.com/apis/design/resource_names#full_resource_name", 
+                    "type": "string"
+                }, 
+                "parent": {
+                    "description": "The full resource name of resource's parent.", 
+                    "type": "string"
+                }, 
+                "parentDisplayName": {
+                    "description": "\nThe human readable name of resource's parent.", 
+                    "type": "string"
+                }, 
+                "project": {
+                    "description": "The full resource name of project that the resource belongs to.", 
+                    "type": "string"
+                }, 
+                "projectDisplayName": {
+                    "description": "\nThe human readable name of project that the resource belongs to.", 
                     "type": "string"
                 }
             }, 
@@ -497,9 +528,40 @@
                     "description": "Name of the notification config that generated current notification.", 
                     "type": "string"
                 }, 
+                "resource": {
+                    "$ref": "GoogleCloudSecuritycenterV1p1beta1Resource", 
+                    "description": "The Cloud resource tied to the notification."
+                }, 
                 "temporalAsset": {
                     "$ref": "GoogleCloudSecuritycenterV1p1beta1TemporalAsset", 
                     "description": "If it's an asset based notification config, this field will be\npopulated."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "GoogleCloudSecuritycenterV1p1beta1Resource": {
+            "description": "\nInformation related to the Google Cloud resource.", 
+            "id": "GoogleCloudSecuritycenterV1p1beta1Resource", 
+            "properties": {
+                "name": {
+                    "description": "The full resource name of the resource. See:\nhttps://cloud.google.com/apis/design/resource_names#full_resource_name", 
+                    "type": "string"
+                }, 
+                "parent": {
+                    "description": "The full resource name of resource's parent.", 
+                    "type": "string"
+                }, 
+                "parentDisplayName": {
+                    "description": "\nThe human readable name of resource's parent.", 
+                    "type": "string"
+                }, 
+                "project": {
+                    "description": "The full resource name of project that the resource belongs to.", 
+                    "type": "string"
+                }, 
+                "projectDisplayName": {
+                    "description": "\nThe human readable name of project that the resource belongs to.", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
