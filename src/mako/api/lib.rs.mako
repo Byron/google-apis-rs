@@ -95,7 +95,7 @@ pub struct ${hub_type}${ht_params} {
     _root_url: String,
 }
 
-impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> Hub for ${hub_type}${ht_params} {}
+impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> cmn::Hub for ${hub_type}${ht_params} {}
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     where  ${', '.join(hub_type_bounds())} {

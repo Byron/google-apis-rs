@@ -1,7 +1,7 @@
 <%!
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
-                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
+                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE,
                       PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals,
                       rust_doc_sanitize)
 %>\
@@ -9,7 +9,7 @@
 ###################################################################################################################
 ###################################################################################################################
 <%def name="_new_object(s, properties, c, allow_optionals)">\
-<% struct = 'pub struct ' + unique_type_name(s.id) %>\
+<% struct = 'pub struct ' + s.id %>\
 % if properties:
 ${struct} {
 % for pn, p in properties.iteritems():
@@ -24,7 +24,7 @@ ${struct} {
 ${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
 % elif 'variant' in s:
 <% 
-    et = unique_type_name(s.id)
+    et = s.id
     variant_type = lambda p: canonical_type_name(p.type_value)
 %>\
 pub enum ${et} {
@@ -71,7 +71,7 @@ ${struct} { _never_set: Option<bool> }
     if s.type == 'any':
         traits.remove('Default')
 
-    s_type = unique_type_name(s.id)
+    s_type = s.id
 %>\
 <%block filter="rust_doc_sanitize, rust_doc_comment">\
 ${doc(s, c)}\

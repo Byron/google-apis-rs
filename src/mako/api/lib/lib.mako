@@ -6,7 +6,7 @@
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
-                      upload_action_fn, unique_type_name, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT,
+                      upload_action_fn, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT,
                       to_extern_crate_name, rust_doc_sanitize)  
 
     def pretty_name(name):
@@ -89,7 +89,7 @@ It seems there is nothing you can do here ... .
     sn = singular(canonical_type_name(r))
 
     if sn in schemas:
-        md_resource = link(md_resource, schema_doc_format(schemas[sn]) % unique_type_name(sn))
+        md_resource = link(md_resource, schema_doc_format(schemas[sn]) % sn)
 %>\
 * ${md_resource}
  * ${put_and(md_methods)}

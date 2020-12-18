@@ -211,7 +211,7 @@ def to_cli_schema(c, schema):
 # documentation only
 def cli_schema_to_yaml(schema, prefix=''):
     if not prefix:
-        o = '%s%s:\n' % (prefix, util.unique_type_name(schema.id))
+        o = '%s%s:\n' % (prefix, schema.id)
     else:
         o = ''
     prefix += '  '

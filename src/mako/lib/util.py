@@ -62,21 +62,19 @@ ADD_PARAM_MEDIA_EXAMPLE = "." + ADD_PARAM_FN + '("alt", "media")'
 SPACES_PER_TAB = 4
 
 NESTED_TYPE_SUFFIX = 'item'
-DELEGATE_TYPE = 'Delegate'
+DELEGATE_TYPE = 'cmn::Delegate'
 REQUEST_PRIORITY = 100
-REQUEST_MARKER_TRAIT = 'RequestValue'
-RESPONSE_MARKER_TRAIT = 'ResponseResult'
-RESOURCE_MARKER_TRAIT = 'Resource'
-CALL_BUILDER_MARKERT_TRAIT = 'CallBuilder'
-METHODS_BUILDER_MARKER_TRAIT = 'MethodsBuilder'
-PART_MARKER_TRAIT = 'Part'
-NESTED_MARKER_TRAIT = 'NestedType'
+REQUEST_MARKER_TRAIT = 'cmn::RequestValue'
+RESPONSE_MARKER_TRAIT = 'cmn::ResponseResult'
+RESOURCE_MARKER_TRAIT = 'cmn::Resource'
+CALL_BUILDER_MARKERT_TRAIT = 'cmn::CallBuilder'
+METHODS_BUILDER_MARKER_TRAIT = 'cmn::MethodsBuilder'
+PART_MARKER_TRAIT = 'cmn::Part'
+NESTED_MARKER_TRAIT = 'cmn::NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
 DELEGATE_PROPERTY_NAME = 'delegate'
-TO_PARTS_MARKER = 'ToParts'
-UNUSED_TYPE_MARKER = 'UnusedType'
-
-RESERVED_TYPES = set(("Result", RESOURCE_MARKER_TRAIT, "Error"))
+TO_PARTS_MARKER = 'cmn::ToParts'
+UNUSED_TYPE_MARKER = 'cmn::UnusedType'
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
@@ -328,7 +326,7 @@ def _assure_unique_type_name(schemas, tn):
     if tn in schemas:
         tn += 'Nested'
         assert tn not in schemas
-    return unique_type_name(tn)
+    return tn
 
 # map a json type to an rust type
 # sn = schema name
@@ -349,7 +347,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
 
     def wrap_type(tn):
         if allow_optionals:
-            tn = "Option<%s>" % unique_type_name(tn)
+            tn = "Option<%s>" % tn
         return tn
 
     # unconditionally handle $ref types, which should point to another schema.
@@ -359,12 +357,12 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
         # usually is on on the first call, and off when recursion is involved.
         tn = t[TREF]
         if not _is_recursive and tn == sn:
-            tn = 'Option<Box<%s>>' % unique_type_name(tn)
+            tn = 'Option<Box<%s>>' % tn
         return wrap_type(tn)
     try:
         rust_type = TYPE_MAP[t['type']]
         if t['type'] == 'array':
-            return wrap_type("%s<%s>" % (rust_type, unique_type_name((nested_type(t)))))
+            return wrap_type("%s<%s>" % (rust_type, (nested_type(t))))
         elif t['type'] == 'object':
             if is_map_prop(t):
                 return wrap_type("%s<String, %s>" % (rust_type, nested_type(t)))
@@ -940,12 +938,6 @@ def mb_type_params_s(m):
 # as rb_additional_type_params, but for an individual method, as seen from a resource builder !
 def mb_additional_type_params(m):
     return []
-
-# check type_name against a list of reserved types, and return a possibly rename type_name to prevent a clash
-def unique_type_name(type_name):
-    if type_name in RESERVED_TYPES:
-        type_name += 'Type'
-    return type_name
 
 # return type name for a method on the given resource
 def mb_type(r, m):
