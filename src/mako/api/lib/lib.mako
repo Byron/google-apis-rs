@@ -6,7 +6,7 @@
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
-                      upload_action_fn, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT,
+                      upload_action_fn, METHODS_BUILDER_MARKER_TRAIT, DELEGATE_TYPE,
                       to_extern_crate_name, rust_doc_sanitize)  
 
     def pretty_name(name):
@@ -23,12 +23,12 @@
 <%
     # fr == fattest resource, the fatter, the more important, right ?
     fr = find_fattest_resource(c)
-    hub_url = 'struct.' + hub_type(c.schemas, util.canonical_name()) + '.html'
-    call_builder_url = 'trait.' + CALL_BUILDER_MARKERT_TRAIT + '.html'
-    delegate_url = 'trait.Delegate.html'
-    request_trait_url = 'trait.' + REQUEST_MARKER_TRAIT + '.html'
-    response_trait_url = 'trait.' + RESPONSE_MARKER_TRAIT + '.html'
-    part_trait_url = 'trait.' + PART_MARKER_TRAIT + '.html'
+    hub_url = hub_type(c.schemas, util.canonical_name())
+    call_builder_url = CALL_BUILDER_MARKERT_TRAIT
+    delegate_url = DELEGATE_TYPE
+    request_trait_url = REQUEST_MARKER_TRAIT
+    response_trait_url = RESPONSE_MARKER_TRAIT
+    part_trait_url = PART_MARKER_TRAIT
 
     doc_base_url = util.doc_base_url() + '/' + to_extern_crate_name(util.crate_name()) + '/'
 
@@ -83,13 +83,12 @@ It seems there is nothing you can do here ... .
 <%
     md_methods = list()
     for method in sorted(c.rta_map[r]):
-        md_methods.append(link('*%s*' % pretty_name(method),
-                               'struct.%s.html' % mb_type(r, method)))
+        md_methods.append(link('*%s*' % pretty_name(method), mb_type(r, method)))
     md_resource = pretty_name(r)
     sn = singular(canonical_type_name(r))
 
     if sn in schemas:
-        md_resource = link(md_resource, schema_doc_format(schemas[sn]) % sn)
+        md_resource = link(md_resource, sn)
 %>\
 * ${md_resource}
  * ${put_and(md_methods)}
@@ -101,7 +100,7 @@ Other activities are ...
 
 % endif
 % for method in sorted(c.rta_map[METHODS_RESOURCE]):
-* ${link(pretty_name(method), 'struct.%s.html' % mb_type(METHODS_RESOURCE, method))}
+* ${link(pretty_name(method), mb_type(METHODS_RESOURCE, method))}
 % endfor
 % endif
 
@@ -116,7 +115,7 @@ ${method_type} supported by ...
     if resource != METHODS_RESOURCE:
         name_parts.append(pretty_name(resource))
 %>\
-* ${link('*%s*' % ' '.join(name_parts), 'struct.%s.html' % mb_type(resource, method))}
+* ${link('*%s*' % ' '.join(name_parts), mb_type(resource, method))}
 % endfor ## for each method
 
 % endif  ## if methods
@@ -133,9 +132,9 @@ The API is structured into the following primary items:
 
 * **${link('Hub', hub_url)}**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates ${link('*Method Builders*', 'trait.' + METHODS_BUILDER_MARKER_TRAIT + '.html')} which in turn
+    * creates ${link('*Method Builders*', METHODS_BUILDER_MARKER_TRAIT)} which in turn
       allow access to individual ${link('*Call Builders*', call_builder_url)}
-* **${link('Resources', 'trait.' + RESOURCE_MARKER_TRAIT + '.html')}**
+* **${link('Resources', RESOURCE_MARKER_TRAIT)}**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
     * **${link('Parts', part_trait_url)}**
@@ -193,7 +192,7 @@ ${self.hub_usage_example(c, rust_doc, fr=fr)}\
 
 ${'##'} Handling Errors
 
-All errors produced by the system are provided either as ${link('Result', 'enum.Result.html')} enumeration as return value of 
+All errors produced by the system are provided either as ${link('Result', 'cmn::Result')} enumeration as return value of
 the ${api.terms.action}() methods, or handed as possibly intermediate results to either the 
 ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', urls.authenticator_delegate)}.
 
@@ -201,9 +200,9 @@ When delegates handle errors or intermediate values, they may have a chance to i
 makes the system potentially resilient to all kinds of errors.
 
 ${'##'} Uploads and Downloads
-If a method supports downloads, the response body, which is part of the ${link('Result', 'enum.Result.html')}, should be
+If a method supports downloads, the response body, which is part of the ${link('Result', 'cmn::Result')}, should be
 read by you to obtain the media.
-If such a method also supports a ${link('Response Result', 'trait.ResponseResult.html')}, it will return that by default.
+If such a method also supports a ${link('Response Result', 'ResponseResult')}, it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `${ADD_PARAM_MEDIA_EXAMPLE}`.
 

@@ -146,7 +146,7 @@ The list links the activity name, along with information about where it is used 
     name_suffix = ' ' + split_camelcase_s(name)
     if name == METHODS_RESOURCE:
         name_suffix = ''
-    struct_url = 'struct.' + mb_type(name, method) + '.html'
+    struct_url = mb_type(name, method)
     method_name = ' '.join(split_camelcase_s(method).split('.')) + name_suffix
     value_type = '|'.join(iot) or 'none'
 %>\

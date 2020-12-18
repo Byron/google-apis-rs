@@ -139,7 +139,7 @@ pub trait Delegate {
     /// between various API calls.
     fn begin(&mut self, MethodInfo) {}
 
-    /// Called whenever there is an [HttpError](http://hyperium.github.io/hyper/hyper/error/enum.HttpError.html), usually if there are network problems.
+    /// Called whenever there is an [HttpError](hyper::Error), usually if there are network problems.
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
