@@ -83,12 +83,12 @@ It seems there is nothing you can do here ... .
 <%
     md_methods = list()
     for method in sorted(c.rta_map[r]):
-        md_methods.append(link('*%s*' % pretty_name(method), mb_type(r, method)))
+        md_methods.append(link('*%s*' % pretty_name(method), "api::%s" % mb_type(r, method)))
     md_resource = pretty_name(r)
     sn = singular(canonical_type_name(r))
 
     if sn in schemas:
-        md_resource = link(md_resource, sn)
+        md_resource = link(md_resource, "api::%s" % sn)
 %>\
 * ${md_resource}
  * ${put_and(md_methods)}
@@ -100,7 +100,7 @@ Other activities are ...
 
 % endif
 % for method in sorted(c.rta_map[METHODS_RESOURCE]):
-* ${link(pretty_name(method), mb_type(METHODS_RESOURCE, method))}
+* ${link(pretty_name(method), "api::%s" % mb_type(METHODS_RESOURCE, method))}
 % endfor
 % endif
 
@@ -115,7 +115,7 @@ ${method_type} supported by ...
     if resource != METHODS_RESOURCE:
         name_parts.append(pretty_name(resource))
 %>\
-* ${link('*%s*' % ' '.join(name_parts), mb_type(resource, method))}
+* ${link('*%s*' % ' '.join(name_parts), "api::%s" % mb_type(resource, method))}
 % endfor ## for each method
 
 % endif  ## if methods
@@ -202,7 +202,7 @@ makes the system potentially resilient to all kinds of errors.
 ${'##'} Uploads and Downloads
 If a method supports downloads, the response body, which is part of the ${link('Result', 'cmn::Result')}, should be
 read by you to obtain the media.
-If such a method also supports a ${link('Response Result', 'ResponseResult')}, it will return that by default.
+If such a method also supports a ${link('Response Result', 'cmn::ResponseResult')}, it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `${ADD_PARAM_MEDIA_EXAMPLE}`.
 

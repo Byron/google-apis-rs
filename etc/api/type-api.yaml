@@ -20,6 +20,8 @@ make:
     - source: ../Cargo.toml
     - source: lib.rs
       output_dir: src
+    - source: api.rs
+      output_dir: src
 cargo:
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs

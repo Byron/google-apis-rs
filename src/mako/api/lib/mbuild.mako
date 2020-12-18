@@ -321,7 +321,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 <%block filter="test_block_filter">\
 ${capture(util.test_prelude) | hide_filter}\
 % if request_value:
-use ${util.library_name()}::${request_value_type};
+use ${util.library_name()}::api::${request_value_type};
 % endif
 % if handle_result:
 use ${util.library_name()}::{Result, Error};
