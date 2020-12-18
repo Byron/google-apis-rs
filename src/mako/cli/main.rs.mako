@@ -30,7 +30,7 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+mod client;
 
 ${engine.new(c)}\
 

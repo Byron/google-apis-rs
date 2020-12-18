@@ -62,7 +62,7 @@
 	def gen_type_cfg_path(id):
 		return '$(API_DIR)/type-' + id + '.yaml'
 
-	CMN_SRC = '/src/cmn.rs'
+	CMN_SRC = '/src/client.rs'
 
 	api_name = util.library_name(an, version)
 	api_target = util.target_directory_name(an, version, suffix)
@@ -101,7 +101,7 @@
 	except:
 		print('Could not open JSON file at {}'.format(api_json))
 %>\
-${api_common}: $(RUST_SRC)/${make.id}/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
+${api_common}: $(RUST_SRC)/${make.id}/client.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
 	@ echo "// COPY OF '$<'"  > $@
 	@ echo "// DO NOT EDIT"  >> $@
 	@cat $< >> $@

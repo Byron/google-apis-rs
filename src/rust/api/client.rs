@@ -727,7 +727,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
     }
 }
 
-// Copy of src/rust/cli/cmn.rs
+// Copy of src/rust/cli/client.rs
 // TODO(ST): Allow sharing common code between program types
 pub fn remove_json_null_values(value: &mut json::value::Value) {
     match *value {

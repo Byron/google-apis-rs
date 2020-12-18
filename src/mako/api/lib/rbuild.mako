@@ -95,7 +95,7 @@ impl${rb_params} ${ThisType} {
     % endfor
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
-        use cmn::ToParts;
+        use client::ToParts;
         % if part_prop and request_value:
         let parts = ${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
         % endif

@@ -62,19 +62,19 @@ ADD_PARAM_MEDIA_EXAMPLE = "." + ADD_PARAM_FN + '("alt", "media")'
 SPACES_PER_TAB = 4
 
 NESTED_TYPE_SUFFIX = 'item'
-DELEGATE_TYPE = 'cmn::Delegate'
+DELEGATE_TYPE = 'client::Delegate'
 REQUEST_PRIORITY = 100
-REQUEST_MARKER_TRAIT = 'cmn::RequestValue'
-RESPONSE_MARKER_TRAIT = 'cmn::ResponseResult'
-RESOURCE_MARKER_TRAIT = 'cmn::Resource'
-CALL_BUILDER_MARKERT_TRAIT = 'cmn::CallBuilder'
-METHODS_BUILDER_MARKER_TRAIT = 'cmn::MethodsBuilder'
-PART_MARKER_TRAIT = 'cmn::Part'
-NESTED_MARKER_TRAIT = 'cmn::NestedType'
+REQUEST_MARKER_TRAIT = 'client::RequestValue'
+RESPONSE_MARKER_TRAIT = 'client::ResponseResult'
+RESOURCE_MARKER_TRAIT = 'client::Resource'
+CALL_BUILDER_MARKERT_TRAIT = 'client::CallBuilder'
+METHODS_BUILDER_MARKER_TRAIT = 'client::MethodsBuilder'
+PART_MARKER_TRAIT = 'client::Part'
+NESTED_MARKER_TRAIT = 'client::NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
 DELEGATE_PROPERTY_NAME = 'delegate'
-TO_PARTS_MARKER = 'cmn::ToParts'
-UNUSED_TYPE_MARKER = 'cmn::UnusedType'
+TO_PARTS_MARKER = 'client::ToParts'
+UNUSED_TYPE_MARKER = 'client::UnusedType'
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {

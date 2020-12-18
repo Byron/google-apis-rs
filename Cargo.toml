@@ -2,7 +2,7 @@
 # This library is just to try out the code that should ultimately go into the code generator !
 [package]
 
-name = "cmn"
+name = "client"
 version = "0.0.1"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A library to facilitate interacting with your youtube account"
@@ -11,8 +11,8 @@ license = "MIT/Apache-2.0"
 keywords = ["youtube", "google", "protocol", "not-for-use"]
 
 [lib]
-# The common code, used by all generated implementations
-name = "cmn"
+# The common client code, used by all generated implementations
+name = "client"
 path = "src/rust/lib.rs"
 
 [dependencies]

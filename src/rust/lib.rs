@@ -22,7 +22,7 @@ mod cli;
 #[cfg(test)]
 mod test_api {
     extern crate yup_hyper_mock as hyper_mock;
-    use super::api::cmn::*;
+    use super::api::client::*;
     use self::hyper_mock::*;
     use std::io::Read;
     use std::default::Default;
@@ -159,7 +159,7 @@ bar\r\n\
 
 #[cfg(test)]
 mod test_cli {
-    use super::cli::cmn::*;
+    use super::cli::client::*;
 
     use std::default::Default;
 

@@ -51,8 +51,8 @@ extern crate mime;
 extern crate url;
 
 pub mod api;
-pub mod cmn;
+pub mod client;
 
 // Re-export the hub type and some basic client structs
 pub use api::${hub_type};
-pub use cmn::{Result, Error, Delegate};
+pub use client::{Result, Error, Delegate};

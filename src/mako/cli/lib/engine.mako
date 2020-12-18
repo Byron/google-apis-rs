@@ -31,7 +31,7 @@
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+use client::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -105,12 +105,12 @@ impl<'n> Engine<'n> {
     // Please note that this call will fail if any part of the opt can't be handled
     fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
+            match client::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
                                                          "${api.credentials.replace('"', r'\"')}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
