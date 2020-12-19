@@ -44,7 +44,7 @@ use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
