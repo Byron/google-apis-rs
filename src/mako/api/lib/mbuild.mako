@@ -530,6 +530,11 @@ match result {
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
         % if p.name == 'part' and request_value:
+        % if is_repeated_property(p):
+        if ${pname}.is_empty() {
+            ${pname}.push(self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts());
+        }
+        % else:
         % if not is_required_property(p):
         if ${pname}.is_none() {
             ${pname} = Some(self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts());
@@ -538,7 +543,8 @@ match result {
         if ${pname}.len() == 0 {
             ${pname} = self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
         }
-        % endif ## not is_required_property(p):
+        % endif ## not is_required_property(p)
+        % endif is_repeated_property(p):
         % endif ## p.name == 'part' and request_value:
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {

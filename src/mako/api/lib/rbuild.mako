@@ -1,7 +1,7 @@
 <%!
     from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, singular, hub_type, mangle_ident, mb_type, property,
-                      to_fqan, indent_all_but_first_by, 
+                      to_fqan, indent_all_but_first_by, is_repeated_property, is_required_property,
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, organize_params, REQUEST_VALUE_PROPERTY_NAME,
                       build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params, 
@@ -95,9 +95,17 @@ impl${rb_params} ${ThisType} {
     % endfor
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
-        use client::ToParts;
         % if part_prop and request_value:
-        let parts = ${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
+        use client::ToParts;
+        % if is_repeated_property(part_prop):
+            let parts = vec![${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts()];
+        % else:
+        % if not is_required_property(part_prop):
+            let parts = Some(${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts());
+        % else:
+            let parts = ${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
+        % endif ## not is_required_property(part_prop)
+        % endif is_repeated_property(part_prop):
         % endif
         ${RType} {
             hub: self.hub,
