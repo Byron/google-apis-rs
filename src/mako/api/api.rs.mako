@@ -25,7 +25,6 @@ use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
-use std::time::Duration;
 
 use crate::client;
 
