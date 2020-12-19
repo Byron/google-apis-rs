@@ -11,6 +11,7 @@ api:
     # It seems functions are containing illegal characters, like `@context`
     - kgsearch
     - mapsengine
+    - spanner
     - firebaserules
     - servicemanagement
     # defines its own `Option` type
