@@ -9,7 +9,6 @@ VENV_DIR := .pyenv-$(shell uname)
 PYTHON_BIN := $(VENV_DIR)/bin/python
 
 PYTHON := . $(VENV_DIR)/bin/activate; python
-PIP := $(PYTHON) -m pip
 PYTEST := $(PYTHON) -m pytest
 
 MAKO_RENDER := etc/bin/mako-render
@@ -69,7 +68,7 @@ $(VENV_BIN):
 
 $(PYTHON_BIN): $(VENV_BIN) requirements.txt
 	$(VENV_BIN) -p python3.8 $(VENV_DIR)
-	$(PIP) install -r requirements.txt
+	$@ -m pip install -r requirements.txt
 
 $(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(MAKO_LIB_DIR)/*)
 
