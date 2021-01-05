@@ -46,7 +46,7 @@
 	if mako is not UNDEFINED:
 		post_processor_arg = '--post-process-python-module=%s' % mako.post_processor_module
 %>\
-% for an, versions in api.list.iteritems():
+% for an, versions in api.list.items():
 % if an in api.get('blacklist', list()):
 <% continue %>\
 % endif
