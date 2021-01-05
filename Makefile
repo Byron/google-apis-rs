@@ -2,7 +2,8 @@
 .SUFFIXES:
 
 VIRTUALENV_VERSION = 16.0.0
-VENV_BIN = .virtualenv/virtualenv.py
+VENV_BIN = ./.virtualenv.py
+VENV_VERSION = 20.2.2
 
 VENV_DIR := .pyenv-$(shell uname)
 PYTHON_BIN := $(VENV_DIR)/bin/python
@@ -63,12 +64,11 @@ $(PREPROC): $(PREPROC_DIR)/src/main.rs
 	cd "$(PREPROC_DIR)" && cargo build --release 
 
 $(VENV_BIN):
-	wget -nv https://pypi.python.org/packages/source/v/virtualenv/virtualenv-$(VIRTUALENV_VERSION).tar.gz -O virtualenv-$(VIRTUALENV_VERSION).tar.gz
-	tar -xzf virtualenv-$(VIRTUALENV_VERSION).tar.gz && mv virtualenv-$(VIRTUALENV_VERSION) ./.virtualenv && rm -f virtualenv-$(VIRTUALENV_VERSION).tar.gz
-	chmod +x $@
+	python3 -m pip install virtualenv==$(VENV_VERSION) || python3 -m pip install --user virtualenv==$(VENV_VERSION)
+	ln -s `which virtualenv` $@
 
 $(PYTHON_BIN): $(VENV_BIN) requirements.txt
-	$(VENV_BIN) -p python2.7 $(VENV_DIR)
+	$(VENV_BIN) -p python3.8 $(VENV_DIR)
 	$(PIP) install -r requirements.txt
 
 $(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(MAKO_LIB_DIR)/*)
