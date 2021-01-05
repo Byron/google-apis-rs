@@ -847,7 +847,7 @@ def library_to_crate_name(name, suffix=''):
 
 # return version like 0.1.0+2014031421
 def crate_version(build_version, revision):
-    return '%s+%s' % (build_version, isinstance(revision, basestring) and revision or '00000000')
+    return '%s+%s' % (build_version, isinstance(revision, str) and revision or '00000000')
 
 # return a crate name for us in extern crate statements
 def to_extern_crate_name(crate_name):
