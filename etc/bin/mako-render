@@ -70,9 +70,6 @@ class DictObject(object):
     def __repr__(self):
         return repr(self.__dict__)
 
-    def __getattr__(self, name):
-        return object.__getattribute__(self, name)
-
     def __getitem__(self, name):
         try:
             return getattr(self, name)

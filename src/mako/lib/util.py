@@ -746,6 +746,7 @@ def new_context(schemas, resources, methods):
             # end this is already a perfectly valid type
 
             properties = s.get('properties', {'': s})
+            print(properties)
             for pn, p in properties.items():
                 link_used(p, rs)
                 if is_nested_type_property(p):

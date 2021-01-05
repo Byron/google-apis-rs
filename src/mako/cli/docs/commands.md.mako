@@ -143,7 +143,8 @@ You may set the following properties to further configure the call. Please note 
 or more key-value-pairs, and is called like this `-${PARAM_FLAG} k1=v1 k2=v2` even though the listing below repeats the
 `-${PARAM_FLAG}` for completeness.
 
-% for p in sorted(oprops):
+## % for p in sorted(oprops): FIXME(this really should be sorted, I suppose, but that doesn't work anymore)
+% for p in oprops:
 ${self._md_property(p)}
 % endfor 
 % endif # optional method properties
