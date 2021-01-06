@@ -357,7 +357,7 @@ if dry_run {
         allow_optionals = allow_optionals_fn(schema)
         if not allow_optionals:
             opt_access = ''
-        for fn, f in schema.fields.iteritems():
+        for fn, f in schema.fields.items():
             cur.append(['%s%s' % (mangle_ident(fn), opt_access), fn])
             fields.add(fn)
             if isinstance(f, SchemaEntry):

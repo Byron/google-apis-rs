@@ -1,7 +1,7 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
     from mako.filters import xml_escape
-    from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property)
+    from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property, custom_sorted)
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
                      mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
                      FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml, SchemaEntry,
@@ -143,7 +143,7 @@ You may set the following properties to further configure the call. Please note 
 or more key-value-pairs, and is called like this `-${PARAM_FLAG} k1=v1 k2=v2` even though the listing below repeats the
 `-${PARAM_FLAG}` for completeness.
 
-% for p in sorted(oprops):
+% for p in custom_sorted(oprops):
 ${self._md_property(p)}
 % endfor 
 % endif # optional method properties

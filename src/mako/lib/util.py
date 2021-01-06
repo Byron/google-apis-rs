@@ -112,6 +112,17 @@ data_unit_multipliers = {
 
 HUB_TYPE_PARAMETERS = ('C', 'A')
 
+def items(p):
+    if isinstance(p, dict):
+        return p.items()
+    else:
+        return p._items()
+
+def custom_sorted(p):
+    if not isinstance(p, list):
+        assert(false, p, "unexpected type")
+    return sorted(p, key = lambda p: p['name'])
+
 # ==============================================================================
 ## @name Filters
 # ------------------------------------------------------------------------------
@@ -438,7 +449,7 @@ def schema_markers(s, c, transitive=True):
             continue
         has_activity = True
         # it should have at least one activity that matches it's type to qualify for the Resource trait
-        for fqan, iot in activities.iteritems():
+        for fqan, iot in activities.items():
             _, resource, _ = activity_split(fqan)
             if resource and activity_name_to_type_name(resource).lower() == sid.lower():
                 res.add(RESOURCE_MARKER_TRAIT)
@@ -502,7 +513,7 @@ def activity_name_to_type_name(an):
 
 # yields (category, resource, activity, activity_data)
 def iter_acitivities(c):
-    return ((activity_split(an) + [a]) for an, a in c.fqan_map.iteritems())
+    return ((activity_split(an) + [a]) for an, a in c.fqan_map.items())
 
 # return a list of parameter structures of all params of the given method dict
 # apply a prune filter to restrict the set of returned parameters.
@@ -510,7 +521,7 @@ def iter_acitivities(c):
 def _method_params(m, required=None, location=None):
     res = list()
     po = m.get('parameterOrder', [])
-    for pn, p in m.get('parameters', dict()).iteritems():
+    for pn, p in m.get('parameters', dict()).items():
         if required is not None and p.get('required', False) != required:
             continue
         if location is not None and p.get('location', '') != location:
@@ -604,7 +615,7 @@ def method_media_params(m):
     # actually, one of them is required, but we can't encode that ...
     # runtime will have to check
     res = list()
-    for pn, proto in mu.protocols.iteritems():
+    for pn, proto in mu.protocols.items():
         # the pi (proto-info) dict can be shown to the user
         pi = {'multipart': proto.multipart and 'yes' or 'no', 'maxSize': mu.get('maxSize', '0kb'), 'validMimeTypes': mu.accept}
         try:
@@ -663,12 +674,12 @@ def new_context(schemas, resources, methods):
             res = dict()
         if fqan is None:
             fqan = dict()
-        for k,a in activities.iteritems():
+        for k,a in activities.items():
             if 'resources' in a:
                 build_activity_mappings(a.resources, res, fqan)
             if 'methods' not in a:
                 continue
-            for mn, m in a.methods.iteritems():
+            for mn, m in a.methods.items():
                 assert m.id not in fqan
                 category, resource, method = activity_split(m.id)
                 # This may be another name by which people try to find the method.
@@ -737,7 +748,8 @@ def new_context(schemas, resources, methods):
             # end this is already a perfectly valid type
 
             properties = s.get('properties', {'': s})
-            for pn, p in properties.iteritems():
+
+            for pn, p in items(properties):
                 link_used(p, rs)
                 if is_nested_type_property(p):
                     ns = deepcopy(p)
@@ -746,7 +758,7 @@ def new_context(schemas, resources, methods):
 
                     # To allow us recursing arrays, we simply put items one level up
                     if 'items' in p:
-                        ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
+                        ns.update((k, deepcopy(v)) for k, v in p.items.items())
 
                     recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs.id))
                 elif is_map_prop(p):
@@ -838,7 +850,7 @@ def library_to_crate_name(name, suffix=''):
 
 # return version like 0.1.0+2014031421
 def crate_version(build_version, revision):
-    return '%s+%s' % (build_version, isinstance(revision, basestring) and revision or '00000000')
+    return '%s+%s' % (build_version, isinstance(revision, str) and revision or '00000000')
 
 # return a crate name for us in extern crate statements
 def to_extern_crate_name(crate_name):

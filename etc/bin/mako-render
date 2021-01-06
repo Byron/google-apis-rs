@@ -70,9 +70,6 @@ class DictObject(object):
     def __repr__(self):
         return repr(self.__dict__)
 
-    def __getattr__(self, name):
-        return object.__getattribute__(self, name)
-
     def __getitem__(self, name):
         try:
             return getattr(self, name)
@@ -191,9 +188,9 @@ class DictObject(object):
         """as dict.items"""
         return list(self.__dict__.items())
 
-    def iteritems(self):
-        """as dict.iteritems"""
-        return iter(self.__dict__.items())
+    def _items(self):
+        """as dict.items, avoiding name clashes"""
+        return list(self.__dict__.items())
 
     def pop(self, key, default=sys):
         """as dict.pop"""

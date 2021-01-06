@@ -119,7 +119,7 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
-% for prop_key, custom_name in api.properties.iteritems():
+% for prop_key, custom_name in api.properties.items():
             % if prop_key == 'scopes' and not method_default_scope(m):
 <% continue %>\
             % endif
