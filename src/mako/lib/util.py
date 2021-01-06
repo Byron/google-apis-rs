@@ -120,6 +120,11 @@ def items(p):
     else:
         return p._items()
 
+def custom_sorted(p):
+    if not isinstance(p, list):
+        assert(false, p, "unexpected type")
+    return sorted(p, key = lambda p: p['name'])
+
 # ==============================================================================
 ## @name Filters
 # ------------------------------------------------------------------------------
