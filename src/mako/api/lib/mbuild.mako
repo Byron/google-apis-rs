@@ -11,7 +11,7 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
-                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize)
+                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize, items)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -336,7 +336,7 @@ ${capture(lib.test_hub, hub_type_name, comments=show_all) | hide_filter}
 // into the respective structure. Some of the parts shown here might not be applicable !
 // ${random_value_warning}
 let mut ${rb_name} = ${request_value_type}::default();
-% for spn, sp in request_value.get('properties', dict()).items():
+% for spn, sp in items(request_value.get('properties', dict())):
 % if parts is not None and spn not in parts:
 <% continue %>
 % endif

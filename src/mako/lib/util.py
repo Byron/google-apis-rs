@@ -114,6 +114,12 @@ data_unit_multipliers = {
 
 HUB_TYPE_PARAMETERS = ('C', 'A')
 
+def items(p):
+    if isinstance(p, dict):
+        return p.items()
+    else:
+        return p._items()
+
 # ==============================================================================
 ## @name Filters
 # ------------------------------------------------------------------------------
@@ -746,8 +752,8 @@ def new_context(schemas, resources, methods):
             # end this is already a perfectly valid type
 
             properties = s.get('properties', {'': s})
-            print(properties)
-            for pn, p in properties.items():
+
+            for pn, p in items(properties):
                 link_used(p, rs)
                 if is_nested_type_property(p):
                     ns = deepcopy(p)

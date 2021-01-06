@@ -172,7 +172,7 @@ def to_cli_schema(c, schema):
             properties[e.type_value] = e
     # end handle enumerations
 
-    for pn, p in properties.items():
+    for pn, p in util.items(properties):
         def set_nested_schema(ns):
             if ns.fields:
                 fd[pn] = ns
