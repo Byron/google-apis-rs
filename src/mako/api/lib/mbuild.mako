@@ -11,7 +11,7 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
-                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize)
+                      is_repeated_property, setter_fn_name, ADD_SCOPE_FN, rust_doc_sanitize, items)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -154,7 +154,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     ///
     /// # Additional Parameters
     ///
-    % for opn, op in list((opn, op) for (opn, op) in parameters.iteritems() if opn not in [p.name for p in params]):
+    % for opn, op in list((opn, op) for (opn, op) in parameters.items() if opn not in [p.name for p in params]):
     /// * *${opn}* (${op.location}-${op.type}) - ${op.description}
     % endfor
     % endif
@@ -336,7 +336,7 @@ ${capture(lib.test_hub, hub_type_name, comments=show_all) | hide_filter}
 // into the respective structure. Some of the parts shown here might not be applicable !
 // ${random_value_warning}
 let mut ${rb_name} = ${request_value_type}::default();
-% for spn, sp in request_value.get('properties', dict()).iteritems():
+% for spn, sp in items(request_value.get('properties', dict())):
 % if parts is not None and spn not in parts:
 <% continue %>
 % endif
@@ -896,7 +896,7 @@ if enable_resource_parsing \
     % for p in media_params:
     ${p.description | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
     ///
-    % for item_name, item in p.info.iteritems():
+    % for item_name, item in p.info.items():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
     pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}

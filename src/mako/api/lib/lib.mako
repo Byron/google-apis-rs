@@ -156,7 +156,7 @@ let r = hub.resource().activity(...).${api.terms.action}()
 Or specifically ...
 
 ```ignore
-% for an, a in c.sta_map[fr.id].iteritems():
+% for an, a in c.sta_map[fr.id].items():
 <% category, resource, activity = activity_split(an) %>\
 let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}()
 % endfor

@@ -16,7 +16,7 @@
             return 'None'
         if isinstance(v, bool):
             v = v and 'true' or 'false'
-        elif isinstance(v, basestring):
+        elif isinstance(v, str):
             v = 'r##"%s"##' % v
         elif isinstance(v, list):
             v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)

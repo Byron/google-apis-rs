@@ -3,7 +3,7 @@
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
                       PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals,
-                      rust_doc_sanitize)
+                      rust_doc_sanitize, items)
 %>\
 ## Build a schema which must be an object
 ###################################################################################################################
@@ -12,7 +12,7 @@
 <% struct = 'pub struct ' + unique_type_name(s.id) %>\
 % if properties:
 ${struct} {
-% for pn, p in properties.iteritems():
+% for pn, p in items(properties):
     ${p.get('description', 'no description provided') | rust_doc_sanitize, rust_doc_comment, indent_all_but_first_by(1)}
     % if pn != mangle_ident(pn):
     #[serde(rename="${pn}")]
@@ -111,7 +111,7 @@ impl ${TO_PARTS_MARKER} for ${s_type} {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        % for pn, p in s.properties.iteritems():
+        % for pn, p in items(s.properties):
 <%
             mn = 'self.' + mangle_ident(pn)
             rt = to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)
@@ -140,7 +140,7 @@ ${s.get('description', 'There is no detailed description.')}
 This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 The list links the activity name, along with information about where it is used (one of ${put_and(enclose_in('*', IO_TYPES))}).
 
-% for a, iot in c.sta_map[s.id].iteritems():
+% for a, iot in c.sta_map[s.id].items():
 <%
     category, name, method = activity_split(a)
     name_suffix = ' ' + split_camelcase_s(name)
