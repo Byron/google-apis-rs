@@ -2,9 +2,8 @@
 .SUFFIXES:
 
 VIRTUALENV_VERSION = 16.0.0
-VENV_BIN = .virtualenv.py
+VENV_BIN = .virtualenv.marker
 VENV_VERSION = 20.2.2
-PY_VERSION = 3.8
 
 VENV_DIR := .pyenv-$(shell uname)
 PYTHON_BIN := $(VENV_DIR)/bin/python
@@ -65,10 +64,10 @@ $(PREPROC): $(PREPROC_DIR)/src/main.rs
 
 $(VENV_BIN):
 	python3 -m pip install --user virtualenv==$(VENV_VERSION)
-	ln -s `pip show virtualenv | grep lib/python | cut -d ' ' -f 2 | sed 's#/lib/python/site-packages##'`/bin/virtualenv $@
+	touch $@
 
 $(PYTHON_BIN): $(VENV_BIN) requirements.txt
-	./$(VENV_BIN) -p python3.8 $(VENV_DIR)
+	python3 -m virtualenv -p python3 $(VENV_DIR)
 	$@ -m pip install -r requirements.txt
 
 $(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(MAKO_LIB_DIR)/*)

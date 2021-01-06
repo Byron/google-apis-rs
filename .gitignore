@@ -12,7 +12,7 @@ gen/doc
 
 # Python: Makefile lead dirs
 .pyenv-*
-.virtualenv.py
+.virtualenv.marker
 
 # Sublime
 *.sublime-workspace
