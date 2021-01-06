@@ -1,19 +1,20 @@
-use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
 use std;
-use std::fmt::{self, Display};
-use std::str::FromStr;
 use std::error;
+use std::fmt::{self, Display};
+use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 
-use mime::{Mime, TopLevel, SubLevel, Attr, Value};
-use oauth2::{TokenType, Retry, self};
 use hyper;
-use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization, Header,
-                    HeaderFormat, Bearer};
+use hyper::header::{
+    Authorization, Bearer, ContentLength, ContentType, Header, HeaderFormat, Headers, UserAgent,
+};
 use hyper::http::h1::LINE_ENDING;
 use hyper::method::Method;
 use hyper::status::StatusCode;
+use mime::{Attr, Mime, SubLevel, TopLevel, Value};
+use oauth2::{self, Retry, TokenType};
 
 use serde_json as json;
 
@@ -63,7 +64,7 @@ pub trait ToParts {
 #[derive(Deserialize)]
 pub struct JsonServerError {
     pub error: String,
-    pub error_description: Option<String>
+    pub error_description: Option<String>,
 }
 
 /// A utility to represent detailed errors we might see in case there are BadRequests.
@@ -85,9 +86,9 @@ pub struct ServerMessage {
     pub domain: String,
     pub reason: String,
     pub message: String,
-    #[serde(rename="locationType")]
+    #[serde(rename = "locationType")]
     pub location_type: Option<String>,
-    pub location: Option<String>
+    pub location: Option<String>,
 }
 
 #[derive(Copy, Clone)]
@@ -123,14 +124,12 @@ impl hyper::net::NetworkStream for DummyNetworkStream {
     }
 }
 
-
 /// A trait specifying functionality to help controlling any request performed by the API.
 /// The trait has a conservative default implementation.
 ///
 /// It contains methods to deal with all common issues, as well with the ones related to
 /// uploading media
 pub trait Delegate {
-
     /// Called at the beginning of any API request. The delegate should store the method
     /// information if he is interesting in knowing more context when further calls to it
     /// are made.
@@ -195,7 +194,11 @@ pub trait Delegate {
     ///
     /// * `json_encoded_value` - The json-encoded value which failed to decode.
     /// * `json_decode_error`  - The decoder error
-    fn response_json_decode_error(&mut self, json_encoded_value: &str, json_decode_error: &json::Error) {
+    fn response_json_decode_error(
+        &mut self,
+        json_encoded_value: &str,
+        json_decode_error: &json::Error,
+    ) {
         let _ = json_encoded_value;
         let _ = json_decode_error;
     }
@@ -208,14 +211,19 @@ pub trait Delegate {
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
-    fn http_failure(&mut self, _: &hyper::client::Response, Option<JsonServerError>, _: Option<ServerError>) -> Retry {
+    fn http_failure(
+        &mut self,
+        _: &hyper::client::Response,
+        Option<JsonServerError>,
+        _: Option<ServerError>,
+    ) -> Retry {
         Retry::Abort
     }
 
     /// Called prior to sending the main request of the given method. It can be used to time
     /// the call or to print progress information.
     /// It's also useful as you can be sure that a request will definitely be made.
-    fn pre_request(&mut self) { }
+    fn pre_request(&mut self) {}
 
     /// Return the size of each chunk of a resumable upload.
     /// Must be a power of two, with 1<<18 being the smallest allowed chunk size.
@@ -253,7 +261,6 @@ pub struct DefaultDelegate;
 
 impl Delegate for DefaultDelegate {}
 
-
 #[derive(Debug)]
 pub enum Error {
     /// The http connection failed
@@ -288,60 +295,66 @@ pub enum Error {
     Failure(hyper::client::Response),
 }
 
-
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::HttpError(ref err) => err.fmt(f),
-            Error::UploadSizeLimitExceeded(ref resource_size, ref max_size) =>
-                writeln!(f, "The media size {} exceeds the maximum allowed upload size of {}"
-                         , resource_size, max_size),
+            Error::UploadSizeLimitExceeded(ref resource_size, ref max_size) => writeln!(
+                f,
+                "The media size {} exceeds the maximum allowed upload size of {}",
+                resource_size, max_size
+            ),
             Error::MissingAPIKey => {
-                (writeln!(f, "The application's API key was not found in the configuration")).ok();
-                writeln!(f, "It is used as there are no Scopes defined for this method.")
-            },
+                (writeln!(
+                    f,
+                    "The application's API key was not found in the configuration"
+                ))
+                .ok();
+                writeln!(
+                    f,
+                    "It is used as there are no Scopes defined for this method."
+                )
+            }
             Error::BadRequest(ref err) => {
                 writeln!(f, "Bad Request ({}): {}", err.error.code, err.error.message)?;
                 for err in err.error.errors.iter() {
-                    writeln!(f, "    {}: {}, {}{}",
-                             err.domain,
-                             err.message,
-                             err.reason,
-                             match &err.location {
-                                 &Some(ref loc) => format!("@{}", loc),
-                                 &None => String::new(),
-                             })?;
+                    writeln!(
+                        f,
+                        "    {}: {}, {}{}",
+                        err.domain,
+                        err.message,
+                        err.reason,
+                        match &err.location {
+                            &Some(ref loc) => format!("@{}", loc),
+                            &None => String::new(),
+                        }
+                    )?;
                 }
                 Ok(())
-            },
-            Error::MissingToken(ref err) =>
-                writeln!(f, "Token retrieval failed with error: {}", err),
-            Error::Cancelled =>
-                writeln!(f, "Operation cancelled by delegate"),
-            Error::FieldClash(field) =>
-                writeln!(f, "The custom parameter '{}' is already provided natively by the CallBuilder.", field),
-            Error::JsonDecodeError(ref json_str, ref err)
-                => writeln!(f, "{}: {}", err, json_str),
-            Error::Failure(ref response) =>
-                writeln!(f, "Http status indicates failure: {:?}", response),
+            }
+            Error::MissingToken(ref err) => {
+                writeln!(f, "Token retrieval failed with error: {}", err)
+            }
+            Error::Cancelled => writeln!(f, "Operation cancelled by delegate"),
+            Error::FieldClash(field) => writeln!(
+                f,
+                "The custom parameter '{}' is already provided natively by the CallBuilder.",
+                field
+            ),
+            Error::JsonDecodeError(ref json_str, ref err) => writeln!(f, "{}: {}", err, json_str),
+            Error::Failure(ref response) => {
+                writeln!(f, "Http status indicates failure: {:?}", response)
+            }
         }
     }
 }
 
 impl error::Error for Error {
-    fn description(&self) -> &str {
-        match *self {
-            Error::HttpError(ref err) => err.description(),
-            Error::JsonDecodeError(_, ref err) => err.description(),
-            _ => "NO DESCRIPTION POSSIBLE - use `Display.fmt()` instead"
-        }
-    }
-
-    fn cause(&self) -> Option<&dyn error::Error> {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
             Error::HttpError(ref err) => err.source(),
             Error::JsonDecodeError(_, ref err) => err.source(),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -369,7 +382,6 @@ pub struct MultiPartReader<'a> {
 }
 
 impl<'a> MultiPartReader<'a> {
-
     /// Reserve memory for exactly the given amount of parts
     pub fn reserve_exact(&mut self, cap: usize) {
         self.raw_parts.reserve_exact(cap);
@@ -386,7 +398,12 @@ impl<'a> MultiPartReader<'a> {
     /// `size`    - the amount of bytes provided by the reader. It will be put onto the header as
     ///             content-size.
     /// `mime`    - It will be put onto the content type
-    pub fn add_part(&mut self, reader: &'a mut dyn Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
+    pub fn add_part(
+        &mut self,
+        reader: &'a mut dyn Read,
+        size: u64,
+        mime_type: Mime,
+    ) -> &mut MultiPartReader<'a> {
         let mut headers = Headers::new();
         headers.set(ContentType(mime_type));
         headers.set(ContentLength(size));
@@ -400,13 +417,18 @@ impl<'a> MultiPartReader<'a> {
         Mime(
             TopLevel::Multipart,
             SubLevel::Ext("Related".to_string()),
-            vec![(Attr::Ext("boundary".to_string()), Value::Ext(BOUNDARY.to_string()))],
+            vec![(
+                Attr::Ext("boundary".to_string()),
+                Value::Ext(BOUNDARY.to_string()),
+            )],
         )
     }
 
     /// Returns true if we are totally used
     fn is_depleted(&self) -> bool {
-        self.raw_parts.len() == 0 && self.current_part.is_none() && self.last_part_boundary.is_none()
+        self.raw_parts.len() == 0
+            && self.current_part.is_none()
+            && self.last_part_boundary.is_none()
     }
 
     /// Returns true if we are handling our last part
@@ -417,26 +439,37 @@ impl<'a> MultiPartReader<'a> {
 
 impl<'a> Read for MultiPartReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        match (self.raw_parts.len(),
-               self.current_part.is_none(),
-               self.last_part_boundary.is_none()) {
+        match (
+            self.raw_parts.len(),
+            self.current_part.is_none(),
+            self.last_part_boundary.is_none(),
+        ) {
             (_, _, false) => {
-                let br = self.last_part_boundary.as_mut().unwrap().read(buf).unwrap_or(0);
+                let br = self
+                    .last_part_boundary
+                    .as_mut()
+                    .unwrap()
+                    .read(buf)
+                    .unwrap_or(0);
                 if br < buf.len() {
                     self.last_part_boundary = None;
                 }
-                return Ok(br)
-            },
+                return Ok(br);
+            }
             (0, true, true) => return Ok(0),
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                (write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING,
-                                                headers, LINE_ENDING)).unwrap();
+                (write!(
+                    &mut c,
+                    "{}--{}{}{}{}",
+                    LINE_ENDING, BOUNDARY, LINE_ENDING, headers, LINE_ENDING
+                ))
+                .unwrap();
                 c.seek(SeekFrom::Start(0)).unwrap();
                 self.current_part = Some((c, reader));
             }
-            _ => {},
+            _ => {}
         }
 
         // read headers as long as possible
@@ -453,14 +486,15 @@ impl<'a> Read for MultiPartReader<'a> {
                         // before clearing the last part, we will add the boundary that
                         // will be written last
                         self.last_part_boundary = Some(Cursor::new(
-                                                        format!("{}--{}--", LINE_ENDING, BOUNDARY).into_bytes()))
+                            format!("{}--{}--", LINE_ENDING, BOUNDARY).into_bytes(),
+                        ))
                     }
                     // We are depleted - this can trigger the next part to come in
                     self.current_part = None;
                 }
                 let mut total_bytes_read = hb + bytes_read;
                 while total_bytes_read < buf.len() && !self.is_depleted() {
-                    match self.read(&mut buf[total_bytes_read ..]) {
+                    match self.read(&mut buf[total_bytes_read..]) {
                         Ok(br) => total_bytes_read += br,
                         Err(err) => return Err(err),
                     }
@@ -487,13 +521,19 @@ pub struct XUploadContentType(pub Mime);
 
 impl ::std::ops::Deref for XUploadContentType {
     type Target = Mime;
-    fn deref<'a>(&'a self) -> &'a Mime { &self.0 }
+    fn deref<'a>(&'a self) -> &'a Mime {
+        &self.0
+    }
 }
 impl ::std::ops::DerefMut for XUploadContentType {
-    fn deref_mut<'a>(&'a mut self) -> &'a mut Mime { &mut self.0 }
+    fn deref_mut<'a>(&'a mut self) -> &'a mut Mime {
+        &mut self.0
+    }
 }
 impl Header for XUploadContentType {
-    fn header_name() -> &'static str { "X-Upload-Content-Type" }
+    fn header_name() -> &'static str {
+        "X-Upload-Content-Type"
+    }
     fn parse_header(raw: &[Vec<u8>]) -> hyper::error::Result<Self> {
         hyper::header::parsing::from_one_raw_str(raw).map(XUploadContentType)
     }
@@ -512,7 +552,7 @@ impl Display for XUploadContentType {
 #[derive(Clone, PartialEq, Debug)]
 pub struct Chunk {
     pub first: u64,
-    pub last: u64
+    pub last: u64,
 }
 
 impl fmt::Display for Chunk {
@@ -529,20 +569,18 @@ impl FromStr for Chunk {
     fn from_str(s: &str) -> std::result::Result<Chunk, &'static str> {
         let parts: Vec<&str> = s.split('-').collect();
         if parts.len() != 2 {
-            return Err("Expected two parts: %i-%i")
+            return Err("Expected two parts: %i-%i");
         }
-        Ok(
-            Chunk {
-                first: match FromStr::from_str(parts[0]) {
-                    Ok(d) => d,
-                    _ => return Err("Couldn't parse 'first' as digit")
-                },
-                last: match FromStr::from_str(parts[1]) {
-                    Ok(d) => d,
-                    _ => return Err("Couldn't parse 'last' as digit")
-                }
-            }
-        )
+        Ok(Chunk {
+            first: match FromStr::from_str(parts[0]) {
+                Ok(d) => d,
+                _ => return Err("Couldn't parse 'first' as digit"),
+            },
+            last: match FromStr::from_str(parts[1]) {
+                Ok(d) => d,
+                _ => return Err("Couldn't parse 'last' as digit"),
+            },
+        })
     }
 }
 
@@ -564,13 +602,12 @@ impl Header for ContentRange {
     }
 }
 
-
 impl HeaderFormat for ContentRange {
     fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt.write_str("bytes ")?;
         match self.range {
             Some(ref c) => c.fmt(fmt)?,
-            None => fmt.write_str("*")?
+            None => fmt.write_str("*")?,
         }
         (write!(fmt, "/{}", self.total_length)).ok();
         Ok(())
@@ -592,7 +629,7 @@ impl Header for RangeResponseHeader {
                 const PREFIX: &'static str = "bytes ";
                 if s.starts_with(PREFIX) {
                     if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
-                        return  Ok(RangeResponseHeader(c))
+                        return Ok(RangeResponseHeader(c));
                     }
                 }
             }
@@ -619,40 +656,49 @@ pub struct ResumableUploadHelper<'a, A: 'a> {
     pub url: &'a str,
     pub reader: &'a mut dyn ReadSeek,
     pub media_type: Mime,
-    pub content_length: u64
+    pub content_length: u64,
 }
 
 impl<'a, A> ResumableUploadHelper<'a, A>
-    where A: oauth2::GetToken {
-
-    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::Result<hyper::client::Response>> {
+where
+    A: oauth2::GetToken,
+{
+    fn query_transfer_status(
+        &mut self,
+    ) -> std::result::Result<u64, hyper::Result<hyper::client::Response>> {
         loop {
-            match self.client.post(self.url)
+            match self
+                .client
+                .post(self.url)
                 .header(UserAgent(self.user_agent.to_string()))
-                .header(ContentRange { range: None, total_length: self.content_length })
+                .header(ContentRange {
+                    range: None,
+                    total_length: self.content_length,
+                })
                 .header(self.auth_header.clone())
-                .send() {
+                .send()
+            {
                 Ok(r) => {
                     // 308 = resume-incomplete == PermanentRedirect
                     let headers = r.headers.clone();
                     let h: &RangeResponseHeader = match headers.get() {
                         Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
-                        None|Some(_) => {
+                        None | Some(_) => {
                             if let Retry::After(d) = self.delegate.http_failure(&r, None, None) {
                                 sleep(d);
                                 continue;
                             }
-                            return Err(Ok(r))
+                            return Err(Ok(r));
                         }
                     };
-                    return Ok(h.0.last)
+                    return Ok(h.0.last);
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
                         sleep(d);
                         continue;
                     }
-                    return Err(Err(err))
+                    return Err(Err(err));
                 }
             }
         }
@@ -666,61 +712,68 @@ impl<'a, A> ResumableUploadHelper<'a, A>
             Some(s) => s,
             None => match self.query_transfer_status() {
                 Ok(s) => s,
-                Err(result) => return Some(result)
-            }
+                Err(result) => return Some(result),
+            },
         };
 
         const MIN_CHUNK_SIZE: u64 = 1 << 18;
         let chunk_size = match self.delegate.chunk_size() {
             cs if cs > MIN_CHUNK_SIZE => cs,
-            _ => MIN_CHUNK_SIZE
+            _ => MIN_CHUNK_SIZE,
         };
 
         self.reader.seek(SeekFrom::Start(start)).unwrap();
         loop {
             let request_size = match self.content_length - start {
                 rs if rs > chunk_size => chunk_size,
-                rs => rs
+                rs => rs,
             };
 
             let mut section_reader = self.reader.take(request_size);
             let range_header = ContentRange {
-                range: Some(Chunk {first: start, last: start + request_size - 1}),
-                total_length: self.content_length
+                range: Some(Chunk {
+                    first: start,
+                    last: start + request_size - 1,
+                }),
+                total_length: self.content_length,
             };
             start += request_size;
             if self.delegate.cancel_chunk_upload(&range_header) {
-                return None
+                return None;
             }
-            let res = self.client.post(self.url)
-                                 .header(range_header)
-                                 .header(ContentType(self.media_type.clone()))
-                                 .header(UserAgent(self.user_agent.to_string()))
-                                 .body(&mut section_reader)
-                                 .send();
+            let res = self
+                .client
+                .post(self.url)
+                .header(range_header)
+                .header(ContentType(self.media_type.clone()))
+                .header(UserAgent(self.user_agent.to_string()))
+                .body(&mut section_reader)
+                .send();
             match res {
                 Ok(mut res) => {
-                    if res.status == StatusCode::PermanentRedirect  {
-                        continue
+                    if res.status == StatusCode::PermanentRedirect {
+                        continue;
                     }
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let Retry::After(d) = self.delegate.http_failure(&res,
-                                                        json::from_str(&json_err).ok(),
-                                                        json::from_str(&json_err).ok()) {
+                        if let Retry::After(d) = self.delegate.http_failure(
+                            &res,
+                            json::from_str(&json_err).ok(),
+                            json::from_str(&json_err).ok(),
+                        ) {
                             sleep(d);
                             continue;
                         }
                     }
-                    return Some(Ok(res))
-                },
+                    return Some(Ok(res));
+                }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
                         sleep(d);
                         continue;
                     }
-                    return Some(Err(err))
+                    return Some(Err(err));
                 }
             }
         }

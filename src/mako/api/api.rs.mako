@@ -129,7 +129,7 @@ ${rbuild.new(resource, c)}
 // CallBuilders   ###
 // #################
 
-% for resource, methods in c.rta_map.iteritems():
+% for resource, methods in c.rta_map.items():
 % for method in methods:
 ${mbuild.new(resource, method, c)}
 
