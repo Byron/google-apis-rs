@@ -49,7 +49,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: ${hub_type_name}<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>>>,
     gp: ${"Vec<&'static str>"},
     gpm: Vec<(&'static str, &'static str)>,
 }

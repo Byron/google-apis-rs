@@ -50,7 +50,7 @@ ${lib.hub_usage_example(c)}\
 </%block>
 pub struct ${hub_type}${ht_params} {
     client: RefCell<C>,
-    auth: RefCell<A>,
+    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -61,7 +61,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_para
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     where  ${', '.join(hub_type_bounds())} {
 
-    pub fn new(client: C, authenticator: A) -> ${hub_type}${ht_params} {
+    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),

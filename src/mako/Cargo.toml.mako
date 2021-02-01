@@ -17,6 +17,7 @@ documentation = "${util.doc_base_url()}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 autobins = false
+edition = "2018"
 
 % if cargo.get('is_executable', False):
 [[bin]]
@@ -24,25 +25,21 @@ name = "${util.program_name()}"
 path = "src/main.rs"
 % endif
 
-[dev-dependencies]
-hyper-rustls = "^0.6"
-
 [dependencies]
-hyper = "^ 0.10"
+hyper = "^ 0.14"
+hyper-rustls = "^0.22"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = { version = "^ 1.0", default-features = false }
+yup-oauth2 = "^ 5.0"
+tokio = "^ 1.0"
+itertools = "^ 0.10"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
 
-[features]
-default = ["openssl"]
-openssl = ["yup-oauth2/default"]
-rustls = ["yup-oauth2/no-openssl"]
 <%
   api_name = util.library_name()
   crate_name_we_depend_on = None

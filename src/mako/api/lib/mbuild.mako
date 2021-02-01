@@ -412,7 +412,7 @@ match result {
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = 'client::Result<hyper::client::Response>'
+    rtype = 'client::Result<hyper::Response<hyper::body::Body>>'
     response_schema = method_response(c, m)
 
     supports_download = m.get('supportsMediaDownload', False);
@@ -420,7 +420,7 @@ match result {
     if response_schema:
         if not supports_download:
             reserved_params = ['alt']
-        rtype = 'client::Result<(hyper::client::Response, %s)>' % (response_schema.id)
+        rtype = 'client::Result<(hyper::Response<hyper::body::Body>, %s)>' % (response_schema.id)
 
     mtype_param = 'RS'
 
@@ -440,9 +440,9 @@ match result {
     # end handle media params
 
     if doit_without_upload:
-        action_fn = qualifier + 'fn ' + "doit_without_upload" + type_params + '(mut self)' + ' -> ' + rtype + where
+        action_fn = qualifier + 'async fn ' + "doit_without_upload" + type_params + '(mut self)' + ' -> ' + rtype + where
     else:
-        action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
+        action_fn = qualifier + 'async fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
 
     field_params = [p for p in params if p.get('is_query_param', True)]
 
@@ -504,7 +504,7 @@ match result {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         % endif
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         use client::ToParts;
         let mut dd = client::DefaultDelegate;
         let mut dlg: &mut dyn client::Delegate = match ${delegate} {
@@ -678,10 +678,10 @@ else {
         }
         % endif
 
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+        let url = url::Url::parse_with_params(&url, params).unwrap();
 
         % if request_value:
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).expect("serde to work");
@@ -702,10 +702,11 @@ else {
 
         loop {
             % if default_scope:
-            let token = match ${auth_call}.token(self.${api.properties.scopes}.keys()) {
-                Ok(token) => token,
+            let authenticator = ${auth_call};
+            let token = match authenticator.token(&self.${api.properties.scopes}.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
                 Err(err) => {
-                    match  dlg.token(&*err) {
+                    match  dlg.token(&err) {
                         Some(token) => token,
                         None => {
                             ${delegate_finish}(false);
@@ -714,7 +715,6 @@ else {
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
             % endif
             % if request_value:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
@@ -724,12 +724,12 @@ else {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(client::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
+                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
+                    Ok(hyper::Response::builder()
+                        .status(hyper::StatusCode::OK)
+                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .body(hyper::body::Body::empty())
+                        .unwrap())
                 } else {
             % endif
 <%block filter="indent_by(resumable_media_param and 4 or 0)">\
@@ -742,48 +742,59 @@ else {
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                  .add_part(&mut reader, size, reader_mime_type.clone());
                         let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut dyn io::Read, ContentType(mime_type))
+                        (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, format!("{}", mime_type)))
                     },
-                    _ => (&mut request_value_reader as &mut dyn io::Read, ContentType(json_mime_type.clone())),
+                    _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, format!("{}", json_mime_type))),
                 };
             % endif
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))\
-                    % if default_scope:
-
-                    .header(auth_header.clone())\
-                    % endif
-                    % if request_value:
-                    % if not simple_media_param:
-
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader)\
-                    % else:
-
-                    .header(content_type)
-                    .body(&mut body_reader)\
-                    % endif ## not simple_media_param
-                    % endif
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(${method_name_to_variant(m.httpMethod)}).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())\
+                        % if default_scope:
+                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()))\
+                        % endif
 ;
-                % if simple_media_param and not request_value:
-                if protocol == "${simple_media_param.protocol}" {
-                    ${READER_SEEK | indent_all_but_first_by(4)}
-                    req = req.header(ContentType(reader_mime_type.clone()))
-                             .header(ContentLength(size))
-                             .body(&mut reader);
-                }
-                % endif ## media upload handling
+
                 % if resumable_media_param:
                 upload_url_from_server = true;
                 if protocol == "${resumable_media_param.protocol}" {
-                    req = req.header(client::XUploadContentType(reader_mime_type.clone()));
+                    req_builder = req_builder.header("X-Upload-Content-Type", format!("{}", reader_mime_type));
                 }
                 % endif
 
-                dlg.pre_request();
-                req.send()
+                % if request_value:
+                    % if not simple_media_param:
+                        let request = req_builder
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type))
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()))\
+                    % else:
+                        let mut body_reader_bytes = vec![];
+                        body_reader.read_to_end(&mut body_reader_bytes).unwrap();
+                        let request = req_builder
+                        .header(content_type.0, content_type.1)
+                        .body(hyper::body::Body::from(body_reader_bytes))\
+                    % endif ## not simple_media_param
+                % else:
+                    % if simple_media_param:
+                        let request = if protocol == "${simple_media_param.protocol}" {
+                            ${READER_SEEK | indent_all_but_first_by(4)}
+                            req_builder.header(CONTENT_TYPE, reader_mime_type.clone())
+                                     .header(CONTENT_LENGTH, size)
+                                     .body(&mut reader);
+                        } else {
+                            req_builder.body(hyper::body::Body::empty())
+                        }\
+                    % else:
+                        let request = req_builder
+                        .body(hyper::body::Body::empty())\
+                    % endif
+                % endif
+;
+
+                client.borrow_mut().request(request.unwrap()).await
+                
 </%block>\
                 % if resumable_media_param:
             }
@@ -792,7 +803,7 @@ else {
 
             match req_result {
                 Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
                         continue;
                     }
@@ -800,24 +811,33 @@ else {
                     return Err(client::Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&json_err).ok();
-                        let server_error = json::from_str::<client::ServerError>(&json_err)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&json_err).map(|r| r.error))
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
                             .ok();
 
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
                                                               json_server_error,
                                                               server_error) {
                             sleep(d);
                             continue;
                         }
                         ${delegate_finish}(false);
-                        return match json::from_str::<client::ErrorResponse>(&json_err){
-                            Err(_) => Err(client::Error::Failure(res)),
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
                             Ok(serr) => Err(client::Error::BadRequest(serr))
                         }
                     }
@@ -826,7 +846,7 @@ else {
                         ${READER_SEEK | indent_all_but_first_by(6)}
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            let url_str = &reconstructed_result.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
                                 dlg.store_upload_url(Some(url_str));
                             }
@@ -837,12 +857,12 @@ else {
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
+                                auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
                                 content_length: size
-                            }.upload()
+                            }.upload().await
                         };
                         match upload_result {
                             None => {
@@ -858,7 +878,7 @@ else {
                             ## decoded next
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
-                                if !res.status.is_success() {
+                                if !res.status().is_success() {
                                     ## delegate was called in upload() already - don't tell him again
                                     dlg.store_upload_url(None);
                                     ${delegate_finish}(false);
@@ -875,22 +895,20 @@ else {
 if enable_resource_parsing \
                     % endif
 {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
                             Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(client::Error::JsonDecodeError(json_response, err));
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
                             }
                         }
                     }\
                     % if supports_download:
- else { (res, Default::default()) }\
+ else { (reconstructed_result, Default::default()) }\
                     % endif
 ;
                 % else:
-                    let result_value = res;
+                    let result_value = reconstructed_result;
                 % endif
 
                     ${delegate_finish}(true);
@@ -906,9 +924,9 @@ if enable_resource_parsing \
     % for item_name, item in p.info.items():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
-    pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
+    pub async fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
                 where ${mtype_param}: client::ReadSeek {
-        self.${api.terms.action}(${p.type.arg_name}, mime_type, "${p.protocol}")
+        self.${api.terms.action}(${p.type.arg_name}, mime_type, "${p.protocol}").await
     }
     % endfor
 </%def>
