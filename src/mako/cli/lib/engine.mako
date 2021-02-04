@@ -31,14 +31,13 @@
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-use client::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
@@ -49,7 +48,8 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: ${hub_type_name}<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>>>,
+    hub: ${hub_type_name}<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: ${"Vec<&'static str>"},
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -58,14 +58,14 @@ struct Engine<'n> {
 impl<'n> Engine<'n> {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
-    fn ${call_method_ident(resource, method)}(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn ${call_method_ident(resource, method)}(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         ${self._method_call_impl(c, resource, method) | indent_all_but_first_by(2)}
     }
 
     % endfor # each method
 % endfor
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -76,7 +76,7 @@ impl<'n> Engine<'n> {
                 match opt.subcommand() {
                     % for method in sorted(c.rta_map[resource]):
                     ("${mangle_subcommand(method)}", Some(opt)) => {
-                        call_result = self.${call_method_ident(resource, method)}(opt, dry_run, &mut err);
+                        call_result = self.${call_method_ident(resource, method)}(opt, dry_run, &mut err).await;
                     },
                     % endfor # each method
                     _ => {
@@ -103,7 +103,7 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match client::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
@@ -117,12 +117,10 @@ impl<'n> Engine<'n> {
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        ${self._debug_client(DEBUG_AUTH_FLAG) | indent_all_but_first_by(10)},
-                                        JsonTokenStorage {
-                                          program_name: "${util.program_name()}",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 
         let client =
             ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
@@ -138,15 +136,15 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
@@ -306,7 +304,7 @@ if dry_run {
         % endfor
         CallType::Standard => unreachable!()
         % else:
-        CallType::Standard => call.${api.terms.action}(),
+        CallType::Standard => call.${api.terms.action}().await,
         _ => unreachable!()
         % endif
     } {

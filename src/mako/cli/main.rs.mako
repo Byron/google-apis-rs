@@ -15,6 +15,9 @@
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
+extern crate tokio;
+
+#[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
@@ -36,7 +39,8 @@ mod client;
 
 ${engine.new(c)}\
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     ${argparse.new(c) | indent_all_but_first_by(1)}\
     let matches = app.get_matches();
@@ -48,7 +52,7 @@ fn main() {
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

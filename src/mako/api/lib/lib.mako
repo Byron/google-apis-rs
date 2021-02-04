@@ -179,11 +179,11 @@ ${util.crate_name()} = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ${'##'} A complete example
@@ -249,7 +249,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use ${util.library_name()}::${hub_type};
 
 % if comments:
@@ -264,9 +264,10 @@ let secret: ApplicationSecret = Default::default();
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 % endif
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
 let mut hub = ${hub_type}::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);\
 </%def>
 
