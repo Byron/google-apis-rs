@@ -5,7 +5,7 @@
     from util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and, escape_rust_string)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
-                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG,
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, MODE_ARG, SCOPE_ARG,
                      CONFIG_DIR_ARG, FILE_FLAG, MIME_FLAG, subcommand_md_filename)
 
     def rust_boolean(v):
@@ -71,12 +71,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ${CONFIG_DIR}]
-  --${DEBUG_FLAG}
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --${DEBUG_AUTH_FLAG}
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 </%def>
 
 
@@ -114,16 +108,7 @@ Configuration:
 
     global_args.append((
         DEBUG_FLAG,
-        "Output all server communication to standard error. `tx` and `rx` are placed "
-        "into the same stream.",
-        None,
-        False,
-    ))
-
-    global_args.append((
-        DEBUG_AUTH_FLAG,
-        "Output all communication related to authentication to standard error. `tx` "
-        "and `rx` are placed into the same stream.",
+        "Debug print all errors",
         None,
         False,
     ))

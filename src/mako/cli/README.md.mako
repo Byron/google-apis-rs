@@ -1,6 +1,6 @@
 <%
     from util import (markdown_comment, new_context)
-    from cli import (CONFIG_DIR, CONFIG_DIR_FLAG, SCOPE_FLAG, application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG)
+    from cli import (CONFIG_DIR, CONFIG_DIR_FLAG, SCOPE_FLAG, application_secret_path, DEBUG_FLAG)
 
     c = new_context(schemas, resources, context.get('methods'))
 %>\
@@ -88,10 +88,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--${DEBUG_FLAG}` flag will print all client-server communication to standard error, whereas the `--${DEBUG_AUTH_FLAG}` flag
-will cause all communication related to authentication to standard error.
-If the `--${DEBUG_FLAG}` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--${DEBUG_FLAG}` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `${util.program_name()} --${DEBUG_FLAG} <resource> <method> [options] 2>debug.txt`.
 

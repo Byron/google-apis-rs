@@ -14,13 +14,11 @@
 </%block>
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-#[macro_use]
 extern crate tokio;
 
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
 extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;

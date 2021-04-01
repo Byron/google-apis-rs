@@ -26,7 +26,6 @@ path = "src/main.rs"
 % endif
 
 [dependencies]
-hyper = "^ 0.14"
 hyper-rustls = "^0.22"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.2.0"
@@ -34,7 +33,6 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 5.0"
-tokio = "^ 1.0"
 itertools = "^ 0.10"
 % for dep in cargo.get('dependencies', list()):
 ${dep}

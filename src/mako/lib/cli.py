@@ -18,7 +18,6 @@ KEY_VALUE_ARG = 'kv'
 SCOPE_FLAG = 'scope'
 CONFIG_DIR_FLAG = 'config-dir'
 DEBUG_FLAG = 'debug'
-DEBUG_AUTH_FLAG = 'debug-auth'
 DEFAULT_MIME = 'application/octet-stream'
 
 MODE_ARG = 'mode'

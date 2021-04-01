@@ -7,7 +7,7 @@
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
-                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG,
+                     application_secret_path, CONFIG_DIR_FLAG, req_value, MODE_ARG,
                      opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP,
                      CTYPE_TO_ENUM_MAP)
 
@@ -122,8 +122,7 @@ impl<'n> Engine<'n> {
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
         ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 
-        let client =
-            ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
 <% gpm = gen_global_parameter_names(parameters) %>\
         let engine = Engine {
             opt: opt,
@@ -150,16 +149,6 @@ impl<'n> Engine<'n> {
         }
     }
 }
-</%def>
-
-<%def name="_debug_client(flag_name)" buffered="True">\
-if opt.is_present("${flag_name}") {
-    hyper::Client::with_connector(mock::TeeConnector {
-            connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-        })
-} else {
-    hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-}\
 </%def>
 
 <%def name="_method_call_impl(c, resource, method)" buffered="True">\
