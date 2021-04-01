@@ -742,9 +742,9 @@ else {
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                  .add_part(&mut reader, size, reader_mime_type.clone());
                         let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, format!("{}", mime_type)))
+                        (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
                     },
-                    _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, format!("{}", json_mime_type))),
+                    _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                 };
             % endif
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -766,21 +766,21 @@ else {
                 % if request_value:
                     % if not simple_media_param:
                         let request = req_builder
-                        .header(CONTENT_TYPE, format!("{}", json_mime_type))
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()))\
                     % else:
                         let mut body_reader_bytes = vec![];
                         body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                         let request = req_builder
-                        .header(content_type.0, content_type.1)
+                        .header(content_type.0, content_type.1.to_string())
                         .body(hyper::body::Body::from(body_reader_bytes))\
                     % endif ## not simple_media_param
                 % else:
                     % if simple_media_param:
                         let request = if protocol == "${simple_media_param.protocol}" {
                             ${READER_SEEK | indent_all_but_first_by(4)}
-                            req_builder.header(CONTENT_TYPE, reader_mime_type.clone())
+                            req_builder.header(CONTENT_TYPE, reader_mime_type.to_string())
                                      .header(CONTENT_LENGTH, size)
                                      .body(&mut reader);
                         } else {
