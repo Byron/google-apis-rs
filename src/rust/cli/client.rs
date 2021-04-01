@@ -102,7 +102,7 @@ pub enum CallType {
 arg_enum! {
     pub enum UploadProtocol {
         Simple,
-        Resumable
+        // Resumable // This seems to be lost during the async conversion
     }
 }
 
@@ -110,7 +110,7 @@ impl AsRef<str> for UploadProtocol {
     fn as_ref(&self) -> &str {
         match *self {
             UploadProtocol::Simple => "simple",
-            UploadProtocol::Resumable => "resumable",
+            // UploadProtocol::Resumable => "resumable",
         }
     }
 }
