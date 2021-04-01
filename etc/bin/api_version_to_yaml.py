@@ -52,7 +52,7 @@ for api_name in sorted(os.listdir(api_base)):
     api_data[api_name] = list(sorted(versions))
 # end for each item in api-base
 
-fp = open(sys.argv[3], 'wb')
+fp = open(sys.argv[3], 'wt')
 fp.write("# DO NOT EDIT !!!\n")
 fp.write("# Created by '%s'\n" % ' '.join(sys.argv))
 fp.write("# DO NOT EDIT !!!\n")

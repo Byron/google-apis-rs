@@ -3,1673 +3,1682 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/photoslibrary": {
-                    "description": "View and manage your Google Photos library"
-                }, 
+                    "description": "See, upload, and organize items in your Google Photos library"
+                },
                 "https://www.googleapis.com/auth/photoslibrary.appendonly": {
                     "description": "Add to your Google Photos library"
-                }, 
+                },
+                "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata": {
+                    "description": "Edit the info in your photos, videos, and albums created within this app, including titles, descriptions, and covers"
+                },
                 "https://www.googleapis.com/auth/photoslibrary.readonly": {
                     "description": "View your Google Photos library"
-                }, 
+                },
                 "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata": {
                     "description": "Manage photos added by this app"
-                }, 
+                },
                 "https://www.googleapis.com/auth/photoslibrary.sharing": {
                     "description": "Manage and add to shared albums on your behalf"
                 }
             }
         }
-    }, 
-    "basePath": "", 
-    "baseUrl": "https://photoslibrary.googleapis.com/", 
-    "batchPath": "batch", 
-    "canonicalName": "Photos Library", 
-    "description": "Manage photos, videos, and albums in Google Photos\n", 
-    "discoveryVersion": "v1", 
-    "documentationLink": "https://developers.google.com/photos/", 
-    "fullyEncodeReservedExpansion": true, 
+    },
+    "basePath": "",
+    "baseUrl": "https://photoslibrary.googleapis.com/",
+    "batchPath": "batch",
+    "canonicalName": "Photos Library",
+    "description": "Manage photos, videos, and albums in Google Photos ",
+    "discoveryVersion": "v1",
+    "documentationLink": "https://developers.google.com/photos/",
+    "fullyEncodeReservedExpansion": true,
     "icons": {
-        "x16": "http://www.google.com/images/icons/product/search-16.gif", 
+        "x16": "http://www.google.com/images/icons/product/search-16.gif",
         "x32": "http://www.google.com/images/icons/product/search-32.gif"
-    }, 
-    "id": "photoslibrary:v1", 
-    "kind": "discovery#restDescription", 
-    "mtlsRootUrl": "https://photoslibrary.mtls.googleapis.com/", 
-    "name": "photoslibrary", 
-    "ownerDomain": "google.com", 
-    "ownerName": "Google", 
+    },
+    "id": "photoslibrary:v1",
+    "kind": "discovery#restDescription",
+    "mtlsRootUrl": "https://photoslibrary.mtls.googleapis.com/",
+    "name": "photoslibrary",
+    "ownerDomain": "google.com",
+    "ownerName": "Google",
     "parameters": {
         "$.xgafv": {
-            "description": "V1 error format.", 
+            "description": "V1 error format.",
             "enum": [
-                "1", 
+                "1",
                 "2"
-            ], 
+            ],
             "enumDescriptions": [
-                "v1 error format", 
+                "v1 error format",
                 "v2 error format"
-            ], 
-            "location": "query", 
+            ],
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "access_token": {
-            "description": "OAuth access token.", 
-            "location": "query", 
+            "description": "OAuth access token.",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "alt": {
-            "default": "json", 
-            "description": "Data format for response.", 
+            "default": "json",
+            "description": "Data format for response.",
             "enum": [
-                "json", 
-                "media", 
+                "json",
+                "media",
                 "proto"
-            ], 
+            ],
             "enumDescriptions": [
-                "Responses with Content-Type of application/json", 
-                "Media download with context-dependent Content-Type", 
+                "Responses with Content-Type of application/json",
+                "Media download with context-dependent Content-Type",
                 "Responses with Content-Type of application/x-protobuf"
-            ], 
-            "location": "query", 
+            ],
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "callback": {
-            "description": "JSONP", 
-            "location": "query", 
+            "description": "JSONP",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "fields": {
-            "description": "Selector specifying which fields to include in a partial response.", 
-            "location": "query", 
+            "description": "Selector specifying which fields to include in a partial response.",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "key": {
-            "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.", 
-            "location": "query", 
+            "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "oauth_token": {
-            "description": "OAuth 2.0 token for the current user.", 
-            "location": "query", 
+            "description": "OAuth 2.0 token for the current user.",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "prettyPrint": {
-            "default": "true", 
-            "description": "Returns response with indentations and line breaks.", 
-            "location": "query", 
+            "default": "true",
+            "description": "Returns response with indentations and line breaks.",
+            "location": "query",
             "type": "boolean"
-        }, 
+        },
         "quotaUser": {
-            "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.", 
-            "location": "query", 
+            "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "uploadType": {
-            "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").", 
-            "location": "query", 
+            "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+            "location": "query",
             "type": "string"
-        }, 
+        },
         "upload_protocol": {
-            "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").", 
-            "location": "query", 
+            "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+            "location": "query",
             "type": "string"
         }
-    }, 
-    "protocol": "rest", 
+    },
+    "protocol": "rest",
     "resources": {
         "albums": {
             "methods": {
                 "addEnrichment": {
-                    "description": "Adds an enrichment at a specified position in a defined album.", 
-                    "flatPath": "v1/albums/{albumsId}:addEnrichment", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.albums.addEnrichment", 
+                    "description": "Adds an enrichment at a specified position in a defined album.",
+                    "flatPath": "v1/albums/{albumsId}:addEnrichment",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.albums.addEnrichment",
                     "parameterOrder": [
                         "albumId"
-                    ], 
+                    ],
                     "parameters": {
                         "albumId": {
-                            "description": "Identifier of the album where the enrichment is to be added.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the album where the enrichment is to be added.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+albumId}:addEnrichment", 
+                    },
+                    "path": "v1/albums/{+albumId}:addEnrichment",
                     "request": {
                         "$ref": "AddEnrichmentToAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "AddEnrichmentToAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.appendonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.appendonly",
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "batchAddMediaItems": {
-                    "description": "Adds one or more media items in a user's Google Photos library to\nan album. The media items and albums must have been created by the\ndeveloper via the API.\n\nMedia items are added to the end of the album. If multiple media items are\ngiven, they are added in the order specified in this call.\n\nEach album can contain up to 20,000 media items.\n\nOnly media items that are in the user's library can be added to an\nalbum. For albums that are shared, the album must either be owned by the\nuser or the user must have joined the album as a collaborator.\n\nPartial success is not supported. The entire request will fail if an\ninvalid media item or album is specified.", 
-                    "flatPath": "v1/albums/{albumsId}:batchAddMediaItems", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.albums.batchAddMediaItems", 
+                    "description": "Adds one or more media items in a user's Google Photos library to an album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Only media items that are in the user's library can be added to an album. For albums that are shared, the album must either be owned by the user or the user must have joined the album as a collaborator. Partial success is not supported. The entire request will fail if an invalid media item or album is specified.",
+                    "flatPath": "v1/albums/{albumsId}:batchAddMediaItems",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.albums.batchAddMediaItems",
                     "parameterOrder": [
                         "albumId"
-                    ], 
+                    ],
                     "parameters": {
                         "albumId": {
-                            "description": "Identifier of the Album that the\nmedia items are added to.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the Album that the media items are added to.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+albumId}:batchAddMediaItems", 
+                    },
+                    "path": "v1/albums/{+albumId}:batchAddMediaItems",
                     "request": {
                         "$ref": "BatchAddMediaItemsToAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "BatchAddMediaItemsToAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.appendonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.appendonly",
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "batchRemoveMediaItems": {
-                    "description": "Removes one or more media items from a specified album. The media items and\nthe album must have been created by the developer via the API.\n\nFor albums that are shared, this action is only supported for media items\nthat were added to the album by this user, or for all media items if the\nalbum was created by this user.\n\nPartial success is not supported. The entire request will fail and no\naction will be performed on the album if an invalid media item or album is\nspecified.", 
-                    "flatPath": "v1/albums/{albumsId}:batchRemoveMediaItems", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.albums.batchRemoveMediaItems", 
+                    "description": "Removes one or more media items from a specified album. The media items and the album must have been created by the developer via the API. For albums that are shared, this action is only supported for media items that were added to the album by this user, or for all media items if the album was created by this user. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified.",
+                    "flatPath": "v1/albums/{albumsId}:batchRemoveMediaItems",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.albums.batchRemoveMediaItems",
                     "parameterOrder": [
                         "albumId"
-                    ], 
+                    ],
                     "parameters": {
                         "albumId": {
-                            "description": "Identifier of the Album that the media\nitems are to be removed from.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the Album that the media items are to be removed from.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+albumId}:batchRemoveMediaItems", 
+                    },
+                    "path": "v1/albums/{+albumId}:batchRemoveMediaItems",
                     "request": {
                         "$ref": "BatchRemoveMediaItemsFromAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "BatchRemoveMediaItemsFromAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
                         "https://www.googleapis.com/auth/photoslibrary"
                     ]
-                }, 
+                },
                 "create": {
-                    "description": "Creates an album in a user's Google Photos library.", 
-                    "flatPath": "v1/albums", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.albums.create", 
-                    "parameterOrder": [], 
-                    "parameters": {}, 
-                    "path": "v1/albums", 
+                    "description": "Creates an album in a user's Google Photos library.",
+                    "flatPath": "v1/albums",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.albums.create",
+                    "parameterOrder": [],
+                    "parameters": {},
+                    "path": "v1/albums",
                     "request": {
                         "$ref": "CreateAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "Album"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.appendonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.appendonly",
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "get": {
-                    "description": "Returns the album based on the specified `albumId`.\nThe `albumId` must be the ID of an album owned by the user or a shared\nalbum that the user has joined.", 
-                    "flatPath": "v1/albums/{albumsId}", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.albums.get", 
+                    "description": "Returns the album based on the specified `albumId`. The `albumId` must be the ID of an album owned by the user or a shared album that the user has joined.",
+                    "flatPath": "v1/albums/{albumsId}",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.albums.get",
                     "parameterOrder": [
                         "albumId"
-                    ], 
+                    ],
                     "parameters": {
                         "albumId": {
-                            "description": "Identifier of the album to be requested.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the album to be requested.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+albumId}", 
+                    },
+                    "path": "v1/albums/{+albumId}",
                     "response": {
                         "$ref": "Album"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
-                }, 
+                },
                 "list": {
-                    "description": "Lists all albums shown to a user in the Albums tab of the Google\nPhotos app.", 
-                    "flatPath": "v1/albums", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.albums.list", 
-                    "parameterOrder": [], 
+                    "description": "Lists all albums shown to a user in the Albums tab of the Google Photos app.",
+                    "flatPath": "v1/albums",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.albums.list",
+                    "parameterOrder": [],
                     "parameters": {
                         "excludeNonAppCreatedData": {
-                            "description": "If set, the results exclude media items that were not created by this app.\nDefaults to false (all albums are returned). This field is ignored if the\nphotoslibrary.readonly.appcreateddata scope is used.", 
-                            "location": "query", 
+                            "description": "If set, the results exclude media items that were not created by this app. Defaults to false (all albums are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.",
+                            "location": "query",
                             "type": "boolean"
-                        }, 
+                        },
                         "pageSize": {
-                            "description": "Maximum number of albums to return in the response. Fewer albums might be\nreturned than the specified number. The default `pageSize` is 20, the\nmaximum is 50.", 
-                            "format": "int32", 
-                            "location": "query", 
+                            "description": "Maximum number of albums to return in the response. Fewer albums might be returned than the specified number. The default `pageSize` is 20, the maximum is 50.",
+                            "format": "int32",
+                            "location": "query",
                             "type": "integer"
-                        }, 
+                        },
                         "pageToken": {
-                            "description": "A continuation token to get the next page of the results. Adding this to\nthe request returns the rows after the `pageToken`. The `pageToken` should\nbe the value returned in the `nextPageToken` parameter in the response to\nthe `listAlbums` request.", 
-                            "location": "query", 
+                            "description": "A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listAlbums` request.",
+                            "location": "query",
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums", 
+                    },
+                    "path": "v1/albums",
                     "response": {
                         "$ref": "ListAlbumsResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
-                }, 
+                },
                 "patch": {
-                    "description": "Update the album with the specified `id`.\nOnly the `id`, `title` and `cover_photo_media_item_id` fields of the album\nare read. The album must have been created by the developer via the API and\nmust be owned by the user.", 
-                    "flatPath": "v1/albums/{albumsId}", 
-                    "httpMethod": "PATCH", 
-                    "id": "photoslibrary.albums.patch", 
+                    "description": "Update the album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API and must be owned by the user.",
+                    "flatPath": "v1/albums/{albumsId}",
+                    "httpMethod": "PATCH",
+                    "id": "photoslibrary.albums.patch",
                     "parameterOrder": [
                         "id"
-                    ], 
+                    ],
                     "parameters": {
                         "id": {
-                            "description": "Identifier for the album. This is a persistent identifier that\ncan be used between sessions to identify this album.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Identifier for the album. This is a persistent identifier that can be used between sessions to identify this album.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
-                        }, 
+                        },
                         "updateMask": {
-                            "description": "Indicate what fields in the provided album to update.\nThe only valid values are `title` and `cover_photo_media_item_id`.", 
-                            "format": "google-fieldmask", 
-                            "location": "query", 
+                            "description": "Required. Indicate what fields in the provided album to update. The only valid values are `title` and `cover_photo_media_item_id`.",
+                            "format": "google-fieldmask",
+                            "location": "query",
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+id}", 
+                    },
+                    "path": "v1/albums/{+id}",
                     "request": {
                         "$ref": "Album"
-                    }, 
+                    },
                     "response": {
                         "$ref": "Album"
-                    }
-                }, 
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata"
+                    ]
+                },
                 "share": {
-                    "description": "Marks an album as shared and accessible to other users. This action can\nonly be performed on albums which were created by the developer via the\nAPI.", 
-                    "flatPath": "v1/albums/{albumsId}:share", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.albums.share", 
+                    "description": "Marks an album as shared and accessible to other users. This action can only be performed on albums which were created by the developer via the API.",
+                    "flatPath": "v1/albums/{albumsId}:share",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.albums.share",
                     "parameterOrder": [
                         "albumId"
-                    ], 
+                    ],
                     "parameters": {
                         "albumId": {
-                            "description": "Identifier of the album to be shared. This `albumId` must belong to an\nalbum created by the developer.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the album to be shared. This `albumId` must belong to an album created by the developer.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+albumId}:share", 
+                    },
+                    "path": "v1/albums/{+albumId}:share",
                     "request": {
                         "$ref": "ShareAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "ShareAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "unshare": {
-                    "description": "Marks a previously shared album as private. This means that the album is\nno longer shared and all the non-owners will lose access to the album. All\nnon-owner content will be removed from the album. If a non-owner has\npreviously added the album to their library, they will retain all photos in\ntheir library. This action can only be performed on albums which were\ncreated by the developer via the API.", 
-                    "flatPath": "v1/albums/{albumsId}:unshare", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.albums.unshare", 
+                    "description": "Marks a previously shared album as private. This means that the album is no longer shared and all the non-owners will lose access to the album. All non-owner content will be removed from the album. If a non-owner has previously added the album to their library, they will retain all photos in their library. This action can only be performed on albums which were created by the developer via the API.",
+                    "flatPath": "v1/albums/{albumsId}:unshare",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.albums.unshare",
                     "parameterOrder": [
                         "albumId"
-                    ], 
+                    ],
                     "parameters": {
                         "albumId": {
-                            "description": "Identifier of the album to be unshared. This album id must belong to an\nalbum created by the developer.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the album to be unshared. This album id must belong to an album created by the developer.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/albums/{+albumId}:unshare", 
+                    },
+                    "path": "v1/albums/{+albumId}:unshare",
                     "request": {
                         "$ref": "UnshareAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "UnshareAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
                 }
             }
-        }, 
+        },
         "mediaItems": {
             "methods": {
                 "batchCreate": {
-                    "description": "Creates one or more media items in a user's Google Photos library.\n\nThis is the second step for creating a media item. For details regarding\nStep 1, uploading the raw bytes to a Google Server, see\n<a href=\"/photos/library/guides/upload-media\">Uploading media</a>.\n\nThis call adds the media item to the library. If an album `id` is\nspecified, the call adds the media item to the album too. Each album can\ncontain up to 20,000 media items. By default, the media item will be added\nto the end of the library or album.\n\nIf an album `id` and position are both defined, the media item is\nadded to the album at the specified position.\n\nIf the call contains multiple media items, they're added at the specified\nposition.\nIf you are creating a media item in a shared album where you are not the\nowner, you are not allowed to position the media item. Doing so will result\nin a `BAD REQUEST` error.", 
-                    "flatPath": "v1/mediaItems:batchCreate", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.mediaItems.batchCreate", 
-                    "parameterOrder": [], 
-                    "parameters": {}, 
-                    "path": "v1/mediaItems:batchCreate", 
+                    "description": "Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position. If you are creating a media item in a shared album where you are not the owner, you are not allowed to position the media item. Doing so will result in a `BAD REQUEST` error.",
+                    "flatPath": "v1/mediaItems:batchCreate",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.mediaItems.batchCreate",
+                    "parameterOrder": [],
+                    "parameters": {},
+                    "path": "v1/mediaItems:batchCreate",
                     "request": {
                         "$ref": "BatchCreateMediaItemsRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "BatchCreateMediaItemsResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.appendonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.appendonly",
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "batchGet": {
-                    "description": "Returns the list of media items for the specified media item identifiers.\nItems are returned in the same order as the supplied identifiers.", 
-                    "flatPath": "v1/mediaItems:batchGet", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.mediaItems.batchGet", 
-                    "parameterOrder": [], 
+                    "description": "Returns the list of media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.",
+                    "flatPath": "v1/mediaItems:batchGet",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.mediaItems.batchGet",
+                    "parameterOrder": [],
                     "parameters": {
                         "mediaItemIds": {
-                            "description": "Identifiers of the media items to be requested.\nMust not contain repeated identifiers and cannot be empty. The maximum\nnumber of media items that can be retrieved in one call is 50.", 
-                            "location": "query", 
-                            "repeated": true, 
+                            "description": "Required. Identifiers of the media items to be requested. Must not contain repeated identifiers and cannot be empty. The maximum number of media items that can be retrieved in one call is 50.",
+                            "location": "query",
+                            "repeated": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/mediaItems:batchGet", 
+                    },
+                    "path": "v1/mediaItems:batchGet",
                     "response": {
                         "$ref": "BatchGetMediaItemsResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
-                }, 
+                },
                 "get": {
-                    "description": "Returns the media item for the specified media item identifier.", 
-                    "flatPath": "v1/mediaItems/{mediaItemsId}", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.mediaItems.get", 
+                    "description": "Returns the media item for the specified media item identifier.",
+                    "flatPath": "v1/mediaItems/{mediaItemsId}",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.mediaItems.get",
                     "parameterOrder": [
                         "mediaItemId"
-                    ], 
+                    ],
                     "parameters": {
                         "mediaItemId": {
-                            "description": "Identifier of the media item to be requested.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Identifier of the media item to be requested.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/mediaItems/{+mediaItemId}", 
+                    },
+                    "path": "v1/mediaItems/{+mediaItemId}",
                     "response": {
                         "$ref": "MediaItem"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
-                }, 
+                },
                 "list": {
-                    "description": "List all media items from a user's Google Photos library.", 
-                    "flatPath": "v1/mediaItems", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.mediaItems.list", 
-                    "parameterOrder": [], 
+                    "description": "List all media items from a user's Google Photos library.",
+                    "flatPath": "v1/mediaItems",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.mediaItems.list",
+                    "parameterOrder": [],
                     "parameters": {
                         "pageSize": {
-                            "description": "Maximum number of media items to return in the response. Fewer media items\nmight be returned than the specified number. The default `pageSize` is 25,\nthe maximum is 100.", 
-                            "format": "int32", 
-                            "location": "query", 
+                            "description": "Maximum number of media items to return in the response. Fewer media items might be returned than the specified number. The default `pageSize` is 25, the maximum is 100.",
+                            "format": "int32",
+                            "location": "query",
                             "type": "integer"
-                        }, 
+                        },
                         "pageToken": {
-                            "description": "A continuation token to get the next page of the results. Adding this to\nthe request returns the rows after the `pageToken`. The `pageToken` should\nbe the value returned in the `nextPageToken` parameter in the response to\nthe `listMediaItems` request.", 
-                            "location": "query", 
+                            "description": "A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listMediaItems` request.",
+                            "location": "query",
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/mediaItems", 
+                    },
+                    "path": "v1/mediaItems",
                     "response": {
                         "$ref": "ListMediaItemsResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
-                }, 
+                },
                 "patch": {
-                    "description": "Update the media item with the specified `id`.\nOnly the `id` and `description` fields of the media item are read. The\nmedia item must have been created by the developer via the API and must be\nowned by the user.", 
-                    "flatPath": "v1/mediaItems/{mediaItemsId}", 
-                    "httpMethod": "PATCH", 
-                    "id": "photoslibrary.mediaItems.patch", 
+                    "description": "Update the media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API and must be owned by the user.",
+                    "flatPath": "v1/mediaItems/{mediaItemsId}",
+                    "httpMethod": "PATCH",
+                    "id": "photoslibrary.mediaItems.patch",
                     "parameterOrder": [
                         "id"
-                    ], 
+                    ],
                     "parameters": {
                         "id": {
-                            "description": "Identifier for the media item. This is a persistent identifier that can be\nused between sessions to identify this media item.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Identifier for the media item. This is a persistent identifier that can be used between sessions to identify this media item.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
-                        }, 
+                        },
                         "updateMask": {
-                            "description": "Indicate what fields in the provided media item to update.\nThe only valid value is `description`.", 
-                            "format": "google-fieldmask", 
-                            "location": "query", 
+                            "description": "Required. Indicate what fields in the provided media item to update. The only valid value is `description`.",
+                            "format": "google-fieldmask",
+                            "location": "query",
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/mediaItems/{+id}", 
+                    },
+                    "path": "v1/mediaItems/{+id}",
                     "request": {
                         "$ref": "MediaItem"
-                    }, 
+                    },
                     "response": {
                         "$ref": "MediaItem"
-                    }
-                }, 
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/photoslibrary.edit.appcreateddata"
+                    ]
+                },
                 "search": {
-                    "description": "Searches for media items in a user's Google Photos library.\nIf no filters are set, then all media items in the user's library are\nreturned.\nIf an album is set, all media items in the specified album are returned.\nIf filters are specified, media items that match the filters from the\nuser's library are listed. If you set both the album and the filters, the\nrequest results in an error.", 
-                    "flatPath": "v1/mediaItems:search", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.mediaItems.search", 
-                    "parameterOrder": [], 
-                    "parameters": {}, 
-                    "path": "v1/mediaItems:search", 
+                    "description": "Searches for media items in a user's Google Photos library. If no filters are set, then all media items in the user's library are returned. If an album is set, all media items in the specified album are returned. If filters are specified, media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error.",
+                    "flatPath": "v1/mediaItems:search",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.mediaItems.search",
+                    "parameterOrder": [],
+                    "parameters": {},
+                    "path": "v1/mediaItems:search",
                     "request": {
                         "$ref": "SearchMediaItemsRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "SearchMediaItemsResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
                 }
             }
-        }, 
+        },
         "sharedAlbums": {
             "methods": {
                 "get": {
-                    "description": "Returns the album based on the specified `shareToken`.", 
-                    "flatPath": "v1/sharedAlbums/{sharedAlbumsId}", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.sharedAlbums.get", 
+                    "description": "Returns the album based on the specified `shareToken`.",
+                    "flatPath": "v1/sharedAlbums/{sharedAlbumsId}",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.sharedAlbums.get",
                     "parameterOrder": [
                         "shareToken"
-                    ], 
+                    ],
                     "parameters": {
                         "shareToken": {
-                            "description": "Share token of the album to be requested.", 
-                            "location": "path", 
-                            "pattern": "^[^/]+$", 
-                            "required": true, 
+                            "description": "Required. Share token of the album to be requested.",
+                            "location": "path",
+                            "pattern": "^[^/]+$",
+                            "required": true,
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/sharedAlbums/{+shareToken}", 
+                    },
+                    "path": "v1/sharedAlbums/{+shareToken}",
                     "response": {
                         "$ref": "Album"
-                    }, 
+                    },
                     "scopes": [
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "join": {
-                    "description": "Joins a shared album on behalf of the Google Photos user.", 
-                    "flatPath": "v1/sharedAlbums:join", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.sharedAlbums.join", 
-                    "parameterOrder": [], 
-                    "parameters": {}, 
-                    "path": "v1/sharedAlbums:join", 
+                    "description": "Joins a shared album on behalf of the Google Photos user.",
+                    "flatPath": "v1/sharedAlbums:join",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.sharedAlbums.join",
+                    "parameterOrder": [],
+                    "parameters": {},
+                    "path": "v1/sharedAlbums:join",
                     "request": {
                         "$ref": "JoinSharedAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "JoinSharedAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "leave": {
-                    "description": "Leaves a previously-joined shared album on behalf of the Google Photos\nuser. The user must not own this album.", 
-                    "flatPath": "v1/sharedAlbums:leave", 
-                    "httpMethod": "POST", 
-                    "id": "photoslibrary.sharedAlbums.leave", 
-                    "parameterOrder": [], 
-                    "parameters": {}, 
-                    "path": "v1/sharedAlbums:leave", 
+                    "description": "Leaves a previously-joined shared album on behalf of the Google Photos user. The user must not own this album.",
+                    "flatPath": "v1/sharedAlbums:leave",
+                    "httpMethod": "POST",
+                    "id": "photoslibrary.sharedAlbums.leave",
+                    "parameterOrder": [],
+                    "parameters": {},
+                    "path": "v1/sharedAlbums:leave",
                     "request": {
                         "$ref": "LeaveSharedAlbumRequest"
-                    }, 
+                    },
                     "response": {
                         "$ref": "LeaveSharedAlbumResponse"
-                    }, 
+                    },
                     "scopes": [
                         "https://www.googleapis.com/auth/photoslibrary.sharing"
                     ]
-                }, 
+                },
                 "list": {
-                    "description": "Lists all shared albums available in the Sharing tab of the\nuser's Google Photos app.", 
-                    "flatPath": "v1/sharedAlbums", 
-                    "httpMethod": "GET", 
-                    "id": "photoslibrary.sharedAlbums.list", 
-                    "parameterOrder": [], 
+                    "description": "Lists all shared albums available in the Sharing tab of the user's Google Photos app.",
+                    "flatPath": "v1/sharedAlbums",
+                    "httpMethod": "GET",
+                    "id": "photoslibrary.sharedAlbums.list",
+                    "parameterOrder": [],
                     "parameters": {
                         "excludeNonAppCreatedData": {
-                            "description": "If set, the results exclude media items that were not created by this app.\nDefaults to false (all albums are returned). This field is ignored if the\nphotoslibrary.readonly.appcreateddata scope is used.", 
-                            "location": "query", 
+                            "description": "If set, the results exclude media items that were not created by this app. Defaults to false (all albums are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.",
+                            "location": "query",
                             "type": "boolean"
-                        }, 
+                        },
                         "pageSize": {
-                            "description": "Maximum number of albums to return in the response. Fewer albums might be\nreturned than the specified number. The default `pageSize` is 20, the\nmaximum is 50.", 
-                            "format": "int32", 
-                            "location": "query", 
+                            "description": "Maximum number of albums to return in the response. Fewer albums might be returned than the specified number. The default `pageSize` is 20, the maximum is 50.",
+                            "format": "int32",
+                            "location": "query",
                             "type": "integer"
-                        }, 
+                        },
                         "pageToken": {
-                            "description": "A continuation token to get the next page of the results. Adding this to\nthe request returns the rows after the `pageToken`. The `pageToken` should\nbe the value returned in the `nextPageToken` parameter in the response to\nthe `listSharedAlbums` request.", 
-                            "location": "query", 
+                            "description": "A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listSharedAlbums` request.",
+                            "location": "query",
                             "type": "string"
                         }
-                    }, 
-                    "path": "v1/sharedAlbums", 
+                    },
+                    "path": "v1/sharedAlbums",
                     "response": {
                         "$ref": "ListSharedAlbumsResponse"
-                    }, 
+                    },
                     "scopes": [
-                        "https://www.googleapis.com/auth/photoslibrary", 
-                        "https://www.googleapis.com/auth/photoslibrary.readonly", 
+                        "https://www.googleapis.com/auth/photoslibrary",
+                        "https://www.googleapis.com/auth/photoslibrary.readonly",
                         "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata"
                     ]
                 }
             }
         }
-    }, 
-    "revision": "20200707", 
-    "rootUrl": "https://photoslibrary.googleapis.com/", 
+    },
+    "revision": "20210331",
+    "rootUrl": "https://photoslibrary.googleapis.com/",
     "schemas": {
         "AddEnrichmentToAlbumRequest": {
-            "description": "Request to add an enrichment to a specific album at a specific position.", 
-            "id": "AddEnrichmentToAlbumRequest", 
+            "description": "Request to add an enrichment to a specific album at a specific position.",
+            "id": "AddEnrichmentToAlbumRequest",
             "properties": {
                 "albumPosition": {
-                    "$ref": "AlbumPosition", 
-                    "description": "The position in the album where the enrichment is to be inserted."
-                }, 
+                    "$ref": "AlbumPosition",
+                    "description": "Required. The position in the album where the enrichment is to be inserted."
+                },
                 "newEnrichmentItem": {
-                    "$ref": "NewEnrichmentItem", 
-                    "description": "The enrichment to be added."
+                    "$ref": "NewEnrichmentItem",
+                    "description": "Required. The enrichment to be added."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "AddEnrichmentToAlbumResponse": {
-            "description": "The enrichment item that's created.", 
-            "id": "AddEnrichmentToAlbumResponse", 
+            "description": "The enrichment item that's created.",
+            "id": "AddEnrichmentToAlbumResponse",
             "properties": {
                 "enrichmentItem": {
-                    "$ref": "EnrichmentItem", 
+                    "$ref": "EnrichmentItem",
                     "description": "Output only. Enrichment which was added."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "Album": {
-            "description": "Representation of an album in Google Photos.\nAlbums are containers for media items. If an album has been shared by the\napplication, it contains an extra `shareInfo` property.", 
-            "id": "Album", 
+            "description": "Representation of an album in Google Photos. Albums are containers for media items. If an album has been shared by the application, it contains an extra `shareInfo` property.",
+            "id": "Album",
             "properties": {
                 "coverPhotoBaseUrl": {
-                    "description": "[Output only] A URL to the cover photo's bytes. This shouldn't be used as\nis. Parameters should be appended to this URL before use. See the\n[developer\ndocumentation](https://developers.google.com/photos/library/guides/access-media-items#base-urls)\nfor a complete list of supported parameters. For example,\n`'=w2048-h1024'` sets the dimensions of the cover photo to have a width of\n2048 px and height of 1024 px.", 
+                    "description": "[Output only] A URL to the cover photo's bytes. This shouldn't be used as is. Parameters should be appended to this URL before use. See the [developer documentation](https://developers.google.com/photos/library/guides/access-media-items#base-urls) for a complete list of supported parameters. For example, `'=w2048-h1024'` sets the dimensions of the cover photo to have a width of 2048 px and height of 1024 px.",
                     "type": "string"
-                }, 
+                },
                 "coverPhotoMediaItemId": {
-                    "description": "Identifier for the media item associated with the cover photo.", 
+                    "description": "Identifier for the media item associated with the cover photo.",
                     "type": "string"
-                }, 
+                },
                 "id": {
-                    "description": "Identifier for the album. This is a persistent identifier that\ncan be used between sessions to identify this album.", 
+                    "description": "Identifier for the album. This is a persistent identifier that can be used between sessions to identify this album.",
                     "type": "string"
-                }, 
+                },
                 "isWriteable": {
-                    "description": "[Output only] True if you can create media items in this album.\nThis field is based on the scopes granted and permissions of the album. If\nthe scopes are changed or permissions of the album are changed, this field\nis updated.", 
+                    "description": "[Output only] True if you can create media items in this album. This field is based on the scopes granted and permissions of the album. If the scopes are changed or permissions of the album are changed, this field is updated.",
                     "type": "boolean"
-                }, 
+                },
                 "mediaItemsCount": {
-                    "description": "[Output only] The number of media items in the album.", 
-                    "format": "int64", 
+                    "description": "[Output only] The number of media items in the album.",
+                    "format": "int64",
                     "type": "string"
-                }, 
+                },
                 "productUrl": {
-                    "description": "[Output only] Google Photos URL for the album. The user needs to be signed\nin to their Google Photos account to access this link.", 
+                    "description": "[Output only] Google Photos URL for the album. The user needs to be signed in to their Google Photos account to access this link.",
                     "type": "string"
-                }, 
+                },
                 "shareInfo": {
-                    "$ref": "ShareInfo", 
-                    "description": "[Output only] Information related to shared albums.\nThis field is only populated if the album is a shared album, the\ndeveloper created the album and the user has granted the\n`photoslibrary.sharing` scope."
-                }, 
+                    "$ref": "ShareInfo",
+                    "description": "[Output only] Information related to shared albums. This field is only populated if the album is a shared album, the developer created the album and the user has granted the `photoslibrary.sharing` scope."
+                },
                 "title": {
-                    "description": "Name of the album displayed to the user in their Google Photos account.\nThis string shouldn't be more than 500 characters.", 
+                    "description": "Name of the album displayed to the user in their Google Photos account. This string shouldn't be more than 500 characters.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "AlbumPosition": {
-            "description": "Specifies a position in an album.", 
-            "id": "AlbumPosition", 
+            "description": "Specifies a position in an album.",
+            "id": "AlbumPosition",
             "properties": {
                 "position": {
-                    "description": "Type of position, for a media or enrichment item.", 
+                    "description": "Type of position, for a media or enrichment item.",
                     "enum": [
-                        "POSITION_TYPE_UNSPECIFIED", 
-                        "FIRST_IN_ALBUM", 
-                        "LAST_IN_ALBUM", 
-                        "AFTER_MEDIA_ITEM", 
+                        "POSITION_TYPE_UNSPECIFIED",
+                        "FIRST_IN_ALBUM",
+                        "LAST_IN_ALBUM",
+                        "AFTER_MEDIA_ITEM",
                         "AFTER_ENRICHMENT_ITEM"
-                    ], 
+                    ],
                     "enumDescriptions": [
-                        "Default value if this enum isn't set.", 
-                        "At the beginning of the album.", 
-                        "At the end of the album.", 
-                        "After a media item.", 
+                        "Default value if this enum isn't set.",
+                        "At the beginning of the album.",
+                        "At the end of the album.",
+                        "After a media item.",
                         "After an enrichment item."
-                    ], 
+                    ],
                     "type": "string"
-                }, 
+                },
                 "relativeEnrichmentItemId": {
-                    "description": "The enrichment item to which the position is relative to.\nOnly used when position type is AFTER_ENRICHMENT_ITEM.", 
+                    "description": "The enrichment item to which the position is relative to. Only used when position type is AFTER_ENRICHMENT_ITEM.",
                     "type": "string"
-                }, 
+                },
                 "relativeMediaItemId": {
-                    "description": "The media item to which the position is relative to.\nOnly used when position type is AFTER_MEDIA_ITEM.", 
+                    "description": "The media item to which the position is relative to. Only used when position type is AFTER_MEDIA_ITEM.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "BatchAddMediaItemsToAlbumRequest": {
-            "description": "Request to add media items to an album.", 
-            "id": "BatchAddMediaItemsToAlbumRequest", 
+            "description": "Request to add media items to an album.",
+            "id": "BatchAddMediaItemsToAlbumRequest",
             "properties": {
                 "mediaItemIds": {
-                    "description": "Identifiers of the MediaItems to be\nadded.\nThe maximum number of media items that can be added in one call is 50.", 
+                    "description": "Required. Identifiers of the MediaItems to be added. The maximum number of media items that can be added in one call is 50.",
                     "items": {
                         "type": "string"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "BatchAddMediaItemsToAlbumResponse": {
-            "description": "Response for adding media items to an album.", 
-            "id": "BatchAddMediaItemsToAlbumResponse", 
-            "properties": {}, 
+            "description": "Response for adding media items to an album.",
+            "id": "BatchAddMediaItemsToAlbumResponse",
+            "properties": {},
             "type": "object"
-        }, 
+        },
         "BatchCreateMediaItemsRequest": {
-            "description": "Request to create one or more media items in a user's Google Photos library.\nIf an `albumid` is specified, the media items are also added to that album.\n`albumPosition` is optional and can only be specified if an `albumId` is set.", 
-            "id": "BatchCreateMediaItemsRequest", 
+            "description": "Request to create one or more media items in a user's Google Photos library. If an `albumid` is specified, the media items are also added to that album. `albumPosition` is optional and can only be specified if an `albumId` is set.",
+            "id": "BatchCreateMediaItemsRequest",
             "properties": {
                 "albumId": {
-                    "description": "Identifier of the album where the media items are added. The media items\nare also added to the user's library. This is an optional field.", 
+                    "description": "Identifier of the album where the media items are added. The media items are also added to the user's library. This is an optional field.",
                     "type": "string"
-                }, 
+                },
                 "albumPosition": {
-                    "$ref": "AlbumPosition", 
-                    "description": "Position in the album where the media items are added. If not\nspecified, the media items are added to the end of the album (as per\nthe default value, that is, `LAST_IN_ALBUM`). The request fails if this\nfield is set and the `albumId` is not specified. The request will also fail\nif you set the field and are not the owner of the shared album."
-                }, 
+                    "$ref": "AlbumPosition",
+                    "description": "Position in the album where the media items are added. If not specified, the media items are added to the end of the album (as per the default value, that is, `LAST_IN_ALBUM`). The request fails if this field is set and the `albumId` is not specified. The request will also fail if you set the field and are not the owner of the shared album."
+                },
                 "newMediaItems": {
-                    "description": "List of media items to be created.", 
+                    "description": "Required. List of media items to be created.",
                     "items": {
                         "$ref": "NewMediaItem"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "BatchCreateMediaItemsResponse": {
-            "description": "List of media items created.", 
-            "id": "BatchCreateMediaItemsResponse", 
+            "description": "List of media items created.",
+            "id": "BatchCreateMediaItemsResponse",
             "properties": {
                 "newMediaItemResults": {
-                    "description": "Output only. List of media items created.", 
+                    "description": "Output only. List of media items created.",
                     "items": {
                         "$ref": "NewMediaItemResult"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "BatchGetMediaItemsResponse": {
-            "description": "Response to retrieve a list of media items.", 
-            "id": "BatchGetMediaItemsResponse", 
+            "description": "Response to retrieve a list of media items.",
+            "id": "BatchGetMediaItemsResponse",
             "properties": {
                 "mediaItemResults": {
-                    "description": "Output only. List of media items retrieved.\nNote that even if the call to BatchGetMediaItems succeeds, there may have\nbeen failures for some media items in the batch. These failures are\nindicated in each\nMediaItemResult.status.", 
+                    "description": "Output only. List of media items retrieved. Note that even if the call to BatchGetMediaItems succeeds, there may have been failures for some media items in the batch. These failures are indicated in each MediaItemResult.status.",
                     "items": {
                         "$ref": "MediaItemResult"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "BatchRemoveMediaItemsFromAlbumRequest": {
-            "description": "Request to remove a list of media items from an album.", 
-            "id": "BatchRemoveMediaItemsFromAlbumRequest", 
+            "description": "Request to remove a list of media items from an album.",
+            "id": "BatchRemoveMediaItemsFromAlbumRequest",
             "properties": {
                 "mediaItemIds": {
-                    "description": "Identifiers of the MediaItems to be\nremoved.\n\nMust not contain repeated identifiers and cannot be empty. The maximum\nnumber of media items that can be removed in one call is 50.", 
+                    "description": "Required. Identifiers of the MediaItems to be removed. Must not contain repeated identifiers and cannot be empty. The maximum number of media items that can be removed in one call is 50.",
                     "items": {
                         "type": "string"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "BatchRemoveMediaItemsFromAlbumResponse": {
-            "description": "Response for successfully removing all specified media items from the album.", 
-            "id": "BatchRemoveMediaItemsFromAlbumResponse", 
-            "properties": {}, 
+            "description": "Response for successfully removing all specified media items from the album.",
+            "id": "BatchRemoveMediaItemsFromAlbumResponse",
+            "properties": {},
             "type": "object"
-        }, 
+        },
         "ContentFilter": {
-            "description": "This filter allows you to return media items based on the content type.\n\nIt's possible to specify a list of categories to include, and/or a list of\ncategories to exclude. Within each list, the categories are combined with an\nOR. <p>\nThe content filter `includedContentCategories`: [c1, c2, c3] would get media\nitems that contain (c1 OR c2 OR c3). <p>\nThe content filter `excludedContentCategories`: [c1, c2, c3] would NOT get\nmedia items that contain (c1 OR c2 OR c3). <p>\nYou can also include some categories while excluding others, as in this\nexample: `includedContentCategories`: [c1, c2], `excludedContentCategories`:\n[c3, c4] <p>\nThe previous example would get media items that contain (c1 OR c2) AND NOT\n(c3 OR c4). A category that appears in `includedContentategories` must not\nappear in `excludedContentCategories`.", 
-            "id": "ContentFilter", 
+            "description": "This filter allows you to return media items based on the content type. It's possible to specify a list of categories to include, and/or a list of categories to exclude. Within each list, the categories are combined with an OR. The content filter `includedContentCategories`: [c1, c2, c3] would get media items that contain (c1 OR c2 OR c3). The content filter `excludedContentCategories`: [c1, c2, c3] would NOT get media items that contain (c1 OR c2 OR c3). You can also include some categories while excluding others, as in this example: `includedContentCategories`: [c1, c2], `excludedContentCategories`: [c3, c4] The previous example would get media items that contain (c1 OR c2) AND NOT (c3 OR c4). A category that appears in `includedContentategories` must not appear in `excludedContentCategories`.",
+            "id": "ContentFilter",
             "properties": {
                 "excludedContentCategories": {
-                    "description": "The set of categories which are not to be included in the media item search\nresults. The items in the set are ORed. There's a maximum of 10\n`excludedContentCategories` per request.", 
-                    "enumDescriptions": [
-                        "Default content category. This category is ignored when any other category\nis used in the filter.", 
-                        "Media items containing landscapes.", 
-                        "Media items containing receipts.", 
-                        "Media items containing cityscapes.", 
-                        "Media items containing landmarks.", 
-                        "Media items that are selfies.", 
-                        "Media items containing people.", 
-                        "Media items containing pets.", 
-                        "Media items from weddings.", 
-                        "Media items from birthdays.", 
-                        "Media items containing documents.", 
-                        "Media items taken during travel.", 
-                        "Media items containing animals.", 
-                        "Media items containing food.", 
-                        "Media items from sporting events.", 
-                        "Media items taken at night.", 
-                        "Media items from performances.", 
-                        "Media items containing whiteboards.", 
-                        "Media items that are screenshots.", 
-                        "Media items that are considered to be utility. These include, but aren't\nlimited to documents, screenshots, whiteboards etc.", 
-                        "Media items containing art.", 
-                        "Media items containing crafts.", 
-                        "Media items related to fashion.", 
-                        "Media items containing houses.", 
-                        "Media items containing gardens.", 
-                        "Media items containing flowers.", 
-                        "Media items taken of holidays."
-                    ], 
+                    "description": "The set of categories which are not to be included in the media item search results. The items in the set are ORed. There's a maximum of 10 `excludedContentCategories` per request.",
                     "items": {
                         "enum": [
-                            "NONE", 
-                            "LANDSCAPES", 
-                            "RECEIPTS", 
-                            "CITYSCAPES", 
-                            "LANDMARKS", 
-                            "SELFIES", 
-                            "PEOPLE", 
-                            "PETS", 
-                            "WEDDINGS", 
-                            "BIRTHDAYS", 
-                            "DOCUMENTS", 
-                            "TRAVEL", 
-                            "ANIMALS", 
-                            "FOOD", 
-                            "SPORT", 
-                            "NIGHT", 
-                            "PERFORMANCES", 
-                            "WHITEBOARDS", 
-                            "SCREENSHOTS", 
-                            "UTILITY", 
-                            "ARTS", 
-                            "CRAFTS", 
-                            "FASHION", 
-                            "HOUSES", 
-                            "GARDENS", 
-                            "FLOWERS", 
+                            "NONE",
+                            "LANDSCAPES",
+                            "RECEIPTS",
+                            "CITYSCAPES",
+                            "LANDMARKS",
+                            "SELFIES",
+                            "PEOPLE",
+                            "PETS",
+                            "WEDDINGS",
+                            "BIRTHDAYS",
+                            "DOCUMENTS",
+                            "TRAVEL",
+                            "ANIMALS",
+                            "FOOD",
+                            "SPORT",
+                            "NIGHT",
+                            "PERFORMANCES",
+                            "WHITEBOARDS",
+                            "SCREENSHOTS",
+                            "UTILITY",
+                            "ARTS",
+                            "CRAFTS",
+                            "FASHION",
+                            "HOUSES",
+                            "GARDENS",
+                            "FLOWERS",
                             "HOLIDAYS"
-                        ], 
+                        ],
+                        "enumDescriptions": [
+                            "Default content category. This category is ignored when any other category is used in the filter.",
+                            "Media items containing landscapes.",
+                            "Media items containing receipts.",
+                            "Media items containing cityscapes.",
+                            "Media items containing landmarks.",
+                            "Media items that are selfies.",
+                            "Media items containing people.",
+                            "Media items containing pets.",
+                            "Media items from weddings.",
+                            "Media items from birthdays.",
+                            "Media items containing documents.",
+                            "Media items taken during travel.",
+                            "Media items containing animals.",
+                            "Media items containing food.",
+                            "Media items from sporting events.",
+                            "Media items taken at night.",
+                            "Media items from performances.",
+                            "Media items containing whiteboards.",
+                            "Media items that are screenshots.",
+                            "Media items that are considered to be utility. These include, but aren't limited to documents, screenshots, whiteboards etc.",
+                            "Media items containing art.",
+                            "Media items containing crafts.",
+                            "Media items related to fashion.",
+                            "Media items containing houses.",
+                            "Media items containing gardens.",
+                            "Media items containing flowers.",
+                            "Media items taken of holidays."
+                        ],
                         "type": "string"
-                    }, 
+                    },
                     "type": "array"
-                }, 
+                },
                 "includedContentCategories": {
-                    "description": "The set of categories to be included in the media item search results.\nThe items in the set are ORed. There's a maximum of 10\n`includedContentCategories` per request.", 
-                    "enumDescriptions": [
-                        "Default content category. This category is ignored when any other category\nis used in the filter.", 
-                        "Media items containing landscapes.", 
-                        "Media items containing receipts.", 
-                        "Media items containing cityscapes.", 
-                        "Media items containing landmarks.", 
-                        "Media items that are selfies.", 
-                        "Media items containing people.", 
-                        "Media items containing pets.", 
-                        "Media items from weddings.", 
-                        "Media items from birthdays.", 
-                        "Media items containing documents.", 
-                        "Media items taken during travel.", 
-                        "Media items containing animals.", 
-                        "Media items containing food.", 
-                        "Media items from sporting events.", 
-                        "Media items taken at night.", 
-                        "Media items from performances.", 
-                        "Media items containing whiteboards.", 
-                        "Media items that are screenshots.", 
-                        "Media items that are considered to be utility. These include, but aren't\nlimited to documents, screenshots, whiteboards etc.", 
-                        "Media items containing art.", 
-                        "Media items containing crafts.", 
-                        "Media items related to fashion.", 
-                        "Media items containing houses.", 
-                        "Media items containing gardens.", 
-                        "Media items containing flowers.", 
-                        "Media items taken of holidays."
-                    ], 
+                    "description": "The set of categories to be included in the media item search results. The items in the set are ORed. There's a maximum of 10 `includedContentCategories` per request.",
                     "items": {
                         "enum": [
-                            "NONE", 
-                            "LANDSCAPES", 
-                            "RECEIPTS", 
-                            "CITYSCAPES", 
-                            "LANDMARKS", 
-                            "SELFIES", 
-                            "PEOPLE", 
-                            "PETS", 
-                            "WEDDINGS", 
-                            "BIRTHDAYS", 
-                            "DOCUMENTS", 
-                            "TRAVEL", 
-                            "ANIMALS", 
-                            "FOOD", 
-                            "SPORT", 
-                            "NIGHT", 
-                            "PERFORMANCES", 
-                            "WHITEBOARDS", 
-                            "SCREENSHOTS", 
-                            "UTILITY", 
-                            "ARTS", 
-                            "CRAFTS", 
-                            "FASHION", 
-                            "HOUSES", 
-                            "GARDENS", 
-                            "FLOWERS", 
+                            "NONE",
+                            "LANDSCAPES",
+                            "RECEIPTS",
+                            "CITYSCAPES",
+                            "LANDMARKS",
+                            "SELFIES",
+                            "PEOPLE",
+                            "PETS",
+                            "WEDDINGS",
+                            "BIRTHDAYS",
+                            "DOCUMENTS",
+                            "TRAVEL",
+                            "ANIMALS",
+                            "FOOD",
+                            "SPORT",
+                            "NIGHT",
+                            "PERFORMANCES",
+                            "WHITEBOARDS",
+                            "SCREENSHOTS",
+                            "UTILITY",
+                            "ARTS",
+                            "CRAFTS",
+                            "FASHION",
+                            "HOUSES",
+                            "GARDENS",
+                            "FLOWERS",
                             "HOLIDAYS"
-                        ], 
+                        ],
+                        "enumDescriptions": [
+                            "Default content category. This category is ignored when any other category is used in the filter.",
+                            "Media items containing landscapes.",
+                            "Media items containing receipts.",
+                            "Media items containing cityscapes.",
+                            "Media items containing landmarks.",
+                            "Media items that are selfies.",
+                            "Media items containing people.",
+                            "Media items containing pets.",
+                            "Media items from weddings.",
+                            "Media items from birthdays.",
+                            "Media items containing documents.",
+                            "Media items taken during travel.",
+                            "Media items containing animals.",
+                            "Media items containing food.",
+                            "Media items from sporting events.",
+                            "Media items taken at night.",
+                            "Media items from performances.",
+                            "Media items containing whiteboards.",
+                            "Media items that are screenshots.",
+                            "Media items that are considered to be utility. These include, but aren't limited to documents, screenshots, whiteboards etc.",
+                            "Media items containing art.",
+                            "Media items containing crafts.",
+                            "Media items related to fashion.",
+                            "Media items containing houses.",
+                            "Media items containing gardens.",
+                            "Media items containing flowers.",
+                            "Media items taken of holidays."
+                        ],
                         "type": "string"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "ContributorInfo": {
-            "description": "Information about the user who added the media item. Note that this\ninformation is included only if the media item is within a shared album\ncreated by your app and you have the sharing scope.", 
-            "id": "ContributorInfo", 
+            "description": "Information about the user who added the media item. Note that this information is included only if the media item is within a shared album created by your app and you have the sharing scope.",
+            "id": "ContributorInfo",
             "properties": {
                 "displayName": {
-                    "description": "Display name of the contributor.", 
+                    "description": "Display name of the contributor.",
                     "type": "string"
-                }, 
+                },
                 "profilePictureBaseUrl": {
-                    "description": "URL to the profile picture of the contributor.", 
+                    "description": "URL to the profile picture of the contributor.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "CreateAlbumRequest": {
-            "description": "Request to create an album in Google Photos.", 
-            "id": "CreateAlbumRequest", 
+            "description": "Request to create an album in Google Photos.",
+            "id": "CreateAlbumRequest",
             "properties": {
                 "album": {
-                    "$ref": "Album", 
-                    "description": "The album to be created."
+                    "$ref": "Album",
+                    "description": "Required. The album to be created."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "Date": {
-            "description": "Represents a whole calendar date. Set `day` to 0 when only the month and year are significant, for example, all of December 2018. Set `day` and `month` to 0 if only the year is significant, for example, the entire of 2018. Set `year` to 0 when only the day and month are significant, for example, an anniversary or birthday.\n\nUnsupported: Setting all values to 0, only `month` to 0, or both `day` and `year` to 0 at the same time.", 
-            "id": "Date", 
+            "description": "Represents a whole calendar date. Set `day` to 0 when only the month and year are significant, for example, all of December 2018. Set `day` and `month` to 0 if only the year is significant, for example, the entire of 2018. Set `year` to 0 when only the day and month are significant, for example, an anniversary or birthday. Unsupported: Setting all values to 0, only `month` to 0, or both `day` and `year` to 0 at the same time.",
+            "id": "Date",
             "properties": {
                 "day": {
-                    "description": "Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year/month where the day isn't significant.", 
-                    "format": "int32", 
+                    "description": "Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year/month where the day isn't significant.",
+                    "format": "int32",
                     "type": "integer"
-                }, 
+                },
                 "month": {
-                    "description": "Month of year. Must be from 1 to 12, or 0 if specifying a year without a\nmonth and day.", 
-                    "format": "int32", 
+                    "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
+                    "format": "int32",
                     "type": "integer"
-                }, 
+                },
                 "year": {
-                    "description": "Year of date. Must be from 1 to 9999, or 0 if specifying a date without\na year.", 
-                    "format": "int32", 
+                    "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
+                    "format": "int32",
                     "type": "integer"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "DateFilter": {
-            "description": "This filter defines the allowed dates or date ranges for the media returned.\nIt's possible to pick a set of specific dates and a set of date ranges.", 
-            "id": "DateFilter", 
+            "description": "This filter defines the allowed dates or date ranges for the media returned. It's possible to pick a set of specific dates and a set of date ranges.",
+            "id": "DateFilter",
             "properties": {
                 "dates": {
-                    "description": "List of dates that match the media items' creation date. A maximum of\n5 dates can be included per request.", 
+                    "description": "List of dates that match the media items' creation date. A maximum of 5 dates can be included per request.",
                     "items": {
                         "$ref": "Date"
-                    }, 
+                    },
                     "type": "array"
-                }, 
+                },
                 "ranges": {
-                    "description": "List of dates ranges that match the media items' creation date. A\nmaximum of 5 dates ranges can be included per request.", 
+                    "description": "List of dates ranges that match the media items' creation date. A maximum of 5 dates ranges can be included per request.",
                     "items": {
                         "$ref": "DateRange"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "DateRange": {
-            "description": "Defines a range of dates. Both dates must be of the same format. For more\ninformation, see Date.", 
-            "id": "DateRange", 
+            "description": "Defines a range of dates. Both dates must be of the same format. For more information, see Date.",
+            "id": "DateRange",
             "properties": {
                 "endDate": {
-                    "$ref": "Date", 
-                    "description": "The end date (included as part of the range). It must be specified in the\nsame format as the start date."
-                }, 
+                    "$ref": "Date",
+                    "description": "The end date (included as part of the range). It must be specified in the same format as the start date."
+                },
                 "startDate": {
-                    "$ref": "Date", 
-                    "description": "The start date (included as part of the range) in one of the formats\ndescribed."
+                    "$ref": "Date",
+                    "description": "The start date (included as part of the range) in one of the formats described."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "EnrichmentItem": {
-            "description": "An enrichment item.", 
-            "id": "EnrichmentItem", 
+            "description": "An enrichment item.",
+            "id": "EnrichmentItem",
             "properties": {
                 "id": {
-                    "description": "Identifier of the enrichment item.", 
+                    "description": "Identifier of the enrichment item.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "FeatureFilter": {
-            "description": "This filter defines the features that the media items should have.", 
-            "id": "FeatureFilter", 
+            "description": "This filter defines the features that the media items should have.",
+            "id": "FeatureFilter",
             "properties": {
                 "includedFeatures": {
-                    "description": "The set of features to be included in the media item search results.\nThe items in the set are ORed and may match any of the specified features.", 
-                    "enumDescriptions": [
-                        "Treated as if no filters are applied. All features are included.", 
-                        "Media items that the user has marked as favorites in the Google Photos\napp."
-                    ], 
+                    "description": "The set of features to be included in the media item search results. The items in the set are ORed and may match any of the specified features.",
                     "items": {
                         "enum": [
-                            "NONE", 
+                            "NONE",
                             "FAVORITES"
-                        ], 
+                        ],
+                        "enumDescriptions": [
+                            "Treated as if no filters are applied. All features are included.",
+                            "Media items that the user has marked as favorites in the Google Photos app."
+                        ],
                         "type": "string"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "Filters": {
-            "description": "Filters that can be applied to a media item search.\nIf multiple filter options are specified, they're treated as AND with each\nother.", 
-            "id": "Filters", 
+            "description": "Filters that can be applied to a media item search. If multiple filter options are specified, they're treated as AND with each other.",
+            "id": "Filters",
             "properties": {
                 "contentFilter": {
-                    "$ref": "ContentFilter", 
+                    "$ref": "ContentFilter",
                     "description": "Filters the media items based on their content."
-                }, 
+                },
                 "dateFilter": {
-                    "$ref": "DateFilter", 
+                    "$ref": "DateFilter",
                     "description": "Filters the media items based on their creation date."
-                }, 
+                },
                 "excludeNonAppCreatedData": {
-                    "description": "If set, the results exclude media items that were not created by this app.\nDefaults to false (all media items are returned). This field is ignored if\nthe photoslibrary.readonly.appcreateddata scope is used.", 
+                    "description": "If set, the results exclude media items that were not created by this app. Defaults to false (all media items are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.",
                     "type": "boolean"
-                }, 
+                },
                 "featureFilter": {
-                    "$ref": "FeatureFilter", 
+                    "$ref": "FeatureFilter",
                     "description": "Filters the media items based on their features."
-                }, 
+                },
                 "includeArchivedMedia": {
-                    "description": "If set, the results include media items that the user has archived.\nDefaults to false (archived media items aren't included).", 
+                    "description": "If set, the results include media items that the user has archived. Defaults to false (archived media items aren't included).",
                     "type": "boolean"
-                }, 
+                },
                 "mediaTypeFilter": {
-                    "$ref": "MediaTypeFilter", 
+                    "$ref": "MediaTypeFilter",
                     "description": "Filters the media items based on the type of media."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "JoinSharedAlbumRequest": {
-            "description": "Request to join a shared album on behalf of the user. This uses a shareToken\nwhich can be acquired via the shareAlbum or listSharedAlbums calls.", 
-            "id": "JoinSharedAlbumRequest", 
+            "description": "Request to join a shared album on behalf of the user. This uses a shareToken which can be acquired via the shareAlbum or listSharedAlbums calls.",
+            "id": "JoinSharedAlbumRequest",
             "properties": {
                 "shareToken": {
-                    "description": "Token to join the shared album on behalf of the user.", 
+                    "description": "Required. Token to join the shared album on behalf of the user.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "JoinSharedAlbumResponse": {
-            "description": "Response to successfully joining the shared album on behalf of the user.", 
-            "id": "JoinSharedAlbumResponse", 
+            "description": "Response to successfully joining the shared album on behalf of the user.",
+            "id": "JoinSharedAlbumResponse",
             "properties": {
                 "album": {
-                    "$ref": "Album", 
+                    "$ref": "Album",
                     "description": "Shared album that the user has joined."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "LatLng": {
-            "description": "An object representing a latitude/longitude pair. This is expressed as a pair\nof doubles representing degrees latitude and degrees longitude. Unless\nspecified otherwise, this must conform to the\n<a href=\"http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf\">WGS84\nstandard</a>. Values must be within normalized ranges.", 
-            "id": "LatLng", 
+            "description": "An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this must conform to the WGS84 standard. Values must be within normalized ranges.",
+            "id": "LatLng",
             "properties": {
                 "latitude": {
-                    "description": "The latitude in degrees. It must be in the range [-90.0, +90.0].", 
-                    "format": "double", 
+                    "description": "The latitude in degrees. It must be in the range [-90.0, +90.0].",
+                    "format": "double",
                     "type": "number"
-                }, 
+                },
                 "longitude": {
-                    "description": "The longitude in degrees. It must be in the range [-180.0, +180.0].", 
-                    "format": "double", 
+                    "description": "The longitude in degrees. It must be in the range [-180.0, +180.0].",
+                    "format": "double",
                     "type": "number"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "LeaveSharedAlbumRequest": {
-            "description": "Request to leave a shared album on behalf of the user. This uses a shareToken\nwhich can be acquired via the or listSharedAlbums or getAlbum calls.", 
-            "id": "LeaveSharedAlbumRequest", 
+            "description": "Request to leave a shared album on behalf of the user. This uses a shareToken which can be acquired via the or listSharedAlbums or getAlbum calls.",
+            "id": "LeaveSharedAlbumRequest",
             "properties": {
                 "shareToken": {
-                    "description": "Token to leave the shared album on behalf of the user.", 
+                    "description": "Required. Token to leave the shared album on behalf of the user.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "LeaveSharedAlbumResponse": {
-            "description": "Response to successfully leaving the shared album on behalf of the user.", 
-            "id": "LeaveSharedAlbumResponse", 
-            "properties": {}, 
+            "description": "Response to successfully leaving the shared album on behalf of the user.",
+            "id": "LeaveSharedAlbumResponse",
+            "properties": {},
             "type": "object"
-        }, 
+        },
         "ListAlbumsResponse": {
-            "description": "List of albums requested.", 
-            "id": "ListAlbumsResponse", 
+            "description": "List of albums requested.",
+            "id": "ListAlbumsResponse",
             "properties": {
                 "albums": {
-                    "description": "Output only. List of albums shown in the Albums tab of the user's Google\nPhotos app.", 
+                    "description": "Output only. List of albums shown in the Albums tab of the user's Google Photos app.",
                     "items": {
                         "$ref": "Album"
-                    }, 
+                    },
                     "type": "array"
-                }, 
+                },
                 "nextPageToken": {
-                    "description": "Output only. Token to use to get the next set of albums. Populated if\nthere are more albums to retrieve for this request.", 
+                    "description": "Output only. Token to use to get the next set of albums. Populated if there are more albums to retrieve for this request.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "ListMediaItemsResponse": {
-            "description": "List of all media items from the user's Google Photos library.", 
-            "id": "ListMediaItemsResponse", 
+            "description": "List of all media items from the user's Google Photos library.",
+            "id": "ListMediaItemsResponse",
             "properties": {
                 "mediaItems": {
-                    "description": "Output only. List of media items in the user's library.", 
+                    "description": "Output only. List of media items in the user's library.",
                     "items": {
                         "$ref": "MediaItem"
-                    }, 
+                    },
                     "type": "array"
-                }, 
+                },
                 "nextPageToken": {
-                    "description": "Output only. Token to use to get the next set of media items. Its presence\nis the only reliable indicator of more media items being available in the\nnext request.", 
+                    "description": "Output only. Token to use to get the next set of media items. Its presence is the only reliable indicator of more media items being available in the next request.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "ListSharedAlbumsResponse": {
-            "description": "List of shared albums requested.", 
-            "id": "ListSharedAlbumsResponse", 
+            "description": "List of shared albums requested.",
+            "id": "ListSharedAlbumsResponse",
             "properties": {
                 "nextPageToken": {
-                    "description": "Output only. Token to use to get the next set of shared albums. Populated\nif there are more shared albums to retrieve for this request.", 
+                    "description": "Output only. Token to use to get the next set of shared albums. Populated if there are more shared albums to retrieve for this request.",
                     "type": "string"
-                }, 
+                },
                 "sharedAlbums": {
-                    "description": "Output only. List of shared albums.", 
+                    "description": "Output only. List of shared albums.",
                     "items": {
                         "$ref": "Album"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "Location": {
-            "description": "Represents a physical location.", 
-            "id": "Location", 
+            "description": "Represents a physical location.",
+            "id": "Location",
             "properties": {
                 "latlng": {
-                    "$ref": "LatLng", 
+                    "$ref": "LatLng",
                     "description": "Position of the location on the map."
-                }, 
+                },
                 "locationName": {
-                    "description": "Name of the location to be displayed.", 
+                    "description": "Name of the location to be displayed.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "LocationEnrichment": {
-            "description": "An enrichment containing a single location.", 
-            "id": "LocationEnrichment", 
+            "description": "An enrichment containing a single location.",
+            "id": "LocationEnrichment",
             "properties": {
                 "location": {
-                    "$ref": "Location", 
+                    "$ref": "Location",
                     "description": "Location for this enrichment item."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "MapEnrichment": {
-            "description": "An enrichment containing a map, showing origin and destination locations.", 
-            "id": "MapEnrichment", 
+            "description": "An enrichment containing a map, showing origin and destination locations.",
+            "id": "MapEnrichment",
             "properties": {
                 "destination": {
-                    "$ref": "Location", 
+                    "$ref": "Location",
                     "description": "Destination location for this enrichemt item."
-                }, 
+                },
                 "origin": {
-                    "$ref": "Location", 
+                    "$ref": "Location",
                     "description": "Origin location for this enrichment item."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "MediaItem": {
-            "description": "Representation of a media item (such as a photo or video) in Google Photos.", 
-            "id": "MediaItem", 
+            "description": "Representation of a media item (such as a photo or video) in Google Photos.",
+            "id": "MediaItem",
             "properties": {
                 "baseUrl": {
-                    "description": "A URL to the media item's bytes. This shouldn't be used as is. Parameters\nshould be appended to this URL before use. See the [developer\ndocumentation](https://developers.google.com/photos/library/guides/access-media-items#base-urls)\nfor a complete list of supported parameters. For example, `'=w2048-h1024'`\nwill set the dimensions of a media item of type photo to have a width of\n2048 px and height of 1024 px.", 
+                    "description": "A URL to the media item's bytes. This shouldn't be used as is. Parameters should be appended to this URL before use. See the [developer documentation](https://developers.google.com/photos/library/guides/access-media-items#base-urls) for a complete list of supported parameters. For example, `'=w2048-h1024'` will set the dimensions of a media item of type photo to have a width of 2048 px and height of 1024 px.",
                     "type": "string"
-                }, 
+                },
                 "contributorInfo": {
-                    "$ref": "ContributorInfo", 
+                    "$ref": "ContributorInfo",
                     "description": "Information about the user who created this media item."
-                }, 
+                },
                 "description": {
-                    "description": "Description of the media item. This is shown to the user in the item's\ninfo section in the Google Photos app.", 
+                    "description": "Description of the media item. This is shown to the user in the item's info section in the Google Photos app.",
                     "type": "string"
-                }, 
+                },
                 "filename": {
-                    "description": "Filename of the media item. This is shown to the user in the item's info\nsection in the Google Photos app.", 
+                    "description": "Filename of the media item. This is shown to the user in the item's info section in the Google Photos app.",
                     "type": "string"
-                }, 
+                },
                 "id": {
-                    "description": "Identifier for the media item. This is a persistent identifier that can be\nused between sessions to identify this media item.", 
+                    "description": "Identifier for the media item. This is a persistent identifier that can be used between sessions to identify this media item.",
                     "type": "string"
-                }, 
+                },
                 "mediaMetadata": {
-                    "$ref": "MediaMetadata", 
-                    "description": "Metadata related to the media item, such as, height, width, or\ncreation time."
-                }, 
+                    "$ref": "MediaMetadata",
+                    "description": "Metadata related to the media item, such as, height, width, or creation time."
+                },
                 "mimeType": {
-                    "description": "MIME type of the media item. For example, `image/jpeg`.", 
+                    "description": "MIME type of the media item. For example, `image/jpeg`.",
                     "type": "string"
-                }, 
+                },
                 "productUrl": {
-                    "description": "Google Photos URL for the media item. This link is available to\nthe user only if they're signed in.", 
+                    "description": "Google Photos URL for the media item. This link is available to the user only if they're signed in.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "MediaItemResult": {
-            "description": "Result of retrieving a media item.", 
-            "id": "MediaItemResult", 
+            "description": "Result of retrieving a media item.",
+            "id": "MediaItemResult",
             "properties": {
                 "mediaItem": {
-                    "$ref": "MediaItem", 
-                    "description": "Media item retrieved from the user's library. It's populated if no errors\noccurred and the media item was fetched successfully."
-                }, 
+                    "$ref": "MediaItem",
+                    "description": "Media item retrieved from the user's library. It's populated if no errors occurred and the media item was fetched successfully."
+                },
                 "status": {
-                    "$ref": "Status", 
-                    "description": "If an error occurred while accessing this media item, this field\nis populated with information related to the error. For details regarding\nthis field, see Status."
+                    "$ref": "Status",
+                    "description": "If an error occurred while accessing this media item, this field is populated with information related to the error. For details regarding this field, see Status."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "MediaMetadata": {
-            "description": "Metadata for a media item.", 
-            "id": "MediaMetadata", 
+            "description": "Metadata for a media item.",
+            "id": "MediaMetadata",
             "properties": {
                 "creationTime": {
-                    "description": "Time when the media item was first created (not when it was uploaded to\nGoogle Photos).", 
-                    "format": "google-datetime", 
+                    "description": "Time when the media item was first created (not when it was uploaded to Google Photos).",
+                    "format": "google-datetime",
                     "type": "string"
-                }, 
+                },
                 "height": {
-                    "description": "Original height (in pixels) of the media item.", 
-                    "format": "int64", 
+                    "description": "Original height (in pixels) of the media item.",
+                    "format": "int64",
                     "type": "string"
-                }, 
+                },
                 "photo": {
-                    "$ref": "Photo", 
+                    "$ref": "Photo",
                     "description": "Metadata for a photo media type."
-                }, 
+                },
                 "video": {
-                    "$ref": "Video", 
+                    "$ref": "Video",
                     "description": "Metadata for a video media type."
-                }, 
+                },
                 "width": {
-                    "description": "Original width (in pixels) of the media item.", 
-                    "format": "int64", 
+                    "description": "Original width (in pixels) of the media item.",
+                    "format": "int64",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "MediaTypeFilter": {
-            "description": "This filter defines the type of media items to be returned, for example,\nvideos or photos. All the specified media types are treated as an OR when\nused together.", 
-            "id": "MediaTypeFilter", 
+            "description": "This filter defines the type of media items to be returned, for example, videos or photos. All the specified media types are treated as an OR when used together.",
+            "id": "MediaTypeFilter",
             "properties": {
                 "mediaTypes": {
-                    "description": "The types of media items to be included. This field should be populated\nwith only one media type. If you specify multiple media types, it results\nin an error.", 
-                    "enumDescriptions": [
-                        "Treated as if no filters are applied. All media types are included.", 
-                        "All media items that are considered videos.\nThis also includes movies the user has created using the Google Photos\napp.", 
-                        "All media items that are considered photos. This includes .bmp, .gif,\n.ico, .jpg (and other spellings), .tiff, .webp and special photo types\nsuch as iOS live photos, Android motion photos, panoramas, photospheres."
-                    ], 
+                    "description": "The types of media items to be included. This field should be populated with only one media type. If you specify multiple media types, it results in an error.",
                     "items": {
                         "enum": [
-                            "ALL_MEDIA", 
-                            "VIDEO", 
+                            "ALL_MEDIA",
+                            "VIDEO",
                             "PHOTO"
-                        ], 
+                        ],
+                        "enumDescriptions": [
+                            "Treated as if no filters are applied. All media types are included.",
+                            "All media items that are considered videos. This also includes movies the user has created using the Google Photos app.",
+                            "All media items that are considered photos. This includes .bmp, .gif, .ico, .jpg (and other spellings), .tiff, .webp and special photo types such as iOS live photos, Android motion photos, panoramas, photospheres."
+                        ],
                         "type": "string"
-                    }, 
+                    },
                     "type": "array"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "NewEnrichmentItem": {
-            "description": "A new enrichment item to be added to an album, used by the\n`albums.addEnrichment` call.", 
-            "id": "NewEnrichmentItem", 
+            "description": "A new enrichment item to be added to an album, used by the `albums.addEnrichment` call.",
+            "id": "NewEnrichmentItem",
             "properties": {
                 "locationEnrichment": {
-                    "$ref": "LocationEnrichment", 
+                    "$ref": "LocationEnrichment",
                     "description": "Location to be added to the album."
-                }, 
+                },
                 "mapEnrichment": {
-                    "$ref": "MapEnrichment", 
+                    "$ref": "MapEnrichment",
                     "description": "Map to be added to the album."
-                }, 
+                },
                 "textEnrichment": {
-                    "$ref": "TextEnrichment", 
+                    "$ref": "TextEnrichment",
                     "description": "Text to be added to the album."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "NewMediaItem": {
-            "description": "New media item that's created in a user's Google Photos account.", 
-            "id": "NewMediaItem", 
+            "description": "New media item that's created in a user's Google Photos account.",
+            "id": "NewMediaItem",
             "properties": {
                 "description": {
-                    "description": "Description of the media item. This will be shown to the user in the item's\ninfo section in the Google Photos app.\nThis string shouldn't be more than 1000 characters.", 
+                    "description": "Description of the media item. This will be shown to the user in the item's info section in the Google Photos app. This string shouldn't be more than 1000 characters.",
                     "type": "string"
-                }, 
+                },
                 "simpleMediaItem": {
-                    "$ref": "SimpleMediaItem", 
+                    "$ref": "SimpleMediaItem",
                     "description": "A new media item that has been uploaded via the included `uploadToken`."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "NewMediaItemResult": {
-            "description": "Result of creating a new media item.", 
-            "id": "NewMediaItemResult", 
+            "description": "Result of creating a new media item.",
+            "id": "NewMediaItemResult",
             "properties": {
                 "mediaItem": {
-                    "$ref": "MediaItem", 
-                    "description": "Media item created with the upload token. It's populated if no errors\noccurred and the media item was created successfully."
-                }, 
+                    "$ref": "MediaItem",
+                    "description": "Media item created with the upload token. It's populated if no errors occurred and the media item was created successfully."
+                },
                 "status": {
-                    "$ref": "Status", 
-                    "description": "If an error occurred during the creation of this media item, this field\nis  populated with information related to the error. For details regarding\nthis field, see <a href=\"#Status\">Status</a>."
-                }, 
+                    "$ref": "Status",
+                    "description": "If an error occurred during the creation of this media item, this field is populated with information related to the error. For details regarding this field, see Status."
+                },
                 "uploadToken": {
-                    "description": "The upload token used to create this new media item.", 
+                    "description": "The upload token used to create this new media item.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "Photo": {
-            "description": "Metadata that is specific to a photo, such as, ISO, focal length and\nexposure time. Some of these fields may be null or not included.", 
-            "id": "Photo", 
+            "description": "Metadata that is specific to a photo, such as, ISO, focal length and exposure time. Some of these fields may be null or not included.",
+            "id": "Photo",
             "properties": {
                 "apertureFNumber": {
-                    "description": "Aperture f number of the camera lens with which the photo was taken.", 
-                    "format": "float", 
+                    "description": "Aperture f number of the camera lens with which the photo was taken.",
+                    "format": "float",
                     "type": "number"
-                }, 
+                },
                 "cameraMake": {
-                    "description": "Brand of the camera with which the photo was taken.", 
+                    "description": "Brand of the camera with which the photo was taken.",
                     "type": "string"
-                }, 
+                },
                 "cameraModel": {
-                    "description": "Model of the camera with which the photo was taken.", 
+                    "description": "Model of the camera with which the photo was taken.",
                     "type": "string"
-                }, 
+                },
                 "exposureTime": {
-                    "description": "Exposure time of the camera aperture when the photo was taken.", 
-                    "format": "google-duration", 
+                    "description": "Exposure time of the camera aperture when the photo was taken.",
+                    "format": "google-duration",
                     "type": "string"
-                }, 
+                },
                 "focalLength": {
-                    "description": "Focal length of the camera lens with which the photo was taken.", 
-                    "format": "float", 
+                    "description": "Focal length of the camera lens with which the photo was taken.",
+                    "format": "float",
                     "type": "number"
-                }, 
+                },
                 "isoEquivalent": {
-                    "description": "ISO of the camera with which the photo was taken.", 
-                    "format": "int32", 
+                    "description": "ISO of the camera with which the photo was taken.",
+                    "format": "int32",
                     "type": "integer"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "SearchMediaItemsRequest": {
-            "description": "Request to search for media items in a user's library.\n\nIf the album id is specified, this call will return the list of media items\nin the album. If neither filters nor album id are\nspecified, this call will return all media items in a user's Google Photos\nlibrary.\n\nIf filters are specified, this call will return all media items in\nthe user's library that fulfill the filter criteria.\n\nFilters and album id must not both be set, as this will result in an\ninvalid request.", 
-            "id": "SearchMediaItemsRequest", 
+            "description": "Request to search for media items in a user's library. If the album id is specified, this call will return the list of media items in the album. If neither filters nor album id are specified, this call will return all media items in a user's Google Photos library. If filters are specified, this call will return all media items in the user's library that fulfill the filter criteria. Filters and album id must not both be set, as this will result in an invalid request.",
+            "id": "SearchMediaItemsRequest",
             "properties": {
                 "albumId": {
-                    "description": "Identifier of an album. If populated, lists all media items in\nspecified album. Can't set in conjunction with any filters.", 
+                    "description": "Identifier of an album. If populated, lists all media items in specified album. Can't set in conjunction with any filters.",
                     "type": "string"
-                }, 
+                },
                 "filters": {
-                    "$ref": "Filters", 
-                    "description": "Filters to apply to the request. Can't be set in conjunction with an\n`albumId`."
-                }, 
+                    "$ref": "Filters",
+                    "description": "Filters to apply to the request. Can't be set in conjunction with an `albumId`."
+                },
                 "pageSize": {
-                    "description": "Maximum number of media items to return in the response. Fewer media items\nmight be returned than the specified number. The default `pageSize` is 25,\nthe maximum is 100.", 
-                    "format": "int32", 
+                    "description": "Maximum number of media items to return in the response. Fewer media items might be returned than the specified number. The default `pageSize` is 25, the maximum is 100.",
+                    "format": "int32",
                     "type": "integer"
-                }, 
+                },
                 "pageToken": {
-                    "description": "A continuation token to get the next page of the results. Adding this to\nthe request returns the rows after the `pageToken`. The `pageToken` should\nbe the value returned in the `nextPageToken` parameter in the response to\nthe `searchMediaItems` request.", 
+                    "description": "A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `searchMediaItems` request.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "SearchMediaItemsResponse": {
-            "description": "List of media items that match the search parameters.", 
-            "id": "SearchMediaItemsResponse", 
+            "description": "List of media items that match the search parameters.",
+            "id": "SearchMediaItemsResponse",
             "properties": {
                 "mediaItems": {
-                    "description": "Output only. List of media items that match the search parameters.", 
+                    "description": "Output only. List of media items that match the search parameters.",
                     "items": {
                         "$ref": "MediaItem"
-                    }, 
+                    },
                     "type": "array"
-                }, 
+                },
                 "nextPageToken": {
-                    "description": "Output only. Use this token to get the next set of media items. Its\npresence is the only reliable indicator of more media items being available\nin the next request.", 
+                    "description": "Output only. Use this token to get the next set of media items. Its presence is the only reliable indicator of more media items being available in the next request.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "ShareAlbumRequest": {
-            "description": "Request to make an album shared in Google Photos.", 
-            "id": "ShareAlbumRequest", 
+            "description": "Request to make an album shared in Google Photos.",
+            "id": "ShareAlbumRequest",
             "properties": {
                 "sharedAlbumOptions": {
-                    "$ref": "SharedAlbumOptions", 
+                    "$ref": "SharedAlbumOptions",
                     "description": "Options to be set when converting the album to a shared album."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "ShareAlbumResponse": {
-            "description": "Response to successfully sharing an album.", 
-            "id": "ShareAlbumResponse", 
+            "description": "Response to successfully sharing an album.",
+            "id": "ShareAlbumResponse",
             "properties": {
                 "shareInfo": {
-                    "$ref": "ShareInfo", 
+                    "$ref": "ShareInfo",
                     "description": "Output only. Information about the shared album."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "ShareInfo": {
-            "description": "Information about albums that are shared. This information is only included\nif you created the album, it is shared and you have the sharing scope.", 
-            "id": "ShareInfo", 
+            "description": "Information about albums that are shared. This information is only included if you created the album, it is shared and you have the sharing scope.",
+            "id": "ShareInfo",
             "properties": {
                 "isJoinable": {
-                    "description": "True if the album can be joined by users.", 
+                    "description": "True if the album can be joined by users.",
                     "type": "boolean"
-                }, 
+                },
                 "isJoined": {
-                    "description": "True if the user is joined to the album. This is always true for\nthe owner of the album.", 
+                    "description": "True if the user is joined to the album. This is always true for the owner of the album.",
                     "type": "boolean"
-                }, 
+                },
                 "isOwned": {
-                    "description": "True if the user owns the album.", 
+                    "description": "True if the user owns the album.",
                     "type": "boolean"
-                }, 
+                },
                 "shareToken": {
-                    "description": "A token that is used to join, leave, or retrieve the details of a shared\nalbum on behalf of a user who isn't the owner.\n\nA `shareToken` is invalidated if the owner turns off link sharing in the\nGoogle Photos app, or if the album is unshared.", 
+                    "description": "A token that is used to join, leave, or retrieve the details of a shared album on behalf of a user who isn't the owner. A `shareToken` is invalidated if the owner turns off link sharing in the Google Photos app, or if the album is unshared.",
                     "type": "string"
-                }, 
+                },
                 "shareableUrl": {
-                    "description": "A link to the shared Google Photos album. Anyone with the link can view the\ncontents of the album, so it should be treated with care.\n\nThe `shareableUrl` parameter is only returned if the album has link sharing\nturned on. If a user is already joined to an album that isn't link-shared,\nthey can use the album's\n[`productUrl`](https://developers.google.com/photos/library/reference/rest/v1/albums#Album)\nto access it instead.\n\nA `shareableUrl` is invalidated if the owner turns off link sharing in the\nGoogle Photos app, or if the album is unshared.", 
+                    "description": "A link to the shared Google Photos album. Anyone with the link can view the contents of the album, so it should be treated with care. The `shareableUrl` parameter is only returned if the album has link sharing turned on. If a user is already joined to an album that isn't link-shared, they can use the album's [`productUrl`](https://developers.google.com/photos/library/reference/rest/v1/albums#Album) to access it instead. A `shareableUrl` is invalidated if the owner turns off link sharing in the Google Photos app, or if the album is unshared.",
                     "type": "string"
-                }, 
+                },
                 "sharedAlbumOptions": {
-                    "$ref": "SharedAlbumOptions", 
-                    "description": "Options that control whether someone can add media items to, or comment on\na shared album."
+                    "$ref": "SharedAlbumOptions",
+                    "description": "Options that control whether someone can add media items to, or comment on a shared album."
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "SharedAlbumOptions": {
-            "description": "Options that control the sharing of an album.", 
-            "id": "SharedAlbumOptions", 
+            "description": "Options that control the sharing of an album.",
+            "id": "SharedAlbumOptions",
             "properties": {
                 "isCollaborative": {
-                    "description": "True if the shared album allows collaborators (users who have joined\nthe album) to add media items to it. Defaults to false.", 
+                    "description": "True if the shared album allows collaborators (users who have joined the album) to add media items to it. Defaults to false.",
                     "type": "boolean"
-                }, 
+                },
                 "isCommentable": {
-                    "description": "True if the shared album allows collaborators (users who have joined the\nalbum) to add comments to the album. Defaults to false.", 
+                    "description": "True if the shared album allows collaborators (users who have joined the album) to add comments to the album. Defaults to false.",
                     "type": "boolean"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "SimpleMediaItem": {
-            "description": "A simple media item to be created in Google Photos via an upload token.", 
-            "id": "SimpleMediaItem", 
+            "description": "A simple media item to be created in Google Photos via an upload token.",
+            "id": "SimpleMediaItem",
             "properties": {
                 "fileName": {
-                    "description": "File name with extension of the media item. This is shown to the user in\nGoogle Photos. The file name specified during the <a\nhref=\"https://developers.google.com/photos/library/guides/upload-media\">byte\nupload process</a> is ignored if this field is set. The file name,\nincluding the file extension, shouldn't be more than 255 characters. This\nis an optional field.", 
+                    "description": "File name with extension of the media item. This is shown to the user in Google Photos. The file name specified during the byte upload process is ignored if this field is set. The file name, including the file extension, shouldn't be more than 255 characters. This is an optional field.",
                     "type": "string"
-                }, 
+                },
                 "uploadToken": {
-                    "description": "Token identifying the media bytes that have been uploaded to Google.", 
+                    "description": "Token identifying the media bytes that have been uploaded to Google.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "Status": {
-            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).", 
-            "id": "Status", 
+            "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
+            "id": "Status",
             "properties": {
                 "code": {
-                    "description": "The status code, which should be an enum value of google.rpc.Code.", 
-                    "format": "int32", 
+                    "description": "The status code, which should be an enum value of google.rpc.Code.",
+                    "format": "int32",
                     "type": "integer"
-                }, 
+                },
                 "details": {
-                    "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use.", 
+                    "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
                     "items": {
                         "additionalProperties": {
-                            "description": "Properties of the object. Contains field @type with type URL.", 
+                            "description": "Properties of the object. Contains field @type with type URL.",
                             "type": "any"
-                        }, 
+                        },
                         "type": "object"
-                    }, 
+                    },
                     "type": "array"
-                }, 
+                },
                 "message": {
-                    "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\ngoogle.rpc.Status.details field, or localized by the client.", 
+                    "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "TextEnrichment": {
-            "description": "An enrichment containing text.", 
-            "id": "TextEnrichment", 
+            "description": "An enrichment containing text.",
+            "id": "TextEnrichment",
             "properties": {
                 "text": {
-                    "description": "Text for this enrichment item.", 
+                    "description": "Text for this enrichment item.",
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
-        }, 
+        },
         "UnshareAlbumRequest": {
-            "description": "Request to unshare a shared album in Google Photos.", 
-            "id": "UnshareAlbumRequest", 
-            "properties": {}, 
+            "description": "Request to unshare a shared album in Google Photos.",
+            "id": "UnshareAlbumRequest",
+            "properties": {},
             "type": "object"
-        }, 
+        },
         "UnshareAlbumResponse": {
-            "description": "Response of a successful unshare of a shared album.", 
-            "id": "UnshareAlbumResponse", 
-            "properties": {}, 
+            "description": "Response of a successful unshare of a shared album.",
+            "id": "UnshareAlbumResponse",
+            "properties": {},
             "type": "object"
-        }, 
+        },
         "Video": {
-            "description": "Metadata that is specific to a video, for example, fps and processing status.\nSome of these fields may be null or not included.", 
-            "id": "Video", 
+            "description": "Metadata that is specific to a video, for example, fps and processing status. Some of these fields may be null or not included.",
+            "id": "Video",
             "properties": {
                 "cameraMake": {
-                    "description": "Brand of the camera with which the video was taken.", 
+                    "description": "Brand of the camera with which the video was taken.",
                     "type": "string"
-                }, 
+                },
                 "cameraModel": {
-                    "description": "Model of the camera with which the video was taken.", 
+                    "description": "Model of the camera with which the video was taken.",
                     "type": "string"
-                }, 
+                },
                 "fps": {
-                    "description": "Frame rate of the video.", 
-                    "format": "double", 
+                    "description": "Frame rate of the video.",
+                    "format": "double",
                     "type": "number"
-                }, 
+                },
                 "status": {
-                    "description": "Processing status of the video.", 
+                    "description": "Processing status of the video.",
                     "enum": [
-                        "UNSPECIFIED", 
-                        "PROCESSING", 
-                        "READY", 
+                        "UNSPECIFIED",
+                        "PROCESSING",
+                        "READY",
                         "FAILED"
-                    ], 
+                    ],
                     "enumDescriptions": [
-                        "Video processing status is unknown.", 
-                        "Video is being processed. The user sees an icon for this\nvideo in the Google Photos app; however, it isn't playable yet.", 
-                        "Video processing is complete and it is now ready for viewing.", 
+                        "Video processing status is unknown.",
+                        "Video is being processed. The user sees an icon for this video in the Google Photos app; however, it isn't playable yet.",
+                        "Video processing is complete and it is now ready for viewing.",
                         "Something has gone wrong and the video has failed to process."
-                    ], 
+                    ],
                     "type": "string"
                 }
-            }, 
+            },
             "type": "object"
         }
-    }, 
-    "servicePath": "", 
-    "title": "Photos Library API", 
-    "version": "v1", 
+    },
+    "servicePath": "",
+    "title": "Photos Library API",
+    "version": "v1",
     "version_module": true
 }

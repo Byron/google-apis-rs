@@ -35,6 +35,10 @@ api:
     - v1beta1
     analytics:
     - v3
+    analyticsadmin:
+    - v1alpha
+    analyticsdata:
+    - v1beta
     analyticsreporting:
     - v4
     androiddeviceprovisioning:
@@ -46,6 +50,8 @@ api:
     androidpublisher:
     - v2
     - v3
+    apigateway:
+    - v1
     apigee:
     - v1
     appengine:
@@ -56,8 +62,13 @@ api:
     - v1
     appstate:
     - v1
+    area120tables:
+    - v1alpha1
     artifactregistry:
+    - v1
     - v1beta1
+    assuredworkloads:
+    - v1
     audit:
     - v1
     autoscaler:
@@ -73,6 +84,7 @@ api:
     bigtableadmin:
     - v2
     billingbudgets:
+    - v1
     - v1beta1
     binaryauthorization:
     - v1
@@ -84,6 +96,10 @@ api:
     calendar:
     - v3
     chat:
+    - v1
+    chromemanagement:
+    - v1
+    chromepolicy:
     - v1
     chromeuxreport:
     - v1
@@ -97,6 +113,8 @@ api:
     cloudbilling:
     - v1
     cloudbuild:
+    - v1
+    cloudchannel:
     - v1
     clouddebugger:
     - v2
@@ -125,6 +143,7 @@ api:
     - v1
     - v1beta1
     - v2
+    - v3
     cloudscheduler:
     - v1
     - v1beta1
@@ -165,7 +184,12 @@ api:
     dataflow:
     - v1b4
     datafusion:
+    - v1
     - v1beta1
+    datalabeling:
+    - v1beta1
+    datamigration:
+    - v1
     dataproc:
     - v1
     datastore:
@@ -183,6 +207,7 @@ api:
     dialogflow:
     - v2
     - v2beta1
+    - v3
     digitalassetlinks:
     - v1
     discovery:
@@ -197,7 +222,10 @@ api:
     docs:
     - v1
     documentai:
+    - v1
     - v1beta2
+    domains:
+    - v1beta1
     domainsrdap:
     - v1
     doubleclickbidmanager:
@@ -210,6 +238,8 @@ api:
     - v3
     driveactivity:
     - v2
+    eventarc:
+    - v1
     factchecktools:
     - v1alpha1
     fcm:
@@ -219,6 +249,8 @@ api:
     - v1beta1
     firebase:
     - v1beta1
+    firebasedatabase:
+    - v1beta
     firebasedynamiclinks:
     - v1
     firebasehosting:
@@ -230,6 +262,8 @@ api:
     - v1
     firebaserules:
     - v1
+    firebasestorage:
+    - v1beta
     firestore:
     - v1
     - v1beta1
@@ -251,9 +285,12 @@ api:
     - v1beta1
     genomics:
     - v1
+    gkehub:
+    - v1
     gmail:
     - v1
     gmailpostmastertools:
+    - v1
     - v1beta1
     groupsmigration:
     - v1
@@ -277,6 +314,7 @@ api:
     - v3
     jobs:
     - v3
+    - v4
     kgsearch:
     - v1
     language:
@@ -288,6 +326,8 @@ api:
     - v1
     lifesciences:
     - v2beta
+    localservices:
+    - v1
     logging:
     - v2
     - v2beta1
@@ -300,7 +340,10 @@ api:
     mapsengine:
     - v1
     memcache:
+    - v1
     - v1beta2
+    metastore:
+    - v1beta
     mirror:
     - v1
     ml:
@@ -309,9 +352,19 @@ api:
     - v3
     mybusiness:
     - v4
+    mybusinessaccountmanagement:
+    - v1
+    networkconnectivity:
+    - v1alpha1
     networkmanagement:
     - v1
+    notebooks:
+    - v1
     oauth2:
+    - v2
+    ondemandscanning:
+    - v1
+    orgpolicy:
     - v2
     osconfig:
     - v1
@@ -340,12 +393,16 @@ api:
     - v1
     plusdomains:
     - v1
+    policysimulator:
+    - v1
     policytroubleshooter:
     - v1
     poly:
     - v1
     prediction:
     - v1.6
+    privateca:
+    - v1beta1
     prod_tt_sasportal:
     - v1alpha1
     proximitybeacon:
@@ -353,10 +410,14 @@ api:
     pubsub:
     - v1
     - v1beta2
+    pubsublite:
+    - v1
     qpxexpress:
     - v1
     realtimebidding:
     - v1
+    recommendationengine:
+    - v1beta1
     recommender:
     - v1
     - v1beta1
@@ -372,6 +433,8 @@ api:
     - v1sandbox
     resourceviews:
     - v1beta2
+    retail:
+    - v2
     run:
     - v1
     runtimeconfig:
@@ -398,6 +461,7 @@ api:
     - v1
     - v2
     servicedirectory:
+    - v1
     - v1beta1
     servicemanagement:
     - v1
@@ -415,6 +479,8 @@ api:
     siteverification:
     - v1
     slides:
+    - v1
+    smartdevicemanagement:
     - v1
     sourcerepo:
     - v1
@@ -434,6 +500,8 @@ api:
     storagetransfer:
     - v1
     streetviewpublish:
+    - v1
+    sts:
     - v1
     surveys:
     - v2
@@ -456,6 +524,8 @@ api:
     - v1alpha1
     trafficdirector:
     - v2
+    transcoder:
+    - v1beta1
     translate:
     - v2
     - v3
@@ -476,9 +546,15 @@ api:
     - v1
     webmasters:
     - v3
+    webrisk:
+    - v1
     websecurityscanner:
     - v1
     - v1beta
+    workflowexecutions:
+    - v1
+    workflows:
+    - v1
     youtube:
     - v3
     youtubeanalytics:
