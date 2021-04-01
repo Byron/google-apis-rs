@@ -159,7 +159,7 @@ docs-all-clean:
 	rm -Rf ${doc_root}
 
 github-pages: | docs-all-clean docs-all
-	ghp-import -n ${doc_root}
+	GHP_IMPORT -n ${doc_root}
 	## Have to force-push - allows us to start docs fresh, clearing out unused history
 	git push origin +gh-pages
 

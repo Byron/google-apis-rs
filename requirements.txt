@@ -5,3 +5,4 @@ pytest
 pytest-cov
 importlib_resources
 codecov
+ghp-import
