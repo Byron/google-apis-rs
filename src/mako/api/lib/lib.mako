@@ -148,7 +148,7 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).${api.terms.action}()
+let r = hub.resource().activity(...).${api.terms.action}().await
 ```
 
 % if fr:
@@ -157,7 +157,7 @@ Or specifically ...
 ```ignore
 % for an, a in c.sta_map[fr.id].items():
 <% category, resource, activity = activity_split(an) %>\
-let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}()
+let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}().await
 % endfor
 ```
 % endif

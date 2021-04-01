@@ -287,7 +287,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         # could also just skip the first element, but ... let's be safe
         if request_value and request_value.id == p.get(TREF):
             continue
-        v = rvfrt(p.name, p)
+        v = rnd_arg_val_for_type(activity_input_type(schemas, p))
         # we chose to replace random strings with their meaning, as indicated by the name !
         if is_string_value(v):
             v = '"%s"' % p.name

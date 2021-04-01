@@ -46,6 +46,8 @@ RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
                      'i32' : lambda: randint(-101, -1),
                      'i64' : lambda: randint(-101, -1),
                      'String': lambda: '"%s"' % choice(words),
+                     '&str': lambda: '"%s"' % choice(words),
+                     '&Vec<String>': lambda: '&vec!["%s".into()]' % choice(words), # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
 }
 TREF = '$ref'
 IO_RESPONSE = 'response'
