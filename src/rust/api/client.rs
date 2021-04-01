@@ -269,11 +269,15 @@ pub enum Error {
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(hyper::Response<hyper::body::Body>),
+
+    /// An IO error occurred while reading a stream into memory
+    Io(std::io::Error),
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
+            Error::Io(ref err) => err.fmt(f),
             Error::HttpError(ref err) => err.fmt(f),
             Error::UploadSizeLimitExceeded(ref resource_size, ref max_size) => writeln!(
                 f,
@@ -332,6 +336,12 @@ impl error::Error for Error {
             Error::JsonDecodeError(_, ref err) => err.source(),
             _ => None,
         }
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(err: std::io::Error) -> Self {
+        Error::Io(err)
     }
 }
 
@@ -593,7 +603,7 @@ impl RangeResponseHeader {
             }
         }
 
-        panic!(format!("Unable to parse Range header {:?}", raw))
+        panic!("Unable to parse Range header {:?}", raw)
     }
 }
 

@@ -780,11 +780,13 @@ else {
                     % if simple_media_param:
                         let request = if protocol == "${simple_media_param.protocol}" {
                             ${READER_SEEK | indent_all_but_first_by(4)}
+                            let mut bytes = Vec::with_capacity(size as usize);
+                            reader.read_to_end(&mut bytes)?;
                             req_builder.header(CONTENT_TYPE, reader_mime_type.to_string())
                                      .header(CONTENT_LENGTH, size)
-                                     .body(&mut reader);
+                                     .body(hyper::body::Body::from(bytes))
                         } else {
-                            req_builder.body(hyper::body::Body::empty())
+                            req_builder.body(hyper::body::Body::from(Vec::new()))
                         }\
                     % else:
                         let request = req_builder
