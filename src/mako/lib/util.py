@@ -234,7 +234,7 @@ def markdown_rust_block(s):
 
 # wraps s into an invisible doc test function.
 def rust_test_fn_invisible(s):
-    return "# #[test] fn egal() {\n%s# }" % trailing_newline(s)
+    return "# async fn dox() {\n%s# }" % trailing_newline(s)
 
 # markdown comments
 def markdown_comment(s):

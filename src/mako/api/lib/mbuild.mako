@@ -371,7 +371,7 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 </%block>\
 % endfor
 
-${'.' + action_name | indent_by(13)}(${action_args});
+${'.' + action_name | indent_by(13)}(${action_args}).await;
 % if handle_result:
 
 match result {
@@ -379,6 +379,7 @@ match result {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled

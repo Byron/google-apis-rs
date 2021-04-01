@@ -256,7 +256,7 @@ use ${util.library_name()}::${hub_type};
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
 % endif
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 % if comments:
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
@@ -268,7 +268,7 @@ let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
         secret,
         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = ${hub_type}::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);\
+let mut hub = ${hub_type}::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);\
 </%def>
 
 ## You will still have to set the filter for your comment type - either nothing, or rust_doc_comment !
