@@ -1,0 +1,31 @@
+site_name: Document v2.0.0+20210329
+site_url: http://byron.github.io/google-apis-rs/google-documentai1-cli
+site_description: A complete library to interact with Document (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/documentai1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_list.md', 'Operations', 'List']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-processors-batch-process.md', 'Projects', 'Locations Processors Batch Process']
+- ['projects_locations-processors-human-review-config-review-document.md', 'Projects', 'Locations Processors Human Review Config Review Document']
+- ['projects_locations-processors-process.md', 'Projects', 'Locations Processors Process']
+- ['projects_locations-processors-processor-versions-batch-process.md', 'Projects', 'Locations Processors Processor Versions Batch Process']
+- ['projects_locations-processors-processor-versions-process.md', 'Projects', 'Locations Processors Processor Versions Process']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+- ['uiv1beta3_projects-locations-get.md', 'Uiv1beta3', 'Projects Locations Get']
+- ['uiv1beta3_projects-locations-list.md', 'Uiv1beta3', 'Projects Locations List']
+- ['uiv1beta3_projects-locations-operations-get.md', 'Uiv1beta3', 'Projects Locations Operations Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_gamesconfiguration1_configuration as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_gamesconfiguration1_configuration::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::GamesConfiguration<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::GamesConfiguration<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _achievement_configurations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievement_configurations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievement_configurations().delete(opt.value_of("achievement-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -79,7 +75,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -90,7 +86,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievement_configurations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievement_configurations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievement_configurations().get(opt.value_of("achievement-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -127,7 +123,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -142,7 +138,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievement_configurations_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievement_configurations_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -166,23 +162,23 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "achievement-type" => Some(("achievementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "initial-state" => Some(("initialState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.description.kind" => Some(("draft.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.icon-url" => Some(("draft.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.point-value" => Some(("draft.pointValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "draft.sort-rank" => Some(("draft.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "initial-state" => Some(("initialState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published.description.kind" => Some(("published.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published.point-value" => Some(("published.pointValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["achievement-type", "description", "draft", "icon-url", "id", "initial-state", "kind", "name", "point-value", "published", "sort-rank", "steps-to-unlock", "token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -229,7 +225,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -244,7 +240,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievement_configurations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievement_configurations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievement_configurations().list(opt.value_of("application-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -288,7 +284,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -303,7 +299,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievement_configurations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievement_configurations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -327,23 +323,23 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "achievement-type" => Some(("achievementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "initial-state" => Some(("initialState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.description.kind" => Some(("draft.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.icon-url" => Some(("draft.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.point-value" => Some(("draft.pointValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "draft.sort-rank" => Some(("draft.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "initial-state" => Some(("initialState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published.description.kind" => Some(("published.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published.point-value" => Some(("published.pointValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["achievement-type", "description", "draft", "icon-url", "id", "initial-state", "kind", "name", "point-value", "published", "sort-rank", "steps-to-unlock", "token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -390,7 +386,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -405,7 +401,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _image_configurations_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _image_configurations_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.image_configurations().upload(opt.value_of("resource-id").unwrap_or(""), opt.value_of("image-type").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -445,7 +441,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -460,7 +456,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _leaderboard_configurations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _leaderboard_configurations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.leaderboard_configurations().delete(opt.value_of("leaderboard-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -493,7 +489,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -504,7 +500,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _leaderboard_configurations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _leaderboard_configurations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.leaderboard_configurations().get(opt.value_of("leaderboard-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -541,7 +537,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -556,7 +552,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _leaderboard_configurations_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _leaderboard_configurations_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -579,38 +575,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-min" => Some(("scoreMin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-max" => Some(("scoreMax", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.currency-code" => Some(("published.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.many.kind" => Some(("published.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.two.kind" => Some(("published.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.one.kind" => Some(("published.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.few.kind" => Some(("published.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.zero.kind" => Some(("published.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.other.kind" => Some(("published.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.number-format-type" => Some(("published.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.num-decimal-places" => Some(("published.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.score-format.currency-code" => Some(("draft.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.many.kind" => Some(("draft.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.two.kind" => Some(("draft.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.one.kind" => Some(("draft.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.few.kind" => Some(("draft.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.zero.kind" => Some(("draft.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.other.kind" => Some(("draft.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.number-format-type" => Some(("draft.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.num-decimal-places" => Some(("draft.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "draft.icon-url" => Some(("draft.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.currency-code" => Some(("draft.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.num-decimal-places" => Some(("draft.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "draft.score-format.number-format-type" => Some(("draft.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.few.kind" => Some(("draft.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.many.kind" => Some(("draft.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.one.kind" => Some(("draft.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.other.kind" => Some(("draft.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.two.kind" => Some(("draft.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.zero.kind" => Some(("draft.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.sort-rank" => Some(("draft.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.currency-code" => Some(("published.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.num-decimal-places" => Some(("published.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "published.score-format.number-format-type" => Some(("published.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.few.kind" => Some(("published.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.many.kind" => Some(("published.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.one.kind" => Some(("published.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.other.kind" => Some(("published.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.two.kind" => Some(("published.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.zero.kind" => Some(("published.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "score-max" => Some(("scoreMax", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "score-min" => Some(("scoreMin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["currency-code", "draft", "few", "icon-url", "id", "kind", "many", "name", "num-decimal-places", "number-format-type", "one", "other", "published", "score-format", "score-max", "score-min", "score-order", "sort-rank", "suffix", "token", "two", "zero"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -657,7 +653,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -672,7 +668,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _leaderboard_configurations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _leaderboard_configurations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.leaderboard_configurations().list(opt.value_of("application-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -716,7 +712,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -731,7 +727,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _leaderboard_configurations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _leaderboard_configurations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -754,38 +750,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-min" => Some(("scoreMin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-max" => Some(("scoreMax", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.currency-code" => Some(("published.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.many.kind" => Some(("published.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.two.kind" => Some(("published.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.one.kind" => Some(("published.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.few.kind" => Some(("published.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.zero.kind" => Some(("published.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.other.kind" => Some(("published.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.number-format-type" => Some(("published.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.num-decimal-places" => Some(("published.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.score-format.currency-code" => Some(("draft.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.many.kind" => Some(("draft.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.two.kind" => Some(("draft.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.one.kind" => Some(("draft.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.few.kind" => Some(("draft.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.zero.kind" => Some(("draft.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.other.kind" => Some(("draft.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.number-format-type" => Some(("draft.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.num-decimal-places" => Some(("draft.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "draft.icon-url" => Some(("draft.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.currency-code" => Some(("draft.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.num-decimal-places" => Some(("draft.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "draft.score-format.number-format-type" => Some(("draft.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.few.kind" => Some(("draft.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.many.kind" => Some(("draft.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.one.kind" => Some(("draft.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.other.kind" => Some(("draft.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.two.kind" => Some(("draft.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "draft.score-format.suffix.zero.kind" => Some(("draft.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "draft.sort-rank" => Some(("draft.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.currency-code" => Some(("published.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.num-decimal-places" => Some(("published.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "published.score-format.number-format-type" => Some(("published.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.few.kind" => Some(("published.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.many.kind" => Some(("published.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.one.kind" => Some(("published.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.other.kind" => Some(("published.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.two.kind" => Some(("published.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.score-format.suffix.zero.kind" => Some(("published.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "score-max" => Some(("scoreMax", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "score-min" => Some(("scoreMin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["currency-code", "draft", "few", "icon-url", "id", "kind", "many", "name", "num-decimal-places", "number-format-type", "one", "other", "published", "score-format", "score-max", "score-min", "score-order", "sort-rank", "suffix", "token", "two", "zero"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -832,7 +828,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -847,7 +843,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -855,19 +851,19 @@ impl<'n> Engine<'n> {
             ("achievement-configurations", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._achievement_configurations_delete(opt, dry_run, &mut err);
+                        call_result = self._achievement_configurations_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._achievement_configurations_get(opt, dry_run, &mut err);
+                        call_result = self._achievement_configurations_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._achievement_configurations_insert(opt, dry_run, &mut err);
+                        call_result = self._achievement_configurations_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._achievement_configurations_list(opt, dry_run, &mut err);
+                        call_result = self._achievement_configurations_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._achievement_configurations_update(opt, dry_run, &mut err);
+                        call_result = self._achievement_configurations_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("achievement-configurations".to_string()));
@@ -878,7 +874,7 @@ impl<'n> Engine<'n> {
             ("image-configurations", Some(opt)) => {
                 match opt.subcommand() {
                     ("upload", Some(opt)) => {
-                        call_result = self._image_configurations_upload(opt, dry_run, &mut err);
+                        call_result = self._image_configurations_upload(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("image-configurations".to_string()));
@@ -889,19 +885,19 @@ impl<'n> Engine<'n> {
             ("leaderboard-configurations", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._leaderboard_configurations_delete(opt, dry_run, &mut err);
+                        call_result = self._leaderboard_configurations_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._leaderboard_configurations_get(opt, dry_run, &mut err);
+                        call_result = self._leaderboard_configurations_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._leaderboard_configurations_insert(opt, dry_run, &mut err);
+                        call_result = self._leaderboard_configurations_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._leaderboard_configurations_list(opt, dry_run, &mut err);
+                        call_result = self._leaderboard_configurations_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._leaderboard_configurations_update(opt, dry_run, &mut err);
+                        call_result = self._leaderboard_configurations_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("leaderboard-configurations".to_string()));
@@ -926,41 +922,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "gamesconfiguration1-configuration-secret.json",
+            match client::application_secret_from_directory(&config_dir, "gamesconfiguration1-configuration-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "gamesconfiguration1-configuration",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/gamesconfiguration1-configuration", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::GamesConfiguration::new(client, auth),
@@ -976,22 +957,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
@@ -1274,7 +1256,7 @@ fn main() {
     
     let mut app = App::new("gamesconfiguration1-configuration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200701")
+           .version("2.0.0+20210325")
            .about("The Google Play Game Services Publishing API allows developers to configure their games in Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli")
            .arg(Arg::with_name("url")
@@ -1289,12 +1271,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1353,13 +1330,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

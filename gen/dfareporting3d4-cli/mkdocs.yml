@@ -1,6 +1,6 @@
-site_name: dfareporting v1.0.14+20200514
+site_name: Dfareporting v2.0.0+20210210
 site_url: http://byron.github.io/google-apis-rs/google-dfareporting3d4-cli
-site_description: A complete library to interact with dfareporting (protocol v3.4)
+site_description: A complete library to interact with Dfareporting (protocol v3.4)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting3d4-cli
 
@@ -177,6 +177,7 @@ pages:
 - ['reports_get.md', 'Reports', 'Get']
 - ['reports_insert.md', 'Reports', 'Insert']
 - ['reports_list.md', 'Reports', 'List']
+- ['reports_patch.md', 'Reports', 'Patch']
 - ['reports_run.md', 'Reports', 'Run']
 - ['reports_update.md', 'Reports', 'Update']
 - ['sites_get.md', 'Sites', 'Get']

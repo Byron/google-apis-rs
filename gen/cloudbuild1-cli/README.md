@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Build* API at revision *20200704*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Cloud Build* API at revision *20210329*. The CLI is at version *2.0.0*.
 
 ```bash
 cloudbuild1 [options]
@@ -38,6 +38,11 @@ cloudbuild1 [options]
                 builds-get <project-id> <id> [-p <v>]... [-o <out>]
                 builds-list <project-id> [-p <v>]... [-o <out>]
                 builds-retry <project-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-builds-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-builds-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-builds-get <name> [-p <v>]... [-o <out>]
+                locations-builds-list <parent> [-p <v>]... [-o <out>]
+                locations-builds-retry <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 triggers-create <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -46,6 +51,7 @@ cloudbuild1 [options]
                 triggers-list <project-id> [-p <v>]... [-o <out>]
                 triggers-patch <project-id> <trigger-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 triggers-run <project-id> <trigger-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                triggers-webhook <project-id> <trigger> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudbuild1 --help
 
 Configuration:
@@ -57,12 +63,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -115,10 +115,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `cloudbuild1 --debug <resource> <method> [options] 2>debug.txt`.
 

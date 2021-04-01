@@ -3,164 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_bigqueryreservation1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_bigqueryreservation1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::BigQueryReservation<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::BigQueryReservation<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.operations().delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.operations().list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_locations_capacity_commitments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -183,15 +65,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "commitment-end-time" => Some(("commitmentEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "commitment-start-time" => Some(("commitmentStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "failure-status.code" => Some(("failureStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "failure-status.message" => Some(("failureStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plan" => Some(("plan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "renewal-plan" => Some(("renewalPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "slot-count" => Some(("slotCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "plan" => Some(("plan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "commitment-end-time" => Some(("commitmentEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "failure-status.message" => Some(("failureStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "failure-status.code" => Some(("failureStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "renewal-plan" => Some(("renewalPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "commitment-end-time", "commitment-start-time", "failure-status", "message", "name", "plan", "renewal-plan", "slot-count", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -242,7 +124,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -257,7 +139,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_capacity_commitments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_capacity_commitments_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -294,7 +176,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -309,7 +191,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_capacity_commitments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_capacity_commitments_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -346,7 +228,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -361,7 +243,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_capacity_commitments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_capacity_commitments_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -405,7 +287,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -420,7 +302,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_capacity_commitments_merge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_merge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -490,7 +372,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -505,7 +387,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_capacity_commitments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -528,15 +410,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "commitment-end-time" => Some(("commitmentEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "commitment-start-time" => Some(("commitmentStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "failure-status.code" => Some(("failureStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "failure-status.message" => Some(("failureStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plan" => Some(("plan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "renewal-plan" => Some(("renewalPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "slot-count" => Some(("slotCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "plan" => Some(("plan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "commitment-end-time" => Some(("commitmentEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "failure-status.message" => Some(("failureStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "failure-status.code" => Some(("failureStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "renewal-plan" => Some(("renewalPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "commitment-end-time", "commitment-start-time", "failure-status", "message", "name", "plan", "renewal-plan", "slot-count", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -587,7 +469,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -602,7 +484,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_capacity_commitments_split(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_capacity_commitments_split(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -672,7 +554,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -687,7 +569,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_get_bi_reservation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_get_bi_reservation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get_bi_reservation(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -724,7 +606,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -739,7 +621,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_assignments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_assignments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -763,9 +645,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "assignee" => Some(("assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-type" => Some(("jobType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["assignee", "job-type", "name", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -812,7 +694,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -827,7 +709,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_assignments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_assignments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_reservations_assignments_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -864,7 +746,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -879,7 +761,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_assignments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_assignments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_reservations_assignments_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -923,7 +805,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -938,7 +820,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_assignments_move(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_assignments_move(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1008,7 +890,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1023,7 +905,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1046,11 +928,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignore-idle-slots" => Some(("ignoreIdleSlots", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-idle-slots", "name", "slot-capacity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "ignore-idle-slots", "name", "slot-capacity", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1099,7 +983,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1114,7 +998,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_reservations_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1151,7 +1035,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1166,7 +1050,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_reservations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1203,7 +1087,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1218,7 +1102,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_reservations_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1262,7 +1146,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1277,7 +1161,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_reservations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_reservations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1300,11 +1184,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ignore-idle-slots" => Some(("ignoreIdleSlots", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-idle-slots", "name", "slot-capacity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "ignore-idle-slots", "name", "slot-capacity", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1353,7 +1239,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1368,7 +1254,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_search_all_assignments(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_search_all_assignments(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_search_all_assignments(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1396,7 +1282,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["query", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "query", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1415,7 +1301,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1430,7 +1316,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_search_assignments(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_search_assignments(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_search_assignments(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1458,7 +1344,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["query", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "query", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1477,7 +1363,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1492,7 +1378,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_update_bi_reservation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_update_bi_reservation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1515,9 +1401,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "size", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1568,7 +1454,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1583,86 +1469,72 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("operations", Some(opt)) => {
-                match opt.subcommand() {
-                    ("delete", Some(opt)) => {
-                        call_result = self._operations_delete(opt, dry_run, &mut err);
-                    },
-                    ("list", Some(opt)) => {
-                        call_result = self._operations_list(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("operations".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-capacity-commitments-create", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-capacity-commitments-delete", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-capacity-commitments-get", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-capacity-commitments-list", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-capacity-commitments-merge", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_merge(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_merge(opt, dry_run, &mut err).await;
                     },
                     ("locations-capacity-commitments-patch", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-capacity-commitments-split", Some(opt)) => {
-                        call_result = self._projects_locations_capacity_commitments_split(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_capacity_commitments_split(opt, dry_run, &mut err).await;
                     },
                     ("locations-get-bi-reservation", Some(opt)) => {
-                        call_result = self._projects_locations_get_bi_reservation(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_get_bi_reservation(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-assignments-create", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_assignments_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_assignments_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-assignments-delete", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_assignments_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_assignments_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-assignments-list", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_assignments_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_assignments_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-assignments-move", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_assignments_move(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_assignments_move(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-create", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-delete", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-get", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-list", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-reservations-patch", Some(opt)) => {
-                        call_result = self._projects_locations_reservations_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_reservations_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-search-all-assignments", Some(opt)) => {
-                        call_result = self._projects_locations_search_all_assignments(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_search_all_assignments(opt, dry_run, &mut err).await;
                     },
                     ("locations-search-assignments", Some(opt)) => {
-                        call_result = self._projects_locations_search_assignments(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_search_assignments(opt, dry_run, &mut err).await;
                     },
                     ("locations-update-bi-reservation", Some(opt)) => {
-                        call_result = self._projects_locations_update_bi_reservation(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_update_bi_reservation(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1687,41 +1559,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "bigqueryreservation1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "bigqueryreservation1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "bigqueryreservation1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/bigqueryreservation1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::BigQueryReservation::new(client, auth),
@@ -1737,83 +1594,25 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("operations", "methods: 'delete' and 'list'", vec![
-            ("delete",
-                    Some(r##"Deletes a long-running operation. This method indicates that the client is
-        no longer interested in the operation result. It does not cancel the
-        operation. If the server doesn't support this method, it returns
-        `google.rpc.Code.UNIMPLEMENTED`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/operations_delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation resource to be deleted."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the
-        server doesn't support this method, it returns `UNIMPLEMENTED`.
-        
-        NOTE: the `name` binding allows API services to override the binding
-        to use different resource name schemes, such as `users/*/operations`. To
-        override the binding, API services can add a binding such as
-        `"/v1/{name=users/*}/operations"` to their service configuration.
-        For backwards compatibility, the default name includes the operations
-        collection id, however overriding users must ensure the name binding
-        is the parent resource, without the operations collection id."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/operations_list",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation's parent resource."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
         ("projects", "methods: 'locations-capacity-commitments-create', 'locations-capacity-commitments-delete', 'locations-capacity-commitments-get', 'locations-capacity-commitments-list', 'locations-capacity-commitments-merge', 'locations-capacity-commitments-patch', 'locations-capacity-commitments-split', 'locations-get-bi-reservation', 'locations-reservations-assignments-create', 'locations-reservations-assignments-delete', 'locations-reservations-assignments-list', 'locations-reservations-assignments-move', 'locations-reservations-create', 'locations-reservations-delete', 'locations-reservations-get', 'locations-reservations-list', 'locations-reservations-patch', 'locations-search-all-assignments', 'locations-search-assignments' and 'locations-update-bi-reservation'", vec![
             ("locations-capacity-commitments-create",
                     Some(r##"Creates a new capacity commitment resource."##),
@@ -1821,8 +1620,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent reservation. E.g.,
-           `projects/myproject/locations/US`"##),
+                     Some(r##"Required. Resource name of the parent reservation. E.g., `projects/myproject/locations/US`"##),
                      Some(true),
                      Some(false)),
         
@@ -1845,15 +1643,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-capacity-commitments-delete",
-                    Some(r##"Deletes a capacity commitment. Attempting to delete capacity commitment
-        before its commitment_end_time will fail with the error code
-        `google.rpc.Code.FAILED_PRECONDITION`."##),
+                    Some(r##"Deletes a capacity commitment. Attempting to delete capacity commitment before its commitment_end_time will fail with the error code `google.rpc.Code.FAILED_PRECONDITION`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the capacity commitment to delete. E.g.,
-           `projects/myproject/locations/US/capacityCommitments/123`"##),
+                     Some(r##"Required. Resource name of the capacity commitment to delete. E.g., `projects/myproject/locations/US/capacityCommitments/123`"##),
                      Some(true),
                      Some(false)),
         
@@ -1875,8 +1670,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the capacity commitment to retrieve. E.g.,
-           `projects/myproject/locations/US/capacityCommitments/123`"##),
+                     Some(r##"Required. Resource name of the capacity commitment to retrieve. E.g., `projects/myproject/locations/US/capacityCommitments/123`"##),
                      Some(true),
                      Some(false)),
         
@@ -1898,8 +1692,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent reservation. E.g.,
-           `projects/myproject/locations/US`"##),
+                     Some(r##"Required. Resource name of the parent reservation. E.g., `projects/myproject/locations/US`"##),
                      Some(true),
                      Some(false)),
         
@@ -1916,19 +1709,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-capacity-commitments-merge",
-                    Some(r##"Merges capacity commitments of the same plan into a single commitment.
-        
-        The resulting capacity commitment has the greater commitment_end_time
-        out of the to-be-merged capacity commitments.
-        
-        Attempting to merge capacity commitments of different plan will fail
-        with the error code `google.rpc.Code.FAILED_PRECONDITION`."##),
+                    Some(r##"Merges capacity commitments of the same plan into a single commitment. The resulting capacity commitment has the greater commitment_end_time out of the to-be-merged capacity commitments. Attempting to merge capacity commitments of different plan will fail with the error code `google.rpc.Code.FAILED_PRECONDITION`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-merge",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Parent resource that identifies admin project and location e.g.,
-         `projects/myproject/locations/us`"##),
+                     Some(r##"Parent resource that identifies admin project and location e.g., `projects/myproject/locations/us`"##),
                      Some(true),
                      Some(false)),
         
@@ -1951,19 +1737,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-capacity-commitments-patch",
-                    Some(r##"Updates an existing capacity commitment.
-        
-        Only `plan` and `renewal_plan` fields can be updated.
-        
-        Plan can only be changed to a plan of a longer commitment period.
-        Attempting to change to a plan with shorter commitment period will fail
-        with the error code `google.rpc.Code.FAILED_PRECONDITION`."##),
+                    Some(r##"Updates an existing capacity commitment. Only `plan` and `renewal_plan` fields can be updated. Plan can only be changed to a plan of a longer commitment period. Attempting to change to a plan with shorter commitment period will fail with the error code `google.rpc.Code.FAILED_PRECONDITION`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name of the capacity commitment, e.g.,
-        `projects/myproject/locations/US/capacityCommitments/123`"##),
+                     Some(r##"Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123`"##),
                      Some(true),
                      Some(false)),
         
@@ -1986,20 +1765,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-capacity-commitments-split",
-                    Some(r##"Splits capacity commitment to two commitments of the same plan and
-        `commitment_end_time`.
-        
-        A common use case is to enable downgrading commitments.
-        
-        For example, in order to downgrade from 10000 slots to 8000, you might
-        split a 10000 capacity commitment into commitments of 2000 and 8000. Then,
-        you would change the plan of the first one to `FLEX` and then delete it."##),
+                    Some(r##"Splits capacity commitment to two commitments of the same plan and `commitment_end_time`. A common use case is to enable downgrading commitments. For example, in order to downgrade from 10000 slots to 8000, you might split a 10000 capacity commitment into commitments of 2000 and 8000. Then, you would change the plan of the first one to `FLEX` and then delete it."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-split",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name e.g.,:
-         `projects/myproject/locations/US/capacityCommitments/123`"##),
+                     Some(r##"Required. The resource name e.g.,: `projects/myproject/locations/US/capacityCommitments/123`"##),
                      Some(true),
                      Some(false)),
         
@@ -2027,8 +1798,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the requested reservation, for example:
-        `projects/{project_id}/locations/{location_id}/bireservation`"##),
+                     Some(r##"Required. Name of the requested reservation, for example: `projects/{project_id}/locations/{location_id}/biReservation`"##),
                      Some(true),
                      Some(false)),
         
@@ -2045,42 +1815,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-reservations-assignments-create",
-                    Some(r##"Creates an assignment object which allows the given project to submit jobs
-        of a certain type using slots from the specified reservation.
-        
-        Currently a
-        resource (project, folder, organization) can only have one assignment per
-        each (job_type, location) combination, and that reservation will be used
-        for all jobs of the matching type.
-        
-        Different assignments can be created on different levels of the
-        projects, folders or organization hierarchy.  During query execution,
-        the assignment is looked up at the project, folder and organization levels
-        in that order. The first assignment found is applied to the query.
-        
-        When creating assignments, it does not matter if other assignments exist at
-        higher levels.
-        
-        Example:
-        
-        * The organization `organizationA` contains two projects, `project1`
-          and `project2`.
-        * Assignments for all three entities (`organizationA`, `project1`, and
-          `project2`) could all be created and mapped to the same or different
-          reservations.
-        
-        Returns `google.rpc.Code.PERMISSION_DENIED` if user does not have
-        'bigquery.admin' permissions on the project using the reservation
-        and the project that owns this reservation.
-        
-        Returns `google.rpc.Code.INVALID_ARGUMENT` when location of the assignment
-        does not match location of the reservation."##),
+                    Some(r##"Creates an assignment object which allows the given project to submit jobs of a certain type using slots from the specified reservation. Currently a resource (project, folder, organization) can only have one assignment per each (job_type, location) combination, and that reservation will be used for all jobs of the matching type. Different assignments can be created on different levels of the projects, folders or organization hierarchy. During query execution, the assignment is looked up at the project, folder and organization levels in that order. The first assignment found is applied to the query. When creating assignments, it does not matter if other assignments exist at higher levels. Example: * The organization `organizationA` contains two projects, `project1` and `project2`. * Assignments for all three entities (`organizationA`, `project1`, and `project2`) could all be created and mapped to the same or different reservations. "None" assignments represent an absence of the assignment. Projects assigned to None use on-demand pricing. To create a "None" assignment, use "none" as a reservation_id in the parent. Example parent: `projects/myproject/locations/US/reservations/none`. Returns `google.rpc.Code.PERMISSION_DENIED` if user does not have 'bigquery.admin' permissions on the project using the reservation and the project that owns this reservation. Returns `google.rpc.Code.INVALID_ARGUMENT` when location of the assignment does not match location of the reservation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-assignments-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name of the assignment
-        E.g. `projects/myproject/locations/US/reservations/team1-prod`"##),
+                     Some(r##"Required. The parent resource name of the assignment E.g. `projects/myproject/locations/US/reservations/team1-prod`"##),
                      Some(true),
                      Some(false)),
         
@@ -2103,27 +1843,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-reservations-assignments-delete",
-                    Some(r##"Deletes a assignment. No expansion will happen.
-        
-        Example:
-        
-        * Organization `organizationA` contains two projects, `project1` and
-          `project2`.
-        * Reservation `res1` exists and was created previously.
-        * CreateAssignment was used previously to define the following
-          associations between entities and reservations: `<organizationA, res1>`
-          and `<project1, res1>`
-        
-        In this example, deletion of the `<organizationA, res1>` assignment won't
-        affect the other assignment `<project1, res1>`. After said deletion,
-        queries from `project1` will still use `res1` while queries from
-        `project2` will switch to use on-demand mode."##),
+                    Some(r##"Deletes a assignment. No expansion will happen. Example: * Organization `organizationA` contains two projects, `project1` and `project2`. * Reservation `res1` exists and was created previously. * CreateAssignment was used previously to define the following associations between entities and reservations: `` and `` In this example, deletion of the `` assignment won't affect the other assignment ``. After said deletion, queries from `project1` will still use `res1` while queries from `project2` will switch to use on-demand mode."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-assignments-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the resource, e.g.
-          `projects/myproject/locations/US/reservations/team1-prod/assignments/123`"##),
+                     Some(r##"Required. Name of the resource, e.g. `projects/myproject/locations/US/reservations/team1-prod/assignments/123`"##),
                      Some(true),
                      Some(false)),
         
@@ -2140,38 +1865,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-reservations-assignments-list",
-                    Some(r##"Lists assignments.
-        
-        Only explicitly created assignments will be returned.
-        
-        Example:
-        
-        * Organization `organizationA` contains two projects, `project1` and
-          `project2`.
-        * Reservation `res1` exists and was created previously.
-        * CreateAssignment was used previously to define the following
-          associations between entities and reservations: `<organizationA, res1>`
-          and `<project1, res1>`
-        
-        In this example, ListAssignments will just return the above two assignments
-        for reservation `res1`, and no expansion/merge will happen.
-        
-        The wildcard "-" can be used for
-        reservations in the request. In that case all assignments belongs to the
-        specified project and location will be listed.
-        
-        **Note** "-" cannot be used for projects nor locations."##),
+                    Some(r##"Lists assignments. Only explicitly created assignments will be returned. Example: * Organization `organizationA` contains two projects, `project1` and `project2`. * Reservation `res1` exists and was created previously. * CreateAssignment was used previously to define the following associations between entities and reservations: `` and `` In this example, ListAssignments will just return the above two assignments for reservation `res1`, and no expansion/merge will happen. The wildcard "-" can be used for reservations in the request. In that case all assignments belongs to the specified project and location will be listed. **Note** "-" cannot be used for projects nor locations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-assignments-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name e.g.:
-        
-        `projects/myproject/locations/US/reservations/team1-prod`
-        
-        Or:
-        
-        `projects/myproject/locations/US/reservations/-`"##),
+                     Some(r##"Required. The parent resource name e.g.: `projects/myproject/locations/US/reservations/team1-prod` Or: `projects/myproject/locations/US/reservations/-`"##),
                      Some(true),
                      Some(false)),
         
@@ -2188,18 +1887,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-reservations-assignments-move",
-                    Some(r##"Moves an assignment under a new reservation.
-        
-        This differs from removing an existing assignment and recreating a new one
-        by providing a transactional change that ensures an assignee always has an
-        associated reservation."##),
+                    Some(r##"Moves an assignment under a new reservation. This differs from removing an existing assignment and recreating a new one by providing a transactional change that ensures an assignee always has an associated reservation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-assignments-move",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the assignment,
-        e.g.
-        `projects/myproject/locations/US/reservations/team1-prod/assignments/123`"##),
+                     Some(r##"Required. The resource name of the assignment, e.g. `projects/myproject/locations/US/reservations/team1-prod/assignments/123`"##),
                      Some(true),
                      Some(false)),
         
@@ -2227,8 +1920,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Project, location. E.g.,
-        `projects/myproject/locations/US`"##),
+                     Some(r##"Required. Project, location. E.g., `projects/myproject/locations/US`"##),
                      Some(true),
                      Some(false)),
         
@@ -2251,15 +1943,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-reservations-delete",
-                    Some(r##"Deletes a reservation.
-        Returns `google.rpc.Code.FAILED_PRECONDITION` when reservation has
-        assignments."##),
+                    Some(r##"Deletes a reservation. Returns `google.rpc.Code.FAILED_PRECONDITION` when reservation has assignments."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the reservation to retrieve. E.g.,
-           `projects/myproject/locations/US/reservations/team1-prod`"##),
+                     Some(r##"Required. Resource name of the reservation to retrieve. E.g., `projects/myproject/locations/US/reservations/team1-prod`"##),
                      Some(true),
                      Some(false)),
         
@@ -2281,8 +1970,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the reservation to retrieve. E.g.,
-           `projects/myproject/locations/US/reservations/team1-prod`"##),
+                     Some(r##"Required. Resource name of the reservation to retrieve. E.g., `projects/myproject/locations/US/reservations/team1-prod`"##),
                      Some(true),
                      Some(false)),
         
@@ -2304,8 +1992,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource name containing project and location, e.g.:
-          `projects/myproject/locations/US`"##),
+                     Some(r##"Required. The parent resource name containing project and location, e.g.: `projects/myproject/locations/US`"##),
                      Some(true),
                      Some(false)),
         
@@ -2327,8 +2014,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the reservation, e.g.,
-        `projects/*/locations/*/reservations/team1-prod`."##),
+                     Some(r##"The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`."##),
                      Some(true),
                      Some(false)),
         
@@ -2351,33 +2037,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-search-all-assignments",
-                    Some(r##"Looks up assignments for a specified resource for a particular region.
-        If the request is about a project:
-        
-        1. Assignments created on the project will be returned if they exist.
-        2. Otherwise assignments created on the closest ancestor will be
-           returned.
-        3. Assignments for different JobTypes will all be returned.
-        
-        The same logic applies if the request is about a folder.
-        
-        If the request is about an organization, then assignments created on the
-        organization will be returned (organization doesn't have ancestors).
-        
-        Comparing to ListAssignments, there are some behavior
-        differences:
-        
-        1. permission on the assignee will be verified in this API.
-        2. Hierarchy lookup (project->folder->organization) happens in this API.
-        3. Parent here is `projects/*/locations/*`, instead of
-           `projects/*/locations/*reservations/*`."##),
+                    Some(r##"Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn't have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project->folder->organization) happens in this API. 3. Parent here is `projects/*/locations/*`, instead of `projects/*/locations/*reservations/*`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-search-all-assignments",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name with location (project name could be the wildcard '-'),
-        e.g.:
-          `projects/-/locations/US`."##),
+                     Some(r##"Required. The resource name with location (project name could be the wildcard '-'), e.g.: `projects/-/locations/US`."##),
                      Some(true),
                      Some(false)),
         
@@ -2394,36 +2059,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-search-assignments",
-                    Some(r##"Looks up assignments for a specified resource for a particular region.
-        If the request is about a project:
-        
-        1. Assignments created on the project will be returned if they exist.
-        2. Otherwise assignments created on the closest ancestor will be
-           returned.
-        3. Assignments for different JobTypes will all be returned.
-        
-        The same logic applies if the request is about a folder.
-        
-        If the request is about an organization, then assignments created on the
-        organization will be returned (organization doesn't have ancestors).
-        
-        Comparing to ListAssignments, there are some behavior
-        differences:
-        
-        1. permission on the assignee will be verified in this API.
-        2. Hierarchy lookup (project->folder->organization) happens in this API.
-        3. Parent here is `projects/*/locations/*`, instead of
-           `projects/*/locations/*reservations/*`.
-        
-        **Note** "-" cannot be used for projects
-        nor locations."##),
+                    Some(r##"Looks up assignments for a specified resource for a particular region. If the request is about a project: 1. Assignments created on the project will be returned if they exist. 2. Otherwise assignments created on the closest ancestor will be returned. 3. Assignments for different JobTypes will all be returned. The same logic applies if the request is about a folder. If the request is about an organization, then assignments created on the organization will be returned (organization doesn't have ancestors). Comparing to ListAssignments, there are some behavior differences: 1. permission on the assignee will be verified in this API. 2. Hierarchy lookup (project->folder->organization) happens in this API. 3. Parent here is `projects/*/locations/*`, instead of `projects/*/locations/*reservations/*`. **Note** "-" cannot be used for projects nor locations."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-search-assignments",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the admin project(containing project and location),
-        e.g.:
-          `projects/myproject/locations/US`."##),
+                     Some(r##"Required. The resource name of the admin project(containing project and location), e.g.: `projects/myproject/locations/US`."##),
                      Some(true),
                      Some(false)),
         
@@ -2440,21 +2081,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-update-bi-reservation",
-                    Some(r##"Updates a BI reservation.
-        
-        Only fields specified in the `field_mask` are updated.
-        
-        A singleton BI reservation always exists with default size 0.
-        In order to reserve BI capacity it needs to be updated to an amount
-        greater than 0. In order to release BI capacity reservation size
-        must be set to 0."##),
+                    Some(r##"Updates a BI reservation. Only fields specified in the `field_mask` are updated. A singleton BI reservation always exists with default size 0. In order to reserve BI capacity it needs to be updated to an amount greater than 0. In order to release BI capacity reservation size must be set to 0."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-update-bi-reservation",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the singleton BI reservation.
-        Reservation names have the form
-        `projects/{project_id}/locations/{location_id}/bireservation`."##),
+                     Some(r##"The resource name of the singleton BI reservation. Reservation names have the form `projects/{project_id}/locations/{location_id}/biReservation`."##),
                      Some(true),
                      Some(false)),
         
@@ -2482,7 +2114,7 @@ fn main() {
     
     let mut app = App::new("bigqueryreservation1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200702")
+           .version("2.0.0+20210324")
            .about("A service to modify your BigQuery flat-rate reservations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli")
            .arg(Arg::with_name("url")
@@ -2497,12 +2129,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -2550,13 +2177,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

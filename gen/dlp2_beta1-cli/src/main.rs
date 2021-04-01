@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_dlp2_beta1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_dlp2_beta1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::DLP<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::DLP<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _content_deidentify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _content_deidentify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -119,7 +115,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -134,7 +130,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _content_inspect(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _content_inspect(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -207,7 +203,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -222,7 +218,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _content_redact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _content_redact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -295,7 +291,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -310,7 +306,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _data_source_analyze(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _data_source_analyze(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -333,14 +329,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "privacy-metric.numerical-stats-config.field.column-name" => Some(("privacyMetric.numericalStatsConfig.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "privacy-metric.l-diversity-config.sensitive-attribute.column-name" => Some(("privacyMetric.lDiversityConfig.sensitiveAttribute.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "privacy-metric.k-map-estimation-config.region-code" => Some(("privacyMetric.kMapEstimationConfig.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "privacy-metric.categorical-stats-config.field.column-name" => Some(("privacyMetric.categoricalStatsConfig.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "privacy-metric.k-anonymity-config.entity-id.field.column-name" => Some(("privacyMetric.kAnonymityConfig.entityId.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-table.project-id" => Some(("sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-table.table-id" => Some(("sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-table.project-id" => Some(("sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-table.dataset-id" => Some(("sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "privacy-metric.k-map-estimation-config.region-code" => Some(("privacyMetric.kMapEstimationConfig.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "privacy-metric.l-diversity-config.sensitive-attribute.column-name" => Some(("privacyMetric.lDiversityConfig.sensitiveAttribute.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "privacy-metric.numerical-stats-config.field.column-name" => Some(("privacyMetric.numericalStatsConfig.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "privacy-metric.k-anonymity-config.entity-id.field.column-name" => Some(("privacyMetric.kAnonymityConfig.entityId.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "privacy-metric.categorical-stats-config.field.column-name" => Some(("privacyMetric.categoricalStatsConfig.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["categorical-stats-config", "column-name", "dataset-id", "entity-id", "field", "k-anonymity-config", "k-map-estimation-config", "l-diversity-config", "numerical-stats-config", "privacy-metric", "project-id", "region-code", "sensitive-attribute", "source-table", "table-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -387,7 +383,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -402,7 +398,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _inspect_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inspect_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -471,7 +467,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -486,7 +482,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _inspect_operations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inspect_operations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -509,22 +505,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "output-config.table.project-id" => Some(("outputConfig.table.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "output-config.table.table-id" => Some(("outputConfig.table.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "output-config.table.dataset-id" => Some(("outputConfig.table.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.big-query-options.table-reference.table-id" => Some(("storageConfig.bigQueryOptions.tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.big-query-options.table-reference.project-id" => Some(("storageConfig.bigQueryOptions.tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.big-query-options.table-reference.dataset-id" => Some(("storageConfig.bigQueryOptions.tableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.cloud-storage-options.file-set.url" => Some(("storageConfig.cloudStorageOptions.fileSet.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.datastore-options.partition-id.namespace-id" => Some(("storageConfig.datastoreOptions.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.datastore-options.partition-id.project-id" => Some(("storageConfig.datastoreOptions.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.datastore-options.kind.name" => Some(("storageConfig.datastoreOptions.kind.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-config.storage-path.path" => Some(("outputConfig.storagePath.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.table.table-id" => Some(("outputConfig.table.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.table.project-id" => Some(("outputConfig.table.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-config.table.dataset-id" => Some(("outputConfig.table.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "operation-config.max-item-findings" => Some(("operationConfig.maxItemFindings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inspect-config.max-findings" => Some(("inspectConfig.maxFindings", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inspect-config.include-quote" => Some(("inspectConfig.includeQuote", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "inspect-config.exclude-types" => Some(("inspectConfig.excludeTypes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "inspect-config.min-likelihood" => Some(("inspectConfig.minLikelihood", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.big-query-options.table-reference.project-id" => Some(("storageConfig.bigQueryOptions.tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.big-query-options.table-reference.table-id" => Some(("storageConfig.bigQueryOptions.tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.big-query-options.table-reference.dataset-id" => Some(("storageConfig.bigQueryOptions.tableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.datastore-options.partition-id.project-id" => Some(("storageConfig.datastoreOptions.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.datastore-options.partition-id.namespace-id" => Some(("storageConfig.datastoreOptions.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.datastore-options.kind.name" => Some(("storageConfig.datastoreOptions.kind.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.cloud-storage-options.file-set.url" => Some(("storageConfig.cloudStorageOptions.fileSet.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-config.max-item-findings" => Some(("operationConfig.maxItemFindings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["big-query-options", "cloud-storage-options", "dataset-id", "datastore-options", "exclude-types", "file-set", "include-quote", "inspect-config", "kind", "max-findings", "max-item-findings", "min-likelihood", "name", "namespace-id", "operation-config", "output-config", "partition-id", "path", "project-id", "storage-config", "storage-path", "table", "table-id", "table-reference", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -571,7 +567,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -586,7 +582,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _inspect_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inspect_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.inspect().operations_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -623,7 +619,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -638,7 +634,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _inspect_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inspect_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.inspect().operations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -675,7 +671,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -690,7 +686,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _inspect_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inspect_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.inspect().operations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -718,7 +714,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -737,7 +733,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -752,7 +748,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _inspect_results_findings_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _inspect_results_findings_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.inspect().results_findings_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -780,7 +776,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -799,7 +795,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -814,7 +810,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _risk_analysis_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _risk_analysis_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -883,7 +879,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -898,7 +894,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _risk_analysis_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _risk_analysis_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.risk_analysis().operations_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -935,7 +931,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -950,7 +946,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _risk_analysis_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _risk_analysis_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.risk_analysis().operations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -987,7 +983,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1002,7 +998,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _risk_analysis_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _risk_analysis_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.risk_analysis().operations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1030,7 +1026,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1049,7 +1045,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1064,7 +1060,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _root_categories_info_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _root_categories_info_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.root_categories().info_types_list(opt.value_of("category").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1105,7 +1101,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1120,7 +1116,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _root_categories_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _root_categories_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.root_categories().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1161,7 +1157,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1176,7 +1172,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1184,13 +1180,13 @@ impl<'n> Engine<'n> {
             ("content", Some(opt)) => {
                 match opt.subcommand() {
                     ("deidentify", Some(opt)) => {
-                        call_result = self._content_deidentify(opt, dry_run, &mut err);
+                        call_result = self._content_deidentify(opt, dry_run, &mut err).await;
                     },
                     ("inspect", Some(opt)) => {
-                        call_result = self._content_inspect(opt, dry_run, &mut err);
+                        call_result = self._content_inspect(opt, dry_run, &mut err).await;
                     },
                     ("redact", Some(opt)) => {
-                        call_result = self._content_redact(opt, dry_run, &mut err);
+                        call_result = self._content_redact(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("content".to_string()));
@@ -1201,7 +1197,7 @@ impl<'n> Engine<'n> {
             ("data-source", Some(opt)) => {
                 match opt.subcommand() {
                     ("analyze", Some(opt)) => {
-                        call_result = self._data_source_analyze(opt, dry_run, &mut err);
+                        call_result = self._data_source_analyze(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("data-source".to_string()));
@@ -1212,22 +1208,22 @@ impl<'n> Engine<'n> {
             ("inspect", Some(opt)) => {
                 match opt.subcommand() {
                     ("operations-cancel", Some(opt)) => {
-                        call_result = self._inspect_operations_cancel(opt, dry_run, &mut err);
+                        call_result = self._inspect_operations_cancel(opt, dry_run, &mut err).await;
                     },
                     ("operations-create", Some(opt)) => {
-                        call_result = self._inspect_operations_create(opt, dry_run, &mut err);
+                        call_result = self._inspect_operations_create(opt, dry_run, &mut err).await;
                     },
                     ("operations-delete", Some(opt)) => {
-                        call_result = self._inspect_operations_delete(opt, dry_run, &mut err);
+                        call_result = self._inspect_operations_delete(opt, dry_run, &mut err).await;
                     },
                     ("operations-get", Some(opt)) => {
-                        call_result = self._inspect_operations_get(opt, dry_run, &mut err);
+                        call_result = self._inspect_operations_get(opt, dry_run, &mut err).await;
                     },
                     ("operations-list", Some(opt)) => {
-                        call_result = self._inspect_operations_list(opt, dry_run, &mut err);
+                        call_result = self._inspect_operations_list(opt, dry_run, &mut err).await;
                     },
                     ("results-findings-list", Some(opt)) => {
-                        call_result = self._inspect_results_findings_list(opt, dry_run, &mut err);
+                        call_result = self._inspect_results_findings_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("inspect".to_string()));
@@ -1238,16 +1234,16 @@ impl<'n> Engine<'n> {
             ("risk-analysis", Some(opt)) => {
                 match opt.subcommand() {
                     ("operations-cancel", Some(opt)) => {
-                        call_result = self._risk_analysis_operations_cancel(opt, dry_run, &mut err);
+                        call_result = self._risk_analysis_operations_cancel(opt, dry_run, &mut err).await;
                     },
                     ("operations-delete", Some(opt)) => {
-                        call_result = self._risk_analysis_operations_delete(opt, dry_run, &mut err);
+                        call_result = self._risk_analysis_operations_delete(opt, dry_run, &mut err).await;
                     },
                     ("operations-get", Some(opt)) => {
-                        call_result = self._risk_analysis_operations_get(opt, dry_run, &mut err);
+                        call_result = self._risk_analysis_operations_get(opt, dry_run, &mut err).await;
                     },
                     ("operations-list", Some(opt)) => {
-                        call_result = self._risk_analysis_operations_list(opt, dry_run, &mut err);
+                        call_result = self._risk_analysis_operations_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("risk-analysis".to_string()));
@@ -1258,10 +1254,10 @@ impl<'n> Engine<'n> {
             ("root-categories", Some(opt)) => {
                 match opt.subcommand() {
                     ("info-types-list", Some(opt)) => {
-                        call_result = self._root_categories_info_types_list(opt, dry_run, &mut err);
+                        call_result = self._root_categories_info_types_list(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._root_categories_list(opt, dry_run, &mut err);
+                        call_result = self._root_categories_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("root-categories".to_string()));
@@ -1286,41 +1282,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "dlp2-beta1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "dlp2-beta1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "dlp2-beta1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/dlp2-beta1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::DLP::new(client, auth),
@@ -1337,22 +1318,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("content", "methods: 'deidentify', 'inspect' and 'redact'", vec![
@@ -1743,7 +1725,7 @@ fn main() {
     
     let mut app = App::new("dlp2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20171205")
+           .version("2.0.0+20171205")
            .about("The Google Data Loss Prevention API provides methods for detection of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_beta1_cli")
            .arg(Arg::with_name("url")
@@ -1758,12 +1740,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1811,13 +1788,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -1,4 +1,4 @@
-site_name: Blogger v1.0.14+20200707
+site_name: Blogger v2.0.0+20210331
 site_url: http://byron.github.io/google-apis-rs/google-blogger3-cli
 site_description: A complete library to interact with Blogger (protocol v3)
 

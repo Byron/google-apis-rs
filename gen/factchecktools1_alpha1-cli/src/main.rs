@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_factchecktools1_alpha1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_factchecktools1_alpha1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::FactCheckTools<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::FactCheckTools<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _claims_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _claims_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.claims().search();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -86,7 +82,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-age-days", "language-code", "page-size", "page-token", "review-publisher-site-filter", "offset", "query"].iter().map(|v|*v));
+                                                                           v.extend(["offset", "review-publisher-site-filter", "page-size", "page-token", "query", "max-age-days", "language-code"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -102,7 +98,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -117,7 +113,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _pages_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _pages_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -142,10 +138,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "claim-review-author.image-url" => Some(("claimReviewAuthor.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "claim-review-author.name" => Some(("claimReviewAuthor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-url" => Some(("pageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-url" => Some(("pageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "publish-date" => Some(("publishDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["claim-review-author", "image-url", "name", "page-url", "publish-date", "version-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -192,7 +188,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -207,7 +203,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _pages_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _pages_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.pages().delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -244,7 +240,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -259,7 +255,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _pages_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _pages_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.pages().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -296,7 +292,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -311,7 +307,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _pages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _pages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.pages().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -345,7 +341,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["url", "page-token", "offset", "page-size", "organization"].iter().map(|v|*v));
+                                                                           v.extend(["offset", "organization", "page-size", "page-token", "url"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -364,7 +360,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -379,7 +375,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _pages_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _pages_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -404,10 +400,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "claim-review-author.image-url" => Some(("claimReviewAuthor.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "claim-review-author.name" => Some(("claimReviewAuthor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-url" => Some(("pageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-url" => Some(("pageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "publish-date" => Some(("publishDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["claim-review-author", "image-url", "name", "page-url", "publish-date", "version-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -454,7 +450,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -469,7 +465,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -477,7 +473,7 @@ impl<'n> Engine<'n> {
             ("claims", Some(opt)) => {
                 match opt.subcommand() {
                     ("search", Some(opt)) => {
-                        call_result = self._claims_search(opt, dry_run, &mut err);
+                        call_result = self._claims_search(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("claims".to_string()));
@@ -488,19 +484,19 @@ impl<'n> Engine<'n> {
             ("pages", Some(opt)) => {
                 match opt.subcommand() {
                     ("create", Some(opt)) => {
-                        call_result = self._pages_create(opt, dry_run, &mut err);
+                        call_result = self._pages_create(opt, dry_run, &mut err).await;
                     },
                     ("delete", Some(opt)) => {
-                        call_result = self._pages_delete(opt, dry_run, &mut err);
+                        call_result = self._pages_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._pages_get(opt, dry_run, &mut err);
+                        call_result = self._pages_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._pages_list(opt, dry_run, &mut err);
+                        call_result = self._pages_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._pages_update(opt, dry_run, &mut err);
+                        call_result = self._pages_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("pages".to_string()));
@@ -525,41 +521,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "factchecktools1-alpha1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "factchecktools1-alpha1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "factchecktools1-alpha1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/factchecktools1-alpha1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::FactCheckTools::new(client, auth),
@@ -575,22 +556,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("claims", "methods: 'search'", vec![
@@ -680,8 +662,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List the `ClaimReview` markup pages for a specific URL or for an
-        organization."##),
+                    Some(r##"List the `ClaimReview` markup pages for a specific URL or for an organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli/pages_list",
                   vec![
                     (Some(r##"v"##),
@@ -697,19 +678,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update for all `ClaimReview` markup on a page
-        
-        Note that this is a full update. To retain the existing `ClaimReview`
-        markup on a page, first perform a Get operation, then modify the returned
-        markup, and finally call Update with the entire `ClaimReview` markup as the
-        body."##),
+                    Some(r##"Update for all `ClaimReview` markup on a page Note that this is a full update. To retain the existing `ClaimReview` markup on a page, first perform a Get operation, then modify the returned markup, and finally call Update with the entire `ClaimReview` markup as the body."##),
                     "Details at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli/pages_update",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of this `ClaimReview` markup page resource, in the form of
-        `pages/{page_id}`. Except for update requests, this field is output-only
-        and should not be set by the user."##),
+                     Some(r##"The name of this `ClaimReview` markup page resource, in the form of `pages/{page_id}`. Except for update requests, this field is output-only and should not be set by the user."##),
                      Some(true),
                      Some(false)),
         
@@ -737,7 +711,7 @@ fn main() {
     
     let mut app = App::new("factchecktools1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200708")
+           .version("2.0.0+20210330")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli")
            .arg(Arg::with_name("url")
@@ -752,12 +726,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -805,13 +774,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

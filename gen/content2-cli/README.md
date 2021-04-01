@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Shopping Content* API can be found at the
-[official documentation site](https://developers.google.com/shopping-content).
+[official documentation site](https://developers.google.com/shopping-content/v2/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20200617*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Shopping Content* API at revision *20210325*. The CLI is at version *2.0.0*.
 
 ```bash
 content2 [options]
@@ -71,15 +71,15 @@ content2 [options]
                 listposdataproviders [-p <v>]... [-o <out>]
                 requestgmbaccess <merchant-id> <account-id> <gmb-email> [-p <v>]... [-o <out>]
                 requestinventoryverification <merchant-id> <account-id> <country> [-p <v>]... [-o <out>]
-                setinventoryverificationcontact <merchant-id> <account-id> <contact-email> <contact-name> <country> <language> [-p <v>]... [-o <out>]
+                setinventoryverificationcontact <merchant-id> <account-id> <country> <language> <contact-name> <contact-email> [-p <v>]... [-o <out>]
                 setposdataprovider <merchant-id> <account-id> <country> [-p <v>]... [-o <out>]
                 update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
         orderinvoices
                 createchargeinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 createrefundinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
         orderreports
-                listdisbursements <merchant-id> <disbursement-start-date> [-p <v>]... [-o <out>]
-                listtransactions <merchant-id> <disbursement-id> <transaction-start-date> [-p <v>]... [-o <out>]
+                listdisbursements <merchant-id> [-p <v>]... [-o <out>]
+                listtransactions <merchant-id> <disbursement-id> [-p <v>]... [-o <out>]
         orderreturns
                 get <merchant-id> <return-id> [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
@@ -143,12 +143,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -201,10 +195,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `content2 --debug <resource> <method> [options] 2>debug.txt`.
 

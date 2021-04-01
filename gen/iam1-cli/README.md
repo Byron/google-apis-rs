@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `iam1` command-line interface *(CLI)* allows to use most features of the *Google iam* service from the comfort of your terminal.
+The `iam1` command-line interface *(CLI)* allows to use most features of the *Google Iam* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *iam* API can be found at the
+Everything else about the *Iam* API can be found at the
 [official documentation site](https://cloud.google.com/iam/).
 
 # Installation and Source Code
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20200617*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Iam* API at revision *20210325*. The CLI is at version *2.0.0*.
 
 ```bash
 iam1 [options]
@@ -42,6 +42,20 @@ iam1 [options]
         permissions
                 query-testable-permissions (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                locations-workload-identity-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-delete <name> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-get <name> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-list <parent> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-operations-get <name> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-delete <name> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-get <name> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-list <parent> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-operations-get <name> [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-providers-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workload-identity-pools-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 roles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 roles-delete <name> [-p <v>]... [-o <out>]
                 roles-get <name> [-p <v>]... [-o <out>]
@@ -82,12 +96,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -140,10 +148,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `iam1 --debug <resource> <method> [options] 2>debug.txt`.
 

@@ -1,0 +1,22 @@
+site_name: AnalyticsData v2.0.0+20210329
+site_url: http://byron.github.io/google-apis-rs/google-analyticsdata1_beta-cli
+site_description: A complete library to interact with AnalyticsData (protocol v1beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/analyticsdata1_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['properties_batch-run-pivot-reports.md', 'Properties', 'Batch Run Pivot Reports']
+- ['properties_batch-run-reports.md', 'Properties', 'Batch Run Reports']
+- ['properties_get-metadata.md', 'Properties', 'Get Metadata']
+- ['properties_run-pivot-report.md', 'Properties', 'Run Pivot Report']
+- ['properties_run-realtime-report.md', 'Properties', 'Run Realtime Report']
+- ['properties_run-report.md', 'Properties', 'Run Report']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

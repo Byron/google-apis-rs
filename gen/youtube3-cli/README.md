@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20200709*. The CLI is at version *1.0.14*.
+This documentation was generated from the *YouTube* API at revision *20210330*. The CLI is at version *2.0.0*.
 
 ```bash
 youtube3 [options]
@@ -37,7 +37,7 @@ youtube3 [options]
                 delete <id> [-p <v>]...
                 download <id> [-p <v>]... [-o <out>]
                 insert (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
-                list <video-id> <part>... [-p <v>]... [-o <out>]
+                list <part>... <video-id> [-p <v>]... [-o <out>]
                 update (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         channel-banners
                 insert (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
@@ -60,19 +60,16 @@ youtube3 [options]
                 mark-as-spam <id>... [-p <v>]...
                 set-moderation-status <id>... <moderation-status> [-p <v>]...
                 update (-r <kv>)... [-p <v>]... [-o <out>]
-        guide-categories
-                list <part>... [-p <v>]... [-o <out>]
         i18n-languages
                 list <part>... [-p <v>]... [-o <out>]
         i18n-regions
                 list <part>... [-p <v>]... [-o <out>]
         live-broadcasts
                 bind <id> <part>... [-p <v>]... [-o <out>]
-                control <id> <part>... [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 list <part>... [-p <v>]... [-o <out>]
-                transition <id> <broadcast-status> <part>... [-p <v>]... [-o <out>]
+                transition <broadcast-status> <id> <part>... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         live-chat-bans
                 delete <id> [-p <v>]...
@@ -106,14 +103,14 @@ youtube3 [options]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
         search
                 list <part>... [-p <v>]... [-o <out>]
-        sponsors
-                list <part>... [-p <v>]... [-o <out>]
         subscriptions
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 list <part>... [-p <v>]... [-o <out>]
         super-chat-events
                 list <part>... [-p <v>]... [-o <out>]
+        tests
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
         third-party-links
                 delete <linking-token> <type> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
@@ -136,10 +133,6 @@ youtube3 [options]
         watermarks
                 set <channel-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]...
                 unset <channel-id> [-p <v>]...
-        youtube
-                v3-infocards (-r <kv>)... [-p <v>]... [-o <out>]
-                v3-infocards-list <part>... [-p <v>]... [-o <out>]
-                v3-tests-create (-r <kv>)... [-p <v>]... [-o <out>]
   youtube3 --help
 
 Configuration:
@@ -151,12 +144,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -209,10 +196,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `youtube3 --debug <resource> <method> [options] 2>debug.txt`.
 

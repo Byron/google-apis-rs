@@ -25,17 +25,20 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *sasportal* API at revision *20200708*. The CLI is at version *1.0.14*.
+This documentation was generated from the *sasportal* API at revision *20210330*. The CLI is at version *2.0.0*.
 
 ```bash
 sasportal1-alpha1 [options]
         customers
                 deployments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 deployments-delete <name> [-p <v>]... [-o <out>]
+                deployments-devices-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                deployments-devices-create-signed <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                deployments-devices-list <parent> [-p <v>]... [-o <out>]
                 deployments-get <name> [-p <v>]... [-o <out>]
                 deployments-list <parent> [-p <v>]... [-o <out>]
+                deployments-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 deployments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                devices-bulk <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-create-signed <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-delete <name> [-p <v>]... [-o <out>]
@@ -51,6 +54,9 @@ sasportal1-alpha1 [options]
                 nodes-delete <name> [-p <v>]... [-o <out>]
                 nodes-deployments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-deployments-list <parent> [-p <v>]... [-o <out>]
+                nodes-devices-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                nodes-devices-create-signed <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                nodes-devices-list <parent> [-p <v>]... [-o <out>]
                 nodes-get <name> [-p <v>]... [-o <out>]
                 nodes-list <parent> [-p <v>]... [-o <out>]
                 nodes-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -59,16 +65,25 @@ sasportal1-alpha1 [options]
                 nodes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         deployments
+                devices-delete <name> [-p <v>]... [-o <out>]
+                devices-get <name> [-p <v>]... [-o <out>]
+                devices-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                devices-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                devices-sign-device <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                devices-update-signed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
         installer
                 generate-secret (-r <kv>)... [-p <v>]... [-o <out>]
                 validate (-r <kv>)... [-p <v>]... [-o <out>]
         nodes
                 deployments-delete <name> [-p <v>]... [-o <out>]
+                deployments-devices-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                deployments-devices-create-signed <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                deployments-devices-list <parent> [-p <v>]... [-o <out>]
                 deployments-get <name> [-p <v>]... [-o <out>]
                 deployments-list <parent> [-p <v>]... [-o <out>]
+                deployments-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 deployments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                devices-bulk <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-create-signed <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-delete <name> [-p <v>]... [-o <out>]
@@ -83,7 +98,6 @@ sasportal1-alpha1 [options]
                 nodes-delete <name> [-p <v>]... [-o <out>]
                 nodes-deployments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-deployments-list <parent> [-p <v>]... [-o <out>]
-                nodes-devices-bulk <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-devices-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-devices-create-signed <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 nodes-devices-list <parent> [-p <v>]... [-o <out>]
@@ -108,12 +122,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -166,10 +174,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `sasportal1-alpha1 --debug <resource> <method> [options] 2>debug.txt`.
 

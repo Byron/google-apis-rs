@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_bigquerydatatransfer1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_bigquerydatatransfer1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::BigQueryDataTransfer<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::BigQueryDataTransfer<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_data_sources_check_valid_creds(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_data_sources_check_valid_creds(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -115,7 +111,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -130,7 +126,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_data_sources_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_data_sources_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().data_sources_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -167,7 +163,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -182,7 +178,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().data_sources_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -226,7 +222,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -241,7 +237,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_data_sources_check_valid_creds(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_data_sources_check_valid_creds(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -310,7 +306,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -325,7 +321,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_data_sources_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_data_sources_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_data_sources_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -362,7 +358,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -377,7 +373,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_data_sources_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -421,7 +417,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -436,7 +432,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -473,7 +469,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -488,7 +484,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -516,7 +512,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "filter", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -535,7 +531,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -550,7 +546,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -574,22 +570,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "data-refresh-window-days" => Some(("dataRefreshWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -627,7 +623,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info", "service-account-name"].iter().map(|v|*v));
+                                                                           v.extend(["service-account-name", "authorization-code", "version-info"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -646,7 +642,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -661,7 +657,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -698,7 +694,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -713,7 +709,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -750,7 +746,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -765,7 +761,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -812,7 +808,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -827,7 +823,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -851,22 +847,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "data-refresh-window-days" => Some(("dataRefreshWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -907,7 +903,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info", "update-mask", "service-account-name"].iter().map(|v|*v));
+                                                                           v.extend(["service-account-name", "update-mask", "authorization-code", "version-info"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -926,7 +922,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -941,7 +937,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_runs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_runs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_runs_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -978,7 +974,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -993,7 +989,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_runs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_runs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_runs_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1030,7 +1026,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1045,7 +1041,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_runs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1076,7 +1072,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["states", "run-attempt", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "states", "run-attempt", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1095,7 +1091,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1110,7 +1106,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_runs_transfer_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_runs_transfer_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_transfer_configs_runs_transfer_logs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1138,7 +1134,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["message-types", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "message-types", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1157,7 +1153,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1172,7 +1168,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_schedule_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_schedule_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1243,7 +1239,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1258,7 +1254,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_transfer_configs_start_manual_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_transfer_configs_start_manual_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1281,9 +1277,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "requested-run-time" => Some(("requestedRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "requested-time-range.end-time" => Some(("requestedTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "requested-time-range.start-time" => Some(("requestedTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "requested-run-time" => Some(("requestedRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["end-time", "requested-run-time", "requested-time-range", "start-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1330,7 +1326,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1345,7 +1341,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1369,22 +1365,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "data-refresh-window-days" => Some(("dataRefreshWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1422,7 +1418,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info", "service-account-name"].iter().map(|v|*v));
+                                                                           v.extend(["service-account-name", "authorization-code", "version-info"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1441,7 +1437,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1456,7 +1452,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1493,7 +1489,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1508,7 +1504,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1545,7 +1541,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1560,7 +1556,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1607,7 +1603,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1622,7 +1618,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1646,22 +1642,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "data-refresh-window-days" => Some(("dataRefreshWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1702,7 +1698,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info", "update-mask", "service-account-name"].iter().map(|v|*v));
+                                                                           v.extend(["service-account-name", "update-mask", "authorization-code", "version-info"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1721,7 +1717,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1736,7 +1732,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_runs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_runs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_runs_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1773,7 +1769,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1788,7 +1784,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_runs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_runs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_runs_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1825,7 +1821,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1840,7 +1836,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_runs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1871,7 +1867,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["states", "run-attempt", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "states", "run-attempt", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1890,7 +1886,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1905,7 +1901,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_runs_transfer_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_runs_transfer_logs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().transfer_configs_runs_transfer_logs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1933,7 +1929,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["message-types", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "message-types", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1952,7 +1948,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1967,7 +1963,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_schedule_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_schedule_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2038,7 +2034,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2053,7 +2049,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_transfer_configs_start_manual_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_transfer_configs_start_manual_runs(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2076,9 +2072,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "requested-run-time" => Some(("requestedRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "requested-time-range.end-time" => Some(("requestedTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "requested-time-range.start-time" => Some(("requestedTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "requested-run-time" => Some(("requestedRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["end-time", "requested-run-time", "requested-time-range", "start-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2125,7 +2121,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2140,7 +2136,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -2148,94 +2144,94 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("data-sources-check-valid-creds", Some(opt)) => {
-                        call_result = self._projects_data_sources_check_valid_creds(opt, dry_run, &mut err);
+                        call_result = self._projects_data_sources_check_valid_creds(opt, dry_run, &mut err).await;
                     },
                     ("data-sources-get", Some(opt)) => {
-                        call_result = self._projects_data_sources_get(opt, dry_run, &mut err);
+                        call_result = self._projects_data_sources_get(opt, dry_run, &mut err).await;
                     },
                     ("data-sources-list", Some(opt)) => {
-                        call_result = self._projects_data_sources_list(opt, dry_run, &mut err);
+                        call_result = self._projects_data_sources_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-data-sources-check-valid-creds", Some(opt)) => {
-                        call_result = self._projects_locations_data_sources_check_valid_creds(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_data_sources_check_valid_creds(opt, dry_run, &mut err).await;
                     },
                     ("locations-data-sources-get", Some(opt)) => {
-                        call_result = self._projects_locations_data_sources_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_data_sources_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-data-sources-list", Some(opt)) => {
-                        call_result = self._projects_locations_data_sources_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_data_sources_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-get", Some(opt)) => {
-                        call_result = self._projects_locations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-create", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-delete", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-get", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-list", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-patch", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-runs-delete", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_runs_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_runs_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-runs-get", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_runs_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_runs_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-runs-list", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_runs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_runs_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-runs-transfer-logs-list", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_runs_transfer_logs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_runs_transfer_logs_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-schedule-runs", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_schedule_runs(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_schedule_runs(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer-configs-start-manual-runs", Some(opt)) => {
-                        call_result = self._projects_locations_transfer_configs_start_manual_runs(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_transfer_configs_start_manual_runs(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-create", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_create(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_create(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-delete", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_delete(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-get", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_get(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_get(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-list", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_list(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-patch", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-runs-delete", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_runs_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_runs_delete(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-runs-get", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_runs_get(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_runs_get(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-runs-list", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_runs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_runs_list(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-runs-transfer-logs-list", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_runs_transfer_logs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_runs_transfer_logs_list(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-schedule-runs", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_schedule_runs(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_schedule_runs(opt, dry_run, &mut err).await;
                     },
                     ("transfer-configs-start-manual-runs", Some(opt)) => {
-                        call_result = self._projects_transfer_configs_start_manual_runs(opt, dry_run, &mut err);
+                        call_result = self._projects_transfer_configs_start_manual_runs(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -2260,41 +2256,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "bigquerydatatransfer1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "bigquerydatatransfer1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "bigquerydatatransfer1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/bigquerydatatransfer1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::BigQueryDataTransfer::new(client, auth),
@@ -2310,39 +2291,33 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'data-sources-check-valid-creds', 'data-sources-get', 'data-sources-list', 'locations-data-sources-check-valid-creds', 'locations-data-sources-get', 'locations-data-sources-list', 'locations-get', 'locations-list', 'locations-transfer-configs-create', 'locations-transfer-configs-delete', 'locations-transfer-configs-get', 'locations-transfer-configs-list', 'locations-transfer-configs-patch', 'locations-transfer-configs-runs-delete', 'locations-transfer-configs-runs-get', 'locations-transfer-configs-runs-list', 'locations-transfer-configs-runs-transfer-logs-list', 'locations-transfer-configs-schedule-runs', 'locations-transfer-configs-start-manual-runs', 'transfer-configs-create', 'transfer-configs-delete', 'transfer-configs-get', 'transfer-configs-list', 'transfer-configs-patch', 'transfer-configs-runs-delete', 'transfer-configs-runs-get', 'transfer-configs-runs-list', 'transfer-configs-runs-transfer-logs-list', 'transfer-configs-schedule-runs' and 'transfer-configs-start-manual-runs'", vec![
             ("data-sources-check-valid-creds",
-                    Some(r##"Returns true if valid credentials exist for the given data source and
-        requesting user.
-        Some data sources doesn't support service account, so we need to talk to
-        them on behalf of the end user. This API just checks whether we have OAuth
-        token for the particular user, which is a pre-requisite before user can
-        create a transfer config."##),
+                    Some(r##"Returns true if valid credentials exist for the given data source and requesting user. Some data sources doesn't support service account, so we need to talk to them on behalf of the end user. This API just checks whether we have OAuth token for the particular user, which is a pre-requisite before user can create a transfer config."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_data-sources-check-valid-creds",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The data source in the form:
-        `projects/{project_id}/dataSources/{data_source_id}` or
-        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
+                     Some(r##"Required. The data source in the form: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2365,15 +2340,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-get",
-                    Some(r##"Retrieves a supported data source and returns its settings,
-        which can be used for UI rendering."##),
+                    Some(r##"Retrieves a supported data source and returns its settings, which can be used for UI rendering."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_data-sources-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/dataSources/{data_source_id}` or
-        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2390,15 +2362,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("data-sources-list",
-                    Some(r##"Lists supported data sources and returns their settings,
-        which can be used for UI rendering."##),
+                    Some(r##"Lists supported data sources and returns their settings, which can be used for UI rendering."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_data-sources-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id for which data sources should be returned.
-        Must be in the form: `projects/{project_id}` or
-        `projects/{project_id}/locations/{location_id}"##),
+                     Some(r##"Required. The BigQuery project id for which data sources should be returned. Must be in the form: `projects/{project_id}` or `projects/{project_id}/locations/{location_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -2415,19 +2384,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-data-sources-check-valid-creds",
-                    Some(r##"Returns true if valid credentials exist for the given data source and
-        requesting user.
-        Some data sources doesn't support service account, so we need to talk to
-        them on behalf of the end user. This API just checks whether we have OAuth
-        token for the particular user, which is a pre-requisite before user can
-        create a transfer config."##),
+                    Some(r##"Returns true if valid credentials exist for the given data source and requesting user. Some data sources doesn't support service account, so we need to talk to them on behalf of the end user. This API just checks whether we have OAuth token for the particular user, which is a pre-requisite before user can create a transfer config."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-data-sources-check-valid-creds",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The data source in the form:
-        `projects/{project_id}/dataSources/{data_source_id}` or
-        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
+                     Some(r##"Required. The data source in the form: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2450,15 +2412,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-data-sources-get",
-                    Some(r##"Retrieves a supported data source and returns its settings,
-        which can be used for UI rendering."##),
+                    Some(r##"Retrieves a supported data source and returns its settings, which can be used for UI rendering."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-data-sources-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/dataSources/{data_source_id}` or
-        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/dataSources/{data_source_id}` or `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2475,15 +2434,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-data-sources-list",
-                    Some(r##"Lists supported data sources and returns their settings,
-        which can be used for UI rendering."##),
+                    Some(r##"Lists supported data sources and returns their settings, which can be used for UI rendering."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-data-sources-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id for which data sources should be returned.
-        Must be in the form: `projects/{project_id}` or
-        `projects/{project_id}/locations/{location_id}"##),
+                     Some(r##"Required. The BigQuery project id for which data sources should be returned. Must be in the form: `projects/{project_id}` or `projects/{project_id}/locations/{location_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -2549,10 +2505,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id where the transfer configuration should be created.
-        Must be in the format projects/{project_id}/locations/{location_id} or
-        projects/{project_id}. If specified location and location of the
-        destination bigquery dataset do not match - the request will fail."##),
+                     Some(r##"Required. The BigQuery project id where the transfer configuration should be created. Must be in the format projects/{project_id}/locations/{location_id} or projects/{project_id}. If specified location and location of the destination bigquery dataset do not match - the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -2575,15 +2528,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-transfer-configs-delete",
-                    Some(r##"Deletes a data transfer configuration,
-        including any associated transfer runs and logs."##),
+                    Some(r##"Deletes a data transfer configuration, including any associated transfer runs and logs."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2605,9 +2555,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2629,9 +2577,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id for which data sources
-        should be returned: `projects/{project_id}` or
-        `projects/{project_id}/locations/{location_id}`"##),
+                     Some(r##"Required. The BigQuery project id for which data sources should be returned: `projects/{project_id}` or `projects/{project_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2648,19 +2594,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-transfer-configs-patch",
-                    Some(r##"Updates a data transfer configuration.
-        All fields must be set, even if they are not updated."##),
+                    Some(r##"Updates a data transfer configuration. All fields must be set, even if they are not updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the transfer config.
-        Transfer config names have the form of
-        `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`.
-        The name is automatically generated based on the config_id specified in
-        CreateTransferConfigRequest along with project_id and region. If config_id
-        is not provided, usually a uuid, even though it is not guaranteed or
-        required, will be generated for config_id."##),
+                     Some(r##"The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
                      Some(true),
                      Some(false)),
         
@@ -2688,9 +2627,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2712,9 +2649,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2736,10 +2671,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved.
-        Format of transfer configuration resource name is:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved. Format of transfer configuration resource name is: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2761,9 +2693,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer run name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. Transfer run name in the form: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2780,18 +2710,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-transfer-configs-schedule-runs",
-                    Some(r##"Creates transfer runs for a time range [start_time, end_time].
-        For each date - or whatever granularity the data source supports - in the
-        range, one transfer run is created.
-        Note that runs are created per UTC time in the time range.
-        DEPRECATED: use StartManualTransferRuns instead."##),
+                    Some(r##"Creates transfer runs for a time range [start_time, end_time]. For each date - or whatever granularity the data source supports - in the range, one transfer run is created. Note that runs are created per UTC time in the time range. DEPRECATED: use StartManualTransferRuns instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-schedule-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2814,17 +2738,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-transfer-configs-start-manual-runs",
-                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to
-        current time. The transfer runs can be created for a time range where the
-        run_time is between start_time (inclusive) and end_time (exclusive), or for
-        a specific run_time."##),
+                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to current time. The transfer runs can be created for a time range where the run_time is between start_time (inclusive) and end_time (exclusive), or for a specific run_time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-transfer-configs-start-manual-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2852,10 +2771,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id where the transfer configuration should be created.
-        Must be in the format projects/{project_id}/locations/{location_id} or
-        projects/{project_id}. If specified location and location of the
-        destination bigquery dataset do not match - the request will fail."##),
+                     Some(r##"Required. The BigQuery project id where the transfer configuration should be created. Must be in the format projects/{project_id}/locations/{location_id} or projects/{project_id}. If specified location and location of the destination bigquery dataset do not match - the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -2878,15 +2794,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("transfer-configs-delete",
-                    Some(r##"Deletes a data transfer configuration,
-        including any associated transfer runs and logs."##),
+                    Some(r##"Deletes a data transfer configuration, including any associated transfer runs and logs."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2908,9 +2821,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2932,9 +2843,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The BigQuery project id for which data sources
-        should be returned: `projects/{project_id}` or
-        `projects/{project_id}/locations/{location_id}`"##),
+                     Some(r##"Required. The BigQuery project id for which data sources should be returned: `projects/{project_id}` or `projects/{project_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2951,19 +2860,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("transfer-configs-patch",
-                    Some(r##"Updates a data transfer configuration.
-        All fields must be set, even if they are not updated."##),
+                    Some(r##"Updates a data transfer configuration. All fields must be set, even if they are not updated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the transfer config.
-        Transfer config names have the form of
-        `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`.
-        The name is automatically generated based on the config_id specified in
-        CreateTransferConfigRequest along with project_id and region. If config_id
-        is not provided, usually a uuid, even though it is not guaranteed or
-        required, will be generated for config_id."##),
+                     Some(r##"The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
                      Some(true),
                      Some(false)),
         
@@ -2991,9 +2893,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -3015,9 +2915,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -3039,10 +2937,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved.
-        Format of transfer configuration resource name is:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved. Format of transfer configuration resource name is: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3064,9 +2959,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer run name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. Transfer run name in the form: `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -3083,18 +2976,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("transfer-configs-schedule-runs",
-                    Some(r##"Creates transfer runs for a time range [start_time, end_time].
-        For each date - or whatever granularity the data source supports - in the
-        range, one transfer run is created.
-        Note that runs are created per UTC time in the time range.
-        DEPRECATED: use StartManualTransferRuns instead."##),
+                    Some(r##"Creates transfer runs for a time range [start_time, end_time]. For each date - or whatever granularity the data source supports - in the range, one transfer run is created. Note that runs are created per UTC time in the time range. DEPRECATED: use StartManualTransferRuns instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-schedule-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3117,17 +3004,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("transfer-configs-start-manual-runs",
-                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to
-        current time. The transfer runs can be created for a time range where the
-        run_time is between start_time (inclusive) and end_time (exclusive), or for
-        a specific run_time."##),
+                    Some(r##"Start manual transfer runs to be executed now with schedule_time equal to current time. The transfer runs can be created for a time range where the run_time is between start_time (inclusive) and end_time (exclusive), or for a specific run_time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-start-manual-runs",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}` or
-        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3155,7 +3037,7 @@ fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200502")
+           .version("2.0.0+20210324")
            .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")
@@ -3170,12 +3052,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -3223,13 +3100,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

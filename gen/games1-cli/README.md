@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games* API at revision *20200701*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Games* API at revision *20210325*. The CLI is at version *2.0.0*.
 
 ```bash
 games1 [options]
@@ -40,6 +40,7 @@ games1 [options]
                 update-multiple (-r <kv>)... [-p <v>]... [-o <out>]
         applications
                 get <application-id> [-p <v>]... [-o <out>]
+                get-end-point [-p <v>]... [-o <out>]
                 played [-p <v>]...
                 verify <application-id> [-p <v>]... [-o <out>]
         events
@@ -66,6 +67,8 @@ games1 [options]
         snapshots
                 get <snapshot-id> [-p <v>]... [-o <out>]
                 list <player-id> [-p <v>]... [-o <out>]
+        snapshots-extended
+                resolve-snapshot-head <snapshot-name> (-r <kv>)... [-p <v>]... [-o <out>]
         stats
                 get [-p <v>]... [-o <out>]
   games1 --help
@@ -79,12 +82,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -137,10 +134,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `games1 --debug <resource> <method> [options] 2>debug.txt`.
 

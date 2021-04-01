@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_datacatalog1_beta1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_datacatalog1_beta1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::DataCatalog<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::DataCatalog<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _catalog_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _catalog_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -70,13 +66,13 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "scope.include-org-ids" => Some(("scope.includeOrgIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "scope.include-gcp-public-datasets" => Some(("scope.includeGcpPublicDatasets", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope.restricted-locations" => Some(("scope.restrictedLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "scope.include-project-ids" => Some(("scope.includeProjectIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope.include-gcp-public-datasets" => Some(("scope.includeGcpPublicDatasets", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope.include-org-ids" => Some(("scope.includeOrgIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "scope.include-project-ids" => Some(("scope.includeProjectIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "scope.restricted-locations" => Some(("scope.restrictedLocations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["include-gcp-public-datasets", "include-org-ids", "include-project-ids", "order-by", "page-size", "page-token", "query", "restricted-locations", "scope"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -123,7 +119,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -138,7 +134,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _entries_lookup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _entries_lookup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.entries().lookup();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -182,7 +178,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -197,7 +193,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -220,11 +216,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "data-catalog-timestamps.create-time" => Some(("dataCatalogTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-catalog-timestamps.expire-time" => Some(("dataCatalogTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-catalog-timestamps.update-time" => Some(("dataCatalogTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-catalog-timestamps.create-time" => Some(("dataCatalogTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "data-catalog-timestamps", "description", "display-name", "expire-time", "name", "update-time"]);
@@ -276,7 +272,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -291,7 +287,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -332,7 +328,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -347,7 +343,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -370,24 +366,24 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "bigquery-date-sharded-spec.table-prefix" => Some(("bigqueryDateShardedSpec.tablePrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-date-sharded-spec.shard-count" => Some(("bigqueryDateShardedSpec.shardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "bigquery-date-sharded-spec.dataset" => Some(("bigqueryDateShardedSpec.dataset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "integrated-system" => Some(("integratedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-date-sharded-spec.shard-count" => Some(("bigqueryDateShardedSpec.shardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "bigquery-date-sharded-spec.table-prefix" => Some(("bigqueryDateShardedSpec.tablePrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table-spec.table-source-type" => Some(("bigqueryTableSpec.tableSourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table-spec.table-spec.grouped-entry" => Some(("bigqueryTableSpec.tableSpec.groupedEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table-spec.view-spec.view-query" => Some(("bigqueryTableSpec.viewSpec.viewQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-system-timestamps.expire-time" => Some(("sourceSystemTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-system-timestamps.update-time" => Some(("sourceSystemTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-system-timestamps.create-time" => Some(("sourceSystemTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-specified-type" => Some(("userSpecifiedType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-specified-system" => Some(("userSpecifiedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-fileset-spec.file-patterns" => Some(("gcsFilesetSpec.filePatterns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table-spec.table-spec.grouped-entry" => Some(("bigqueryTableSpec.tableSpec.groupedEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table-spec.table-source-type" => Some(("bigqueryTableSpec.tableSourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table-spec.view-spec.view-query" => Some(("bigqueryTableSpec.viewSpec.viewQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "integrated-system" => Some(("integratedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linked-resource" => Some(("linkedResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-system-timestamps.create-time" => Some(("sourceSystemTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-system-timestamps.expire-time" => Some(("sourceSystemTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-system-timestamps.update-time" => Some(("sourceSystemTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-specified-system" => Some(("userSpecifiedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-specified-type" => Some(("userSpecifiedType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-date-sharded-spec", "bigquery-table-spec", "create-time", "dataset", "description", "display-name", "expire-time", "file-patterns", "gcs-fileset-spec", "grouped-entry", "integrated-system", "linked-resource", "name", "shard-count", "source-system-timestamps", "table-prefix", "table-source-type", "table-spec", "type", "update-time", "user-specified-system", "user-specified-type", "view-query", "view-spec"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -438,7 +434,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -453,7 +449,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_entries_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -490,7 +486,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -505,7 +501,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_entries_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -542,7 +538,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -557,7 +553,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -627,7 +623,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -642,7 +638,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_entries_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -670,7 +666,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "read-mask", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["read-mask", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -689,7 +685,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -704,7 +700,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -727,24 +723,24 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "bigquery-date-sharded-spec.table-prefix" => Some(("bigqueryDateShardedSpec.tablePrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-date-sharded-spec.shard-count" => Some(("bigqueryDateShardedSpec.shardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "bigquery-date-sharded-spec.dataset" => Some(("bigqueryDateShardedSpec.dataset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "integrated-system" => Some(("integratedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-date-sharded-spec.shard-count" => Some(("bigqueryDateShardedSpec.shardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "bigquery-date-sharded-spec.table-prefix" => Some(("bigqueryDateShardedSpec.tablePrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table-spec.table-source-type" => Some(("bigqueryTableSpec.tableSourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table-spec.table-spec.grouped-entry" => Some(("bigqueryTableSpec.tableSpec.groupedEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table-spec.view-spec.view-query" => Some(("bigqueryTableSpec.viewSpec.viewQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-system-timestamps.expire-time" => Some(("sourceSystemTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-system-timestamps.update-time" => Some(("sourceSystemTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-system-timestamps.create-time" => Some(("sourceSystemTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-specified-type" => Some(("userSpecifiedType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-specified-system" => Some(("userSpecifiedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-fileset-spec.file-patterns" => Some(("gcsFilesetSpec.filePatterns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table-spec.table-spec.grouped-entry" => Some(("bigqueryTableSpec.tableSpec.groupedEntry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table-spec.table-source-type" => Some(("bigqueryTableSpec.tableSourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table-spec.view-spec.view-query" => Some(("bigqueryTableSpec.viewSpec.viewQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "integrated-system" => Some(("integratedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linked-resource" => Some(("linkedResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-system-timestamps.create-time" => Some(("sourceSystemTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-system-timestamps.expire-time" => Some(("sourceSystemTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-system-timestamps.update-time" => Some(("sourceSystemTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-specified-system" => Some(("userSpecifiedSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-specified-type" => Some(("userSpecifiedType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-date-sharded-spec", "bigquery-table-spec", "create-time", "dataset", "description", "display-name", "expire-time", "file-patterns", "gcs-fileset-spec", "grouped-entry", "integrated-system", "linked-resource", "name", "shard-count", "source-system-timestamps", "table-prefix", "table-source-type", "table-spec", "type", "update-time", "user-specified-system", "user-specified-type", "view-query", "view-spec"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -795,7 +791,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -810,7 +806,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_tags_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_tags_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -834,9 +830,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "column" => Some(("column", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template" => Some(("template", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column", "name", "template", "template-display-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -883,7 +879,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -898,7 +894,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_tags_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_tags_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_entries_tags_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -935,7 +931,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -950,7 +946,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_tags_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_tags_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_entries_tags_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -975,7 +971,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -994,7 +990,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1009,7 +1005,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_tags_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_tags_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1033,9 +1029,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "column" => Some(("column", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template" => Some(("template", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column", "name", "template", "template-display-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1086,7 +1082,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1101,7 +1097,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_entries_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_entries_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1171,7 +1167,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1186,7 +1182,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1227,7 +1223,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1242,7 +1238,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1312,7 +1308,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1327,7 +1323,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1352,7 +1348,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1371,7 +1367,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1386,7 +1382,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1409,11 +1405,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "data-catalog-timestamps.create-time" => Some(("dataCatalogTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-catalog-timestamps.expire-time" => Some(("dataCatalogTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-catalog-timestamps.update-time" => Some(("dataCatalogTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-catalog-timestamps.create-time" => Some(("dataCatalogTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "data-catalog-timestamps", "description", "display-name", "expire-time", "name", "update-time"]);
@@ -1465,7 +1461,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1480,7 +1476,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1551,7 +1547,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1566,7 +1562,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_tags_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_tags_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1590,9 +1586,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "column" => Some(("column", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template" => Some(("template", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column", "name", "template", "template-display-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1639,7 +1635,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1654,7 +1650,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_tags_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_tags_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_tags_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1691,7 +1687,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1706,7 +1702,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_tags_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_tags_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_entry_groups_tags_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1731,7 +1727,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1750,7 +1746,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1765,7 +1761,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_tags_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_tags_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1789,9 +1785,9 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "column" => Some(("column", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template" => Some(("template", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-display-name" => Some(("templateDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column", "name", "template", "template-display-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1842,7 +1838,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1857,7 +1853,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_entry_groups_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_entry_groups_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1927,7 +1923,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1942,7 +1938,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2017,7 +2013,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2032,7 +2028,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_tag_templates_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2073,7 +2069,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2088,7 +2084,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_fields_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_fields_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2111,13 +2107,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "is-required" => Some(("isRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "type.primitive-type" => Some(("type.primitiveType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "order" => Some(("order", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-required" => Some(("isRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "order" => Some(("order", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "type.primitive-type" => Some(("type.primitiveType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "is-required", "name", "order", "primitive-type", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "is-required", "name", "order", "primitive-type", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2166,7 +2163,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2181,7 +2178,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_fields_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_fields_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_tag_templates_fields_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2222,7 +2219,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2237,7 +2234,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_fields_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_fields_enum_values_rename(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2260,13 +2257,99 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "is-required" => Some(("isRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "type.primitive-type" => Some(("type.primitiveType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "order" => Some(("order", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "new-enum-value-display-name" => Some(("newEnumValueDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "is-required", "name", "order", "primitive-type", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["new-enum-value-display-name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDatacatalogV1beta1RenameTagTemplateFieldEnumValueRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_tag_templates_fields_enum_values_rename(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_tag_templates_fields_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-required" => Some(("isRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "order" => Some(("order", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "type.primitive-type" => Some(("type.primitiveType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "is-required", "name", "order", "primitive-type", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2315,7 +2398,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2330,7 +2413,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_fields_rename(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_fields_rename(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2400,7 +2483,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2415,7 +2498,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_tag_templates_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2452,7 +2535,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2467,7 +2550,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2537,7 +2620,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2552,7 +2635,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2627,7 +2710,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2642,7 +2725,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2713,7 +2796,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2728,7 +2811,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_tag_templates_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_tag_templates_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2798,7 +2881,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2813,7 +2896,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2836,12 +2919,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "activated-policy-types" => Some(("activatedPolicyTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy-tag-count" => Some(("policyTagCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "taxonomy-timestamps.create-time" => Some(("taxonomyTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "taxonomy-timestamps.expire-time" => Some(("taxonomyTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "taxonomy-timestamps.update-time" => Some(("taxonomyTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activated-policy-types", "description", "display-name", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activated-policy-types", "create-time", "description", "display-name", "expire-time", "name", "policy-tag-count", "taxonomy-timestamps", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2886,7 +2973,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2901,7 +2988,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2938,7 +3025,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2953,7 +3040,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_export(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2997,7 +3084,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3012,7 +3099,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3049,7 +3136,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3064,7 +3151,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3134,7 +3221,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3149,7 +3236,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3218,7 +3305,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3233,7 +3320,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3258,7 +3345,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3277,7 +3364,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3292,7 +3379,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3315,12 +3402,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "activated-policy-types" => Some(("activatedPolicyTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy-tag-count" => Some(("policyTagCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "taxonomy-timestamps.create-time" => Some(("taxonomyTimestamps.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "taxonomy-timestamps.expire-time" => Some(("taxonomyTimestamps.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "taxonomy-timestamps.update-time" => Some(("taxonomyTimestamps.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activated-policy-types", "description", "display-name", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activated-policy-types", "create-time", "description", "display-name", "expire-time", "name", "policy-tag-count", "taxonomy-timestamps", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3369,7 +3460,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3384,7 +3475,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3407,11 +3498,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-policy-tags" => Some(("childPolicyTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-policy-tag" => Some(("parentPolicyTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-policy-tag" => Some(("parentPolicyTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["child-policy-tags", "description", "display-name", "name", "parent-policy-tag"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3458,7 +3549,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3473,7 +3564,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_policy_tags_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3510,7 +3601,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3525,7 +3616,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_policy_tags_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3562,7 +3653,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3577,7 +3668,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3647,7 +3738,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3662,7 +3753,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_taxonomies_policy_tags_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3687,7 +3778,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3706,7 +3797,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3721,7 +3812,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3744,11 +3835,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-policy-tags" => Some(("childPolicyTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-policy-tag" => Some(("parentPolicyTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-policy-tag" => Some(("parentPolicyTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["child-policy-tags", "description", "display-name", "name", "parent-policy-tag"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3799,7 +3890,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3814,7 +3905,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3885,7 +3976,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3900,7 +3991,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_policy_tags_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_policy_tags_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3970,7 +4061,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3985,7 +4076,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4056,7 +4147,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4071,7 +4162,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_taxonomies_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_taxonomies_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4141,7 +4232,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4156,7 +4247,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -4164,7 +4255,7 @@ impl<'n> Engine<'n> {
             ("catalog", Some(opt)) => {
                 match opt.subcommand() {
                     ("search", Some(opt)) => {
-                        call_result = self._catalog_search(opt, dry_run, &mut err);
+                        call_result = self._catalog_search(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("catalog".to_string()));
@@ -4175,7 +4266,7 @@ impl<'n> Engine<'n> {
             ("entries", Some(opt)) => {
                 match opt.subcommand() {
                     ("lookup", Some(opt)) => {
-                        call_result = self._entries_lookup(opt, dry_run, &mut err);
+                        call_result = self._entries_lookup(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("entries".to_string()));
@@ -4186,160 +4277,163 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-entry-groups-create", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-delete", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-create", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-delete", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-get", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-list", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-patch", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-tags-create", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_tags_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_tags_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-tags-delete", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_tags_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_tags_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-tags-list", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_tags_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_tags_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-tags-patch", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_tags_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_tags_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-entries-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_entries_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_entries_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-get", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-list", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-patch", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-tags-create", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_tags_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_tags_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-tags-delete", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_tags_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_tags_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-tags-list", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_tags_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_tags_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-tags-patch", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_tags_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_tags_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-entry-groups-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_entry_groups_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_entry_groups_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-create", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-delete", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-fields-create", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_fields_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_fields_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-fields-delete", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_fields_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_fields_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-tag-templates-fields-enum-values-rename", Some(opt)) => {
+                        call_result = self._projects_locations_tag_templates_fields_enum_values_rename(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-fields-patch", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_fields_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_fields_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-fields-rename", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_fields_rename(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_fields_rename(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-get", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-patch", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-tag-templates-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_tag_templates_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_tag_templates_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-create", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-delete", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-export", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_export(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_export(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-get", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-import", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_import(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_import(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-list", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-patch", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-create", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-delete", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-get", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-list", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-patch", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-policy-tags-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_policy_tags_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_policy_tags_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-taxonomies-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_taxonomies_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_taxonomies_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -4364,41 +4458,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "datacatalog1-beta1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "datacatalog1-beta1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "datacatalog1-beta1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/datacatalog1-beta1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::DataCatalog::new(client, auth),
@@ -4414,42 +4493,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("catalog", "methods: 'search'", vec![
             ("search",
-                    Some(r##"Searches Data Catalog for multiple resources like entries, tags that
-        match a query.
-        
-        This is a custom method
-        (https://cloud.google.com/apis/design/custom_methods) and does not return
-        the complete resource, only the resource identifier and high level
-        fields. Clients can subsequentally call `Get` methods.
-        
-        Note that Data Catalog search queries do not guarantee full recall. Query
-        results that match your query may not be returned, even in subsequent
-        result pages. Also note that results returned (and not returned) can vary
-        across repeated search queries.
-        
-        See [Data Catalog Search
-        Syntax](https://cloud.google.com/data-catalog/docs/how-to/search-reference)
-        for more information."##),
+                    Some(r##"Searches Data Catalog for multiple resources like entries, tags that match a query. This is a custom method (https://cloud.google.com/apis/design/custom_methods) and does not return the complete resource, only the resource identifier and high level fields. Clients can subsequently call `Get` methods. Note that Data Catalog search queries do not guarantee full recall. Query results that match your query may not be returned, even in subsequent result pages. Also note that results returned (and not returned) can vary across repeated search queries. See [Data Catalog Search Syntax](https://cloud.google.com/data-catalog/docs/how-to/search-reference) for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/catalog_search",
                   vec![
                     (Some(r##"kv"##),
@@ -4474,9 +4539,7 @@ fn main() {
         
         ("entries", "methods: 'lookup'", vec![
             ("lookup",
-                    Some(r##"Get an entry by target resource name. This method allows clients to use
-        the resource name from the source Google Cloud Platform service to get the
-        Data Catalog Entry."##),
+                    Some(r##"Get an entry by target resource name. This method allows clients to use the resource name from the source Google Cloud Platform service to get the Data Catalog Entry."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/entries_lookup",
                   vec![
                     (Some(r##"v"##),
@@ -4493,25 +4556,14 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-entry-groups-create', 'locations-entry-groups-delete', 'locations-entry-groups-entries-create', 'locations-entry-groups-entries-delete', 'locations-entry-groups-entries-get', 'locations-entry-groups-entries-get-iam-policy', 'locations-entry-groups-entries-list', 'locations-entry-groups-entries-patch', 'locations-entry-groups-entries-tags-create', 'locations-entry-groups-entries-tags-delete', 'locations-entry-groups-entries-tags-list', 'locations-entry-groups-entries-tags-patch', 'locations-entry-groups-entries-test-iam-permissions', 'locations-entry-groups-get', 'locations-entry-groups-get-iam-policy', 'locations-entry-groups-list', 'locations-entry-groups-patch', 'locations-entry-groups-set-iam-policy', 'locations-entry-groups-tags-create', 'locations-entry-groups-tags-delete', 'locations-entry-groups-tags-list', 'locations-entry-groups-tags-patch', 'locations-entry-groups-test-iam-permissions', 'locations-tag-templates-create', 'locations-tag-templates-delete', 'locations-tag-templates-fields-create', 'locations-tag-templates-fields-delete', 'locations-tag-templates-fields-patch', 'locations-tag-templates-fields-rename', 'locations-tag-templates-get', 'locations-tag-templates-get-iam-policy', 'locations-tag-templates-patch', 'locations-tag-templates-set-iam-policy', 'locations-tag-templates-test-iam-permissions', 'locations-taxonomies-create', 'locations-taxonomies-delete', 'locations-taxonomies-export', 'locations-taxonomies-get', 'locations-taxonomies-get-iam-policy', 'locations-taxonomies-import', 'locations-taxonomies-list', 'locations-taxonomies-patch', 'locations-taxonomies-policy-tags-create', 'locations-taxonomies-policy-tags-delete', 'locations-taxonomies-policy-tags-get', 'locations-taxonomies-policy-tags-get-iam-policy', 'locations-taxonomies-policy-tags-list', 'locations-taxonomies-policy-tags-patch', 'locations-taxonomies-policy-tags-set-iam-policy', 'locations-taxonomies-policy-tags-test-iam-permissions', 'locations-taxonomies-set-iam-policy' and 'locations-taxonomies-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-entry-groups-create', 'locations-entry-groups-delete', 'locations-entry-groups-entries-create', 'locations-entry-groups-entries-delete', 'locations-entry-groups-entries-get', 'locations-entry-groups-entries-get-iam-policy', 'locations-entry-groups-entries-list', 'locations-entry-groups-entries-patch', 'locations-entry-groups-entries-tags-create', 'locations-entry-groups-entries-tags-delete', 'locations-entry-groups-entries-tags-list', 'locations-entry-groups-entries-tags-patch', 'locations-entry-groups-entries-test-iam-permissions', 'locations-entry-groups-get', 'locations-entry-groups-get-iam-policy', 'locations-entry-groups-list', 'locations-entry-groups-patch', 'locations-entry-groups-set-iam-policy', 'locations-entry-groups-tags-create', 'locations-entry-groups-tags-delete', 'locations-entry-groups-tags-list', 'locations-entry-groups-tags-patch', 'locations-entry-groups-test-iam-permissions', 'locations-tag-templates-create', 'locations-tag-templates-delete', 'locations-tag-templates-fields-create', 'locations-tag-templates-fields-delete', 'locations-tag-templates-fields-enum-values-rename', 'locations-tag-templates-fields-patch', 'locations-tag-templates-fields-rename', 'locations-tag-templates-get', 'locations-tag-templates-get-iam-policy', 'locations-tag-templates-patch', 'locations-tag-templates-set-iam-policy', 'locations-tag-templates-test-iam-permissions', 'locations-taxonomies-create', 'locations-taxonomies-delete', 'locations-taxonomies-export', 'locations-taxonomies-get', 'locations-taxonomies-get-iam-policy', 'locations-taxonomies-import', 'locations-taxonomies-list', 'locations-taxonomies-patch', 'locations-taxonomies-policy-tags-create', 'locations-taxonomies-policy-tags-delete', 'locations-taxonomies-policy-tags-get', 'locations-taxonomies-policy-tags-get-iam-policy', 'locations-taxonomies-policy-tags-list', 'locations-taxonomies-policy-tags-patch', 'locations-taxonomies-policy-tags-set-iam-policy', 'locations-taxonomies-policy-tags-test-iam-permissions', 'locations-taxonomies-set-iam-policy' and 'locations-taxonomies-test-iam-permissions'", vec![
             ("locations-entry-groups-create",
-                    Some(r##"A maximum of 10,000 entry groups may be created per organization across all
-        locations.
-        
-        Users should enable the Data Catalog API in the project identified by
-        the `parent` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"A maximum of 10,000 entry groups may be created per organization across all locations. Users should enable the Data Catalog API in the project identified by the `parent` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project this entry group is in. Example:
-        
-        * projects/{project_id}/locations/{location}
-        
-        Note that this EntryGroup and its child resources may not actually be
-        stored in the location in this name."##),
+                     Some(r##"Required. The name of the project this entry group is in. Example: * projects/{project_id}/locations/{location} Note that this EntryGroup and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -4534,17 +4586,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-delete",
-                    Some(r##"Deletes an EntryGroup. Only entry groups that do not contain entries can be
-        deleted. Users should enable the Data Catalog API in the project
-        identified by the `name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Deletes an EntryGroup. Only entry groups that do not contain entries can be deleted. Users should enable the Data Catalog API in the project identified by the `name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the entry group. For example,
-        `projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}`."##),
+                     Some(r##"Required. The name of the entry group. For example, `projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -4561,25 +4608,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-create",
-                    Some(r##"Creates an entry. Only entries of 'FILESET' type or user-specified type can
-        be created.
-        
-        Users should enable the Data Catalog API in the project identified by
-        the `parent` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information).
-        
-        A maximum of 100,000 entries may be created per entry group."##),
+                    Some(r##"Creates an entry. Only entries of 'FILESET' type or user-specified type can be created. Users should enable the Data Catalog API in the project identified by the `parent` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information). A maximum of 100,000 entries may be created per entry group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-entries-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the entry group this entry is in. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}
-        
-        Note that this Entry and its child resources may not actually be stored in
-        the location in this name."##),
+                     Some(r##"Required. The name of the entry group this entry is in. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id} Note that this Entry and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -4602,20 +4636,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-delete",
-                    Some(r##"Deletes an existing entry. Only entries created through
-        CreateEntry
-        method can be deleted.
-        Users should enable the Data Catalog API in the project identified by
-        the `name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Deletes an existing entry. Only entries created through CreateEntry method can be deleted. Users should enable the Data Catalog API in the project identified by the `name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-entries-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the entry. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
+                     Some(r##"Required. The name of the entry. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -4637,9 +4663,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the entry. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
+                     Some(r##"Required. The name of the entry. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -4656,28 +4680,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource. A `NOT_FOUND` error
-        is returned if the resource does not exist. An empty policy is returned
-        if the resource exists but does not have a policy set on it.
-        
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        Callers must have following Google IAM permission
-          - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag
-            templates.
-          - `datacatalog.entries.getIamPolicy` to get policies on entries.
-          - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups."##),
+                    Some(r##"Gets the access control policy for a resource. A `NOT_FOUND` error is returned if the resource does not exist. An empty policy is returned if the resource exists but does not have a policy set on it. Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. Callers must have following Google IAM permission - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag templates. - `datacatalog.entries.getIamPolicy` to get policies on entries. - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-entries-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4705,10 +4713,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the entry group that contains the entries, which can
-        be provided in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}"##),
+                     Some(r##"Required. The name of the entry group that contains the entries, which can be provided in URL format. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -4725,21 +4730,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-patch",
-                    Some(r##"Updates an existing entry.
-        Users should enable the Data Catalog API in the project identified by
-        the `entry.name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Updates an existing entry. Users should enable the Data Catalog API in the project identified by the `entry.name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-entries-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The Data Catalog resource name of the entry in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}
-        
-        Note that this Entry and its child resources may not actually be stored in
-        the location in this name."##),
+                     Some(r##"Output only. The Data Catalog resource name of the entry in URL format. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id} Note that this Entry and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -4762,24 +4758,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-tags-create",
-                    Some(r##"Creates a tag on an Entry.
-        Note: The project identified by the `parent` parameter for the
-        [tag](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.entryGroups.entries.tags/create#path-parameters)
-        and the
-        [tag
-        template](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.tagTemplates/create#path-parameters)
-        used to create the tag must be from the same organization."##),
+                    Some(r##"Creates a tag on an Entry. Note: The project identified by the `parent` parameter for the [tag](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.entryGroups.entries.tags/create#path-parameters) and the [tag template](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.tagTemplates/create#path-parameters) used to create the tag must be from the same organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-entries-tags-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the resource to attach this tag to. Tags can be attached to
-        Entries. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}
-        
-        Note that this Tag and its child resources may not actually be stored in
-        the location in this name."##),
+                     Some(r##"Required. The name of the resource to attach this tag to. Tags can be attached to Entries. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id} Note that this Tag and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -4807,9 +4791,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag to delete. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id}"##),
+                     Some(r##"Required. The name of the tag to delete. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -4831,14 +4813,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the Data Catalog resource to list the tags of. The resource
-        could be an Entry or an
-        EntryGroup.
-        
-        Examples:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
+                     Some(r##"Required. The name of the Data Catalog resource to list the tags of. The resource could be an Entry or an EntryGroup. Examples: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id} * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -4860,12 +4835,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the tag in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}/entrygroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id}
-        
-        where `tag_id` is a system-generated identifier.
-        Note that this Tag may not actually be stored in the location in this name."##),
+                     Some(r##"The resource name of the tag in URL format. Example: * projects/{project_id}/locations/{location}/entrygroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id} where `tag_id` is a system-generated identifier. Note that this Tag may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -4888,25 +4858,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-test-iam-permissions",
-                    Some(r##"Returns the caller's permissions on a resource.
-        If the resource does not exist, an empty set of permissions is returned
-        (We don't return a `NOT_FOUND` error).
-        
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        A caller is not required to have Google IAM permission to make this
-        request."##),
+                    Some(r##"Returns the caller's permissions on a resource. If the resource does not exist, an empty set of permissions is returned (We don't return a `NOT_FOUND` error). Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. A caller is not required to have Google IAM permission to make this request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-entries-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4934,8 +4891,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the entry group. For example,
-        `projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}`."##),
+                     Some(r##"Required. The name of the entry group. For example, `projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -4952,28 +4908,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource. A `NOT_FOUND` error
-        is returned if the resource does not exist. An empty policy is returned
-        if the resource exists but does not have a policy set on it.
-        
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        Callers must have following Google IAM permission
-          - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag
-            templates.
-          - `datacatalog.entries.getIamPolicy` to get policies on entries.
-          - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups."##),
+                    Some(r##"Gets the access control policy for a resource. A `NOT_FOUND` error is returned if the resource does not exist. An empty policy is returned if the resource exists but does not have a policy set on it. Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. Callers must have following Google IAM permission - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag templates. - `datacatalog.entries.getIamPolicy` to get policies on entries. - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5001,10 +4941,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the location that contains the entry groups, which can be
-        provided in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}"##),
+                     Some(r##"Required. The name of the location that contains the entry groups, which can be provided in URL format. Example: * projects/{project_id}/locations/{location}"##),
                      Some(true),
                      Some(false)),
         
@@ -5021,21 +4958,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-patch",
-                    Some(r##"Updates an EntryGroup. The user should enable the Data Catalog API in the
-        project identified by the `entry_group.name` parameter (see [Data Catalog
-        Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Updates an EntryGroup. The user should enable the Data Catalog API in the project identified by the `entry_group.name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the entry group in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}
-        
-        Note that this EntryGroup and its child resources may not actually be
-        stored in the location in this name."##),
+                     Some(r##"The resource name of the entry group in URL format. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id} Note that this EntryGroup and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -5058,26 +4986,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-set-iam-policy",
-                    Some(r##"Sets the access control policy for a resource. Replaces any existing
-        policy.
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        Callers must have following Google IAM permission
-          - `datacatalog.tagTemplates.setIamPolicy` to set policies on tag
-            templates.
-          - `datacatalog.entries.setIamPolicy` to set policies on entries.
-          - `datacatalog.entryGroups.setIamPolicy` to set policies on entry groups."##),
+                    Some(r##"Sets the access control policy for a resource. Replaces any existing policy. Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. Callers must have following Google IAM permission - `datacatalog.tagTemplates.setIamPolicy` to set policies on tag templates. - `datacatalog.entries.setIamPolicy` to set policies on entries. - `datacatalog.entryGroups.setIamPolicy` to set policies on entry groups."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5100,24 +5014,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-tags-create",
-                    Some(r##"Creates a tag on an Entry.
-        Note: The project identified by the `parent` parameter for the
-        [tag](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.entryGroups.entries.tags/create#path-parameters)
-        and the
-        [tag
-        template](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.tagTemplates/create#path-parameters)
-        used to create the tag must be from the same organization."##),
+                    Some(r##"Creates a tag on an Entry. Note: The project identified by the `parent` parameter for the [tag](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.entryGroups.entries.tags/create#path-parameters) and the [tag template](https://cloud.google.com/data-catalog/docs/reference/rest/v1beta1/projects.locations.tagTemplates/create#path-parameters) used to create the tag must be from the same organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-tags-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the resource to attach this tag to. Tags can be attached to
-        Entries. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}
-        
-        Note that this Tag and its child resources may not actually be stored in
-        the location in this name."##),
+                     Some(r##"Required. The name of the resource to attach this tag to. Tags can be attached to Entries. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id} Note that this Tag and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -5145,9 +5047,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag to delete. Example:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id}"##),
+                     Some(r##"Required. The name of the tag to delete. Example: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5169,14 +5069,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the Data Catalog resource to list the tags of. The resource
-        could be an Entry or an
-        EntryGroup.
-        
-        Examples:
-        
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}
-        * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
+                     Some(r##"Required. The name of the Data Catalog resource to list the tags of. The resource could be an Entry or an EntryGroup. Examples: * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id} * projects/{project_id}/locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5198,12 +5091,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the tag in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}/entrygroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id}
-        
-        where `tag_id` is a system-generated identifier.
-        Note that this Tag may not actually be stored in the location in this name."##),
+                     Some(r##"The resource name of the tag in URL format. Example: * projects/{project_id}/locations/{location}/entrygroups/{entry_group_id}/entries/{entry_id}/tags/{tag_id} where `tag_id` is a system-generated identifier. Note that this Tag may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -5226,25 +5114,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-test-iam-permissions",
-                    Some(r##"Returns the caller's permissions on a resource.
-        If the resource does not exist, an empty set of permissions is returned
-        (We don't return a `NOT_FOUND` error).
-        
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        A caller is not required to have Google IAM permission to make this
-        request."##),
+                    Some(r##"Returns the caller's permissions on a resource. If the resource does not exist, an empty set of permissions is returned (We don't return a `NOT_FOUND` error). Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. A caller is not required to have Google IAM permission to make this request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-entry-groups-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5267,21 +5142,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-create",
-                    Some(r##"Creates a tag template. The user should enable the Data Catalog API in
-        the project identified by the `parent` parameter (see [Data Catalog
-        Resource
-        Project](https://cloud.google.com/data-catalog/docs/concepts/resource-project)
-        for more information)."##),
+                    Some(r##"Creates a tag template. The user should enable the Data Catalog API in the project identified by the `parent` parameter (see [Data Catalog Resource Project](https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project and the template location
-        [region](https://cloud.google.com/data-catalog/docs/concepts/regions.
-        
-        Example:
-        
-        * projects/{project_id}/locations/us-central1"##),
+                     Some(r##"Required. The name of the project and the template location [region](https://cloud.google.com/data-catalog/docs/concepts/regions. Example: * projects/{project_id}/locations/us-central1"##),
                      Some(true),
                      Some(false)),
         
@@ -5304,18 +5170,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-delete",
-                    Some(r##"Deletes a tag template and all tags using the template.
-        Users should enable the Data Catalog API in the project identified by
-        the `name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Deletes a tag template and all tags using the template. Users should enable the Data Catalog API in the project identified by the `name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag template to delete. Example:
-        
-        * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}"##),
+                     Some(r##"Required. The name of the tag template to delete. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5332,21 +5192,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-fields-create",
-                    Some(r##"Creates a field in a tag template. The user should enable the Data Catalog
-        API in the project identified by the `parent` parameter (see
-        [Data Catalog Resource
-        Project](https://cloud.google.com/data-catalog/docs/concepts/resource-project)
-        for more information)."##),
+                    Some(r##"Creates a field in a tag template. The user should enable the Data Catalog API in the project identified by the `parent` parameter (see [Data Catalog Resource Project](https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-fields-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the project and the template location
-        [region](https://cloud.google.com/data-catalog/docs/concepts/regions).
-        
-        Example:
-        
-        * projects/{project_id}/locations/us-central1/tagTemplates/{tag_template_id}"##),
+                     Some(r##"Required. The name of the project and the template location [region](https://cloud.google.com/data-catalog/docs/concepts/regions). Example: * projects/{project_id}/locations/us-central1/tagTemplates/{tag_template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5369,18 +5220,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-fields-delete",
-                    Some(r##"Deletes a field in a tag template and all uses of that field.
-        Users should enable the Data Catalog API in the project identified by
-        the `name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Deletes a field in a tag template and all uses of that field. Users should enable the Data Catalog API in the project identified by the `name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-fields-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag template field to delete. Example:
-        
-        * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}"##),
+                     Some(r##"Required. The name of the tag template field to delete. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5396,19 +5241,41 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-tag-templates-fields-enum-values-rename",
+                    Some(r##"Renames an enum value in a tag template. The enum values have to be unique within one enum field. Thus, an enum value cannot be renamed with a name used in any other enum value within the same enum field."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-fields-enum-values-rename",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the enum field value. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}/enumValues/{enum_value_display_name}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-tag-templates-fields-patch",
-                    Some(r##"Updates a field in a tag template. This method cannot be used to update the
-        field type. Users should enable the Data Catalog API in the project
-        identified by the `name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Updates a field in a tag template. This method cannot be used to update the field type. Users should enable the Data Catalog API in the project identified by the `name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-fields-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag template field. Example:
-        
-        * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}"##),
+                     Some(r##"Required. The name of the tag template field. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5431,18 +5298,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-fields-rename",
-                    Some(r##"Renames a field in a tag template. The user should enable the Data Catalog
-        API in the project identified by the `name` parameter (see [Data Catalog
-        Resource
-        Project](https://cloud.google.com/data-catalog/docs/concepts/resource-project)
-        for more information)."##),
+                    Some(r##"Renames a field in a tag template. The user should enable the Data Catalog API in the project identified by the `name` parameter (see [Data Catalog Resource Project](https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-fields-rename",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag template. Example:
-        
-        * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}"##),
+                     Some(r##"Required. The name of the tag template. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}/fields/{tag_template_field_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5470,9 +5331,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the tag template. Example:
-        
-        * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}"##),
+                     Some(r##"Required. The name of the tag template. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -5489,28 +5348,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource. A `NOT_FOUND` error
-        is returned if the resource does not exist. An empty policy is returned
-        if the resource exists but does not have a policy set on it.
-        
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        Callers must have following Google IAM permission
-          - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag
-            templates.
-          - `datacatalog.entries.getIamPolicy` to get policies on entries.
-          - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups."##),
+                    Some(r##"Gets the access control policy for a resource. A `NOT_FOUND` error is returned if the resource does not exist. An empty policy is returned if the resource exists but does not have a policy set on it. Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. Callers must have following Google IAM permission - `datacatalog.tagTemplates.getIamPolicy` to get policies on tag templates. - `datacatalog.entries.getIamPolicy` to get policies on entries. - `datacatalog.entryGroups.getIamPolicy` to get policies on entry groups."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5533,23 +5376,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-patch",
-                    Some(r##"Updates a tag template. This method cannot be used to update the fields of
-        a template. The tag template fields are represented as separate resources
-        and should be updated using their own create/update/delete methods.
-        Users should enable the Data Catalog API in the project identified by
-        the `tag_template.name` parameter (see [Data Catalog Resource Project]
-        (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for
-        more information)."##),
+                    Some(r##"Updates a tag template. This method cannot be used to update the fields of a template. The tag template fields are represented as separate resources and should be updated using their own create/update/delete methods. Users should enable the Data Catalog API in the project identified by the `tag_template.name` parameter (see [Data Catalog Resource Project] (https://cloud.google.com/data-catalog/docs/concepts/resource-project) for more information)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the tag template in URL format. Example:
-        
-        * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id}
-        
-        Note that this TagTemplate and its child resources may not actually be
-        stored in the location in this name."##),
+                     Some(r##"The resource name of the tag template in URL format. Example: * projects/{project_id}/locations/{location}/tagTemplates/{tag_template_id} Note that this TagTemplate and its child resources may not actually be stored in the location in this name."##),
                      Some(true),
                      Some(false)),
         
@@ -5572,26 +5404,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-set-iam-policy",
-                    Some(r##"Sets the access control policy for a resource. Replaces any existing
-        policy.
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        Callers must have following Google IAM permission
-          - `datacatalog.tagTemplates.setIamPolicy` to set policies on tag
-            templates.
-          - `datacatalog.entries.setIamPolicy` to set policies on entries.
-          - `datacatalog.entryGroups.setIamPolicy` to set policies on entry groups."##),
+                    Some(r##"Sets the access control policy for a resource. Replaces any existing policy. Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. Callers must have following Google IAM permission - `datacatalog.tagTemplates.setIamPolicy` to set policies on tag templates. - `datacatalog.entries.setIamPolicy` to set policies on entries. - `datacatalog.entryGroups.setIamPolicy` to set policies on entry groups."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5614,25 +5432,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-tag-templates-test-iam-permissions",
-                    Some(r##"Returns the caller's permissions on a resource.
-        If the resource does not exist, an empty set of permissions is returned
-        (We don't return a `NOT_FOUND` error).
-        
-        Supported resources are:
-          - Tag templates.
-          - Entries.
-          - Entry groups.
-        Note, this method cannot be used to manage policies for BigQuery, Pub/Sub
-        and any external Google Cloud Platform resources synced to Data Catalog.
-        
-        A caller is not required to have Google IAM permission to make this
-        request."##),
+                    Some(r##"Returns the caller's permissions on a resource. If the resource does not exist, an empty set of permissions is returned (We don't return a `NOT_FOUND` error). Supported resources are: - Tag templates. - Entries. - Entry groups. Note, this method cannot be used to manage policies for BigQuery, Pub/Sub and any external Google Cloud Platform resources synced to Data Catalog. A caller is not required to have Google IAM permission to make this request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-tag-templates-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5683,14 +5488,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-taxonomies-delete",
-                    Some(r##"Deletes a taxonomy. This operation will also delete all
-        policy tags in this taxonomy along with their associated policies."##),
+                    Some(r##"Deletes a taxonomy. This operation will also delete all policy tags in this taxonomy along with their associated policies."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-taxonomies-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the taxonomy to be deleted. All policy tags in
-        this taxonomy will also be deleted."##),
+                     Some(r##"Required. Resource name of the taxonomy to be deleted. All policy tags in this taxonomy will also be deleted."##),
                      Some(true),
                      Some(false)),
         
@@ -5707,16 +5510,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-taxonomies-export",
-                    Some(r##"Exports all taxonomies and their policy tags in a project.
-        
-        This method generates SerializedTaxonomy protos with nested policy tags
-        that can be used as an input for future ImportTaxonomies calls."##),
+                    Some(r##"Exports all taxonomies and their policy tags in a project. This method generates SerializedTaxonomy protos with nested policy tags that can be used as an input for future ImportTaxonomies calls."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-taxonomies-export",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the project that taxonomies to be exported
-        will share."##),
+                     Some(r##"Required. Resource name of the project that taxonomies to be exported will share."##),
                      Some(true),
                      Some(false)),
         
@@ -5760,8 +5559,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5784,11 +5582,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-taxonomies-import",
-                    Some(r##"Imports all taxonomies and their policy tags to a project as new
-        taxonomies.
-        
-        This method provides a bulk taxonomy / policy tag creation using nested
-        proto structure."##),
+                    Some(r##"Imports all taxonomies and their policy tags to a project as new taxonomies. This method provides a bulk taxonomy / policy tag creation using nested proto structure."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-taxonomies-import",
                   vec![
                     (Some(r##"parent"##),
@@ -5816,8 +5610,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-taxonomies-list",
-                    Some(r##"Lists all taxonomies in a project in a particular location that the caller
-        has permission to view."##),
+                    Some(r##"Lists all taxonomies in a project in a particular location that the caller has permission to view."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-taxonomies-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5844,8 +5637,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of this taxonomy, whose format is:
-        "projects/{project_number}/locations/{location_id}/taxonomies/{id}"."##),
+                     Some(r##"Output only. Resource name of this taxonomy, whose format is: "projects/{project_number}/locations/{location_id}/taxonomies/{id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -5901,8 +5693,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the policy tag to be deleted. All of its descendant
-        policy tags will also be deleted."##),
+                     Some(r##"Required. Resource name of the policy tag to be deleted. All of its descendant policy tags will also be deleted."##),
                      Some(true),
                      Some(false)),
         
@@ -5946,8 +5737,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -5997,8 +5787,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of this policy tag, whose format is:
-        "projects/{project_number}/locations/{location_id}/taxonomies/{taxonomy_id}/policyTags/{id}"."##),
+                     Some(r##"Output only. Resource name of this policy tag, whose format is: "projects/{project_number}/locations/{location_id}/taxonomies/{taxonomy_id}/policyTags/{id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -6026,8 +5815,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -6050,14 +5838,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-taxonomies-policy-tags-test-iam-permissions",
-                    Some(r##"Returns the permissions that a caller has on the specified taxonomy or
-        policy tag."##),
+                    Some(r##"Returns the permissions that a caller has on the specified taxonomy or policy tag."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-taxonomies-policy-tags-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -6085,8 +5871,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -6109,14 +5894,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-taxonomies-test-iam-permissions",
-                    Some(r##"Returns the permissions that a caller has on the specified taxonomy or
-        policy tag."##),
+                    Some(r##"Returns the permissions that a caller has on the specified taxonomy or policy tag."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli/projects_locations-taxonomies-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -6144,9 +5927,8 @@ fn main() {
     
     let mut app = App::new("datacatalog1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200528")
-           .about("A fully managed and highly scalable data discovery and metadata management service.
-           ")
+           .version("2.0.0+20210316")
+           .about("A fully managed and highly scalable data discovery and metadata management service. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -6160,12 +5942,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -6213,13 +5990,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

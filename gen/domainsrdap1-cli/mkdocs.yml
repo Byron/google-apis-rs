@@ -1,4 +1,4 @@
-site_name: Domains RDAP v1.0.14+20200603
+site_name: Domains RDAP v2.0.0+20210331
 site_url: http://byron.github.io/google-apis-rs/google-domainsrdap1-cli
 site_description: A complete library to interact with Domains RDAP (protocol v1)
 

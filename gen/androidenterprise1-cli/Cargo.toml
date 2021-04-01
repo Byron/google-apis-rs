@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidenterprise1-cli"
-version = "1.0.14+20200707"
+version = "2.0.0+20210324"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli"
@@ -13,33 +13,28 @@ documentation = "http://byron.github.io/google-apis-rs/google_androidenterprise1
 license = "MIT"
 keywords = ["androidenterprise", "google", "cli"]
 autobins = false
+edition = "2018"
 
 [[bin]]
 name = "androidenterprise1"
 path = "src/main.rs"
 
-[dev-dependencies]
-hyper-rustls = "^0.6"
-
 [dependencies]
-hyper = "^ 0.10"
+hyper-rustls = "^0.22"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = { version = "^ 1.0", default-features = false }
+yup-oauth2 = "^ 5.0"
+itertools = "^ 0.10"
 strsim = "^0.5"
-hyper-rustls = "^0.6"
-yup-hyper-mock = "^2.0"
 clap = "^2.0"
+hyper = { version = "0.14", features = ["full"] }
+tokio = { version = "^ 1.0", features = ["full"] }
 
-[features]
-default = ["openssl"]
-openssl = ["yup-oauth2/default"]
-rustls = ["yup-oauth2/no-openssl"]
 
 
 
 [dependencies.google-androidenterprise1]
 path = "../androidenterprise1"
-version = "1.0.14+20200707"
+version = "2.0.0+20210324"

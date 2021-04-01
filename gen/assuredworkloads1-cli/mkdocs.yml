@@ -1,0 +1,23 @@
+site_name: Assuredworkloads v2.0.0+20210325
+site_url: http://byron.github.io/google-apis-rs/google-assuredworkloads1-cli
+site_description: A complete library to interact with Assuredworkloads (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/assuredworkloads1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['organizations_locations-operations-get.md', 'Organizations', 'Locations Operations Get']
+- ['organizations_locations-operations-list.md', 'Organizations', 'Locations Operations List']
+- ['organizations_locations-workloads-create.md', 'Organizations', 'Locations Workloads Create']
+- ['organizations_locations-workloads-delete.md', 'Organizations', 'Locations Workloads Delete']
+- ['organizations_locations-workloads-get.md', 'Organizations', 'Locations Workloads Get']
+- ['organizations_locations-workloads-list.md', 'Organizations', 'Locations Workloads List']
+- ['organizations_locations-workloads-patch.md', 'Organizations', 'Locations Workloads Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

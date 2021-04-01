@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_mybusiness4 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_mybusiness4::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::MyBusiness<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::MyBusiness<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _accounts_admins_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_admins_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,10 +65,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -116,7 +112,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -131,7 +127,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_admins_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_admins_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().admins_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -165,7 +161,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -180,7 +176,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_admins_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_admins_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().admins_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -214,7 +210,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -229,7 +225,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_admins_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_admins_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -252,10 +248,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -299,7 +295,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -314,7 +310,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -337,26 +333,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "permission-level" => Some(("permissionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-number" => Some(("accountNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-number" => Some(("accountNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.address-lines" => Some(("organizationInfo.postalAddress.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "organization-info.postal-address.administrative-area" => Some(("organizationInfo.postalAddress.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.locality" => Some(("organizationInfo.postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.organization" => Some(("organizationInfo.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.postal-code" => Some(("organizationInfo.postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.recipients" => Some(("organizationInfo.postalAddress.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "organization-info.postal-address.region-code" => Some(("organizationInfo.postalAddress.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.revision" => Some(("organizationInfo.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.sorting-code" => Some(("organizationInfo.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.sublocality" => Some(("organizationInfo.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permission-level" => Some(("permissionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.status" => Some(("state.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.vetted-status" => Some(("state.vettedStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.recipients" => Some(("organizationInfo.postalAddress.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "organization-info.postal-address.locality" => Some(("organizationInfo.postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.sorting-code" => Some(("organizationInfo.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.region-code" => Some(("organizationInfo.postalAddress.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.administrative-area" => Some(("organizationInfo.postalAddress.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.address-lines" => Some(("organizationInfo.postalAddress.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "organization-info.postal-address.postal-code" => Some(("organizationInfo.postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.organization" => Some(("organizationInfo.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.sublocality" => Some(("organizationInfo.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.revision" => Some(("organizationInfo.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
@@ -405,7 +401,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -420,7 +416,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_delete_notifications(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_delete_notifications(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().delete_notifications(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -454,7 +450,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -469,7 +465,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_generate_account_number(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_generate_account_number(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -535,7 +531,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -550,7 +546,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -584,7 +580,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -599,7 +595,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_get_notifications(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_get_notifications(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().get_notifications(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -633,7 +629,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -648,7 +644,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_invitations_accept(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_invitations_accept(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -714,7 +710,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -729,7 +725,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_invitations_decline(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_invitations_decline(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -795,7 +791,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -810,7 +806,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_invitations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_invitations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().invitations_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -848,7 +844,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -863,7 +859,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -894,7 +890,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "name", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "name", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -910,7 +906,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -925,7 +921,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_list_recommend_google_locations(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_list_recommend_google_locations(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().list_recommend_google_locations(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -950,7 +946,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -966,7 +962,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -981,7 +977,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_admins_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_admins_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1004,10 +1000,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1051,7 +1047,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1066,7 +1062,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_admins_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_admins_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_admins_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1100,7 +1096,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1115,7 +1111,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_admins_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_admins_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_admins_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1149,7 +1145,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1164,7 +1160,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_admins_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_admins_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1187,10 +1183,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1234,7 +1230,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1249,7 +1245,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_associate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_associate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1316,7 +1312,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1331,7 +1327,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1398,7 +1394,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1413,7 +1409,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_batch_get_reviews(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_batch_get_reviews(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1436,11 +1432,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-names" => Some(("locationNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ignore-rating-only-reviews" => Some(("ignoreRatingOnlyReviews", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-names" => Some(("locationNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-rating-only-reviews", "location-names", "order-by", "page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1484,7 +1480,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1499,7 +1495,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_clear_association(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_clear_association(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1565,7 +1561,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1580,7 +1576,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1603,64 +1599,64 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "profile.description" => Some(("profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ad-words-location-extensions.ad-phone" => Some(("adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "additional-phones" => Some(("additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.organization" => Some(("address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.recipients" => Some(("address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.revision" => Some(("address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "address.sorting-code" => Some(("address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "open-info.can-reopen" => Some(("openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.year" => Some(("openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location-state.can-update" => Some(("locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.can-delete" => Some(("locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-disabled" => Some(("locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-local-post-api-disabled" => Some(("locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-suspended" => Some(("locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-google-updated" => Some(("locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-published" => Some(("locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.has-pending-verification" => Some(("locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.has-pending-edits" => Some(("locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-pending-review" => Some(("locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-duplicate" => Some(("locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.needs-reverification" => Some(("locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-verified" => Some(("locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-disconnected" => Some(("locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "store-code" => Some(("storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-key.plus-page-id" => Some(("locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-key.explicit-no-place-id" => Some(("locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-key.place-id" => Some(("locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-key.request-id" => Some(("locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latlng.latitude" => Some(("latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "latlng.longitude" => Some(("latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "ad-words-location-extensions.ad-phone" => Some(("adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-area.business-type" => Some(("serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-area.radius.latlng.latitude" => Some(("serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-area.radius.latlng.longitude" => Some(("serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-area.radius.radius-km" => Some(("serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-key.explicit-no-place-id" => Some(("locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-key.place-id" => Some(("locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-key.plus-page-id" => Some(("locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-key.request-id" => Some(("locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-name" => Some(("locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-phone" => Some(("primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.recipients" => Some(("address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.sorting-code" => Some(("address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.organization" => Some(("address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.revision" => Some(("address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "additional-phones" => Some(("additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "relationship-data.parent-chain" => Some(("relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.new-review-url" => Some(("metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-state.can-delete" => Some(("locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.can-update" => Some(("locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.has-pending-edits" => Some(("locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.has-pending-verification" => Some(("locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-disabled" => Some(("locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-disconnected" => Some(("locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-duplicate" => Some(("locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-google-updated" => Some(("locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-local-post-api-disabled" => Some(("locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-pending-review" => Some(("locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-published" => Some(("locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-suspended" => Some(("locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-verified" => Some(("locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.needs-reverification" => Some(("locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "metadata.duplicate.access" => Some(("metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.location-name" => Some(("metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.place-id" => Some(("metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.maps-url" => Some(("metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-category.display-name" => Some(("primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-category.category-id" => Some(("primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.new-review-url" => Some(("metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "open-info.can-reopen" => Some(("openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.year" => Some(("openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-category.category-id" => Some(("primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-category.display-name" => Some(("primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-phone" => Some(("primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.description" => Some(("profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "relationship-data.parent-chain" => Some(("relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-area.business-type" => Some(("serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-area.radius.latlng.latitude" => Some(("serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-area.radius.latlng.longitude" => Some(("serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-area.radius.radius-km" => Some(("serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "store-code" => Some(("storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "ad-phone", "ad-words-location-extensions", "additional-phones", "address", "address-lines", "administrative-area", "business-type", "can-delete", "can-reopen", "can-update", "category-id", "day", "description", "display-name", "duplicate", "explicit-no-place-id", "has-pending-edits", "has-pending-verification", "is-disabled", "is-disconnected", "is-duplicate", "is-google-updated", "is-local-post-api-disabled", "is-pending-review", "is-published", "is-suspended", "is-verified", "labels", "language-code", "latitude", "latlng", "locality", "location-key", "location-name", "location-state", "longitude", "maps-url", "metadata", "month", "name", "needs-reverification", "new-review-url", "open-info", "opening-date", "organization", "parent-chain", "place-id", "plus-page-id", "postal-code", "primary-category", "primary-phone", "profile", "radius", "radius-km", "recipients", "region-code", "relationship-data", "request-id", "revision", "service-area", "sorting-code", "status", "store-code", "sublocality", "website-url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1711,7 +1707,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1726,7 +1722,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1760,7 +1756,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1775,7 +1771,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_fetch_verification_options(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_fetch_verification_options(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1798,18 +1794,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.language-code" => Some(("context.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.recipients" => Some(("context.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "context.address.locality" => Some(("context.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.sorting-code" => Some(("context.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.region-code" => Some(("context.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.administrative-area" => Some(("context.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.address.address-lines" => Some(("context.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "context.address.postal-code" => Some(("context.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.administrative-area" => Some(("context.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.language-code" => Some(("context.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.locality" => Some(("context.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.address.organization" => Some(("context.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.sublocality" => Some(("context.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.postal-code" => Some(("context.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.recipients" => Some(("context.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "context.address.region-code" => Some(("context.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.address.revision" => Some(("context.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "context.address.sorting-code" => Some(("context.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.sublocality" => Some(("context.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "address-lines", "administrative-area", "context", "language-code", "locality", "organization", "postal-code", "recipients", "region-code", "revision", "sorting-code", "sublocality"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1853,7 +1849,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1868,7 +1864,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_find_matches(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_find_matches(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1891,9 +1887,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "num-results" => Some(("numResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-cache-duration" => Some(("maxCacheDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-results" => Some(("numResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["language-code", "max-cache-duration", "num-results"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1937,7 +1933,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1952,7 +1948,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_followers_get_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_followers_get_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_followers_get_metadata(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1986,7 +1982,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2001,7 +1997,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2035,7 +2031,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2050,7 +2046,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_get_google_updated(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_get_google_updated(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_get_google_updated(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2084,7 +2080,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2099,7 +2095,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2133,7 +2129,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size", "language-code"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language-code", "filter", "order-by", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2149,7 +2145,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2164,7 +2160,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_local_posts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_local_posts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2187,35 +2183,35 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alert-type" => Some(("alertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "call-to-action.url" => Some(("callToAction.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-to-action.action-type" => Some(("callToAction.actionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "call-to-action.url" => Some(("callToAction.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event.schedule.end-date.day" => Some(("event.schedule.endDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.end-date.month" => Some(("event.schedule.endDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.hours" => Some(("event.schedule.startTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "alert-type", "call-to-action", "coupon-code", "create-time", "day", "end-date", "end-time", "event", "hours", "language-code", "minutes", "month", "name", "nanos", "offer", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "update-time", "url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2259,7 +2255,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2274,7 +2270,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_local_posts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_local_posts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_local_posts_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2308,7 +2304,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2323,7 +2319,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_local_posts_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_local_posts_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_local_posts_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2357,7 +2353,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2372,7 +2368,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_local_posts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_local_posts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_local_posts_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2397,7 +2393,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2413,7 +2409,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2428,7 +2424,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_local_posts_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_local_posts_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2451,35 +2447,35 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "alert-type" => Some(("alertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "call-to-action.url" => Some(("callToAction.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-to-action.action-type" => Some(("callToAction.actionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "call-to-action.url" => Some(("callToAction.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event.schedule.end-date.day" => Some(("event.schedule.endDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.end-date.month" => Some(("event.schedule.endDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.hours" => Some(("event.schedule.startTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "alert-type", "call-to-action", "coupon-code", "create-time", "day", "end-date", "end-time", "event", "hours", "language-code", "minutes", "month", "name", "nanos", "offer", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "update-time", "url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2527,7 +2523,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2542,7 +2538,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_local_posts_report_insights(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_local_posts_report_insights(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2565,9 +2561,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "local-post-names" => Some(("localPostNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "basic-request.time-range.end-time" => Some(("basicRequest.timeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-request.time-range.start-time" => Some(("basicRequest.timeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "local-post-names" => Some(("localPostNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-request", "end-time", "local-post-names", "start-time", "time-range"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2611,7 +2607,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2626,7 +2622,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2649,23 +2645,23 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "data-ref.resource-name" => Some(("dataRef.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-url" => Some(("sourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attribution.profile-url" => Some(("attribution.profileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.profile-name" => Some(("attribution.profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attribution.takedown-url" => Some(("attribution.takedownUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.profile-photo-url" => Some(("attribution.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attribution.profile-url" => Some(("attribution.profileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution.takedown-url" => Some(("attribution.takedownUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-ref.resource-name" => Some(("dataRef.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dimensions.height-pixels" => Some(("dimensions.heightPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "thumbnail-url" => Some(("thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "google-url" => Some(("googleUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insights.view-count" => Some(("insights.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location-association.category" => Some(("locationAssociation.category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-association.price-list-item-id" => Some(("locationAssociation.priceListItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-url" => Some(("sourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "thumbnail-url" => Some(("thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "category", "create-time", "data-ref", "description", "dimensions", "google-url", "height-pixels", "insights", "location-association", "media-format", "name", "price-list-item-id", "profile-name", "profile-photo-url", "profile-url", "resource-name", "source-url", "takedown-url", "thumbnail-url", "view-count", "width-pixels"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2709,7 +2705,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2724,7 +2720,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_customers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_customers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_media_customers_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2758,7 +2754,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2773,7 +2769,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_media_customers_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2798,7 +2794,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2814,7 +2810,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2829,7 +2825,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_media_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2863,7 +2859,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2878,7 +2874,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_media_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2912,7 +2908,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2927,7 +2923,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_media_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2952,7 +2948,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2968,7 +2964,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2983,7 +2979,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3006,23 +3002,23 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "data-ref.resource-name" => Some(("dataRef.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-url" => Some(("sourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attribution.profile-url" => Some(("attribution.profileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.profile-name" => Some(("attribution.profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attribution.takedown-url" => Some(("attribution.takedownUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.profile-photo-url" => Some(("attribution.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attribution.profile-url" => Some(("attribution.profileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution.takedown-url" => Some(("attribution.takedownUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-ref.resource-name" => Some(("dataRef.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dimensions.height-pixels" => Some(("dimensions.heightPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "thumbnail-url" => Some(("thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "google-url" => Some(("googleUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insights.view-count" => Some(("insights.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location-association.category" => Some(("locationAssociation.category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-association.price-list-item-id" => Some(("locationAssociation.priceListItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-url" => Some(("sourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "thumbnail-url" => Some(("thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "category", "create-time", "data-ref", "description", "dimensions", "google-url", "height-pixels", "insights", "location-association", "media-format", "name", "price-list-item-id", "profile-name", "profile-photo-url", "profile-url", "resource-name", "source-url", "takedown-url", "thumbnail-url", "view-count", "width-pixels"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3070,7 +3066,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3085,7 +3081,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_media_start_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_media_start_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3151,7 +3147,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3166,7 +3162,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3189,64 +3185,64 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "profile.description" => Some(("profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ad-words-location-extensions.ad-phone" => Some(("adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "additional-phones" => Some(("additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.organization" => Some(("address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.recipients" => Some(("address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.revision" => Some(("address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "address.sorting-code" => Some(("address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "open-info.can-reopen" => Some(("openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.year" => Some(("openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location-state.can-update" => Some(("locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.can-delete" => Some(("locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-disabled" => Some(("locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-local-post-api-disabled" => Some(("locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-suspended" => Some(("locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-google-updated" => Some(("locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-published" => Some(("locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.has-pending-verification" => Some(("locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.has-pending-edits" => Some(("locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-pending-review" => Some(("locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-duplicate" => Some(("locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.needs-reverification" => Some(("locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-verified" => Some(("locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-state.is-disconnected" => Some(("locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "store-code" => Some(("storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-key.plus-page-id" => Some(("locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-key.explicit-no-place-id" => Some(("locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location-key.place-id" => Some(("locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-key.request-id" => Some(("locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latlng.latitude" => Some(("latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "latlng.longitude" => Some(("latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "ad-words-location-extensions.ad-phone" => Some(("adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-area.business-type" => Some(("serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-area.radius.latlng.latitude" => Some(("serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-area.radius.latlng.longitude" => Some(("serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-area.radius.radius-km" => Some(("serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-key.explicit-no-place-id" => Some(("locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-key.place-id" => Some(("locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-key.plus-page-id" => Some(("locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-key.request-id" => Some(("locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-name" => Some(("locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-phone" => Some(("primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.recipients" => Some(("address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.sorting-code" => Some(("address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.organization" => Some(("address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "address.revision" => Some(("address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "additional-phones" => Some(("additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "relationship-data.parent-chain" => Some(("relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.new-review-url" => Some(("metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-state.can-delete" => Some(("locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.can-update" => Some(("locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.has-pending-edits" => Some(("locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.has-pending-verification" => Some(("locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-disabled" => Some(("locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-disconnected" => Some(("locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-duplicate" => Some(("locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-google-updated" => Some(("locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-local-post-api-disabled" => Some(("locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-pending-review" => Some(("locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-published" => Some(("locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-suspended" => Some(("locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.is-verified" => Some(("locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-state.needs-reverification" => Some(("locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "metadata.duplicate.access" => Some(("metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.location-name" => Some(("metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.place-id" => Some(("metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.maps-url" => Some(("metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-category.display-name" => Some(("primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-category.category-id" => Some(("primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.new-review-url" => Some(("metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "open-info.can-reopen" => Some(("openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.year" => Some(("openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-category.category-id" => Some(("primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-category.display-name" => Some(("primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-phone" => Some(("primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.description" => Some(("profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "relationship-data.parent-chain" => Some(("relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-area.business-type" => Some(("serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-area.radius.latlng.latitude" => Some(("serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-area.radius.latlng.longitude" => Some(("serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-area.radius.radius-km" => Some(("serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "store-code" => Some(("storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "ad-phone", "ad-words-location-extensions", "additional-phones", "address", "address-lines", "administrative-area", "business-type", "can-delete", "can-reopen", "can-update", "category-id", "day", "description", "display-name", "duplicate", "explicit-no-place-id", "has-pending-edits", "has-pending-verification", "is-disabled", "is-disconnected", "is-duplicate", "is-google-updated", "is-local-post-api-disabled", "is-pending-review", "is-published", "is-suspended", "is-verified", "labels", "language-code", "latitude", "latlng", "locality", "location-key", "location-name", "location-state", "longitude", "maps-url", "metadata", "month", "name", "needs-reverification", "new-review-url", "open-info", "opening-date", "organization", "parent-chain", "place-id", "plus-page-id", "postal-code", "primary-category", "primary-phone", "profile", "radius", "radius-km", "recipients", "region-code", "relationship-data", "request-id", "revision", "service-area", "sorting-code", "status", "store-code", "sublocality", "website-url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3300,7 +3296,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3315,7 +3311,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_answers_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_answers_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_questions_answers_delete(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3349,7 +3345,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3364,7 +3360,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_answers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_answers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_questions_answers_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3392,7 +3388,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3408,7 +3404,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3423,7 +3419,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_answers_upsert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_answers_upsert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3446,13 +3442,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "answer.update-time" => Some(("answer.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "answer.name" => Some(("answer.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "answer.author.type" => Some(("answer.author.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "answer.author.profile-photo-url" => Some(("answer.author.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer.author.display-name" => Some(("answer.author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "answer.text" => Some(("answer.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer.author.profile-photo-url" => Some(("answer.author.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer.author.type" => Some(("answer.author.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer.create-time" => Some(("answer.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer.name" => Some(("answer.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer.text" => Some(("answer.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer.update-time" => Some(("answer.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer.upvote-count" => Some(("answer.upvoteCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["answer", "author", "create-time", "display-name", "name", "profile-photo-url", "text", "type", "update-time", "upvote-count"]);
@@ -3497,7 +3493,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3512,7 +3508,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3535,14 +3531,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.profile-photo-url" => Some(("author.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.type" => Some(("author.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "total-answer-count" => Some(("totalAnswerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "author.type" => Some(("author.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "author.profile-photo-url" => Some(("author.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upvote-count" => Some(("upvoteCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "create-time", "display-name", "name", "profile-photo-url", "text", "total-answer-count", "type", "update-time", "upvote-count"]);
@@ -3587,7 +3583,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3602,7 +3598,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_questions_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3636,7 +3632,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3651,7 +3647,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_questions_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3685,7 +3681,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "answers-per-question", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "answers-per-question", "filter", "order-by", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3701,7 +3697,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3716,7 +3712,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_questions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_questions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3739,14 +3735,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.profile-photo-url" => Some(("author.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.type" => Some(("author.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "total-answer-count" => Some(("totalAnswerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "author.type" => Some(("author.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "author.profile-photo-url" => Some(("author.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upvote-count" => Some(("upvoteCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "create-time", "display-name", "name", "profile-photo-url", "text", "total-answer-count", "type", "update-time", "upvote-count"]);
@@ -3791,7 +3787,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3806,7 +3802,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_report_insights(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_report_insights(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3829,11 +3825,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "location-names" => Some(("locationNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "basic-request.time-range.end-time" => Some(("basicRequest.timeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-request.time-range.start-time" => Some(("basicRequest.timeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "driving-directions-request.language-code" => Some(("drivingDirectionsRequest.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "driving-directions-request.num-days" => Some(("drivingDirectionsRequest.numDays", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-names" => Some(("locationNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-request", "driving-directions-request", "end-time", "language-code", "location-names", "num-days", "start-time", "time-range"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3877,7 +3873,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3892,7 +3888,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_reviews_delete_reply(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_reviews_delete_reply(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_reviews_delete_reply(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3926,7 +3922,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3941,7 +3937,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_reviews_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_reviews_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_reviews_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3975,7 +3971,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3990,7 +3986,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_reviews_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_reviews_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_reviews_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4018,7 +4014,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4034,7 +4030,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4049,7 +4045,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_reviews_update_reply(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_reviews_update_reply(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4117,7 +4113,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4132,7 +4128,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_transfer(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_transfer(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4199,7 +4195,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4214,7 +4210,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_verifications_complete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_verifications_complete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4281,7 +4277,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4296,7 +4292,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_verifications_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_verifications_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().locations_verifications_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4321,7 +4317,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4337,7 +4333,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4352,7 +4348,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_locations_verify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_locations_verify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4376,22 +4372,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "address-input.mailer-contact-name" => Some(("addressInput.mailerContactName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.address-lines" => Some(("context.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "context.address.administrative-area" => Some(("context.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.language-code" => Some(("context.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.locality" => Some(("context.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.organization" => Some(("context.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.postal-code" => Some(("context.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.recipients" => Some(("context.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "context.address.region-code" => Some(("context.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.revision" => Some(("context.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "context.address.sorting-code" => Some(("context.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.address.sublocality" => Some(("context.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email-input.email-address" => Some(("emailInput.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "method" => Some(("method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "phone-input.phone-number" => Some(("phoneInput.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vetted-partner-input.token.token-string" => Some(("vettedPartnerInput.token.tokenString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "email-input.email-address" => Some(("emailInput.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.language-code" => Some(("context.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.recipients" => Some(("context.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "context.address.locality" => Some(("context.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.sorting-code" => Some(("context.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.region-code" => Some(("context.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.administrative-area" => Some(("context.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.address-lines" => Some(("context.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "context.address.postal-code" => Some(("context.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.organization" => Some(("context.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.sublocality" => Some(("context.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.address.revision" => Some(("context.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "method" => Some(("method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "address-input", "address-lines", "administrative-area", "context", "email-address", "email-input", "language-code", "locality", "mailer-contact-name", "method", "organization", "phone-input", "phone-number", "postal-code", "recipients", "region-code", "revision", "sorting-code", "sublocality", "token", "token-string", "vetted-partner-input"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4435,7 +4431,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4450,7 +4446,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4473,26 +4469,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "permission-level" => Some(("permissionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-number" => Some(("accountNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-number" => Some(("accountNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.address-lines" => Some(("organizationInfo.postalAddress.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "organization-info.postal-address.administrative-area" => Some(("organizationInfo.postalAddress.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.locality" => Some(("organizationInfo.postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.organization" => Some(("organizationInfo.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.postal-code" => Some(("organizationInfo.postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.recipients" => Some(("organizationInfo.postalAddress.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "organization-info.postal-address.region-code" => Some(("organizationInfo.postalAddress.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.revision" => Some(("organizationInfo.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.sorting-code" => Some(("organizationInfo.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.postal-address.sublocality" => Some(("organizationInfo.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permission-level" => Some(("permissionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.status" => Some(("state.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.vetted-status" => Some(("state.vettedStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.recipients" => Some(("organizationInfo.postalAddress.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "organization-info.postal-address.locality" => Some(("organizationInfo.postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.sorting-code" => Some(("organizationInfo.postalAddress.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.region-code" => Some(("organizationInfo.postalAddress.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.administrative-area" => Some(("organizationInfo.postalAddress.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.address-lines" => Some(("organizationInfo.postalAddress.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "organization-info.postal-address.postal-code" => Some(("organizationInfo.postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.organization" => Some(("organizationInfo.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.sublocality" => Some(("organizationInfo.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.postal-address.revision" => Some(("organizationInfo.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
@@ -4541,7 +4537,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4556,7 +4552,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_update_notifications(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _accounts_update_notifications(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4580,8 +4576,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "topic-name" => Some(("topicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-types" => Some(("notificationTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "topic-name" => Some(("topicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "notification-types", "topic-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4625,7 +4621,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4640,7 +4636,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _attributes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _attributes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.attributes().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4677,7 +4673,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language-code", "name", "page-size", "country", "page-token", "category-id"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "country", "language-code", "name", "page-size", "category-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4693,7 +4689,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4708,7 +4704,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _categories_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _categories_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.categories().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4742,7 +4738,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["search-term", "region-code", "language-code", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["region-code", "page-token", "language-code", "page-size", "search-term"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4758,7 +4754,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4773,7 +4769,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _chains_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _chains_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.chains().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4807,7 +4803,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4822,7 +4818,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _chains_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _chains_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.chains().search();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4863,7 +4859,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4878,7 +4874,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _google_locations_report(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _google_locations_report(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4901,11 +4897,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "report-reason-language-code" => Some(("reportReasonLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location-group-name" => Some(("locationGroupName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "report-reason-bad-location" => Some(("reportReasonBadLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "report-reason-bad-recommendation" => Some(("reportReasonBadRecommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "report-reason-elaboration" => Some(("reportReasonElaboration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location-group-name" => Some(("locationGroupName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-reason-language-code" => Some(("reportReasonLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["location-group-name", "report-reason-bad-location", "report-reason-bad-recommendation", "report-reason-elaboration", "report-reason-language-code"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4949,7 +4945,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4964,7 +4960,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _google_locations_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _google_locations_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4987,66 +4983,66 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "result-count" => Some(("resultCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.profile.description" => Some(("location.profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.ad-words-location-extensions.ad-phone" => Some(("location.adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.additional-phones" => Some(("location.additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "location.address.address-lines" => Some(("location.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "location.address.administrative-area" => Some(("location.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.language-code" => Some(("location.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.locality" => Some(("location.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.organization" => Some(("location.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.postal-code" => Some(("location.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.recipients" => Some(("location.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "location.address.region-code" => Some(("location.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.revision" => Some(("location.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.address.sorting-code" => Some(("location.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.sublocality" => Some(("location.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.labels" => Some(("location.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "location.language-code" => Some(("location.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.open-info.can-reopen" => Some(("location.openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.year" => Some(("location.openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.location-state.can-update" => Some(("location.locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.can-delete" => Some(("location.locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-disabled" => Some(("location.locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-local-post-api-disabled" => Some(("location.locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-suspended" => Some(("location.locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-google-updated" => Some(("location.locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-published" => Some(("location.locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.has-pending-verification" => Some(("location.locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.has-pending-edits" => Some(("location.locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-pending-review" => Some(("location.locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-duplicate" => Some(("location.locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.needs-reverification" => Some(("location.locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-verified" => Some(("location.locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-disconnected" => Some(("location.locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.store-code" => Some(("location.storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.location-key.plus-page-id" => Some(("location.locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.location-key.explicit-no-place-id" => Some(("location.locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-key.place-id" => Some(("location.locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.location-key.request-id" => Some(("location.locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.latlng.latitude" => Some(("location.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.latlng.longitude" => Some(("location.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.labels" => Some(("location.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.ad-words-location-extensions.ad-phone" => Some(("location.adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.service-area.business-type" => Some(("location.serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.service-area.radius.latlng.latitude" => Some(("location.serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.service-area.radius.latlng.longitude" => Some(("location.serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.service-area.radius.radius-km" => Some(("location.serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.website-url" => Some(("location.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-key.explicit-no-place-id" => Some(("location.locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-key.place-id" => Some(("location.locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-key.plus-page-id" => Some(("location.locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-key.request-id" => Some(("location.locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.location-name" => Some(("location.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.primary-phone" => Some(("location.primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.language-code" => Some(("location.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.recipients" => Some(("location.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.address.locality" => Some(("location.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.sorting-code" => Some(("location.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.region-code" => Some(("location.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.administrative-area" => Some(("location.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.address-lines" => Some(("location.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.address.postal-code" => Some(("location.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.organization" => Some(("location.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.sublocality" => Some(("location.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.revision" => Some(("location.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.additional-phones" => Some(("location.additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.relationship-data.parent-chain" => Some(("location.relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.metadata.new-review-url" => Some(("location.metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-state.can-delete" => Some(("location.locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.can-update" => Some(("location.locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.has-pending-edits" => Some(("location.locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.has-pending-verification" => Some(("location.locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-disabled" => Some(("location.locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-disconnected" => Some(("location.locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-duplicate" => Some(("location.locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-google-updated" => Some(("location.locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-local-post-api-disabled" => Some(("location.locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-pending-review" => Some(("location.locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-published" => Some(("location.locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-suspended" => Some(("location.locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-verified" => Some(("location.locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.needs-reverification" => Some(("location.locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.access" => Some(("location.metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.location-name" => Some(("location.metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.place-id" => Some(("location.metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.maps-url" => Some(("location.metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.primary-category.display-name" => Some(("location.primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.primary-category.category-id" => Some(("location.primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.metadata.new-review-url" => Some(("location.metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.name" => Some(("location.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.open-info.can-reopen" => Some(("location.openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.year" => Some(("location.openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.primary-category.category-id" => Some(("location.primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.primary-category.display-name" => Some(("location.primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.primary-phone" => Some(("location.primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.profile.description" => Some(("location.profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.relationship-data.parent-chain" => Some(("location.relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.service-area.business-type" => Some(("location.serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.service-area.radius.latlng.latitude" => Some(("location.serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.service-area.radius.latlng.longitude" => Some(("location.serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.service-area.radius.radius-km" => Some(("location.serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.store-code" => Some(("location.storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.website-url" => Some(("location.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result-count" => Some(("resultCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "ad-phone", "ad-words-location-extensions", "additional-phones", "address", "address-lines", "administrative-area", "business-type", "can-delete", "can-reopen", "can-update", "category-id", "day", "description", "display-name", "duplicate", "explicit-no-place-id", "has-pending-edits", "has-pending-verification", "is-disabled", "is-disconnected", "is-duplicate", "is-google-updated", "is-local-post-api-disabled", "is-pending-review", "is-published", "is-suspended", "is-verified", "labels", "language-code", "latitude", "latlng", "locality", "location", "location-key", "location-name", "location-state", "longitude", "maps-url", "metadata", "month", "name", "needs-reverification", "new-review-url", "open-info", "opening-date", "organization", "parent-chain", "place-id", "plus-page-id", "postal-code", "primary-category", "primary-phone", "profile", "query", "radius", "radius-km", "recipients", "region-code", "relationship-data", "request-id", "result-count", "revision", "service-area", "sorting-code", "status", "store-code", "sublocality", "website-url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -5090,7 +5086,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5105,7 +5101,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _verification_tokens_generate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _verification_tokens_generate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5128,64 +5124,64 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "location.profile.description" => Some(("location.profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.ad-words-location-extensions.ad-phone" => Some(("location.adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.additional-phones" => Some(("location.additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "location.address.address-lines" => Some(("location.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "location.address.administrative-area" => Some(("location.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.language-code" => Some(("location.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.locality" => Some(("location.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.organization" => Some(("location.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.postal-code" => Some(("location.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.recipients" => Some(("location.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "location.address.region-code" => Some(("location.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.revision" => Some(("location.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.address.sorting-code" => Some(("location.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.address.sublocality" => Some(("location.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.labels" => Some(("location.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "location.language-code" => Some(("location.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.open-info.can-reopen" => Some(("location.openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.year" => Some(("location.openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.location-state.can-update" => Some(("location.locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.can-delete" => Some(("location.locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-disabled" => Some(("location.locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-local-post-api-disabled" => Some(("location.locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-suspended" => Some(("location.locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-google-updated" => Some(("location.locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-published" => Some(("location.locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.has-pending-verification" => Some(("location.locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.has-pending-edits" => Some(("location.locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-pending-review" => Some(("location.locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-duplicate" => Some(("location.locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.needs-reverification" => Some(("location.locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-verified" => Some(("location.locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-state.is-disconnected" => Some(("location.locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.store-code" => Some(("location.storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.location-key.plus-page-id" => Some(("location.locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.location-key.explicit-no-place-id" => Some(("location.locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.location-key.place-id" => Some(("location.locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.location-key.request-id" => Some(("location.locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.latlng.latitude" => Some(("location.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.latlng.longitude" => Some(("location.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.labels" => Some(("location.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.ad-words-location-extensions.ad-phone" => Some(("location.adWordsLocationExtensions.adPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.service-area.business-type" => Some(("location.serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.service-area.radius.latlng.latitude" => Some(("location.serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.service-area.radius.latlng.longitude" => Some(("location.serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.service-area.radius.radius-km" => Some(("location.serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.website-url" => Some(("location.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-key.explicit-no-place-id" => Some(("location.locationKey.explicitNoPlaceId", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-key.place-id" => Some(("location.locationKey.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-key.plus-page-id" => Some(("location.locationKey.plusPageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-key.request-id" => Some(("location.locationKey.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.location-name" => Some(("location.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.primary-phone" => Some(("location.primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.language-code" => Some(("location.address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.recipients" => Some(("location.address.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.address.locality" => Some(("location.address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.sorting-code" => Some(("location.address.sortingCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.region-code" => Some(("location.address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.administrative-area" => Some(("location.address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.address-lines" => Some(("location.address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.address.postal-code" => Some(("location.address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.organization" => Some(("location.address.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.sublocality" => Some(("location.address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.address.revision" => Some(("location.address.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.additional-phones" => Some(("location.additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "location.relationship-data.parent-chain" => Some(("location.relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.metadata.new-review-url" => Some(("location.metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.location-state.can-delete" => Some(("location.locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.can-update" => Some(("location.locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.has-pending-edits" => Some(("location.locationState.hasPendingEdits", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.has-pending-verification" => Some(("location.locationState.hasPendingVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-disabled" => Some(("location.locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-disconnected" => Some(("location.locationState.isDisconnected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-duplicate" => Some(("location.locationState.isDuplicate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-google-updated" => Some(("location.locationState.isGoogleUpdated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-local-post-api-disabled" => Some(("location.locationState.isLocalPostApiDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-pending-review" => Some(("location.locationState.isPendingReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-published" => Some(("location.locationState.isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-suspended" => Some(("location.locationState.isSuspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.is-verified" => Some(("location.locationState.isVerified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.location-state.needs-reverification" => Some(("location.locationState.needsReverification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.access" => Some(("location.metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.location-name" => Some(("location.metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.place-id" => Some(("location.metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.maps-url" => Some(("location.metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.primary-category.display-name" => Some(("location.primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.primary-category.category-id" => Some(("location.primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.metadata.new-review-url" => Some(("location.metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.name" => Some(("location.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.open-info.can-reopen" => Some(("location.openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.year" => Some(("location.openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.primary-category.category-id" => Some(("location.primaryCategory.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.primary-category.display-name" => Some(("location.primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.primary-phone" => Some(("location.primaryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.profile.description" => Some(("location.profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.relationship-data.parent-chain" => Some(("location.relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.service-area.business-type" => Some(("location.serviceArea.businessType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.service-area.radius.latlng.latitude" => Some(("location.serviceArea.radius.latlng.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.service-area.radius.latlng.longitude" => Some(("location.serviceArea.radius.latlng.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.service-area.radius.radius-km" => Some(("location.serviceArea.radius.radiusKm", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.store-code" => Some(("location.storeCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.website-url" => Some(("location.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "ad-phone", "ad-words-location-extensions", "additional-phones", "address", "address-lines", "administrative-area", "business-type", "can-delete", "can-reopen", "can-update", "category-id", "day", "description", "display-name", "duplicate", "explicit-no-place-id", "has-pending-edits", "has-pending-verification", "is-disabled", "is-disconnected", "is-duplicate", "is-google-updated", "is-local-post-api-disabled", "is-pending-review", "is-published", "is-suspended", "is-verified", "labels", "language-code", "latitude", "latlng", "locality", "location", "location-key", "location-name", "location-state", "longitude", "maps-url", "metadata", "month", "name", "needs-reverification", "new-review-url", "open-info", "opening-date", "organization", "parent-chain", "place-id", "plus-page-id", "postal-code", "primary-category", "primary-phone", "profile", "radius", "radius-km", "recipients", "region-code", "relationship-data", "request-id", "revision", "service-area", "sorting-code", "status", "store-code", "sublocality", "website-url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -5229,7 +5225,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5244,7 +5240,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -5252,193 +5248,193 @@ impl<'n> Engine<'n> {
             ("accounts", Some(opt)) => {
                 match opt.subcommand() {
                     ("admins-create", Some(opt)) => {
-                        call_result = self._accounts_admins_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_admins_create(opt, dry_run, &mut err).await;
                     },
                     ("admins-delete", Some(opt)) => {
-                        call_result = self._accounts_admins_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_admins_delete(opt, dry_run, &mut err).await;
                     },
                     ("admins-list", Some(opt)) => {
-                        call_result = self._accounts_admins_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_admins_list(opt, dry_run, &mut err).await;
                     },
                     ("admins-patch", Some(opt)) => {
-                        call_result = self._accounts_admins_patch(opt, dry_run, &mut err);
+                        call_result = self._accounts_admins_patch(opt, dry_run, &mut err).await;
                     },
                     ("create", Some(opt)) => {
-                        call_result = self._accounts_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_create(opt, dry_run, &mut err).await;
                     },
                     ("delete-notifications", Some(opt)) => {
-                        call_result = self._accounts_delete_notifications(opt, dry_run, &mut err);
+                        call_result = self._accounts_delete_notifications(opt, dry_run, &mut err).await;
                     },
                     ("generate-account-number", Some(opt)) => {
-                        call_result = self._accounts_generate_account_number(opt, dry_run, &mut err);
+                        call_result = self._accounts_generate_account_number(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._accounts_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_get(opt, dry_run, &mut err).await;
                     },
                     ("get-notifications", Some(opt)) => {
-                        call_result = self._accounts_get_notifications(opt, dry_run, &mut err);
+                        call_result = self._accounts_get_notifications(opt, dry_run, &mut err).await;
                     },
                     ("invitations-accept", Some(opt)) => {
-                        call_result = self._accounts_invitations_accept(opt, dry_run, &mut err);
+                        call_result = self._accounts_invitations_accept(opt, dry_run, &mut err).await;
                     },
                     ("invitations-decline", Some(opt)) => {
-                        call_result = self._accounts_invitations_decline(opt, dry_run, &mut err);
+                        call_result = self._accounts_invitations_decline(opt, dry_run, &mut err).await;
                     },
                     ("invitations-list", Some(opt)) => {
-                        call_result = self._accounts_invitations_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_invitations_list(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._accounts_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_list(opt, dry_run, &mut err).await;
                     },
                     ("list-recommend-google-locations", Some(opt)) => {
-                        call_result = self._accounts_list_recommend_google_locations(opt, dry_run, &mut err);
+                        call_result = self._accounts_list_recommend_google_locations(opt, dry_run, &mut err).await;
                     },
                     ("locations-admins-create", Some(opt)) => {
-                        call_result = self._accounts_locations_admins_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_admins_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-admins-delete", Some(opt)) => {
-                        call_result = self._accounts_locations_admins_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_admins_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-admins-list", Some(opt)) => {
-                        call_result = self._accounts_locations_admins_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_admins_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-admins-patch", Some(opt)) => {
-                        call_result = self._accounts_locations_admins_patch(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_admins_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-associate", Some(opt)) => {
-                        call_result = self._accounts_locations_associate(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_associate(opt, dry_run, &mut err).await;
                     },
                     ("locations-batch-get", Some(opt)) => {
-                        call_result = self._accounts_locations_batch_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_batch_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-batch-get-reviews", Some(opt)) => {
-                        call_result = self._accounts_locations_batch_get_reviews(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_batch_get_reviews(opt, dry_run, &mut err).await;
                     },
                     ("locations-clear-association", Some(opt)) => {
-                        call_result = self._accounts_locations_clear_association(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_clear_association(opt, dry_run, &mut err).await;
                     },
                     ("locations-create", Some(opt)) => {
-                        call_result = self._accounts_locations_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-delete", Some(opt)) => {
-                        call_result = self._accounts_locations_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-fetch-verification-options", Some(opt)) => {
-                        call_result = self._accounts_locations_fetch_verification_options(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_fetch_verification_options(opt, dry_run, &mut err).await;
                     },
                     ("locations-find-matches", Some(opt)) => {
-                        call_result = self._accounts_locations_find_matches(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_find_matches(opt, dry_run, &mut err).await;
                     },
                     ("locations-followers-get-metadata", Some(opt)) => {
-                        call_result = self._accounts_locations_followers_get_metadata(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_followers_get_metadata(opt, dry_run, &mut err).await;
                     },
                     ("locations-get", Some(opt)) => {
-                        call_result = self._accounts_locations_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-get-google-updated", Some(opt)) => {
-                        call_result = self._accounts_locations_get_google_updated(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_get_google_updated(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._accounts_locations_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-local-posts-create", Some(opt)) => {
-                        call_result = self._accounts_locations_local_posts_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_local_posts_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-local-posts-delete", Some(opt)) => {
-                        call_result = self._accounts_locations_local_posts_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_local_posts_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-local-posts-get", Some(opt)) => {
-                        call_result = self._accounts_locations_local_posts_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_local_posts_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-local-posts-list", Some(opt)) => {
-                        call_result = self._accounts_locations_local_posts_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_local_posts_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-local-posts-patch", Some(opt)) => {
-                        call_result = self._accounts_locations_local_posts_patch(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_local_posts_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-local-posts-report-insights", Some(opt)) => {
-                        call_result = self._accounts_locations_local_posts_report_insights(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_local_posts_report_insights(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-create", Some(opt)) => {
-                        call_result = self._accounts_locations_media_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-customers-get", Some(opt)) => {
-                        call_result = self._accounts_locations_media_customers_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_customers_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-customers-list", Some(opt)) => {
-                        call_result = self._accounts_locations_media_customers_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_customers_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-delete", Some(opt)) => {
-                        call_result = self._accounts_locations_media_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-get", Some(opt)) => {
-                        call_result = self._accounts_locations_media_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-list", Some(opt)) => {
-                        call_result = self._accounts_locations_media_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-patch", Some(opt)) => {
-                        call_result = self._accounts_locations_media_patch(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-media-start-upload", Some(opt)) => {
-                        call_result = self._accounts_locations_media_start_upload(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_media_start_upload(opt, dry_run, &mut err).await;
                     },
                     ("locations-patch", Some(opt)) => {
-                        call_result = self._accounts_locations_patch(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-answers-delete", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_answers_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_answers_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-answers-list", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_answers_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_answers_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-answers-upsert", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_answers_upsert(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_answers_upsert(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-create", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_create(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-delete", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_delete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-list", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-questions-patch", Some(opt)) => {
-                        call_result = self._accounts_locations_questions_patch(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_questions_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-report-insights", Some(opt)) => {
-                        call_result = self._accounts_locations_report_insights(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_report_insights(opt, dry_run, &mut err).await;
                     },
                     ("locations-reviews-delete-reply", Some(opt)) => {
-                        call_result = self._accounts_locations_reviews_delete_reply(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_reviews_delete_reply(opt, dry_run, &mut err).await;
                     },
                     ("locations-reviews-get", Some(opt)) => {
-                        call_result = self._accounts_locations_reviews_get(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_reviews_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-reviews-list", Some(opt)) => {
-                        call_result = self._accounts_locations_reviews_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_reviews_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-reviews-update-reply", Some(opt)) => {
-                        call_result = self._accounts_locations_reviews_update_reply(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_reviews_update_reply(opt, dry_run, &mut err).await;
                     },
                     ("locations-transfer", Some(opt)) => {
-                        call_result = self._accounts_locations_transfer(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_transfer(opt, dry_run, &mut err).await;
                     },
                     ("locations-verifications-complete", Some(opt)) => {
-                        call_result = self._accounts_locations_verifications_complete(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_verifications_complete(opt, dry_run, &mut err).await;
                     },
                     ("locations-verifications-list", Some(opt)) => {
-                        call_result = self._accounts_locations_verifications_list(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_verifications_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-verify", Some(opt)) => {
-                        call_result = self._accounts_locations_verify(opt, dry_run, &mut err);
+                        call_result = self._accounts_locations_verify(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._accounts_update(opt, dry_run, &mut err);
+                        call_result = self._accounts_update(opt, dry_run, &mut err).await;
                     },
                     ("update-notifications", Some(opt)) => {
-                        call_result = self._accounts_update_notifications(opt, dry_run, &mut err);
+                        call_result = self._accounts_update_notifications(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("accounts".to_string()));
@@ -5449,7 +5445,7 @@ impl<'n> Engine<'n> {
             ("attributes", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._attributes_list(opt, dry_run, &mut err);
+                        call_result = self._attributes_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("attributes".to_string()));
@@ -5460,7 +5456,7 @@ impl<'n> Engine<'n> {
             ("categories", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._categories_list(opt, dry_run, &mut err);
+                        call_result = self._categories_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("categories".to_string()));
@@ -5471,10 +5467,10 @@ impl<'n> Engine<'n> {
             ("chains", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._chains_get(opt, dry_run, &mut err);
+                        call_result = self._chains_get(opt, dry_run, &mut err).await;
                     },
                     ("search", Some(opt)) => {
-                        call_result = self._chains_search(opt, dry_run, &mut err);
+                        call_result = self._chains_search(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("chains".to_string()));
@@ -5485,10 +5481,10 @@ impl<'n> Engine<'n> {
             ("google-locations", Some(opt)) => {
                 match opt.subcommand() {
                     ("report", Some(opt)) => {
-                        call_result = self._google_locations_report(opt, dry_run, &mut err);
+                        call_result = self._google_locations_report(opt, dry_run, &mut err).await;
                     },
                     ("search", Some(opt)) => {
-                        call_result = self._google_locations_search(opt, dry_run, &mut err);
+                        call_result = self._google_locations_search(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("google-locations".to_string()));
@@ -5499,7 +5495,7 @@ impl<'n> Engine<'n> {
             ("verification-tokens", Some(opt)) => {
                 match opt.subcommand() {
                     ("generate", Some(opt)) => {
-                        call_result = self._verification_tokens_generate(opt, dry_run, &mut err);
+                        call_result = self._verification_tokens_generate(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("verification-tokens".to_string()));
@@ -5524,41 +5520,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "mybusiness4-secret.json",
+            match client::application_secret_from_directory(&config_dir, "mybusiness4-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "mybusiness4",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/mybusiness4", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::MyBusiness::new(client, auth),
@@ -5574,22 +5555,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("accounts", "methods: 'admins-create', 'admins-delete', 'admins-list', 'admins-patch', 'create', 'delete-notifications', 'generate-account-number', 'get', 'get-notifications', 'invitations-accept', 'invitations-decline', 'invitations-list', 'list', 'list-recommend-google-locations', 'locations-admins-create', 'locations-admins-delete', 'locations-admins-list', 'locations-admins-patch', 'locations-associate', 'locations-batch-get', 'locations-batch-get-reviews', 'locations-clear-association', 'locations-create', 'locations-delete', 'locations-fetch-verification-options', 'locations-find-matches', 'locations-followers-get-metadata', 'locations-get', 'locations-get-google-updated', 'locations-list', 'locations-local-posts-create', 'locations-local-posts-delete', 'locations-local-posts-get', 'locations-local-posts-list', 'locations-local-posts-patch', 'locations-local-posts-report-insights', 'locations-media-create', 'locations-media-customers-get', 'locations-media-customers-list', 'locations-media-delete', 'locations-media-get', 'locations-media-list', 'locations-media-patch', 'locations-media-start-upload', 'locations-patch', 'locations-questions-answers-delete', 'locations-questions-answers-list', 'locations-questions-answers-upsert', 'locations-questions-create', 'locations-questions-delete', 'locations-questions-list', 'locations-questions-patch', 'locations-report-insights', 'locations-reviews-delete-reply', 'locations-reviews-get', 'locations-reviews-list', 'locations-reviews-update-reply', 'locations-transfer', 'locations-verifications-complete', 'locations-verifications-list', 'locations-verify', 'update' and 'update-notifications'", vec![
@@ -7438,7 +7420,7 @@ fn main() {
     
     let mut app = App::new("mybusiness4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+0")
+           .version("2.0.0+0")
            .about("The Google My Business API provides an interface for managing business location information on Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusiness4_cli")
            .arg(Arg::with_name("folder")
@@ -7448,12 +7430,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -7501,13 +7478,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -5,20 +5,18 @@ DO NOT EDIT !
 -->
 The `google-run1` library allows access to all features of the *Google Cloud Run* service.
 
-This documentation was generated from *Cloud Run* crate version *1.0.14+20200622*, where *20200622* is the exact revision of the *run:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *Cloud Run* crate version *2.0.0+20210326*, where *20210326* is the exact revision of the *run:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *Cloud Run* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/run/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.CloudRun.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-run1/2.0.0+20210326/google_run1/CloudRun) ... 
 
-* api
- * [*v1 namespaces get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ApiV1NamespaceGetCall.html), [*v1 namespaces patch*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ApiV1NamespacePatchCall.html), [*v1 namespaces secrets create*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ApiV1NamespaceSecretCreateCall.html), [*v1 namespaces secrets get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ApiV1NamespaceSecretGetCall.html) and [*v1 namespaces secrets replace secret*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ApiV1NamespaceSecretReplaceSecretCall.html)
-* [namespaces](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.Namespace.html)
- * [*authorizeddomains list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceAuthorizeddomainListCall.html), [*configurations get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceConfigurationGetCall.html), [*configurations list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceConfigurationListCall.html), [*domainmappings create*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceDomainmappingCreateCall.html), [*domainmappings delete*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceDomainmappingDeleteCall.html), [*domainmappings get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceDomainmappingGetCall.html), [*domainmappings list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceDomainmappingListCall.html), [*revisions delete*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceRevisionDeleteCall.html), [*revisions get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceRevisionGetCall.html), [*revisions list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceRevisionListCall.html), [*routes get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceRouteGetCall.html), [*routes list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceRouteListCall.html), [*services create*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceServiceCreateCall.html), [*services delete*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceServiceDeleteCall.html), [*services get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceServiceGetCall.html), [*services list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceServiceListCall.html) and [*services replace service*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.NamespaceServiceReplaceServiceCall.html)
+* namespaces
+ * [*authorizeddomains list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceAuthorizeddomainListCall), [*configurations get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceConfigurationGetCall), [*configurations list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceConfigurationListCall), [*domainmappings create*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceDomainmappingCreateCall), [*domainmappings delete*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceDomainmappingDeleteCall), [*domainmappings get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceDomainmappingGetCall), [*domainmappings list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceDomainmappingListCall), [*revisions delete*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceRevisionDeleteCall), [*revisions get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceRevisionGetCall), [*revisions list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceRevisionListCall), [*routes get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceRouteGetCall), [*routes list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceRouteListCall), [*services create*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceServiceCreateCall), [*services delete*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceServiceDeleteCall), [*services get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceServiceGetCall), [*services list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceServiceListCall) and [*services replace service*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::NamespaceServiceReplaceServiceCall)
 * projects
- * [*locations authorizeddomains list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationAuthorizeddomainListCall.html), [*locations configurations get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationConfigurationGetCall.html), [*locations configurations list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationConfigurationListCall.html), [*locations domainmappings create*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationDomainmappingCreateCall.html), [*locations domainmappings delete*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationDomainmappingDeleteCall.html), [*locations domainmappings get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationDomainmappingGetCall.html), [*locations domainmappings list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationDomainmappingListCall.html), [*locations list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationListCall.html), [*locations namespaces get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationNamespaceGetCall.html), [*locations namespaces patch*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationNamespacePatchCall.html), [*locations revisions delete*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationRevisionDeleteCall.html), [*locations revisions get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationRevisionGetCall.html), [*locations revisions list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationRevisionListCall.html), [*locations routes get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationRouteGetCall.html), [*locations routes list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationRouteListCall.html), [*locations secrets create*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationSecretCreateCall.html), [*locations secrets get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationSecretGetCall.html), [*locations secrets replace secret*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationSecretReplaceSecretCall.html), [*locations services create*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceCreateCall.html), [*locations services delete*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceDeleteCall.html), [*locations services get*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceGetCall.html), [*locations services get iam policy*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceGetIamPolicyCall.html), [*locations services list*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceListCall.html), [*locations services replace service*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceReplaceServiceCall.html), [*locations services set iam policy*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceSetIamPolicyCall.html) and [*locations services test iam permissions*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.ProjectLocationServiceTestIamPermissionCall.html)
+ * [*authorizeddomains list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectAuthorizeddomainListCall), [*locations authorizeddomains list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationAuthorizeddomainListCall), [*locations configurations get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationConfigurationGetCall), [*locations configurations list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationConfigurationListCall), [*locations domainmappings create*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationDomainmappingCreateCall), [*locations domainmappings delete*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationDomainmappingDeleteCall), [*locations domainmappings get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationDomainmappingGetCall), [*locations domainmappings list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationDomainmappingListCall), [*locations list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationListCall), [*locations revisions delete*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationRevisionDeleteCall), [*locations revisions get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationRevisionGetCall), [*locations revisions list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationRevisionListCall), [*locations routes get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationRouteGetCall), [*locations routes list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationRouteListCall), [*locations services create*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceCreateCall), [*locations services delete*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceDeleteCall), [*locations services get*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceGetCall), [*locations services get iam policy*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceListCall), [*locations services replace service*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceReplaceServiceCall), [*locations services set iam policy*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/api::ProjectLocationServiceTestIamPermissionCall)
 
 
 
@@ -27,17 +25,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-run1/1.0.14+20200622/google_run1/struct.CloudRun.html)**
+* **[Hub](https://docs.rs/google-run1/2.0.0+20210326/google_run1/CloudRun)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -45,33 +43,18 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.namespaces().services_delete(...).doit()
-let r = hub.namespaces().services_create(...).doit()
-let r = hub.namespaces().routes_get(...).doit()
-let r = hub.namespaces().services_get(...).doit()
-let r = hub.api().v1_namespaces_patch(...).doit()
-let r = hub.namespaces().domainmappings_delete(...).doit()
-let r = hub.projects().locations_namespaces_patch(...).doit()
-let r = hub.api().v1_namespaces_get(...).doit()
-let r = hub.namespaces().authorizeddomains_list(...).doit()
-let r = hub.namespaces().configurations_get(...).doit()
-let r = hub.namespaces().routes_list(...).doit()
-let r = hub.namespaces().services_list(...).doit()
-let r = hub.namespaces().revisions_get(...).doit()
-let r = hub.namespaces().revisions_list(...).doit()
-let r = hub.namespaces().services_replace_service(...).doit()
-let r = hub.namespaces().configurations_list(...).doit()
-let r = hub.namespaces().domainmappings_get(...).doit()
-let r = hub.projects().locations_namespaces_get(...).doit()
-let r = hub.namespaces().domainmappings_create(...).doit()
-let r = hub.namespaces().revisions_delete(...).doit()
-let r = hub.namespaces().domainmappings_list(...).doit()
+let r = hub.namespaces().domainmappings_delete(...).doit().await
+let r = hub.namespaces().revisions_delete(...).doit().await
+let r = hub.namespaces().services_delete(...).doit().await
+let r = hub.projects().locations_domainmappings_delete(...).doit().await
+let r = hub.projects().locations_revisions_delete(...).doit().await
+let r = hub.projects().locations_services_delete(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -91,11 +74,11 @@ google-run1 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -107,39 +90,38 @@ extern crate yup_oauth2 as oauth2;
 extern crate google_run1 as run1;
 use run1::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use run1::CloudRun;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = CloudRun::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.namespaces().routes_list("parent")
-             .watch(true)
-             .resource_version("Stet")
-             .limit(-42)
-             .label_selector("et")
-             .include_uninitialized(true)
-             .field_selector("kasd")
-             .continue_("accusam")
-             .doit();
+let result = hub.namespaces().domainmappings_delete("name")
+             .propagation_policy("magna")
+             .kind("no")
+             .dry_run("ipsum")
+             .api_version("voluptua.")
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -155,17 +137,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-run1/1.0.14+20200622/google_run1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-run1/1.0.14+20200622/google_run1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -175,29 +157,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::RequestValue) and 
+[decodable](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-run1/1.0.14+20200622/google_run1/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-run1/2.0.0+20210326/google_run1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

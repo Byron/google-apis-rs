@@ -25,12 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20200522*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Firestore* API at revision *20210317*. The CLI is at version *2.0.0*.
 
 ```bash
 firestore1-beta1 [options]
         projects
                 databases-documents-batch-get <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-batch-write <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-begin-transaction <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-commit <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-create-document <parent> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -39,6 +40,7 @@ firestore1-beta1 [options]
                 databases-documents-list <parent> <collection-id> [-p <v>]... [-o <out>]
                 databases-documents-list-collection-ids <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-listen <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-partition-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-rollback <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-run-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -60,12 +62,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -118,10 +114,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `firestore1-beta1 --debug <resource> <method> [options] 2>debug.txt`.
 

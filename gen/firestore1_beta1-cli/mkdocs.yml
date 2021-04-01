@@ -1,4 +1,4 @@
-site_name: Firestore v1.0.14+20200522
+site_name: Firestore v2.0.0+20210317
 site_url: http://byron.github.io/google-apis-rs/google-firestore1_beta1-cli
 site_description: A complete library to interact with Firestore (protocol v1beta1)
 
@@ -10,6 +10,7 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['projects_databases-documents-batch-get.md', 'Projects', 'Databases Documents Batch Get']
+- ['projects_databases-documents-batch-write.md', 'Projects', 'Databases Documents Batch Write']
 - ['projects_databases-documents-begin-transaction.md', 'Projects', 'Databases Documents Begin Transaction']
 - ['projects_databases-documents-commit.md', 'Projects', 'Databases Documents Commit']
 - ['projects_databases-documents-create-document.md', 'Projects', 'Databases Documents Create Document']
@@ -18,6 +19,7 @@ pages:
 - ['projects_databases-documents-list.md', 'Projects', 'Databases Documents List']
 - ['projects_databases-documents-list-collection-ids.md', 'Projects', 'Databases Documents List Collection Ids']
 - ['projects_databases-documents-listen.md', 'Projects', 'Databases Documents Listen']
+- ['projects_databases-documents-partition-query.md', 'Projects', 'Databases Documents Partition Query']
 - ['projects_databases-documents-patch.md', 'Projects', 'Databases Documents Patch']
 - ['projects_databases-documents-rollback.md', 'Projects', 'Databases Documents Rollback']
 - ['projects_databases-documents-run-query.md', 'Projects', 'Databases Documents Run Query']

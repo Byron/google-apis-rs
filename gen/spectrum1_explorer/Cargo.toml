@@ -4,32 +4,28 @@
 [package]
 
 name = "google-spectrum1_explorer"
-version = "1.0.14+20170306"
+version = "2.0.0+20170306"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with spectrum (protocol v1explorer)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer"
 homepage = "http://developers.google.com/spectrum"
-documentation = "https://docs.rs/google-spectrum1_explorer/1.0.14+20170306"
+documentation = "https://docs.rs/google-spectrum1_explorer/2.0.0+20170306"
 license = "MIT"
 keywords = ["spectrum", "google", "protocol", "web", "api"]
 autobins = false
+edition = "2018"
 
-
-[dev-dependencies]
-hyper-rustls = "^0.6"
 
 [dependencies]
-hyper = "^ 0.10"
+hyper-rustls = "^0.22"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = { version = "^ 1.0", default-features = false }
+yup-oauth2 = "^ 5.0"
+itertools = "^ 0.10"
+hyper = "^ 0.14"
 url = "= 1.7"
 
-[features]
-default = ["openssl"]
-openssl = ["yup-oauth2/default"]
-rustls = ["yup-oauth2/no-openssl"]
 
 

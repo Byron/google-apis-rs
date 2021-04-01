@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_secretmanager1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_secretmanager1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::SecretManager<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::SecretManager<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -126,7 +122,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -145,7 +141,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -160,7 +156,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_add_version(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_add_version(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -230,7 +226,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -245,7 +241,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -268,11 +264,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication.automatic.customer-managed-encryption.kms-key-name" => Some(("replication.automatic.customerManagedEncryption.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotation.next-rotation-time" => Some(("rotation.nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotation.rotation-period" => Some(("rotation.rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "labels", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic", "create-time", "customer-managed-encryption", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -321,7 +322,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -336,7 +337,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -373,7 +374,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -388,7 +389,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -425,7 +426,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -440,7 +441,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_get_iam_policy(opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -481,7 +482,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -496,7 +497,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -521,7 +522,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -540,7 +541,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -555,7 +556,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -578,11 +579,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication.automatic.customer-managed-encryption.kms-key-name" => Some(("replication.automatic.customerManagedEncryption.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotation.next-rotation-time" => Some(("rotation.nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotation.rotation-period" => Some(("rotation.rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "labels", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic", "create-time", "customer-managed-encryption", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -631,7 +637,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -646,7 +652,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -718,7 +724,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -733,7 +739,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -803,7 +809,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -818,7 +824,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_versions_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_versions_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_versions_access(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -855,7 +861,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -870,7 +876,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_versions_destroy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_versions_destroy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -939,7 +945,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -954,7 +960,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_versions_disable(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_versions_disable(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1023,7 +1029,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1038,7 +1044,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_versions_enable(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_versions_enable(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1107,7 +1113,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1122,7 +1128,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_versions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_versions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_versions_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1159,7 +1165,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1174,7 +1180,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_secrets_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_secrets_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().secrets_versions_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1199,7 +1205,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1218,7 +1224,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1233,7 +1239,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1241,55 +1247,55 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-get", Some(opt)) => {
-                        call_result = self._projects_locations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("secrets-add-version", Some(opt)) => {
-                        call_result = self._projects_secrets_add_version(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_add_version(opt, dry_run, &mut err).await;
                     },
                     ("secrets-create", Some(opt)) => {
-                        call_result = self._projects_secrets_create(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_create(opt, dry_run, &mut err).await;
                     },
                     ("secrets-delete", Some(opt)) => {
-                        call_result = self._projects_secrets_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_delete(opt, dry_run, &mut err).await;
                     },
                     ("secrets-get", Some(opt)) => {
-                        call_result = self._projects_secrets_get(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_get(opt, dry_run, &mut err).await;
                     },
                     ("secrets-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_secrets_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("secrets-list", Some(opt)) => {
-                        call_result = self._projects_secrets_list(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_list(opt, dry_run, &mut err).await;
                     },
                     ("secrets-patch", Some(opt)) => {
-                        call_result = self._projects_secrets_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_patch(opt, dry_run, &mut err).await;
                     },
                     ("secrets-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_secrets_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("secrets-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_secrets_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("secrets-versions-access", Some(opt)) => {
-                        call_result = self._projects_secrets_versions_access(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_versions_access(opt, dry_run, &mut err).await;
                     },
                     ("secrets-versions-destroy", Some(opt)) => {
-                        call_result = self._projects_secrets_versions_destroy(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_versions_destroy(opt, dry_run, &mut err).await;
                     },
                     ("secrets-versions-disable", Some(opt)) => {
-                        call_result = self._projects_secrets_versions_disable(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_versions_disable(opt, dry_run, &mut err).await;
                     },
                     ("secrets-versions-enable", Some(opt)) => {
-                        call_result = self._projects_secrets_versions_enable(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_versions_enable(opt, dry_run, &mut err).await;
                     },
                     ("secrets-versions-get", Some(opt)) => {
-                        call_result = self._projects_secrets_versions_get(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_versions_get(opt, dry_run, &mut err).await;
                     },
                     ("secrets-versions-list", Some(opt)) => {
-                        call_result = self._projects_secrets_versions_list(opt, dry_run, &mut err);
+                        call_result = self._projects_secrets_versions_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1314,41 +1320,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "secretmanager1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "secretmanager1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "secretmanager1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/secretmanager1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::SecretManager::new(client, auth),
@@ -1364,22 +1355,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'locations-get', 'locations-list', 'secrets-add-version', 'secrets-create', 'secrets-delete', 'secrets-get', 'secrets-get-iam-policy', 'secrets-list', 'secrets-patch', 'secrets-set-iam-policy', 'secrets-test-iam-permissions', 'secrets-versions-access', 'secrets-versions-destroy', 'secrets-versions-disable', 'secrets-versions-enable', 'secrets-versions-get' and 'secrets-versions-list'", vec![
@@ -1428,14 +1420,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-add-version",
-                    Some(r##"Creates a new SecretVersion containing secret data and attaches
-        it to an existing Secret."##),
+                    Some(r##"Creates a new SecretVersion containing secret data and attaches it to an existing Secret."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-add-version",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the Secret to associate with the
-        SecretVersion in the format `projects/*/secrets/*`."##),
+                     Some(r##"Required. The resource name of the Secret to associate with the SecretVersion in the format `projects/*/secrets/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1463,8 +1453,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the project to associate with the
-        Secret, in the format `projects/*`."##),
+                     Some(r##"Required. The resource name of the project to associate with the Secret, in the format `projects/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1492,8 +1481,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the Secret to delete in the format
-        `projects/*/secrets/*`."##),
+                     Some(r##"Required. The resource name of the Secret to delete in the format `projects/*/secrets/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1532,14 +1520,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-get-iam-policy",
-                    Some(r##"Gets the access control policy for a secret.
-        Returns empty policy if the secret exists and does not have a policy set."##),
+                    Some(r##"Gets the access control policy for a secret. Returns empty policy if the secret exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1561,8 +1547,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the project associated with the
-        Secrets, in the format `projects/*`."##),
+                     Some(r##"Required. The resource name of the project associated with the Secrets, in the format `projects/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1607,17 +1592,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified secret. Replaces any
-        existing policy.
-        
-        Permissions on SecretVersions are enforced according
-        to the policy set on the associated Secret."##),
+                    Some(r##"Sets the access control policy on the specified secret. Replaces any existing policy. Permissions on SecretVersions are enforced according to the policy set on the associated Secret."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1640,19 +1620,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has for the specified secret.
-        If the secret does not exist, this call returns an empty set of
-        permissions, not a NOT_FOUND error.
-        
-        Note: This operation is designed to be used for building permission-aware
-        UIs and command-line tools, not for authorization checking. This operation
-        may "fail open" without warning."##),
+                    Some(r##"Returns permissions that a caller has for the specified secret. If the secret does not exist, this call returns an empty set of permissions, not a NOT_FOUND error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1675,16 +1648,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-versions-access",
-                    Some(r##"Accesses a SecretVersion. This call returns the secret data.
-        
-        `projects/*/secrets/*/versions/latest` is an alias to the `latest`
-        SecretVersion."##),
+                    Some(r##"Accesses a SecretVersion. This call returns the secret data. `projects/*/secrets/*/versions/latest` is an alias to the `latest` SecretVersion."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-versions-access",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the SecretVersion in the format
-        `projects/*/secrets/*/versions/*`."##),
+                     Some(r##"Required. The resource name of the SecretVersion in the format `projects/*/secrets/*/versions/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1701,17 +1670,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-versions-destroy",
-                    Some(r##"Destroys a SecretVersion.
-        
-        Sets the state of the SecretVersion to
-        DESTROYED and irrevocably destroys the
-        secret data."##),
+                    Some(r##"Destroys a SecretVersion. Sets the state of the SecretVersion to DESTROYED and irrevocably destroys the secret data."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-versions-destroy",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the SecretVersion to destroy in the format
-        `projects/*/secrets/*/versions/*`."##),
+                     Some(r##"Required. The resource name of the SecretVersion to destroy in the format `projects/*/secrets/*/versions/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1734,16 +1698,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-versions-disable",
-                    Some(r##"Disables a SecretVersion.
-        
-        Sets the state of the SecretVersion to
-        DISABLED."##),
+                    Some(r##"Disables a SecretVersion. Sets the state of the SecretVersion to DISABLED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-versions-disable",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the SecretVersion to disable in the format
-        `projects/*/secrets/*/versions/*`."##),
+                     Some(r##"Required. The resource name of the SecretVersion to disable in the format `projects/*/secrets/*/versions/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1766,16 +1726,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-versions-enable",
-                    Some(r##"Enables a SecretVersion.
-        
-        Sets the state of the SecretVersion to
-        ENABLED."##),
+                    Some(r##"Enables a SecretVersion. Sets the state of the SecretVersion to ENABLED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-versions-enable",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the SecretVersion to enable in the format
-        `projects/*/secrets/*/versions/*`."##),
+                     Some(r##"Required. The resource name of the SecretVersion to enable in the format `projects/*/secrets/*/versions/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1798,18 +1754,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-versions-get",
-                    Some(r##"Gets metadata for a SecretVersion.
-        
-        `projects/*/secrets/*/versions/latest` is an alias to the `latest`
-        SecretVersion."##),
+                    Some(r##"Gets metadata for a SecretVersion. `projects/*/secrets/*/versions/latest` is an alias to the `latest` SecretVersion."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-versions-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the SecretVersion in the format
-        `projects/*/secrets/*/versions/*`.
-        `projects/*/secrets/*/versions/latest` is an alias to the `latest`
-        SecretVersion."##),
+                     Some(r##"Required. The resource name of the SecretVersion in the format `projects/*/secrets/*/versions/*`. `projects/*/secrets/*/versions/latest` is an alias to the `latest` SecretVersion."##),
                      Some(true),
                      Some(false)),
         
@@ -1826,15 +1776,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("secrets-versions-list",
-                    Some(r##"Lists SecretVersions. This call does not return secret
-        data."##),
+                    Some(r##"Lists SecretVersions. This call does not return secret data."##),
                     "Details at http://byron.github.io/google-apis-rs/google_secretmanager1_cli/projects_secrets-versions-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the Secret associated with the
-        SecretVersions to list, in the format
-        `projects/*/secrets/*`."##),
+                     Some(r##"Required. The resource name of the Secret associated with the SecretVersions to list, in the format `projects/*/secrets/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1856,9 +1803,8 @@ fn main() {
     
     let mut app = App::new("secretmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200703")
-           .about("Stores sensitive data such as API keys, passwords, and certificates. Provides convenience while improving security.
-           ")
+           .version("2.0.0+20210319")
+           .about("Stores sensitive data such as API keys, passwords, and certificates. Provides convenience while improving security. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_secretmanager1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1872,12 +1818,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1925,13 +1866,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

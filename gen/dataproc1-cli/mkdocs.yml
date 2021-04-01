@@ -1,4 +1,4 @@
-site_name: Dataproc v1.0.14+20200703
+site_name: Dataproc v2.0.0+20210322
 site_url: http://byron.github.io/google-apis-rs/google-dataproc1-cli
 site_description: A complete library to interact with Dataproc (protocol v1)
 
@@ -40,9 +40,12 @@ pages:
 - ['projects_regions-clusters-diagnose.md', 'Projects', 'Regions Clusters Diagnose']
 - ['projects_regions-clusters-get.md', 'Projects', 'Regions Clusters Get']
 - ['projects_regions-clusters-get-iam-policy.md', 'Projects', 'Regions Clusters Get Iam Policy']
+- ['projects_regions-clusters-inject-credentials.md', 'Projects', 'Regions Clusters Inject Credentials']
 - ['projects_regions-clusters-list.md', 'Projects', 'Regions Clusters List']
 - ['projects_regions-clusters-patch.md', 'Projects', 'Regions Clusters Patch']
 - ['projects_regions-clusters-set-iam-policy.md', 'Projects', 'Regions Clusters Set Iam Policy']
+- ['projects_regions-clusters-start.md', 'Projects', 'Regions Clusters Start']
+- ['projects_regions-clusters-stop.md', 'Projects', 'Regions Clusters Stop']
 - ['projects_regions-clusters-test-iam-permissions.md', 'Projects', 'Regions Clusters Test Iam Permissions']
 - ['projects_regions-jobs-cancel.md', 'Projects', 'Regions Jobs Cancel']
 - ['projects_regions-jobs-delete.md', 'Projects', 'Regions Jobs Delete']

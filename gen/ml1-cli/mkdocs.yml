@@ -1,4 +1,4 @@
-site_name: Cloud Machine Learning Engine v1.0.14+20200703
+site_name: Cloud Machine Learning Engine v2.0.0+20210317
 site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
 site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
 
@@ -34,6 +34,7 @@ pages:
 - ['projects_locations-studies-trials-delete.md', 'Projects', 'Locations Studies Trials Delete']
 - ['projects_locations-studies-trials-get.md', 'Projects', 'Locations Studies Trials Get']
 - ['projects_locations-studies-trials-list.md', 'Projects', 'Locations Studies Trials List']
+- ['projects_locations-studies-trials-list-optimal-trials.md', 'Projects', 'Locations Studies Trials List Optimal Trials']
 - ['projects_locations-studies-trials-stop.md', 'Projects', 'Locations Studies Trials Stop']
 - ['projects_locations-studies-trials-suggest.md', 'Projects', 'Locations Studies Trials Suggest']
 - ['projects_models-create.md', 'Projects', 'Models Create']

@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_books1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_books1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Books<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Books<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _bookshelves_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _bookshelves_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.bookshelves().get(opt.value_of("user-id").unwrap_or(""), opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -87,7 +83,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -102,7 +98,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _bookshelves_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _bookshelves_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.bookshelves().list(opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -143,7 +139,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -158,7 +154,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _bookshelves_volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _bookshelves_volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.bookshelves().volumes_list(opt.value_of("user-id").unwrap_or(""), opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -189,7 +185,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "start-index", "show-preorders", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["show-preorders", "max-results", "source", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -208,7 +204,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -223,7 +219,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _cloudloading_add_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _cloudloading_add_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.cloudloading().add_book();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -254,7 +250,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["mime-type", "name", "upload-client-token", "drive-document-id"].iter().map(|v|*v));
+                                                                           v.extend(["name", "mime-type", "upload-client-token", "drive-document-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -273,7 +269,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -288,15 +284,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _cloudloading_delete_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _cloudloading_delete_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.cloudloading().delete_book();
+        let mut call = self.hub.cloudloading().delete_book(opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -310,7 +303,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["volume-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -329,7 +321,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -344,7 +336,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _cloudloading_update_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _cloudloading_update_book(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -367,10 +359,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "processing-state" => Some(("processingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "volume-id" => Some(("volumeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "author" => Some(("author", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-state" => Some(("processingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "volume-id" => Some(("volumeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "processing-state", "title", "volume-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -417,7 +409,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -432,15 +424,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _dictionary_list_offline_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _dictionary_list_offline_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.dictionary().list_offline_metadata();
+        let mut call = self.hub.dictionary().list_offline_metadata(opt.value_of("cpksver").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "cpksver" => {
-                    call = call.cpksver(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -454,7 +443,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["cpksver"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -473,7 +461,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -488,7 +476,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _familysharing_get_family_info(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _familysharing_get_family_info(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.familysharing().get_family_info();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -529,7 +517,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -544,7 +532,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _familysharing_share(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _familysharing_share(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.familysharing().share();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -591,7 +579,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -606,7 +594,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _familysharing_unshare(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _familysharing_unshare(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.familysharing().unshare();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -653,7 +641,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -668,9 +656,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _layers_annotation_data_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _layers_annotation_data_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.layers().annotation_data_get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("annotation-data-id").unwrap_or(""));
+        let mut call = self.hub.layers().annotation_data_get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("annotation-data-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -689,9 +677,6 @@ impl<'n> Engine<'n> {
                 "h" => {
                     call = call.h(arg_from_str(value.unwrap_or("-0"), err, "h", "integer"));
                 },
-                "content-version" => {
-                    call = call.content_version(value.unwrap_or(""));
-                },
                 "allow-web-definitions" => {
                     call = call.allow_web_definitions(arg_from_str(value.unwrap_or("false"), err, "allow-web-definitions", "boolean"));
                 },
@@ -708,7 +693,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["scale", "locale", "h", "source", "content-version", "w", "allow-web-definitions"].iter().map(|v|*v));
+                                                                           v.extend(["source", "locale", "allow-web-definitions", "scale", "h", "w"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -727,7 +712,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -742,9 +727,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _layers_annotation_data_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _layers_annotation_data_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.layers().annotation_data_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""));
+        let mut call = self.hub.layers().annotation_data_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -775,9 +760,6 @@ impl<'n> Engine<'n> {
                 "h" => {
                     call = call.h(arg_from_str(value.unwrap_or("-0"), err, "h", "integer"));
                 },
-                "content-version" => {
-                    call = call.content_version(value.unwrap_or(""));
-                },
                 "annotation-data-id" => {
                     call = call.add_annotation_data_id(value.unwrap_or(""));
                 },
@@ -794,7 +776,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["scale", "source", "locale", "updated-min", "updated-max", "max-results", "annotation-data-id", "page-token", "content-version", "w", "h"].iter().map(|v|*v));
+                                                                           v.extend(["updated-max", "source", "page-token", "locale", "max-results", "scale", "h", "updated-min", "w", "annotation-data-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -813,7 +795,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -828,7 +810,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _layers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _layers_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.layers().get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("summary-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -853,7 +835,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "content-version"].iter().map(|v|*v));
+                                                                           v.extend(["content-version", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -872,7 +854,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -887,7 +869,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _layers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _layers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.layers().list(opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -918,7 +900,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "content-version", "max-results", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["content-version", "page-token", "max-results", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -937,7 +919,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -952,7 +934,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _layers_volume_annotations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _layers_volume_annotations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.layers().volume_annotations_get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("annotation-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -996,7 +978,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1011,9 +993,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _layers_volume_annotations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _layers_volume_annotations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.layers().volume_annotations_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""));
+        let mut call = self.hub.layers().volume_annotations_list(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1053,9 +1035,6 @@ impl<'n> Engine<'n> {
                 "end-offset" => {
                     call = call.end_offset(value.unwrap_or(""));
                 },
-                "content-version" => {
-                    call = call.content_version(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1069,7 +1048,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["show-deleted", "volume-annotations-version", "end-position", "updated-max", "start-position", "updated-min", "end-offset", "max-results", "source", "content-version", "start-offset", "page-token", "locale"].iter().map(|v|*v));
+                                                                           v.extend(["updated-max", "start-position", "source", "volume-annotations-version", "page-token", "locale", "start-offset", "max-results", "end-offset", "updated-min", "show-deleted", "end-position"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1088,7 +1067,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1103,7 +1082,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _myconfig_get_user_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _myconfig_get_user_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.myconfig().get_user_settings();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1144,7 +1123,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1159,23 +1138,17 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _myconfig_release_download_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _myconfig_release_download_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.myconfig().release_download_access();
+        let mut call = self.hub.myconfig().release_download_access(opt.value_of("cpksver").unwrap_or(""), &opt.values_of("volume-ids").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-ids" => {
-                    call = call.add_volume_ids(value.unwrap_or(""));
-                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
-                },
-                "cpksver" => {
-                    call = call.cpksver(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1190,7 +1163,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source", "volume-ids", "cpksver"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1209,7 +1182,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1224,30 +1197,18 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _myconfig_request_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _myconfig_request_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.myconfig().request_access();
+        let mut call = self.hub.myconfig().request_access(opt.value_of("cpksver").unwrap_or(""), opt.value_of("nonce").unwrap_or(""), opt.value_of("source").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
-                "source" => {
-                    call = call.source(value.unwrap_or(""));
-                },
-                "nonce" => {
-                    call = call.nonce(value.unwrap_or(""));
-                },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
                 "license-types" => {
                     call = call.license_types(value.unwrap_or(""));
                 },
-                "cpksver" => {
-                    call = call.cpksver(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1261,7 +1222,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["nonce", "license-types", "locale", "volume-id", "cpksver", "source"].iter().map(|v|*v));
+                                                                           v.extend(["license-types", "locale"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1280,7 +1241,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1295,23 +1256,17 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _myconfig_sync_volume_licenses(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _myconfig_sync_volume_licenses(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.myconfig().sync_volume_licenses();
+        let mut call = self.hub.myconfig().sync_volume_licenses(opt.value_of("cpksver").unwrap_or(""), opt.value_of("nonce").unwrap_or(""), opt.value_of("source").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "volume-ids" => {
                     call = call.add_volume_ids(value.unwrap_or(""));
                 },
-                "source" => {
-                    call = call.source(value.unwrap_or(""));
-                },
                 "show-preorders" => {
                     call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
-                },
-                "nonce" => {
-                    call = call.nonce(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -1322,9 +1277,6 @@ impl<'n> Engine<'n> {
                 "features" => {
                     call = call.add_features(value.unwrap_or(""));
                 },
-                "cpksver" => {
-                    call = call.cpksver(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1338,7 +1290,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["nonce", "features", "locale", "show-preorders", "cpksver", "source", "volume-ids", "include-non-comics-series"].iter().map(|v|*v));
+                                                                           v.extend(["volume-ids", "show-preorders", "locale", "features", "include-non-comics-series"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1357,7 +1309,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1372,7 +1324,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _myconfig_update_user_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _myconfig_update_user_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1395,14 +1347,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "notification.match-my-interests.opted-state" => Some(("notification.matchMyInterests.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification.reward-expirations.opted-state" => Some(("notification.rewardExpirations.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification.more-from-series.opted-state" => Some(("notification.moreFromSeries.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification.more-from-authors.opted-state" => Some(("notification.moreFromAuthors.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification.price-drop.opted-state" => Some(("notification.priceDrop.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notes-export.is-enabled" => Some(("notesExport.isEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notes-export.folder-name" => Some(("notesExport.folderName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notes-export.is-enabled" => Some(("notesExport.isEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "notification.match-my-interests.opted-state" => Some(("notification.matchMyInterests.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.more-from-authors.opted-state" => Some(("notification.moreFromAuthors.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.more-from-series.opted-state" => Some(("notification.moreFromSeries.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.price-drop.opted-state" => Some(("notification.priceDrop.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.reward-expirations.opted-state" => Some(("notification.rewardExpirations.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "match-my-interests", "more-from-authors", "more-from-series", "notes-export", "notification", "opted-state", "price-drop", "reward-expirations"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1449,7 +1401,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1464,7 +1416,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_annotations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_annotations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().annotations_delete(opt.value_of("annotation-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1505,7 +1457,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1520,7 +1472,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_annotations_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_annotations_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1543,57 +1495,57 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-ids" => Some(("pageIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "before-selected-text" => Some(("beforeSelectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.start-position" => Some(("currentVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.end-position" => Some(("currentVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.start-offset" => Some(("currentVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.end-offset" => Some(("currentVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.start-position" => Some(("currentVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.end-position" => Some(("currentVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.start-offset" => Some(("currentVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.end-offset" => Some(("currentVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.content-version" => Some(("currentVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.start-position" => Some(("currentVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.end-position" => Some(("currentVersionRanges.cfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.start-offset" => Some(("currentVersionRanges.cfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.end-offset" => Some(("currentVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.start-position" => Some(("currentVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.end-position" => Some(("currentVersionRanges.gbImageRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.start-offset" => Some(("currentVersionRanges.gbImageRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.end-offset" => Some(("currentVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "after-selected-text" => Some(("afterSelectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "volume-id" => Some(("volumeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "layer-summary.limit-type" => Some(("layerSummary.limitType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "layer-summary.remaining-character-count" => Some(("layerSummary.remainingCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "layer-summary.allowed-character-count" => Some(("layerSummary.allowedCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "selected-text" => Some(("selectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.start-position" => Some(("clientVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.end-position" => Some(("clientVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.start-offset" => Some(("clientVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.end-offset" => Some(("clientVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.start-position" => Some(("clientVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.end-position" => Some(("clientVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.start-offset" => Some(("clientVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.end-offset" => Some(("clientVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.content-version" => Some(("clientVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.cfi-range.start-position" => Some(("clientVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "before-selected-text" => Some(("beforeSelectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.cfi-range.end-offset" => Some(("clientVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.cfi-range.end-position" => Some(("clientVersionRanges.cfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.cfi-range.start-offset" => Some(("clientVersionRanges.cfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.cfi-range.end-offset" => Some(("clientVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-image-range.start-position" => Some(("clientVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.cfi-range.start-position" => Some(("clientVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.content-version" => Some(("clientVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-image-range.end-offset" => Some(("clientVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.gb-image-range.end-position" => Some(("clientVersionRanges.gbImageRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.gb-image-range.start-offset" => Some(("clientVersionRanges.gbImageRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-image-range.end-offset" => Some(("clientVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "layer-id" => Some(("layerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "highlight-style" => Some(("highlightStyle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-image-range.start-position" => Some(("clientVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.end-offset" => Some(("clientVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.end-position" => Some(("clientVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.start-offset" => Some(("clientVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.start-position" => Some(("clientVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.end-offset" => Some(("clientVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.end-position" => Some(("clientVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.start-offset" => Some(("clientVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.start-position" => Some(("clientVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.end-offset" => Some(("currentVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.end-position" => Some(("currentVersionRanges.cfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.start-offset" => Some(("currentVersionRanges.cfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.start-position" => Some(("currentVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.content-version" => Some(("currentVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.end-offset" => Some(("currentVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.end-position" => Some(("currentVersionRanges.gbImageRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.start-offset" => Some(("currentVersionRanges.gbImageRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.start-position" => Some(("currentVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.end-offset" => Some(("currentVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.end-position" => Some(("currentVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.start-offset" => Some(("currentVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.start-position" => Some(("currentVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.end-offset" => Some(("currentVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.end-position" => Some(("currentVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.start-offset" => Some(("currentVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.start-position" => Some(("currentVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "highlight-style" => Some(("highlightStyle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "layer-id" => Some(("layerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "layer-summary.allowed-character-count" => Some(("layerSummary.allowedCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "layer-summary.limit-type" => Some(("layerSummary.limitType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "layer-summary.remaining-character-count" => Some(("layerSummary.remainingCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-ids" => Some(("pageIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "selected-text" => Some(("selectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "volume-id" => Some(("volumeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["after-selected-text", "allowed-character-count", "before-selected-text", "cfi-range", "client-version-ranges", "content-version", "created", "current-version-ranges", "data", "deleted", "end-offset", "end-position", "gb-image-range", "gb-text-range", "highlight-style", "id", "image-cfi-range", "kind", "layer-id", "layer-summary", "limit-type", "page-ids", "remaining-character-count", "selected-text", "self-link", "start-offset", "start-position", "updated", "volume-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1634,7 +1586,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "show-only-summary-in-response", "annotation-id", "country"].iter().map(|v|*v));
+                                                                           v.extend(["annotation-id", "show-only-summary-in-response", "source", "country"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1653,7 +1605,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1668,7 +1620,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_annotations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_annotations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().annotations_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1717,7 +1669,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "layer-ids", "show-deleted", "updated-min", "updated-max", "volume-id", "max-results", "source", "content-version", "layer-id"].iter().map(|v|*v));
+                                                                           v.extend(["updated-max", "content-version", "source", "layer-ids", "layer-id", "page-token", "volume-id", "max-results", "updated-min", "show-deleted"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1736,7 +1688,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1751,18 +1703,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_annotations_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_annotations_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().annotations_summary();
+        let mut call = self.hub.mylibrary().annotations_summary(&opt.values_of("layer-ids").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>(), opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
-                "layer-ids" => {
-                    call = call.add_layer_ids(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1776,7 +1722,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["layer-ids", "volume-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1795,7 +1740,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1810,7 +1755,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_annotations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_annotations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1833,57 +1778,57 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-ids" => Some(("pageIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "before-selected-text" => Some(("beforeSelectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.start-position" => Some(("currentVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.end-position" => Some(("currentVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.start-offset" => Some(("currentVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.image-cfi-range.end-offset" => Some(("currentVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.start-position" => Some(("currentVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.end-position" => Some(("currentVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.start-offset" => Some(("currentVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-text-range.end-offset" => Some(("currentVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.content-version" => Some(("currentVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.start-position" => Some(("currentVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.end-position" => Some(("currentVersionRanges.cfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.start-offset" => Some(("currentVersionRanges.cfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.cfi-range.end-offset" => Some(("currentVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.start-position" => Some(("currentVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.end-position" => Some(("currentVersionRanges.gbImageRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.start-offset" => Some(("currentVersionRanges.gbImageRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "current-version-ranges.gb-image-range.end-offset" => Some(("currentVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "after-selected-text" => Some(("afterSelectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "volume-id" => Some(("volumeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "layer-summary.limit-type" => Some(("layerSummary.limitType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "layer-summary.remaining-character-count" => Some(("layerSummary.remainingCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "layer-summary.allowed-character-count" => Some(("layerSummary.allowedCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "selected-text" => Some(("selectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.start-position" => Some(("clientVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.end-position" => Some(("clientVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.start-offset" => Some(("clientVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.image-cfi-range.end-offset" => Some(("clientVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.start-position" => Some(("clientVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.end-position" => Some(("clientVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.start-offset" => Some(("clientVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-text-range.end-offset" => Some(("clientVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.content-version" => Some(("clientVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.cfi-range.start-position" => Some(("clientVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "before-selected-text" => Some(("beforeSelectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.cfi-range.end-offset" => Some(("clientVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.cfi-range.end-position" => Some(("clientVersionRanges.cfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.cfi-range.start-offset" => Some(("clientVersionRanges.cfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.cfi-range.end-offset" => Some(("clientVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-image-range.start-position" => Some(("clientVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.cfi-range.start-position" => Some(("clientVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.content-version" => Some(("clientVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-image-range.end-offset" => Some(("clientVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.gb-image-range.end-position" => Some(("clientVersionRanges.gbImageRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version-ranges.gb-image-range.start-offset" => Some(("clientVersionRanges.gbImageRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "client-version-ranges.gb-image-range.end-offset" => Some(("clientVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "layer-id" => Some(("layerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "highlight-style" => Some(("highlightStyle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-image-range.start-position" => Some(("clientVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.end-offset" => Some(("clientVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.end-position" => Some(("clientVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.start-offset" => Some(("clientVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.gb-text-range.start-position" => Some(("clientVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.end-offset" => Some(("clientVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.end-position" => Some(("clientVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.start-offset" => Some(("clientVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-version-ranges.image-cfi-range.start-position" => Some(("clientVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.end-offset" => Some(("currentVersionRanges.cfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.end-position" => Some(("currentVersionRanges.cfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.start-offset" => Some(("currentVersionRanges.cfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.cfi-range.start-position" => Some(("currentVersionRanges.cfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.content-version" => Some(("currentVersionRanges.contentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.end-offset" => Some(("currentVersionRanges.gbImageRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.end-position" => Some(("currentVersionRanges.gbImageRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.start-offset" => Some(("currentVersionRanges.gbImageRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-image-range.start-position" => Some(("currentVersionRanges.gbImageRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.end-offset" => Some(("currentVersionRanges.gbTextRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.end-position" => Some(("currentVersionRanges.gbTextRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.start-offset" => Some(("currentVersionRanges.gbTextRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.gb-text-range.start-position" => Some(("currentVersionRanges.gbTextRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.end-offset" => Some(("currentVersionRanges.imageCfiRange.endOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.end-position" => Some(("currentVersionRanges.imageCfiRange.endPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.start-offset" => Some(("currentVersionRanges.imageCfiRange.startOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-version-ranges.image-cfi-range.start-position" => Some(("currentVersionRanges.imageCfiRange.startPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "highlight-style" => Some(("highlightStyle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "layer-id" => Some(("layerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "layer-summary.allowed-character-count" => Some(("layerSummary.allowedCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "layer-summary.limit-type" => Some(("layerSummary.limitType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "layer-summary.remaining-character-count" => Some(("layerSummary.remainingCharacterCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-ids" => Some(("pageIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "selected-text" => Some(("selectedText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "volume-id" => Some(("volumeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["after-selected-text", "allowed-character-count", "before-selected-text", "cfi-range", "client-version-ranges", "content-version", "created", "current-version-ranges", "data", "deleted", "end-offset", "end-position", "gb-image-range", "gb-text-range", "highlight-style", "id", "image-cfi-range", "kind", "layer-id", "layer-summary", "limit-type", "page-ids", "remaining-character-count", "selected-text", "self-link", "start-offset", "start-position", "updated", "volume-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1934,7 +1879,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1949,15 +1894,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_add_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_add_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().bookshelves_add_volume(opt.value_of("shelf").unwrap_or(""));
+        let mut call = self.hub.mylibrary().bookshelves_add_volume(opt.value_of("shelf").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
@@ -1977,7 +1919,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "reason", "volume-id"].iter().map(|v|*v));
+                                                                           v.extend(["reason", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1996,7 +1938,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2011,7 +1953,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_clear_volumes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_clear_volumes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().bookshelves_clear_volumes(opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2052,7 +1994,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2067,7 +2009,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().bookshelves_get(opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2108,7 +2050,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2123,7 +2065,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().bookshelves_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2164,7 +2106,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2179,18 +2121,13 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_move_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_move_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().bookshelves_move_volume(opt.value_of("shelf").unwrap_or(""));
+        let volume_position: i32 = arg_from_str(&opt.value_of("volume-position").unwrap_or(""), err, "<volume-position>", "integer");
+        let mut call = self.hub.mylibrary().bookshelves_move_volume(opt.value_of("shelf").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""), volume_position);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-position" => {
-                    call = call.volume_position(arg_from_str(value.unwrap_or("-0"), err, "volume-position", "integer"));
-                },
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
@@ -2207,7 +2144,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["volume-position", "volume-id", "source"].iter().map(|v|*v));
+                                                                           v.extend(["source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2226,7 +2163,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2241,15 +2178,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_remove_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_remove_volume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().bookshelves_remove_volume(opt.value_of("shelf").unwrap_or(""));
+        let mut call = self.hub.mylibrary().bookshelves_remove_volume(opt.value_of("shelf").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
                 },
@@ -2269,7 +2203,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "reason", "volume-id"].iter().map(|v|*v));
+                                                                           v.extend(["reason", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2288,7 +2222,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2303,7 +2237,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_bookshelves_volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_bookshelves_volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().bookshelves_volumes_list(opt.value_of("shelf").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2343,7 +2277,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "country", "show-preorders", "max-results", "q", "source", "start-index"].iter().map(|v|*v));
+                                                                           v.extend(["source", "q", "start-index", "country", "show-preorders", "max-results", "projection"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2362,7 +2296,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2377,7 +2311,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_readingpositions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_readingpositions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.mylibrary().readingpositions_get(opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2402,7 +2336,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["source", "content-version"].iter().map(|v|*v));
+                                                                           v.extend(["content-version", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2421,7 +2355,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2436,20 +2370,14 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _mylibrary_readingpositions_set_position(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _mylibrary_readingpositions_set_position(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.mylibrary().readingpositions_set_position(opt.value_of("volume-id").unwrap_or(""));
+        let mut call = self.hub.mylibrary().readingpositions_set_position(opt.value_of("volume-id").unwrap_or(""), opt.value_of("position").unwrap_or(""), opt.value_of("timestamp").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "timestamp" => {
-                    call = call.timestamp(value.unwrap_or(""));
-                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
-                },
-                "position" => {
-                    call = call.position(value.unwrap_or(""));
                 },
                 "device-cookie" => {
                     call = call.device_cookie(value.unwrap_or(""));
@@ -2473,7 +2401,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["device-cookie", "timestamp", "source", "content-version", "action", "position"].iter().map(|v|*v));
+                                                                           v.extend(["content-version", "action", "device-cookie", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2492,7 +2420,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2507,17 +2435,14 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _notification_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _notification_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.notification().get();
+        let mut call = self.hub.notification().get(opt.value_of("notification-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source" => {
                     call = call.source(value.unwrap_or(""));
-                },
-                "notification-id" => {
-                    call = call.notification_id(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -2535,7 +2460,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["notification-id", "source", "locale"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2554,7 +2479,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2569,7 +2494,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _onboarding_list_categories(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _onboarding_list_categories(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.onboarding().list_categories();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2610,7 +2535,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2625,7 +2550,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _onboarding_list_category_volumes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _onboarding_list_category_volumes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.onboarding().list_category_volumes();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2659,7 +2584,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "page-token", "max-allowed-maturity-rating", "category-id", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "locale", "max-allowed-maturity-rating", "category-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2678,7 +2603,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2693,7 +2618,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _personalizedstream_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _personalizedstream_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.personalizedstream().get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2721,7 +2646,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source", "max-allowed-maturity-rating"].iter().map(|v|*v));
+                                                                           v.extend(["max-allowed-maturity-rating", "locale", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2740,7 +2665,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2755,7 +2680,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _promooffer_accept(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _promooffer_accept(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.promooffer().accept();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2798,7 +2723,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["product", "volume-id", "offer-id", "android-id", "device", "model", "serial", "manufacturer"].iter().map(|v|*v));
+                                                                           v.extend(["model", "serial", "volume-id", "manufacturer", "product", "offer-id", "device", "android-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2817,7 +2742,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2832,7 +2757,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _promooffer_dismiss(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _promooffer_dismiss(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.promooffer().dismiss();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2872,7 +2797,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["product", "offer-id", "android-id", "device", "model", "serial", "manufacturer"].iter().map(|v|*v));
+                                                                           v.extend(["model", "serial", "manufacturer", "product", "offer-id", "device", "android-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2891,7 +2816,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2906,7 +2831,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _promooffer_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _promooffer_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.promooffer().get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2943,7 +2868,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["product", "android-id", "device", "model", "serial", "manufacturer"].iter().map(|v|*v));
+                                                                           v.extend(["model", "serial", "manufacturer", "product", "device", "android-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2962,7 +2887,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2977,15 +2902,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _series_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _series_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.series().get();
+        let mut call = self.hub.series().get(&opt.values_of("series-id").map(|i|i.collect()).unwrap_or(Vec::new()).iter().map(|&v| v.to_string()).collect::<Vec<String>>());
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "series-id" => {
-                    call = call.add_series_id(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2999,7 +2921,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["series-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3018,7 +2939,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3033,15 +2954,12 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _series_membership_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _series_membership_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.series().membership_get();
+        let mut call = self.hub.series().membership_get(opt.value_of("series-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "series-id" => {
-                    call = call.series_id(value.unwrap_or(""));
-                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -3061,7 +2979,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["series-id", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3080,7 +2998,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3095,7 +3013,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_associated_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_associated_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.volumes().associated_list(opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3126,7 +3044,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source", "max-allowed-maturity-rating", "association"].iter().map(|v|*v));
+                                                                           v.extend(["max-allowed-maturity-rating", "locale", "association", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3145,7 +3063,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3160,7 +3078,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.volumes().get(opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3197,7 +3115,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-library-consistent-read", "projection", "country", "source", "include-non-comics-series", "partner"].iter().map(|v|*v));
+                                                                           v.extend(["source", "country", "include-non-comics-series", "partner", "user-library-consistent-read", "projection"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3216,7 +3134,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3231,9 +3149,9 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.volumes().list();
+        let mut call = self.hub.volumes().list(opt.value_of("q").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3245,9 +3163,6 @@ impl<'n> Engine<'n> {
                 },
                 "show-preorders" => {
                     call = call.show_preorders(arg_from_str(value.unwrap_or("false"), err, "show-preorders", "boolean"));
-                },
-                "q" => {
-                    call = call.q(value.unwrap_or(""));
                 },
                 "projection" => {
                     call = call.projection(value.unwrap_or(""));
@@ -3292,7 +3207,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "filter", "projection", "library-restrict", "lang-restrict", "print-type", "show-preorders", "max-results", "q", "source", "start-index", "max-allowed-maturity-rating", "download", "partner"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "source", "lang-restrict", "start-index", "show-preorders", "order-by", "download", "print-type", "partner", "max-results", "library-restrict", "max-allowed-maturity-rating", "projection"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3311,7 +3226,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3326,7 +3241,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_mybooks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_mybooks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.volumes().mybooks_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3366,7 +3281,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "country", "acquire-method", "max-results", "source", "start-index", "processing-state"].iter().map(|v|*v));
+                                                                           v.extend(["acquire-method", "source", "start-index", "country", "locale", "processing-state", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3385,7 +3300,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3400,7 +3315,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_recommended_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_recommended_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.volumes().recommended_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3428,7 +3343,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source", "max-allowed-maturity-rating"].iter().map(|v|*v));
+                                                                           v.extend(["max-allowed-maturity-rating", "locale", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3447,7 +3362,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3462,20 +3377,14 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_recommended_rate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_recommended_rate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.volumes().recommended_rate();
+        let mut call = self.hub.volumes().recommended_rate(opt.value_of("rating").unwrap_or(""), opt.value_of("volume-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "volume-id" => {
-                    call = call.volume_id(value.unwrap_or(""));
-                },
                 "source" => {
                     call = call.source(value.unwrap_or(""));
-                },
-                "rating" => {
-                    call = call.rating(value.unwrap_or(""));
                 },
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
@@ -3493,7 +3402,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "source", "volume-id", "rating"].iter().map(|v|*v));
+                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3512,7 +3421,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3527,7 +3436,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _volumes_useruploaded_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _volumes_useruploaded_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.volumes().useruploaded_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3564,7 +3473,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "volume-id", "max-results", "source", "start-index", "processing-state"].iter().map(|v|*v));
+                                                                           v.extend(["source", "start-index", "locale", "volume-id", "processing-state", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3583,7 +3492,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3598,7 +3507,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -3606,13 +3515,13 @@ impl<'n> Engine<'n> {
             ("bookshelves", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._bookshelves_get(opt, dry_run, &mut err);
+                        call_result = self._bookshelves_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._bookshelves_list(opt, dry_run, &mut err);
+                        call_result = self._bookshelves_list(opt, dry_run, &mut err).await;
                     },
                     ("volumes-list", Some(opt)) => {
-                        call_result = self._bookshelves_volumes_list(opt, dry_run, &mut err);
+                        call_result = self._bookshelves_volumes_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("bookshelves".to_string()));
@@ -3623,13 +3532,13 @@ impl<'n> Engine<'n> {
             ("cloudloading", Some(opt)) => {
                 match opt.subcommand() {
                     ("add-book", Some(opt)) => {
-                        call_result = self._cloudloading_add_book(opt, dry_run, &mut err);
+                        call_result = self._cloudloading_add_book(opt, dry_run, &mut err).await;
                     },
                     ("delete-book", Some(opt)) => {
-                        call_result = self._cloudloading_delete_book(opt, dry_run, &mut err);
+                        call_result = self._cloudloading_delete_book(opt, dry_run, &mut err).await;
                     },
                     ("update-book", Some(opt)) => {
-                        call_result = self._cloudloading_update_book(opt, dry_run, &mut err);
+                        call_result = self._cloudloading_update_book(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("cloudloading".to_string()));
@@ -3640,7 +3549,7 @@ impl<'n> Engine<'n> {
             ("dictionary", Some(opt)) => {
                 match opt.subcommand() {
                     ("list-offline-metadata", Some(opt)) => {
-                        call_result = self._dictionary_list_offline_metadata(opt, dry_run, &mut err);
+                        call_result = self._dictionary_list_offline_metadata(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("dictionary".to_string()));
@@ -3651,13 +3560,13 @@ impl<'n> Engine<'n> {
             ("familysharing", Some(opt)) => {
                 match opt.subcommand() {
                     ("get-family-info", Some(opt)) => {
-                        call_result = self._familysharing_get_family_info(opt, dry_run, &mut err);
+                        call_result = self._familysharing_get_family_info(opt, dry_run, &mut err).await;
                     },
                     ("share", Some(opt)) => {
-                        call_result = self._familysharing_share(opt, dry_run, &mut err);
+                        call_result = self._familysharing_share(opt, dry_run, &mut err).await;
                     },
                     ("unshare", Some(opt)) => {
-                        call_result = self._familysharing_unshare(opt, dry_run, &mut err);
+                        call_result = self._familysharing_unshare(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("familysharing".to_string()));
@@ -3668,22 +3577,22 @@ impl<'n> Engine<'n> {
             ("layers", Some(opt)) => {
                 match opt.subcommand() {
                     ("annotation-data-get", Some(opt)) => {
-                        call_result = self._layers_annotation_data_get(opt, dry_run, &mut err);
+                        call_result = self._layers_annotation_data_get(opt, dry_run, &mut err).await;
                     },
                     ("annotation-data-list", Some(opt)) => {
-                        call_result = self._layers_annotation_data_list(opt, dry_run, &mut err);
+                        call_result = self._layers_annotation_data_list(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._layers_get(opt, dry_run, &mut err);
+                        call_result = self._layers_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._layers_list(opt, dry_run, &mut err);
+                        call_result = self._layers_list(opt, dry_run, &mut err).await;
                     },
                     ("volume-annotations-get", Some(opt)) => {
-                        call_result = self._layers_volume_annotations_get(opt, dry_run, &mut err);
+                        call_result = self._layers_volume_annotations_get(opt, dry_run, &mut err).await;
                     },
                     ("volume-annotations-list", Some(opt)) => {
-                        call_result = self._layers_volume_annotations_list(opt, dry_run, &mut err);
+                        call_result = self._layers_volume_annotations_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("layers".to_string()));
@@ -3694,19 +3603,19 @@ impl<'n> Engine<'n> {
             ("myconfig", Some(opt)) => {
                 match opt.subcommand() {
                     ("get-user-settings", Some(opt)) => {
-                        call_result = self._myconfig_get_user_settings(opt, dry_run, &mut err);
+                        call_result = self._myconfig_get_user_settings(opt, dry_run, &mut err).await;
                     },
                     ("release-download-access", Some(opt)) => {
-                        call_result = self._myconfig_release_download_access(opt, dry_run, &mut err);
+                        call_result = self._myconfig_release_download_access(opt, dry_run, &mut err).await;
                     },
                     ("request-access", Some(opt)) => {
-                        call_result = self._myconfig_request_access(opt, dry_run, &mut err);
+                        call_result = self._myconfig_request_access(opt, dry_run, &mut err).await;
                     },
                     ("sync-volume-licenses", Some(opt)) => {
-                        call_result = self._myconfig_sync_volume_licenses(opt, dry_run, &mut err);
+                        call_result = self._myconfig_sync_volume_licenses(opt, dry_run, &mut err).await;
                     },
                     ("update-user-settings", Some(opt)) => {
-                        call_result = self._myconfig_update_user_settings(opt, dry_run, &mut err);
+                        call_result = self._myconfig_update_user_settings(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("myconfig".to_string()));
@@ -3717,46 +3626,46 @@ impl<'n> Engine<'n> {
             ("mylibrary", Some(opt)) => {
                 match opt.subcommand() {
                     ("annotations-delete", Some(opt)) => {
-                        call_result = self._mylibrary_annotations_delete(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_annotations_delete(opt, dry_run, &mut err).await;
                     },
                     ("annotations-insert", Some(opt)) => {
-                        call_result = self._mylibrary_annotations_insert(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_annotations_insert(opt, dry_run, &mut err).await;
                     },
                     ("annotations-list", Some(opt)) => {
-                        call_result = self._mylibrary_annotations_list(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_annotations_list(opt, dry_run, &mut err).await;
                     },
                     ("annotations-summary", Some(opt)) => {
-                        call_result = self._mylibrary_annotations_summary(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_annotations_summary(opt, dry_run, &mut err).await;
                     },
                     ("annotations-update", Some(opt)) => {
-                        call_result = self._mylibrary_annotations_update(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_annotations_update(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-add-volume", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_add_volume(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_add_volume(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-clear-volumes", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_clear_volumes(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_clear_volumes(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-get", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_get(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_get(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-list", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_list(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_list(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-move-volume", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_move_volume(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_move_volume(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-remove-volume", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_remove_volume(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_remove_volume(opt, dry_run, &mut err).await;
                     },
                     ("bookshelves-volumes-list", Some(opt)) => {
-                        call_result = self._mylibrary_bookshelves_volumes_list(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_bookshelves_volumes_list(opt, dry_run, &mut err).await;
                     },
                     ("readingpositions-get", Some(opt)) => {
-                        call_result = self._mylibrary_readingpositions_get(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_readingpositions_get(opt, dry_run, &mut err).await;
                     },
                     ("readingpositions-set-position", Some(opt)) => {
-                        call_result = self._mylibrary_readingpositions_set_position(opt, dry_run, &mut err);
+                        call_result = self._mylibrary_readingpositions_set_position(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("mylibrary".to_string()));
@@ -3767,7 +3676,7 @@ impl<'n> Engine<'n> {
             ("notification", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._notification_get(opt, dry_run, &mut err);
+                        call_result = self._notification_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("notification".to_string()));
@@ -3778,10 +3687,10 @@ impl<'n> Engine<'n> {
             ("onboarding", Some(opt)) => {
                 match opt.subcommand() {
                     ("list-categories", Some(opt)) => {
-                        call_result = self._onboarding_list_categories(opt, dry_run, &mut err);
+                        call_result = self._onboarding_list_categories(opt, dry_run, &mut err).await;
                     },
                     ("list-category-volumes", Some(opt)) => {
-                        call_result = self._onboarding_list_category_volumes(opt, dry_run, &mut err);
+                        call_result = self._onboarding_list_category_volumes(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("onboarding".to_string()));
@@ -3792,7 +3701,7 @@ impl<'n> Engine<'n> {
             ("personalizedstream", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._personalizedstream_get(opt, dry_run, &mut err);
+                        call_result = self._personalizedstream_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("personalizedstream".to_string()));
@@ -3803,13 +3712,13 @@ impl<'n> Engine<'n> {
             ("promooffer", Some(opt)) => {
                 match opt.subcommand() {
                     ("accept", Some(opt)) => {
-                        call_result = self._promooffer_accept(opt, dry_run, &mut err);
+                        call_result = self._promooffer_accept(opt, dry_run, &mut err).await;
                     },
                     ("dismiss", Some(opt)) => {
-                        call_result = self._promooffer_dismiss(opt, dry_run, &mut err);
+                        call_result = self._promooffer_dismiss(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._promooffer_get(opt, dry_run, &mut err);
+                        call_result = self._promooffer_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("promooffer".to_string()));
@@ -3820,10 +3729,10 @@ impl<'n> Engine<'n> {
             ("series", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._series_get(opt, dry_run, &mut err);
+                        call_result = self._series_get(opt, dry_run, &mut err).await;
                     },
                     ("membership-get", Some(opt)) => {
-                        call_result = self._series_membership_get(opt, dry_run, &mut err);
+                        call_result = self._series_membership_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("series".to_string()));
@@ -3834,25 +3743,25 @@ impl<'n> Engine<'n> {
             ("volumes", Some(opt)) => {
                 match opt.subcommand() {
                     ("associated-list", Some(opt)) => {
-                        call_result = self._volumes_associated_list(opt, dry_run, &mut err);
+                        call_result = self._volumes_associated_list(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._volumes_get(opt, dry_run, &mut err);
+                        call_result = self._volumes_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._volumes_list(opt, dry_run, &mut err);
+                        call_result = self._volumes_list(opt, dry_run, &mut err).await;
                     },
                     ("mybooks-list", Some(opt)) => {
-                        call_result = self._volumes_mybooks_list(opt, dry_run, &mut err);
+                        call_result = self._volumes_mybooks_list(opt, dry_run, &mut err).await;
                     },
                     ("recommended-list", Some(opt)) => {
-                        call_result = self._volumes_recommended_list(opt, dry_run, &mut err);
+                        call_result = self._volumes_recommended_list(opt, dry_run, &mut err).await;
                     },
                     ("recommended-rate", Some(opt)) => {
-                        call_result = self._volumes_recommended_rate(opt, dry_run, &mut err);
+                        call_result = self._volumes_recommended_rate(opt, dry_run, &mut err).await;
                     },
                     ("useruploaded-list", Some(opt)) => {
-                        call_result = self._volumes_useruploaded_list(opt, dry_run, &mut err);
+                        call_result = self._volumes_useruploaded_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("volumes".to_string()));
@@ -3877,41 +3786,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "books1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "books1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "books1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/books1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Books::new(client, auth),
@@ -3927,22 +3821,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("bookshelves", "methods: 'get', 'list' and 'volumes-list'", vec![
@@ -4047,6 +3942,12 @@ fn main() {
                     Some(r##"Remove the book and its contents"##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/cloudloading_delete-book",
                   vec![
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"The id of the book to be removed."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4088,6 +3989,12 @@ fn main() {
                     Some(r##"Returns a list of offline dictionary metadata available"##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/dictionary_list-offline-metadata",
                   vec![
+                    (Some(r##"cpksver"##),
+                     None,
+                     Some(r##"The device/version ID from which to request the data."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4120,8 +4027,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("share",
-                    Some(r##"Initiates sharing of the content with the user's family. Empty response
-        indicates success."##),
+                    Some(r##"Initiates sharing of the content with the user's family. Empty response indicates success."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_share",
                   vec![
                     (Some(r##"v"##),
@@ -4137,8 +4043,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("unshare",
-                    Some(r##"Initiates revoking content that has already been shared with the user's
-        family. Empty response indicates success."##),
+                    Some(r##"Initiates revoking content that has already been shared with the user's family. Empty response indicates success."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_unshare",
                   vec![
                     (Some(r##"v"##),
@@ -4178,6 +4083,12 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"content-version"##),
+                     None,
+                     Some(r##"The content version for the volume you are trying to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4203,6 +4114,12 @@ fn main() {
                     (Some(r##"layer-id"##),
                      None,
                      Some(r##"The ID for the layer to get the annotation data."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"content-version"##),
+                     None,
+                     Some(r##"The content version for the requested volume."##),
                      Some(true),
                      Some(false)),
         
@@ -4318,6 +4235,12 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"content-version"##),
+                     None,
+                     Some(r##"The content version for the requested volume."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4353,6 +4276,18 @@ fn main() {
                     Some(r##"Release downloaded content access restriction."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_release-download-access",
                   vec![
+                    (Some(r##"cpksver"##),
+                     None,
+                     Some(r##"The device/version ID from which to release the restriction."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"volume-ids"##),
+                     None,
+                     Some(r##"The volume(s) to release restrictions for."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4369,6 +4304,30 @@ fn main() {
                     Some(r##"Request concurrent and download access restrictions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_request-access",
                   vec![
+                    (Some(r##"cpksver"##),
+                     None,
+                     Some(r##"The device/version ID from which to request the restrictions."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"nonce"##),
+                     None,
+                     Some(r##"The client nonce value."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"source"##),
+                     None,
+                     Some(r##"String to identify the originator of this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"The volume to request concurrent/download restrictions for."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4382,10 +4341,27 @@ fn main() {
                      Some(false)),
                   ]),
             ("sync-volume-licenses",
-                    Some(r##"Request downloaded content access for specified volumes on the My eBooks
-        shelf."##),
+                    Some(r##"Request downloaded content access for specified volumes on the My eBooks shelf."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_sync-volume-licenses",
                   vec![
+                    (Some(r##"cpksver"##),
+                     None,
+                     Some(r##"The device/version ID from which to release the restriction."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"nonce"##),
+                     None,
+                     Some(r##"The client nonce value."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"source"##),
+                     None,
+                     Some(r##"String to identify the originator of this request."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4399,9 +4375,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update-user-settings",
-                    Some(r##"Sets the settings for the user. If a sub-object is specified, it will
-        overwrite the existing sub-object stored in the server. Unspecified
-        sub-objects will retain the existing value."##),
+                    Some(r##"Sets the settings for the user. If a sub-object is specified, it will overwrite the existing sub-object stored in the server. Unspecified sub-objects will retain the existing value."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/myconfig_update-user-settings",
                   vec![
                     (Some(r##"kv"##),
@@ -4489,6 +4463,18 @@ fn main() {
                     Some(r##"Gets the summary of specified layers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/mylibrary_annotations-summary",
                   vec![
+                    (Some(r##"layer-ids"##),
+                     None,
+                     Some(r##"Array of layer IDs to get the summary for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"Volume id to get the summary for."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4539,6 +4525,12 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"ID of volume to add."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4574,8 +4566,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("bookshelves-get",
-                    Some(r##"Retrieves metadata for a specific bookshelf belonging to the authenticated
-        user."##),
+                    Some(r##"Retrieves metadata for a specific bookshelf belonging to the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/mylibrary_bookshelves-get",
                   vec![
                     (Some(r##"shelf"##),
@@ -4622,6 +4613,18 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"ID of volume to move."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"volume-position"##),
+                     None,
+                     Some(r##"Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)"##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4641,6 +4644,12 @@ fn main() {
                     (Some(r##"shelf"##),
                      None,
                      Some(r##"ID of bookshelf from which to remove a volume."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"ID of volume to remove."##),
                      Some(true),
                      Some(false)),
         
@@ -4710,6 +4719,18 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"position"##),
+                     None,
+                     Some(r##"Position string for the new volume reading position."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"timestamp"##),
+                     None,
+                     Some(r##"RFC 3339 UTC format timestamp associated with this reading position."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4729,6 +4750,12 @@ fn main() {
                     Some(r##"Returns notification details for a given notification id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/notification_get",
                   vec![
+                    (Some(r##"notification-id"##),
+                     None,
+                     Some(r##"String to identify the notification."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4853,6 +4880,12 @@ fn main() {
                     Some(r##"Returns Series metadata for the given series ids."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/series_get",
                   vec![
+                    (Some(r##"series-id"##),
+                     None,
+                     Some(r##"String that identifies the series"##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4869,6 +4902,12 @@ fn main() {
                     Some(r##"Returns Series membership data given the series id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/series_membership-get",
                   vec![
+                    (Some(r##"series-id"##),
+                     None,
+                     Some(r##"String that identifies the series"##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4932,6 +4971,12 @@ fn main() {
                     Some(r##"Performs a book search."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/volumes_list",
                   vec![
+                    (Some(r##"q"##),
+                     None,
+                     Some(r##"Full-text search query string."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4980,6 +5025,18 @@ fn main() {
                     Some(r##"Rate a recommended book for the current user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/volumes_recommended-rate",
                   vec![
+                    (Some(r##"rating"##),
+                     None,
+                     Some(r##"Rating to be given to the volume."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"volume-id"##),
+                     None,
+                     Some(r##"ID of the source volume."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -5014,7 +5071,7 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200707")
+           .version("2.0.0+20210326")
            .about("The Google Books API allows clients to access the Google Books repository.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")
@@ -5029,12 +5086,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -5082,13 +5134,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

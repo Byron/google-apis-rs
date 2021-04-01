@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_analytics3 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_analytics3::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Analytics<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Analytics<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _data_ga_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _data_ga_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.data().ga_get(opt.value_of("ids").unwrap_or(""), opt.value_of("start-date").unwrap_or(""), opt.value_of("end-date").unwrap_or(""), opt.value_of("metrics").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -92,7 +88,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sort", "max-results", "dimensions", "start-index", "include-empty-rows", "sampling-level", "filters", "output", "segment"].iter().map(|v|*v));
+                                                                           v.extend(["output", "segment", "include-empty-rows", "sort", "sampling-level", "max-results", "filters", "dimensions", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -111,7 +107,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -126,7 +122,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _data_mcf_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _data_mcf_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.data().mcf_get(opt.value_of("ids").unwrap_or(""), opt.value_of("start-date").unwrap_or(""), opt.value_of("end-date").unwrap_or(""), opt.value_of("metrics").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -163,7 +159,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sort", "max-results", "dimensions", "start-index", "sampling-level", "filters"].iter().map(|v|*v));
+                                                                           v.extend(["sort", "max-results", "sampling-level", "filters", "dimensions", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -182,7 +178,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -197,7 +193,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _data_realtime_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _data_realtime_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.data().realtime_get(opt.value_of("ids").unwrap_or(""), opt.value_of("metrics").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -247,7 +243,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -262,7 +258,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_account_summaries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_account_summaries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().account_summaries_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -306,7 +302,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -321,7 +317,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_account_user_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_account_user_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().account_user_links_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -354,7 +350,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -365,7 +361,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_account_user_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_account_user_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -388,31 +384,31 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -459,7 +455,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -474,7 +470,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_account_user_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_account_user_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().account_user_links_list(opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -518,7 +514,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -533,7 +529,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_account_user_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_account_user_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -556,31 +552,31 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -627,7 +623,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -642,7 +638,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_accounts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_accounts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().accounts_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -686,7 +682,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -701,7 +697,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_client_id_hash_client_id(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_client_id_hash_client_id(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -724,8 +720,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client-id", "kind", "web-property-id"]);
@@ -773,7 +769,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -788,7 +784,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().custom_data_sources_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -832,7 +828,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -847,7 +843,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_dimensions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_dimensions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().custom_dimensions_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-dimension-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -884,7 +880,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -899,7 +895,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_dimensions_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_dimensions_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -922,19 +918,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -981,7 +977,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -996,7 +992,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_dimensions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_dimensions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().custom_dimensions_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1040,7 +1036,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1055,7 +1051,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_dimensions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_dimensions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1078,19 +1074,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1141,7 +1137,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1156,7 +1152,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_dimensions_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_dimensions_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1179,19 +1175,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1242,7 +1238,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1257,7 +1253,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_metrics_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_metrics_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().custom_metrics_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-metric-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1294,7 +1290,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1309,7 +1305,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_metrics_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_metrics_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1332,22 +1328,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-value" => Some(("max_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "min-value" => Some(("min_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1394,7 +1390,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1409,7 +1405,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_metrics_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_metrics_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().custom_metrics_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1453,7 +1449,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1468,7 +1464,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_metrics_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_metrics_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1491,22 +1487,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-value" => Some(("max_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "min-value" => Some(("min_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1557,7 +1553,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1572,7 +1568,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_custom_metrics_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_custom_metrics_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1595,22 +1591,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-value" => Some(("max_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "min-value" => Some(("min_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1661,7 +1657,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1676,7 +1672,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_experiments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_experiments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().experiments_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("experiment-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1709,7 +1705,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1720,7 +1716,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_experiments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_experiments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().experiments_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("experiment-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1757,7 +1753,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1772,7 +1768,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_experiments_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_experiments_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1795,34 +1791,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "minimum-experiment-length-in-days" => Some(("minimumExperimentLengthInDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1869,7 +1865,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1884,7 +1880,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_experiments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_experiments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().experiments_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1928,7 +1924,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1943,7 +1939,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_experiments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_experiments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1966,34 +1962,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "minimum-experiment-length-in-days" => Some(("minimumExperimentLengthInDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2040,7 +2036,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2055,7 +2051,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_experiments_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_experiments_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2078,34 +2074,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "minimum-experiment-length-in-days" => Some(("minimumExperimentLengthInDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2152,7 +2148,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2167,7 +2163,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_filters_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_filters_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().filters_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("filter-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2204,7 +2200,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2219,7 +2215,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_filters_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_filters_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().filters_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("filter-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2256,7 +2252,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2271,7 +2267,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_filters_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_filters_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2294,50 +2290,50 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.output-to-field-index" => Some(("advancedDetails.outputToFieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.field-index" => Some(("excludeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-details.field-index" => Some(("includeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-index", "field-a-required", "field-b", "field-b-index", "field-b-required", "field-index", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "output-to-field-index", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2384,7 +2380,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2399,7 +2395,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_filters_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_filters_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().filters_list(opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2443,7 +2439,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2458,7 +2454,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_filters_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_filters_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2481,50 +2477,50 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.output-to-field-index" => Some(("advancedDetails.outputToFieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.field-index" => Some(("excludeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-details.field-index" => Some(("includeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-index", "field-a-required", "field-b", "field-b-index", "field-b-required", "field-index", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "output-to-field-index", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2571,7 +2567,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2586,7 +2582,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_filters_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_filters_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2609,50 +2605,50 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.output-to-field-index" => Some(("advancedDetails.outputToFieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.field-index" => Some(("excludeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-details.field-index" => Some(("includeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-index", "field-a-required", "field-b", "field-b-index", "field-b-required", "field-index", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "output-to-field-index", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2699,7 +2695,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2714,7 +2710,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_goals_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_goals_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().goals_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("goal-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2751,7 +2747,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2766,7 +2762,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_goals_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_goals_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2789,30 +2785,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "visit-num-pages-details.comparison-type" => Some(("visitNumPagesDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visit-num-pages-details.comparison-value" => Some(("visitNumPagesDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2859,7 +2855,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2874,7 +2870,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_goals_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_goals_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().goals_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2918,7 +2914,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2933,7 +2929,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_goals_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_goals_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2956,30 +2952,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "visit-num-pages-details.comparison-type" => Some(("visitNumPagesDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visit-num-pages-details.comparison-value" => Some(("visitNumPagesDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3026,7 +3022,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3041,7 +3037,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_goals_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_goals_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3064,30 +3060,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "visit-num-pages-details.comparison-type" => Some(("visitNumPagesDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visit-num-pages-details.comparison-value" => Some(("visitNumPagesDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3134,7 +3130,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3149,7 +3145,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_filter_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_filter_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profile_filter_links_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3182,7 +3178,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3193,7 +3189,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_filter_links_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_filter_links_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profile_filter_links_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3230,7 +3226,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3245,7 +3241,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_filter_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_filter_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3268,21 +3264,21 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.href" => Some(("filterRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.id" => Some(("filterRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.name" => Some(("filterRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.kind" => Some(("profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.name" => Some(("profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.web-property-id" => Some(("profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
@@ -3330,7 +3326,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3345,7 +3341,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_filter_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_filter_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profile_filter_links_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3389,7 +3385,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3404,7 +3400,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_filter_links_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_filter_links_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3427,21 +3423,21 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.href" => Some(("filterRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.id" => Some(("filterRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.name" => Some(("filterRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.kind" => Some(("profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.name" => Some(("profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.web-property-id" => Some(("profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
@@ -3489,7 +3485,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3504,7 +3500,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_filter_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_filter_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3527,21 +3523,21 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.href" => Some(("filterRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.id" => Some(("filterRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ref.name" => Some(("filterRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.kind" => Some(("profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.name" => Some(("profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ref.web-property-id" => Some(("profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
@@ -3589,7 +3585,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3604,7 +3600,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_user_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_user_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profile_user_links_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3637,7 +3633,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3648,7 +3644,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_user_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_user_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3671,31 +3667,31 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3742,7 +3738,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3757,7 +3753,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_user_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_user_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profile_user_links_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3801,7 +3797,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3816,7 +3812,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profile_user_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profile_user_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3839,31 +3835,31 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3910,7 +3906,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3925,7 +3921,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profiles_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profiles_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profiles_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3958,7 +3954,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3969,7 +3965,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profiles_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4006,7 +4002,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4021,7 +4017,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profiles_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profiles_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4044,34 +4040,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bot-filtering-enabled" => Some(("botFilteringEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4118,7 +4114,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4133,7 +4129,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().profiles_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4177,7 +4173,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4192,7 +4188,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profiles_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profiles_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4215,34 +4211,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bot-filtering-enabled" => Some(("botFilteringEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4289,7 +4285,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4304,7 +4300,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_profiles_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_profiles_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4327,34 +4323,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bot-filtering-enabled" => Some(("botFilteringEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4401,7 +4397,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4416,7 +4412,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_remarketing_audience_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_remarketing_audience_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().remarketing_audience_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4449,7 +4445,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4460,7 +4456,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_remarketing_audience_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_remarketing_audience_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().remarketing_audience_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("remarketing-audience-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4497,7 +4493,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4512,7 +4508,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_remarketing_audience_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_remarketing_audience_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4535,29 +4531,29 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.days-to-look-back" => Some(("audienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.is-smart-list" => Some(("audienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.membership-duration-days" => Some(("audienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "audience-definition", "audience-type", "created", "days-to-look-back", "description", "exclude-conditions", "exclusion-duration", "id", "include-conditions", "internal-web-property-id", "is-smart-list", "kind", "linked-views", "membership-duration-days", "name", "segment", "state-based-audience-definition", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4604,7 +4600,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4619,7 +4615,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_remarketing_audience_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_remarketing_audience_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().remarketing_audience_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4666,7 +4662,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4681,7 +4677,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_remarketing_audience_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_remarketing_audience_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4704,29 +4700,29 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.days-to-look-back" => Some(("audienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.is-smart-list" => Some(("audienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.membership-duration-days" => Some(("audienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "audience-definition", "audience-type", "created", "days-to-look-back", "description", "exclude-conditions", "exclusion-duration", "id", "include-conditions", "internal-web-property-id", "is-smart-list", "kind", "linked-views", "membership-duration-days", "name", "segment", "state-based-audience-definition", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4773,7 +4769,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4788,7 +4784,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_remarketing_audience_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_remarketing_audience_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4811,29 +4807,29 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.days-to-look-back" => Some(("audienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.is-smart-list" => Some(("audienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.kind" => Some(("audienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience-definition.include-conditions.membership-duration-days" => Some(("audienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "audience-definition.include-conditions.segment" => Some(("audienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audience-type" => Some(("audienceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "linked-views" => Some(("linkedViews", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.exclusion-duration" => Some(("stateBasedAudienceDefinition.excludeConditions.exclusionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.exclude-conditions.segment" => Some(("stateBasedAudienceDefinition.excludeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.days-to-look-back" => Some(("stateBasedAudienceDefinition.includeConditions.daysToLookBack", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.is-smart-list" => Some(("stateBasedAudienceDefinition.includeConditions.isSmartList", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.kind" => Some(("stateBasedAudienceDefinition.includeConditions.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.membership-duration-days" => Some(("stateBasedAudienceDefinition.includeConditions.membershipDurationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "state-based-audience-definition.include-conditions.segment" => Some(("stateBasedAudienceDefinition.includeConditions.segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "audience-definition", "audience-type", "created", "days-to-look-back", "description", "exclude-conditions", "exclusion-duration", "id", "include-conditions", "internal-web-property-id", "is-smart-list", "kind", "linked-views", "membership-duration-days", "name", "segment", "state-based-audience-definition", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4880,7 +4876,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4895,7 +4891,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_segments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_segments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().segments_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4939,7 +4935,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4954,7 +4950,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_unsampled_reports_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_unsampled_reports_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().unsampled_reports_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("unsampled-report-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4987,7 +4983,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4998,7 +4994,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_unsampled_reports_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_unsampled_reports_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().unsampled_reports_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("unsampled-report-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5035,7 +5031,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5050,7 +5046,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_unsampled_reports_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_unsampled_reports_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5073,26 +5069,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-storage-download-details.bucket-id" => Some(("cloudStorageDownloadDetails.bucketId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cloud-storage-download-details.object-id" => Some(("cloudStorageDownloadDetails.objectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "download-type" => Some(("downloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dimensions" => Some(("dimensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "start-date" => Some(("start-date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "end-date" => Some(("end-date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions" => Some(("dimensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "download-type" => Some(("downloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "drive-download-details.document-id" => Some(("driveDownloadDetails.documentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metrics" => Some(("metrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-date" => Some(("end-date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filters" => Some(("filters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "segment" => Some(("segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metrics" => Some(("metrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "segment" => Some(("segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-date" => Some(("start-date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bucket-id", "cloud-storage-download-details", "created", "dimensions", "document-id", "download-type", "drive-download-details", "end-date", "filters", "id", "kind", "metrics", "object-id", "profile-id", "segment", "self-link", "start-date", "status", "title", "updated", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -5139,7 +5135,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5154,7 +5150,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_unsampled_reports_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_unsampled_reports_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().unsampled_reports_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5198,7 +5194,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5213,7 +5209,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_uploads_delete_upload_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_uploads_delete_upload_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5279,7 +5275,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5290,7 +5286,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_uploads_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_uploads_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().uploads_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-data-source-id").unwrap_or(""), opt.value_of("upload-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5327,7 +5323,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5342,7 +5338,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_uploads_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_uploads_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().uploads_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-data-source-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5386,7 +5382,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5401,7 +5397,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_uploads_upload_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_uploads_upload_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().uploads_upload_data(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-data-source-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5426,7 +5422,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -5441,8 +5437,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5457,7 +5452,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_web_property_ad_words_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_web_property_ad_words_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().web_property_ad_words_links_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("web-property-ad-words-link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5490,7 +5485,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5501,7 +5496,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_web_property_ad_words_links_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_web_property_ad_words_links_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().web_property_ad_words_links_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("web-property-ad-words-link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5538,7 +5533,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5553,7 +5548,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_web_property_ad_words_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_web_property_ad_words_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5576,16 +5571,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ids" => Some(("profileIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
@@ -5633,7 +5628,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5648,7 +5643,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_web_property_ad_words_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_web_property_ad_words_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().web_property_ad_words_links_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5692,7 +5687,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5707,7 +5702,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_web_property_ad_words_links_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_web_property_ad_words_links_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5730,16 +5725,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ids" => Some(("profileIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
@@ -5787,7 +5782,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5802,7 +5797,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_web_property_ad_words_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_web_property_ad_words_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5825,16 +5820,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-ids" => Some(("profileIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
@@ -5882,7 +5877,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5897,7 +5892,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperties_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperties_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().webproperties_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -5934,7 +5929,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -5949,7 +5944,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperties_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperties_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -5972,27 +5967,27 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-retention-reset-on-new-activity" => Some(("dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6039,7 +6034,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6054,7 +6049,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperties_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperties_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().webproperties_list(opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -6098,7 +6093,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6113,7 +6108,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperties_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperties_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6136,27 +6131,27 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-retention-reset-on-new-activity" => Some(("dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6203,7 +6198,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6218,7 +6213,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperties_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperties_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6241,27 +6236,27 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-retention-reset-on-new-activity" => Some(("dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6308,7 +6303,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6323,7 +6318,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperty_user_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperty_user_links_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().webproperty_user_links_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -6356,7 +6351,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6367,7 +6362,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperty_user_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperty_user_links_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6390,31 +6385,31 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6461,7 +6456,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6476,7 +6471,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperty_user_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperty_user_links_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().webproperty_user_links_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -6520,7 +6515,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6535,7 +6530,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _management_webproperty_user_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _management_webproperty_user_links_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6558,31 +6553,31 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6629,7 +6624,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6644,7 +6639,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _metadata_columns_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _metadata_columns_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.metadata().columns_list(opt.value_of("report-type").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -6681,7 +6676,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6696,7 +6691,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _provisioning_create_account_ticket(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _provisioning_create_account_ticket(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6719,68 +6714,68 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "profile.currency" => Some(("profile.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.e-commerce-tracking" => Some(("profile.eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile.web-property-id" => Some(("profile.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.timezone" => Some(("profile.timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.id" => Some(("profile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.child-link.href" => Some(("account.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.child-link.type" => Some(("account.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.created" => Some(("account.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.id" => Some(("account.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.kind" => Some(("account.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.name" => Some(("account.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.permissions.effective" => Some(("account.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "account.self-link" => Some(("account.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.starred" => Some(("account.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account.updated" => Some(("account.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.account-id" => Some(("profile.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.bot-filtering-enabled" => Some(("profile.botFilteringEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile.strip-site-search-category-parameters" => Some(("profile.stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile.site-search-category-parameters" => Some(("profile.siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.type" => Some(("profile.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.updated" => Some(("profile.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.exclude-query-parameters" => Some(("profile.excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.internal-web-property-id" => Some(("profile.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.child-link.href" => Some(("profile.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.child-link.type" => Some(("profile.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.created" => Some(("profile.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.currency" => Some(("profile.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.default-page" => Some(("profile.defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.e-commerce-tracking" => Some(("profile.eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "profile.enhanced-e-commerce-tracking" => Some(("profile.enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.exclude-query-parameters" => Some(("profile.excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.id" => Some(("profile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.internal-web-property-id" => Some(("profile.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.kind" => Some(("profile.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.name" => Some(("profile.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.parent-link.href" => Some(("profile.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.parent-link.type" => Some(("profile.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.permissions.effective" => Some(("profile.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "profile.default-page" => Some(("profile.defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.kind" => Some(("profile.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.strip-site-search-query-parameters" => Some(("profile.stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "profile.name" => Some(("profile.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.created" => Some(("profile.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.site-search-query-parameters" => Some(("profile.siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.website-url" => Some(("profile.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "profile.starred" => Some(("profile.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "profile.self-link" => Some(("profile.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.kind" => Some(("account.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.name" => Some(("account.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.created" => Some(("account.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.updated" => Some(("account.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.child-link.href" => Some(("account.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.child-link.type" => Some(("account.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.starred" => Some(("account.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "account.id" => Some(("account.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.self-link" => Some(("account.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account.permissions.effective" => Some(("account.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "webproperty.website-url" => Some(("webproperty.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.updated" => Some(("webproperty.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.name" => Some(("webproperty.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.data-retention-ttl" => Some(("webproperty.dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.created" => Some(("webproperty.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.default-profile-id" => Some(("webproperty.defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.level" => Some(("webproperty.level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.kind" => Some(("webproperty.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.profile-count" => Some(("webproperty.profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "webproperty.internal-web-property-id" => Some(("webproperty.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.site-search-category-parameters" => Some(("profile.siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.site-search-query-parameters" => Some(("profile.siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.starred" => Some(("profile.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.strip-site-search-category-parameters" => Some(("profile.stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.strip-site-search-query-parameters" => Some(("profile.stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.timezone" => Some(("profile.timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.type" => Some(("profile.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.updated" => Some(("profile.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.web-property-id" => Some(("profile.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.website-url" => Some(("profile.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.account-id" => Some(("webproperty.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.child-link.href" => Some(("webproperty.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.child-link.type" => Some(("webproperty.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.industry-vertical" => Some(("webproperty.industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.created" => Some(("webproperty.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.data-retention-reset-on-new-activity" => Some(("webproperty.dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "webproperty.starred" => Some(("webproperty.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "webproperty.data-retention-ttl" => Some(("webproperty.dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.default-profile-id" => Some(("webproperty.defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.id" => Some(("webproperty.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.industry-vertical" => Some(("webproperty.industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.internal-web-property-id" => Some(("webproperty.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.kind" => Some(("webproperty.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.level" => Some(("webproperty.level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.name" => Some(("webproperty.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.parent-link.href" => Some(("webproperty.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.parent-link.type" => Some(("webproperty.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.permissions.effective" => Some(("webproperty.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "webproperty.id" => Some(("webproperty.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.profile-count" => Some(("webproperty.profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "webproperty.self-link" => Some(("webproperty.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty.account-id" => Some(("webproperty.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.starred" => Some(("webproperty.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "webproperty.updated" => Some(("webproperty.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.website-url" => Some(("webproperty.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "bot-filtering-enabled", "child-link", "created", "currency", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6827,7 +6822,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6842,7 +6837,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _provisioning_create_account_tree(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _provisioning_create_account_tree(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6865,12 +6860,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "webproperty-name" => Some(("webpropertyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-name" => Some(("profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty-name" => Some(("webpropertyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "kind", "profile-name", "timezone", "webproperty-name", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -6917,7 +6912,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -6932,7 +6927,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _user_deletion_user_deletion_request_upsert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _user_deletion_user_deletion_request_upsert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -6955,13 +6950,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deletion-request-time" => Some(("deletionRequestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "firebase-project-id" => Some(("firebaseProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id.user-id" => Some(("id.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id.type" => Some(("id.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id.user-id" => Some(("id.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "property-id" => Some(("propertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deletion-request-time", "firebase-project-id", "id", "kind", "property-id", "type", "user-id", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -7008,7 +7003,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -7023,7 +7018,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -7031,13 +7026,13 @@ impl<'n> Engine<'n> {
             ("data", Some(opt)) => {
                 match opt.subcommand() {
                     ("ga-get", Some(opt)) => {
-                        call_result = self._data_ga_get(opt, dry_run, &mut err);
+                        call_result = self._data_ga_get(opt, dry_run, &mut err).await;
                     },
                     ("mcf-get", Some(opt)) => {
-                        call_result = self._data_mcf_get(opt, dry_run, &mut err);
+                        call_result = self._data_mcf_get(opt, dry_run, &mut err).await;
                     },
                     ("realtime-get", Some(opt)) => {
-                        call_result = self._data_realtime_get(opt, dry_run, &mut err);
+                        call_result = self._data_realtime_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("data".to_string()));
@@ -7048,247 +7043,247 @@ impl<'n> Engine<'n> {
             ("management", Some(opt)) => {
                 match opt.subcommand() {
                     ("account-summaries-list", Some(opt)) => {
-                        call_result = self._management_account_summaries_list(opt, dry_run, &mut err);
+                        call_result = self._management_account_summaries_list(opt, dry_run, &mut err).await;
                     },
                     ("account-user-links-delete", Some(opt)) => {
-                        call_result = self._management_account_user_links_delete(opt, dry_run, &mut err);
+                        call_result = self._management_account_user_links_delete(opt, dry_run, &mut err).await;
                     },
                     ("account-user-links-insert", Some(opt)) => {
-                        call_result = self._management_account_user_links_insert(opt, dry_run, &mut err);
+                        call_result = self._management_account_user_links_insert(opt, dry_run, &mut err).await;
                     },
                     ("account-user-links-list", Some(opt)) => {
-                        call_result = self._management_account_user_links_list(opt, dry_run, &mut err);
+                        call_result = self._management_account_user_links_list(opt, dry_run, &mut err).await;
                     },
                     ("account-user-links-update", Some(opt)) => {
-                        call_result = self._management_account_user_links_update(opt, dry_run, &mut err);
+                        call_result = self._management_account_user_links_update(opt, dry_run, &mut err).await;
                     },
                     ("accounts-list", Some(opt)) => {
-                        call_result = self._management_accounts_list(opt, dry_run, &mut err);
+                        call_result = self._management_accounts_list(opt, dry_run, &mut err).await;
                     },
                     ("client-id-hash-client-id", Some(opt)) => {
-                        call_result = self._management_client_id_hash_client_id(opt, dry_run, &mut err);
+                        call_result = self._management_client_id_hash_client_id(opt, dry_run, &mut err).await;
                     },
                     ("custom-data-sources-list", Some(opt)) => {
-                        call_result = self._management_custom_data_sources_list(opt, dry_run, &mut err);
+                        call_result = self._management_custom_data_sources_list(opt, dry_run, &mut err).await;
                     },
                     ("custom-dimensions-get", Some(opt)) => {
-                        call_result = self._management_custom_dimensions_get(opt, dry_run, &mut err);
+                        call_result = self._management_custom_dimensions_get(opt, dry_run, &mut err).await;
                     },
                     ("custom-dimensions-insert", Some(opt)) => {
-                        call_result = self._management_custom_dimensions_insert(opt, dry_run, &mut err);
+                        call_result = self._management_custom_dimensions_insert(opt, dry_run, &mut err).await;
                     },
                     ("custom-dimensions-list", Some(opt)) => {
-                        call_result = self._management_custom_dimensions_list(opt, dry_run, &mut err);
+                        call_result = self._management_custom_dimensions_list(opt, dry_run, &mut err).await;
                     },
                     ("custom-dimensions-patch", Some(opt)) => {
-                        call_result = self._management_custom_dimensions_patch(opt, dry_run, &mut err);
+                        call_result = self._management_custom_dimensions_patch(opt, dry_run, &mut err).await;
                     },
                     ("custom-dimensions-update", Some(opt)) => {
-                        call_result = self._management_custom_dimensions_update(opt, dry_run, &mut err);
+                        call_result = self._management_custom_dimensions_update(opt, dry_run, &mut err).await;
                     },
                     ("custom-metrics-get", Some(opt)) => {
-                        call_result = self._management_custom_metrics_get(opt, dry_run, &mut err);
+                        call_result = self._management_custom_metrics_get(opt, dry_run, &mut err).await;
                     },
                     ("custom-metrics-insert", Some(opt)) => {
-                        call_result = self._management_custom_metrics_insert(opt, dry_run, &mut err);
+                        call_result = self._management_custom_metrics_insert(opt, dry_run, &mut err).await;
                     },
                     ("custom-metrics-list", Some(opt)) => {
-                        call_result = self._management_custom_metrics_list(opt, dry_run, &mut err);
+                        call_result = self._management_custom_metrics_list(opt, dry_run, &mut err).await;
                     },
                     ("custom-metrics-patch", Some(opt)) => {
-                        call_result = self._management_custom_metrics_patch(opt, dry_run, &mut err);
+                        call_result = self._management_custom_metrics_patch(opt, dry_run, &mut err).await;
                     },
                     ("custom-metrics-update", Some(opt)) => {
-                        call_result = self._management_custom_metrics_update(opt, dry_run, &mut err);
+                        call_result = self._management_custom_metrics_update(opt, dry_run, &mut err).await;
                     },
                     ("experiments-delete", Some(opt)) => {
-                        call_result = self._management_experiments_delete(opt, dry_run, &mut err);
+                        call_result = self._management_experiments_delete(opt, dry_run, &mut err).await;
                     },
                     ("experiments-get", Some(opt)) => {
-                        call_result = self._management_experiments_get(opt, dry_run, &mut err);
+                        call_result = self._management_experiments_get(opt, dry_run, &mut err).await;
                     },
                     ("experiments-insert", Some(opt)) => {
-                        call_result = self._management_experiments_insert(opt, dry_run, &mut err);
+                        call_result = self._management_experiments_insert(opt, dry_run, &mut err).await;
                     },
                     ("experiments-list", Some(opt)) => {
-                        call_result = self._management_experiments_list(opt, dry_run, &mut err);
+                        call_result = self._management_experiments_list(opt, dry_run, &mut err).await;
                     },
                     ("experiments-patch", Some(opt)) => {
-                        call_result = self._management_experiments_patch(opt, dry_run, &mut err);
+                        call_result = self._management_experiments_patch(opt, dry_run, &mut err).await;
                     },
                     ("experiments-update", Some(opt)) => {
-                        call_result = self._management_experiments_update(opt, dry_run, &mut err);
+                        call_result = self._management_experiments_update(opt, dry_run, &mut err).await;
                     },
                     ("filters-delete", Some(opt)) => {
-                        call_result = self._management_filters_delete(opt, dry_run, &mut err);
+                        call_result = self._management_filters_delete(opt, dry_run, &mut err).await;
                     },
                     ("filters-get", Some(opt)) => {
-                        call_result = self._management_filters_get(opt, dry_run, &mut err);
+                        call_result = self._management_filters_get(opt, dry_run, &mut err).await;
                     },
                     ("filters-insert", Some(opt)) => {
-                        call_result = self._management_filters_insert(opt, dry_run, &mut err);
+                        call_result = self._management_filters_insert(opt, dry_run, &mut err).await;
                     },
                     ("filters-list", Some(opt)) => {
-                        call_result = self._management_filters_list(opt, dry_run, &mut err);
+                        call_result = self._management_filters_list(opt, dry_run, &mut err).await;
                     },
                     ("filters-patch", Some(opt)) => {
-                        call_result = self._management_filters_patch(opt, dry_run, &mut err);
+                        call_result = self._management_filters_patch(opt, dry_run, &mut err).await;
                     },
                     ("filters-update", Some(opt)) => {
-                        call_result = self._management_filters_update(opt, dry_run, &mut err);
+                        call_result = self._management_filters_update(opt, dry_run, &mut err).await;
                     },
                     ("goals-get", Some(opt)) => {
-                        call_result = self._management_goals_get(opt, dry_run, &mut err);
+                        call_result = self._management_goals_get(opt, dry_run, &mut err).await;
                     },
                     ("goals-insert", Some(opt)) => {
-                        call_result = self._management_goals_insert(opt, dry_run, &mut err);
+                        call_result = self._management_goals_insert(opt, dry_run, &mut err).await;
                     },
                     ("goals-list", Some(opt)) => {
-                        call_result = self._management_goals_list(opt, dry_run, &mut err);
+                        call_result = self._management_goals_list(opt, dry_run, &mut err).await;
                     },
                     ("goals-patch", Some(opt)) => {
-                        call_result = self._management_goals_patch(opt, dry_run, &mut err);
+                        call_result = self._management_goals_patch(opt, dry_run, &mut err).await;
                     },
                     ("goals-update", Some(opt)) => {
-                        call_result = self._management_goals_update(opt, dry_run, &mut err);
+                        call_result = self._management_goals_update(opt, dry_run, &mut err).await;
                     },
                     ("profile-filter-links-delete", Some(opt)) => {
-                        call_result = self._management_profile_filter_links_delete(opt, dry_run, &mut err);
+                        call_result = self._management_profile_filter_links_delete(opt, dry_run, &mut err).await;
                     },
                     ("profile-filter-links-get", Some(opt)) => {
-                        call_result = self._management_profile_filter_links_get(opt, dry_run, &mut err);
+                        call_result = self._management_profile_filter_links_get(opt, dry_run, &mut err).await;
                     },
                     ("profile-filter-links-insert", Some(opt)) => {
-                        call_result = self._management_profile_filter_links_insert(opt, dry_run, &mut err);
+                        call_result = self._management_profile_filter_links_insert(opt, dry_run, &mut err).await;
                     },
                     ("profile-filter-links-list", Some(opt)) => {
-                        call_result = self._management_profile_filter_links_list(opt, dry_run, &mut err);
+                        call_result = self._management_profile_filter_links_list(opt, dry_run, &mut err).await;
                     },
                     ("profile-filter-links-patch", Some(opt)) => {
-                        call_result = self._management_profile_filter_links_patch(opt, dry_run, &mut err);
+                        call_result = self._management_profile_filter_links_patch(opt, dry_run, &mut err).await;
                     },
                     ("profile-filter-links-update", Some(opt)) => {
-                        call_result = self._management_profile_filter_links_update(opt, dry_run, &mut err);
+                        call_result = self._management_profile_filter_links_update(opt, dry_run, &mut err).await;
                     },
                     ("profile-user-links-delete", Some(opt)) => {
-                        call_result = self._management_profile_user_links_delete(opt, dry_run, &mut err);
+                        call_result = self._management_profile_user_links_delete(opt, dry_run, &mut err).await;
                     },
                     ("profile-user-links-insert", Some(opt)) => {
-                        call_result = self._management_profile_user_links_insert(opt, dry_run, &mut err);
+                        call_result = self._management_profile_user_links_insert(opt, dry_run, &mut err).await;
                     },
                     ("profile-user-links-list", Some(opt)) => {
-                        call_result = self._management_profile_user_links_list(opt, dry_run, &mut err);
+                        call_result = self._management_profile_user_links_list(opt, dry_run, &mut err).await;
                     },
                     ("profile-user-links-update", Some(opt)) => {
-                        call_result = self._management_profile_user_links_update(opt, dry_run, &mut err);
+                        call_result = self._management_profile_user_links_update(opt, dry_run, &mut err).await;
                     },
                     ("profiles-delete", Some(opt)) => {
-                        call_result = self._management_profiles_delete(opt, dry_run, &mut err);
+                        call_result = self._management_profiles_delete(opt, dry_run, &mut err).await;
                     },
                     ("profiles-get", Some(opt)) => {
-                        call_result = self._management_profiles_get(opt, dry_run, &mut err);
+                        call_result = self._management_profiles_get(opt, dry_run, &mut err).await;
                     },
                     ("profiles-insert", Some(opt)) => {
-                        call_result = self._management_profiles_insert(opt, dry_run, &mut err);
+                        call_result = self._management_profiles_insert(opt, dry_run, &mut err).await;
                     },
                     ("profiles-list", Some(opt)) => {
-                        call_result = self._management_profiles_list(opt, dry_run, &mut err);
+                        call_result = self._management_profiles_list(opt, dry_run, &mut err).await;
                     },
                     ("profiles-patch", Some(opt)) => {
-                        call_result = self._management_profiles_patch(opt, dry_run, &mut err);
+                        call_result = self._management_profiles_patch(opt, dry_run, &mut err).await;
                     },
                     ("profiles-update", Some(opt)) => {
-                        call_result = self._management_profiles_update(opt, dry_run, &mut err);
+                        call_result = self._management_profiles_update(opt, dry_run, &mut err).await;
                     },
                     ("remarketing-audience-delete", Some(opt)) => {
-                        call_result = self._management_remarketing_audience_delete(opt, dry_run, &mut err);
+                        call_result = self._management_remarketing_audience_delete(opt, dry_run, &mut err).await;
                     },
                     ("remarketing-audience-get", Some(opt)) => {
-                        call_result = self._management_remarketing_audience_get(opt, dry_run, &mut err);
+                        call_result = self._management_remarketing_audience_get(opt, dry_run, &mut err).await;
                     },
                     ("remarketing-audience-insert", Some(opt)) => {
-                        call_result = self._management_remarketing_audience_insert(opt, dry_run, &mut err);
+                        call_result = self._management_remarketing_audience_insert(opt, dry_run, &mut err).await;
                     },
                     ("remarketing-audience-list", Some(opt)) => {
-                        call_result = self._management_remarketing_audience_list(opt, dry_run, &mut err);
+                        call_result = self._management_remarketing_audience_list(opt, dry_run, &mut err).await;
                     },
                     ("remarketing-audience-patch", Some(opt)) => {
-                        call_result = self._management_remarketing_audience_patch(opt, dry_run, &mut err);
+                        call_result = self._management_remarketing_audience_patch(opt, dry_run, &mut err).await;
                     },
                     ("remarketing-audience-update", Some(opt)) => {
-                        call_result = self._management_remarketing_audience_update(opt, dry_run, &mut err);
+                        call_result = self._management_remarketing_audience_update(opt, dry_run, &mut err).await;
                     },
                     ("segments-list", Some(opt)) => {
-                        call_result = self._management_segments_list(opt, dry_run, &mut err);
+                        call_result = self._management_segments_list(opt, dry_run, &mut err).await;
                     },
                     ("unsampled-reports-delete", Some(opt)) => {
-                        call_result = self._management_unsampled_reports_delete(opt, dry_run, &mut err);
+                        call_result = self._management_unsampled_reports_delete(opt, dry_run, &mut err).await;
                     },
                     ("unsampled-reports-get", Some(opt)) => {
-                        call_result = self._management_unsampled_reports_get(opt, dry_run, &mut err);
+                        call_result = self._management_unsampled_reports_get(opt, dry_run, &mut err).await;
                     },
                     ("unsampled-reports-insert", Some(opt)) => {
-                        call_result = self._management_unsampled_reports_insert(opt, dry_run, &mut err);
+                        call_result = self._management_unsampled_reports_insert(opt, dry_run, &mut err).await;
                     },
                     ("unsampled-reports-list", Some(opt)) => {
-                        call_result = self._management_unsampled_reports_list(opt, dry_run, &mut err);
+                        call_result = self._management_unsampled_reports_list(opt, dry_run, &mut err).await;
                     },
                     ("uploads-delete-upload-data", Some(opt)) => {
-                        call_result = self._management_uploads_delete_upload_data(opt, dry_run, &mut err);
+                        call_result = self._management_uploads_delete_upload_data(opt, dry_run, &mut err).await;
                     },
                     ("uploads-get", Some(opt)) => {
-                        call_result = self._management_uploads_get(opt, dry_run, &mut err);
+                        call_result = self._management_uploads_get(opt, dry_run, &mut err).await;
                     },
                     ("uploads-list", Some(opt)) => {
-                        call_result = self._management_uploads_list(opt, dry_run, &mut err);
+                        call_result = self._management_uploads_list(opt, dry_run, &mut err).await;
                     },
                     ("uploads-upload-data", Some(opt)) => {
-                        call_result = self._management_uploads_upload_data(opt, dry_run, &mut err);
+                        call_result = self._management_uploads_upload_data(opt, dry_run, &mut err).await;
                     },
                     ("web-property-ad-words-links-delete", Some(opt)) => {
-                        call_result = self._management_web_property_ad_words_links_delete(opt, dry_run, &mut err);
+                        call_result = self._management_web_property_ad_words_links_delete(opt, dry_run, &mut err).await;
                     },
                     ("web-property-ad-words-links-get", Some(opt)) => {
-                        call_result = self._management_web_property_ad_words_links_get(opt, dry_run, &mut err);
+                        call_result = self._management_web_property_ad_words_links_get(opt, dry_run, &mut err).await;
                     },
                     ("web-property-ad-words-links-insert", Some(opt)) => {
-                        call_result = self._management_web_property_ad_words_links_insert(opt, dry_run, &mut err);
+                        call_result = self._management_web_property_ad_words_links_insert(opt, dry_run, &mut err).await;
                     },
                     ("web-property-ad-words-links-list", Some(opt)) => {
-                        call_result = self._management_web_property_ad_words_links_list(opt, dry_run, &mut err);
+                        call_result = self._management_web_property_ad_words_links_list(opt, dry_run, &mut err).await;
                     },
                     ("web-property-ad-words-links-patch", Some(opt)) => {
-                        call_result = self._management_web_property_ad_words_links_patch(opt, dry_run, &mut err);
+                        call_result = self._management_web_property_ad_words_links_patch(opt, dry_run, &mut err).await;
                     },
                     ("web-property-ad-words-links-update", Some(opt)) => {
-                        call_result = self._management_web_property_ad_words_links_update(opt, dry_run, &mut err);
+                        call_result = self._management_web_property_ad_words_links_update(opt, dry_run, &mut err).await;
                     },
                     ("webproperties-get", Some(opt)) => {
-                        call_result = self._management_webproperties_get(opt, dry_run, &mut err);
+                        call_result = self._management_webproperties_get(opt, dry_run, &mut err).await;
                     },
                     ("webproperties-insert", Some(opt)) => {
-                        call_result = self._management_webproperties_insert(opt, dry_run, &mut err);
+                        call_result = self._management_webproperties_insert(opt, dry_run, &mut err).await;
                     },
                     ("webproperties-list", Some(opt)) => {
-                        call_result = self._management_webproperties_list(opt, dry_run, &mut err);
+                        call_result = self._management_webproperties_list(opt, dry_run, &mut err).await;
                     },
                     ("webproperties-patch", Some(opt)) => {
-                        call_result = self._management_webproperties_patch(opt, dry_run, &mut err);
+                        call_result = self._management_webproperties_patch(opt, dry_run, &mut err).await;
                     },
                     ("webproperties-update", Some(opt)) => {
-                        call_result = self._management_webproperties_update(opt, dry_run, &mut err);
+                        call_result = self._management_webproperties_update(opt, dry_run, &mut err).await;
                     },
                     ("webproperty-user-links-delete", Some(opt)) => {
-                        call_result = self._management_webproperty_user_links_delete(opt, dry_run, &mut err);
+                        call_result = self._management_webproperty_user_links_delete(opt, dry_run, &mut err).await;
                     },
                     ("webproperty-user-links-insert", Some(opt)) => {
-                        call_result = self._management_webproperty_user_links_insert(opt, dry_run, &mut err);
+                        call_result = self._management_webproperty_user_links_insert(opt, dry_run, &mut err).await;
                     },
                     ("webproperty-user-links-list", Some(opt)) => {
-                        call_result = self._management_webproperty_user_links_list(opt, dry_run, &mut err);
+                        call_result = self._management_webproperty_user_links_list(opt, dry_run, &mut err).await;
                     },
                     ("webproperty-user-links-update", Some(opt)) => {
-                        call_result = self._management_webproperty_user_links_update(opt, dry_run, &mut err);
+                        call_result = self._management_webproperty_user_links_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("management".to_string()));
@@ -7299,7 +7294,7 @@ impl<'n> Engine<'n> {
             ("metadata", Some(opt)) => {
                 match opt.subcommand() {
                     ("columns-list", Some(opt)) => {
-                        call_result = self._metadata_columns_list(opt, dry_run, &mut err);
+                        call_result = self._metadata_columns_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("metadata".to_string()));
@@ -7310,10 +7305,10 @@ impl<'n> Engine<'n> {
             ("provisioning", Some(opt)) => {
                 match opt.subcommand() {
                     ("create-account-ticket", Some(opt)) => {
-                        call_result = self._provisioning_create_account_ticket(opt, dry_run, &mut err);
+                        call_result = self._provisioning_create_account_ticket(opt, dry_run, &mut err).await;
                     },
                     ("create-account-tree", Some(opt)) => {
-                        call_result = self._provisioning_create_account_tree(opt, dry_run, &mut err);
+                        call_result = self._provisioning_create_account_tree(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("provisioning".to_string()));
@@ -7324,7 +7319,7 @@ impl<'n> Engine<'n> {
             ("user-deletion", Some(opt)) => {
                 match opt.subcommand() {
                     ("user-deletion-request-upsert", Some(opt)) => {
-                        call_result = self._user_deletion_user_deletion_request_upsert(opt, dry_run, &mut err);
+                        call_result = self._user_deletion_user_deletion_request_upsert(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("user-deletion".to_string()));
@@ -7349,41 +7344,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "analytics3-secret.json",
+            match client::application_secret_from_directory(&config_dir, "analytics3-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "analytics3",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/analytics3", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Analytics::new(client, auth),
@@ -7396,22 +7376,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
@@ -9785,7 +9766,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -10384,7 +10365,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20190807")
+           .version("2.0.0+20190807")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")
@@ -10399,12 +10380,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -10463,13 +10439,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

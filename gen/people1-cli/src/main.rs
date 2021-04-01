@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_people1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_people1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::PeopleService<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::PeopleService<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _contact_groups_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.contact_groups().batch_get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -57,6 +53,9 @@ impl<'n> Engine<'n> {
                 },
                 "max-members" => {
                     call = call.max_members(arg_from_str(value.unwrap_or("-0"), err, "max-members", "integer"));
+                },
+                "group-fields" => {
+                    call = call.group_fields(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -71,7 +70,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["resource-names", "max-members"].iter().map(|v|*v));
+                                                                           v.extend(["max-members", "group-fields", "resource-names"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -90,7 +89,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -105,7 +104,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _contact_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -128,17 +127,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "contact-group.etag" => Some(("contactGroup.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "contact-group.etag" => Some(("contactGroup.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.resource-name" => Some(("contactGroup.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.metadata.deleted" => Some(("contactGroup.metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "contact-group.metadata.update-time" => Some(("contactGroup.metadata.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.resource-name" => Some(("contactGroup.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-group-fields" => Some(("readGroupFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["contact-group", "deleted", "etag", "formatted-name", "group-type", "member-count", "member-resource-names", "metadata", "name", "resource-name", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["contact-group", "deleted", "etag", "formatted-name", "group-type", "member-count", "member-resource-names", "metadata", "name", "read-group-fields", "resource-name", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -183,7 +183,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -198,7 +198,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _contact_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.contact_groups().delete(opt.value_of("resource-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -239,7 +239,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -254,7 +254,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _contact_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.contact_groups().get(opt.value_of("resource-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -262,6 +262,9 @@ impl<'n> Engine<'n> {
             match key {
                 "max-members" => {
                     call = call.max_members(arg_from_str(value.unwrap_or("-0"), err, "max-members", "integer"));
+                },
+                "group-fields" => {
+                    call = call.group_fields(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -276,7 +279,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-members"].iter().map(|v|*v));
+                                                                           v.extend(["max-members", "group-fields"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -295,7 +298,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -310,7 +313,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _contact_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.contact_groups().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -325,6 +328,9 @@ impl<'n> Engine<'n> {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
+                "group-fields" => {
+                    call = call.group_fields(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -338,7 +344,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sync-token", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["sync-token", "group-fields", "page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -357,7 +363,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -372,7 +378,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _contact_groups_members_modify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_members_modify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -395,8 +401,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "resource-names-to-remove" => Some(("resourceNamesToRemove", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "resource-names-to-add" => Some(("resourceNamesToAdd", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "resource-names-to-remove" => Some(("resourceNamesToRemove", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["resource-names-to-add", "resource-names-to-remove"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -443,7 +449,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -458,7 +464,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _contact_groups_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _contact_groups_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -481,17 +487,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "contact-group.etag" => Some(("contactGroup.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "contact-group.etag" => Some(("contactGroup.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.resource-name" => Some(("contactGroup.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.metadata.deleted" => Some(("contactGroup.metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "contact-group.metadata.update-time" => Some(("contactGroup.metadata.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.resource-name" => Some(("contactGroup.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-group-fields" => Some(("readGroupFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-group-fields" => Some(("updateGroupFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["contact-group", "deleted", "etag", "formatted-name", "group-type", "member-count", "member-resource-names", "metadata", "name", "resource-name", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["contact-group", "deleted", "etag", "formatted-name", "group-type", "member-count", "member-resource-names", "metadata", "name", "read-group-fields", "resource-name", "update-group-fields", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -536,7 +544,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -551,7 +559,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _other_contacts_copy_other_contact_to_my_contacts_group(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _other_contacts_copy_other_contact_to_my_contacts_group(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -574,9 +582,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "copy-mask" => Some(("copyMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-mask" => Some(("readMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["copy-mask", "read-mask", "sources"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -623,7 +631,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -638,7 +646,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _other_contacts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _other_contacts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.other_contacts().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -672,7 +680,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sync-token", "read-mask", "page-size", "page-token", "request-sync-token"].iter().map(|v|*v));
+                                                                           v.extend(["request-sync-token", "read-mask", "page-size", "page-token", "sync-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -691,7 +699,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -706,7 +714,327 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_connections_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _other_contacts_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.other_contacts().search();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "read-mask" => {
+                    call = call.read_mask(value.unwrap_or(""));
+                },
+                "query" => {
+                    call = call.query(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["query", "read-mask", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _people_batch_create_contacts(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "read-mask" => Some(("readMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["read-mask", "sources"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchCreateContactsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.people().batch_create_contacts(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _people_batch_delete_contacts(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "resource-names" => Some(("resourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["resource-names"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchDeleteContactsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.people().batch_delete_contacts(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _people_batch_update_contacts(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "read-mask" => Some(("readMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["read-mask", "sources", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchUpdateContactsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.people().batch_update_contacts(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _people_connections_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().connections_list(opt.value_of("resource-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -749,7 +1077,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sync-token", "page-size", "page-token", "request-mask-include-field", "sources", "sort-order", "person-fields", "request-sync-token"].iter().map(|v|*v));
+                                                                           v.extend(["request-sync-token", "request-mask-include-field", "sources", "person-fields", "sort-order", "page-size", "page-token", "sync-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -768,7 +1096,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -783,7 +1111,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_create_contact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_create_contact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -807,12 +1135,12 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "age-range" => Some(("ageRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.deleted" => Some(("metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.linked-people-resource-names" => Some(("metadata.linkedPeopleResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.object-type" => Some(("metadata.objectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["age-range", "deleted", "etag", "linked-people-resource-names", "metadata", "object-type", "previous-resource-names", "resource-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -866,7 +1194,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -881,7 +1209,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_delete_contact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_delete_contact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().delete_contact(opt.value_of("resource-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -918,7 +1246,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -933,7 +1261,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_delete_contact_photo(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_delete_contact_photo(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().delete_contact_photo(opt.value_of("resource-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -977,7 +1305,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -992,7 +1320,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().get(opt.value_of("resource-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1020,7 +1348,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["person-fields", "sources", "request-mask-include-field"].iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "request-mask-include-field", "sources"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1039,7 +1367,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1054,7 +1382,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_get_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_get_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().get_batch_get();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1085,7 +1413,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["person-fields", "sources", "request-mask-include-field", "resource-names"].iter().map(|v|*v));
+                                                                           v.extend(["person-fields", "request-mask-include-field", "sources", "resource-names"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1104,7 +1432,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1119,7 +1447,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_list_directory_people(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_list_directory_people(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().list_directory_people();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1159,7 +1487,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sync-token", "page-size", "sources", "page-token", "read-mask", "merge-sources", "request-sync-token"].iter().map(|v|*v));
+                                                                           v.extend(["request-sync-token", "sources", "merge-sources", "read-mask", "page-size", "page-token", "sync-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1178,7 +1506,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1193,7 +1521,69 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_search_directory_people(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_search_contacts(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.people().search_contacts();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "read-mask" => {
+                    call = call.read_mask(value.unwrap_or(""));
+                },
+                "query" => {
+                    call = call.query(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["query", "read-mask", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _people_search_directory_people(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().search_directory_people();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1230,7 +1620,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token", "sources", "read-mask", "merge-sources", "query"].iter().map(|v|*v));
+                                                                           v.extend(["sources", "merge-sources", "read-mask", "page-size", "page-token", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1249,7 +1639,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1264,7 +1654,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_update_contact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_update_contact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1288,12 +1678,12 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "age-range" => Some(("ageRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.deleted" => Some(("metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.linked-people-resource-names" => Some(("metadata.linkedPeopleResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.object-type" => Some(("metadata.objectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.previous-resource-names" => Some(("metadata.previousResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["age-range", "deleted", "etag", "linked-people-resource-names", "metadata", "object-type", "previous-resource-names", "resource-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1350,7 +1740,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1365,7 +1755,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _people_update_contact_photo(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _people_update_contact_photo(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1389,8 +1779,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "person-fields" => Some(("personFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "photo-bytes" => Some(("photoBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sources" => Some(("sources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["person-fields", "photo-bytes", "sources"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1437,7 +1827,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1452,7 +1842,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1460,25 +1850,25 @@ impl<'n> Engine<'n> {
             ("contact-groups", Some(opt)) => {
                 match opt.subcommand() {
                     ("batch-get", Some(opt)) => {
-                        call_result = self._contact_groups_batch_get(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_batch_get(opt, dry_run, &mut err).await;
                     },
                     ("create", Some(opt)) => {
-                        call_result = self._contact_groups_create(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_create(opt, dry_run, &mut err).await;
                     },
                     ("delete", Some(opt)) => {
-                        call_result = self._contact_groups_delete(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._contact_groups_get(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._contact_groups_list(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_list(opt, dry_run, &mut err).await;
                     },
                     ("members-modify", Some(opt)) => {
-                        call_result = self._contact_groups_members_modify(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_members_modify(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._contact_groups_update(opt, dry_run, &mut err);
+                        call_result = self._contact_groups_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("contact-groups".to_string()));
@@ -1489,10 +1879,13 @@ impl<'n> Engine<'n> {
             ("other-contacts", Some(opt)) => {
                 match opt.subcommand() {
                     ("copy-other-contact-to-my-contacts-group", Some(opt)) => {
-                        call_result = self._other_contacts_copy_other_contact_to_my_contacts_group(opt, dry_run, &mut err);
+                        call_result = self._other_contacts_copy_other_contact_to_my_contacts_group(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._other_contacts_list(opt, dry_run, &mut err);
+                        call_result = self._other_contacts_list(opt, dry_run, &mut err).await;
+                    },
+                    ("search", Some(opt)) => {
+                        call_result = self._other_contacts_search(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("other-contacts".to_string()));
@@ -1502,35 +1895,47 @@ impl<'n> Engine<'n> {
             },
             ("people", Some(opt)) => {
                 match opt.subcommand() {
+                    ("batch-create-contacts", Some(opt)) => {
+                        call_result = self._people_batch_create_contacts(opt, dry_run, &mut err).await;
+                    },
+                    ("batch-delete-contacts", Some(opt)) => {
+                        call_result = self._people_batch_delete_contacts(opt, dry_run, &mut err).await;
+                    },
+                    ("batch-update-contacts", Some(opt)) => {
+                        call_result = self._people_batch_update_contacts(opt, dry_run, &mut err).await;
+                    },
                     ("connections-list", Some(opt)) => {
-                        call_result = self._people_connections_list(opt, dry_run, &mut err);
+                        call_result = self._people_connections_list(opt, dry_run, &mut err).await;
                     },
                     ("create-contact", Some(opt)) => {
-                        call_result = self._people_create_contact(opt, dry_run, &mut err);
+                        call_result = self._people_create_contact(opt, dry_run, &mut err).await;
                     },
                     ("delete-contact", Some(opt)) => {
-                        call_result = self._people_delete_contact(opt, dry_run, &mut err);
+                        call_result = self._people_delete_contact(opt, dry_run, &mut err).await;
                     },
                     ("delete-contact-photo", Some(opt)) => {
-                        call_result = self._people_delete_contact_photo(opt, dry_run, &mut err);
+                        call_result = self._people_delete_contact_photo(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._people_get(opt, dry_run, &mut err);
+                        call_result = self._people_get(opt, dry_run, &mut err).await;
                     },
                     ("get-batch-get", Some(opt)) => {
-                        call_result = self._people_get_batch_get(opt, dry_run, &mut err);
+                        call_result = self._people_get_batch_get(opt, dry_run, &mut err).await;
                     },
                     ("list-directory-people", Some(opt)) => {
-                        call_result = self._people_list_directory_people(opt, dry_run, &mut err);
+                        call_result = self._people_list_directory_people(opt, dry_run, &mut err).await;
+                    },
+                    ("search-contacts", Some(opt)) => {
+                        call_result = self._people_search_contacts(opt, dry_run, &mut err).await;
                     },
                     ("search-directory-people", Some(opt)) => {
-                        call_result = self._people_search_directory_people(opt, dry_run, &mut err);
+                        call_result = self._people_search_directory_people(opt, dry_run, &mut err).await;
                     },
                     ("update-contact", Some(opt)) => {
-                        call_result = self._people_update_contact(opt, dry_run, &mut err);
+                        call_result = self._people_update_contact(opt, dry_run, &mut err).await;
                     },
                     ("update-contact-photo", Some(opt)) => {
-                        call_result = self._people_update_contact_photo(opt, dry_run, &mut err);
+                        call_result = self._people_update_contact_photo(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("people".to_string()));
@@ -1555,41 +1960,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "people1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "people1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "people1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/people1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::PeopleService::new(client, auth),
@@ -1605,28 +1995,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("contact-groups", "methods: 'batch-get', 'create', 'delete', 'get', 'list', 'members-modify' and 'update'", vec![
             ("batch-get",
-                    Some(r##"Get a list of contact groups owned by the authenticated user by specifying
-        a list of contact group resource names."##),
+                    Some(r##"Get a list of contact groups owned by the authenticated user by specifying a list of contact group resource names."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_batch-get",
                   vec![
                     (Some(r##"v"##),
@@ -1664,8 +2054,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Delete an existing contact group owned by the authenticated user by
-        specifying a contact group resource name."##),
+                    Some(r##"Delete an existing contact group owned by the authenticated user by specifying a contact group resource name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_delete",
                   vec![
                     (Some(r##"resource-name"##),
@@ -1687,8 +2076,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Get a specific contact group owned by the authenticated user by specifying
-        a contact group resource name."##),
+                    Some(r##"Get a specific contact group owned by the authenticated user by specifying a contact group resource name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_get",
                   vec![
                     (Some(r##"resource-name"##),
@@ -1710,8 +2098,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all contact groups owned by the authenticated user. Members of the
-        contact groups are not populated."##),
+                    Some(r##"List all contact groups owned by the authenticated user. Members of the contact groups are not populated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_list",
                   vec![
                     (Some(r##"v"##),
@@ -1727,11 +2114,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("members-modify",
-                    Some(r##"Modify the members of a contact group owned by the authenticated user.
-        
-        The only system contact groups that can have members added are
-        `contactGroups/myContacts` and `contactGroups/starred`. Other system
-        contact groups are deprecated and can only have contacts removed."##),
+                    Some(r##"Modify the members of a contact group owned by the authenticated user. The only system contact groups that can have members added are `contactGroups/myContacts` and `contactGroups/starred`. Other system contact groups are deprecated and can only have contacts removed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_members-modify",
                   vec![
                     (Some(r##"resource-name"##),
@@ -1759,14 +2142,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update the name of an existing contact group owned by the authenticated
-        user."##),
+                    Some(r##"Update the name of an existing contact group owned by the authenticated user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/contact-groups_update",
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"The resource name for the contact group, assigned by the server. An ASCII
-        string, in the form of `contactGroups/{contact_group_id}`."##),
+                     Some(r##"The resource name for the contact group, assigned by the server. An ASCII string, in the form of `contactGroups/{contact_group_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1790,7 +2171,7 @@ fn main() {
                   ]),
             ]),
         
-        ("other-contacts", "methods: 'copy-other-contact-to-my-contacts-group' and 'list'", vec![
+        ("other-contacts", "methods: 'copy-other-contact-to-my-contacts-group', 'list' and 'search'", vec![
             ("copy-other-contact-to-my-contacts-group",
                     Some(r##"Copies an "Other contact" to a new contact in the user's "myContacts" group"##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/other-contacts_copy-other-contact-to-my-contacts-group",
@@ -1820,10 +2201,24 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all "Other contacts", that is contacts that are not in a contact
-        group. "Other contacts" are typically auto created contacts from
-        interactions."##),
+                    Some(r##"List all "Other contacts", that is contacts that are not in a contact group. "Other contacts" are typically auto created contacts from interactions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/other-contacts_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("search",
+                    Some(r##"Provides a list of contacts in the authenticated user's other contacts that matches the search query. The query matches on a contact's `names`, `emailAddresses`, and `phoneNumbers` fields that are from the OTHER_CONTACT source."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/other-contacts_search",
                   vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -1839,11 +2234,75 @@ fn main() {
                   ]),
             ]),
         
-        ("people", "methods: 'connections-list', 'create-contact', 'delete-contact', 'delete-contact-photo', 'get', 'get-batch-get', 'list-directory-people', 'search-directory-people', 'update-contact' and 'update-contact-photo'", vec![
-            ("connections-list",
-                    Some(r##"Provides a list of the authenticated user's contacts.
+        ("people", "methods: 'batch-create-contacts', 'batch-delete-contacts', 'batch-update-contacts', 'connections-list', 'create-contact', 'delete-contact', 'delete-contact-photo', 'get', 'get-batch-get', 'list-directory-people', 'search-contacts', 'search-directory-people', 'update-contact' and 'update-contact-photo'", vec![
+            ("batch-create-contacts",
+                    Some(r##"Create a batch of new contacts and return the PersonResponses for the newly created contacts. Limited to 10 parallel requests per user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_batch-create-contacts",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
-        The request throws a 400 error if 'personFields' is not specified."##),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("batch-delete-contacts",
+                    Some(r##"Delete a batch of contacts. Any non-contact data will not be deleted. Limited to 10 parallel requests per user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_batch-delete-contacts",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("batch-update-contacts",
+                    Some(r##"Update a batch of contacts and return a map of resource names to PersonResponses for the updated contacts. Limited to 10 parallel requests per user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_batch-update-contacts",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("connections-list",
+                    Some(r##"Provides a list of the authenticated user's contacts. The request returns a 400 error if `personFields` is not specified. The request returns a 410 error if `sync_token` is specified and is expired. Sync tokens expire after 7 days to prevent data drift between clients and the server. To handle a sync token expired error, a request should be sent without `sync_token` to get all contacts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_connections-list",
                   vec![
                     (Some(r##"resource-name"##),
@@ -1865,7 +2324,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("create-contact",
-                    Some(r##"Create a new contact and return the person resource for that contact."##),
+                    Some(r##"Create a new contact and return the person resource for that contact. The request returns a 400 error if more than one field is specified on a field that is a singleton for contact sources: * biographies * birthdays * genders * names"##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_create-contact",
                   vec![
                     (Some(r##"kv"##),
@@ -1931,22 +2390,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Provides information about a person by specifying a resource name. Use
-        `people/me` to indicate the authenticated user.
-        
-        The request throws a 400 error if 'personFields' is not specified."##),
+                    Some(r##"Provides information about a person by specifying a resource name. Use `people/me` to indicate the authenticated user. The request returns a 400 error if 'personFields' is not specified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_get",
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"Required. The resource name of the person to provide information about.
-        
-        - To get information about the authenticated user, specify `people/me`.
-        - To get information about a google account, specify
-         `people/{account_id}`.
-        - To get information about a contact, specify the resource name that
-          identifies the contact as returned by
-        [`people.connections.list`](/people/api/rest/v1/people.connections/list)."##),
+                     Some(r##"Required. The resource name of the person to provide information about. - To get information about the authenticated user, specify `people/me`. - To get information about a google account, specify `people/{account_id}`. - To get information about a contact, specify the resource name that identifies the contact as returned by [`people.connections.list`](/people/api/rest/v1/people.connections/list)."##),
                      Some(true),
                      Some(false)),
         
@@ -1963,11 +2412,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-batch-get",
-                    Some(r##"Provides information about a list of specific people by specifying a list
-        of requested resource names. Use `people/me` to indicate the authenticated
-        user.
-        
-        The request throws a 400 error if 'personFields' is not specified."##),
+                    Some(r##"Provides information about a list of specific people by specifying a list of requested resource names. Use `people/me` to indicate the authenticated user. The request returns a 400 error if 'personFields' is not specified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_get-batch-get",
                   vec![
                     (Some(r##"v"##),
@@ -1983,8 +2428,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-directory-people",
-                    Some(r##"Provides a list of domain profiles and domain contacts in the authenticated
-        user's domain directory."##),
+                    Some(r##"Provides a list of domain profiles and domain contacts in the authenticated user's domain directory."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_list-directory-people",
                   vec![
                     (Some(r##"v"##),
@@ -1999,9 +2443,24 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("search-contacts",
+                    Some(r##"Provides a list of contacts in the authenticated user's grouped contacts that matches the search query. The query matches on a contact's `names`, `nickNames`, `emailAddresses`, `phoneNumbers`, and `organizations` fields that are from the CONTACT" source."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_search-contacts",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("search-directory-people",
-                    Some(r##"Provides a list of domain profiles and domain contacts in the authenticated
-        user's domain directory that match the search query."##),
+                    Some(r##"Provides a list of domain profiles and domain contacts in the authenticated user's domain directory that match the search query."##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_search-directory-people",
                   vec![
                     (Some(r##"v"##),
@@ -2017,26 +2476,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update-contact",
-                    Some(r##"Update contact data for an existing contact person. Any non-contact data
-        will not be modified.
-        
-        The request throws a 400 error if `updatePersonFields` is not specified.
-        
-        The request throws a 400 error if `person.metadata.sources` is not
-        specified for the contact to be updated.
-        
-        The request throws a 400 error with an error with reason
-        `"failedPrecondition"` if `person.metadata.sources.etag` is different than
-        the contact's etag, which indicates the contact has changed since its data
-        was read. Clients should get the latest person and re-apply their updates
-        to the latest person."##),
+                    Some(r##"Update contact data for an existing contact person. Any non-contact data will not be modified. Any non-contact data in the person to update will be ignored. All fields specified in the `update_mask` will be replaced. The server returns a 400 error if `person.metadata.sources` is not specified for the contact to be updated or if there is no contact source. The server returns a 400 error with reason `"failedPrecondition"` if `person.metadata.sources.etag` is different than the contact's etag, which indicates the contact has changed since its data was read. Clients should get the latest person and merge their updates into the latest person. The server returns a 400 error if `memberships` are being updated and there are no contact group memberships specified on the person. The server returns a 400 error if more than one field is specified on a field that is a singleton for contact sources: * biographies * birthdays * genders * names"##),
                     "Details at http://byron.github.io/google-apis-rs/google_people1_cli/people_update-contact",
                   vec![
                     (Some(r##"resource-name"##),
                      None,
-                     Some(r##"The resource name for the person, assigned by the server. An ASCII string
-        with a max length of 27 characters, in the form of
-        `people/{person_id}`."##),
+                     Some(r##"The resource name for the person, assigned by the server. An ASCII string with a max length of 27 characters, in the form of `people/{person_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2092,7 +2537,7 @@ fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200708")
+           .version("2.0.0+20210330")
            .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")
@@ -2107,12 +2552,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -2160,13 +2600,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_cloudkms1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_cloudkms1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudKMS<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudKMS<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -173,7 +169,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -188,7 +184,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -211,30 +207,33 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "rotation-period" => Some(("rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "primary.destroy-time" => Some(("primary.destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.import-failure-reason" => Some(("primary.importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.protection-level" => Some(("primary.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.algorithm" => Some(("primary.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.attestation.cert-chains.cavium-certs" => Some(("primary.attestation.certChains.caviumCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "primary.attestation.cert-chains.google-card-certs" => Some(("primary.attestation.certChains.googleCardCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "primary.attestation.cert-chains.google-partition-certs" => Some(("primary.attestation.certChains.googlePartitionCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "primary.attestation.content" => Some(("primary.attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.attestation.format" => Some(("primary.attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.state" => Some(("primary.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.destroy-event-time" => Some(("primary.destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.generate-time" => Some(("primary.generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.import-time" => Some(("primary.importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.create-time" => Some(("primary.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.destroy-event-time" => Some(("primary.destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.destroy-time" => Some(("primary.destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.external-protection-level-options.external-key-uri" => Some(("primary.externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.generate-time" => Some(("primary.generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.import-failure-reason" => Some(("primary.importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-job" => Some(("primary.importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.import-time" => Some(("primary.importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.protection-level" => Some(("primary.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.state" => Some(("primary.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purpose" => Some(("purpose", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotation-period" => Some(("rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -286,7 +285,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -301,7 +300,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -372,7 +371,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -387,7 +386,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -410,10 +409,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "digest-crc32c" => Some(("digestCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "digest.sha256" => Some(("digest.sha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "digest.sha512" => Some(("digest.sha512", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "digest.sha384" => Some(("digest.sha384", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "digest.sha512" => Some(("digest.sha512", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "digest-crc32c" => Some(("digestCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["digest", "digest-crc32c", "sha256", "sha384", "sha512"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -460,7 +459,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -475,7 +474,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -498,22 +497,25 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "destroy-time" => Some(("destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "import-failure-reason" => Some(("importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attestation.cert-chains.cavium-certs" => Some(("attestation.certChains.caviumCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.cert-chains.google-card-certs" => Some(("attestation.certChains.googleCardCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.cert-chains.google-partition-certs" => Some(("attestation.certChains.googlePartitionCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attestation.content" => Some(("attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attestation.format" => Some(("attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "destroy-event-time" => Some(("destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "import-time" => Some(("importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destroy-event-time" => Some(("destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destroy-time" => Some(("destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-protection-level-options.external-key-uri" => Some(("externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-failure-reason" => Some(("importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-job" => Some(("importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-time" => Some(("importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -558,7 +560,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -573,7 +575,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -642,7 +644,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -657,7 +659,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -694,7 +696,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -709,7 +711,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -746,7 +748,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -761,7 +763,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -784,8 +786,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "import-job" => Some(("importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-job" => Some(("importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rsa-aes-wrapped-key" => Some(("rsaAesWrappedKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "import-job", "rsa-aes-wrapped-key"]);
@@ -833,7 +835,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -848,7 +850,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -882,7 +884,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size", "view"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "filter", "page-token", "view", "order-by"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -901,7 +903,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -916,7 +918,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -939,22 +941,25 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "destroy-time" => Some(("destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "import-failure-reason" => Some(("importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attestation.cert-chains.cavium-certs" => Some(("attestation.certChains.caviumCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.cert-chains.google-card-certs" => Some(("attestation.certChains.googleCardCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.cert-chains.google-partition-certs" => Some(("attestation.certChains.googlePartitionCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attestation.content" => Some(("attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attestation.format" => Some(("attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "destroy-event-time" => Some(("destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "import-time" => Some(("importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destroy-event-time" => Some(("destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destroy-time" => Some(("destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-protection-level-options.external-key-uri" => Some(("externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-failure-reason" => Some(("importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-job" => Some(("importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-time" => Some(("importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1003,7 +1008,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1018,7 +1023,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1087,7 +1092,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1102,7 +1107,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_decrypt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_decrypt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1125,10 +1130,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "ciphertext" => Some(("ciphertext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-authenticated-data" => Some(("additionalAuthenticatedData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ciphertext-crc32c" => Some(("ciphertextCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-authenticated-data-crc32c" => Some(("additionalAuthenticatedDataCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ciphertext" => Some(("ciphertext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ciphertext-crc32c" => Some(("ciphertextCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-authenticated-data", "additional-authenticated-data-crc32c", "ciphertext", "ciphertext-crc32c"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1175,7 +1180,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1190,7 +1195,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_encrypt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_encrypt(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1213,9 +1218,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "plaintext" => Some(("plaintext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-authenticated-data" => Some(("additionalAuthenticatedData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-authenticated-data-crc32c" => Some(("additionalAuthenticatedDataCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plaintext" => Some(("plaintext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "plaintext-crc32c" => Some(("plaintextCrc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-authenticated-data", "additional-authenticated-data-crc32c", "plaintext", "plaintext-crc32c"]);
@@ -1263,7 +1268,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1278,7 +1283,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_crypto_keys_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1315,7 +1320,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1330,7 +1335,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_crypto_keys_get_iam_policy(opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1371,7 +1376,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1386,7 +1391,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_crypto_keys_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1420,7 +1425,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "version-view", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["version-view", "page-size", "filter", "page-token", "order-by"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1439,7 +1444,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1454,7 +1459,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1477,30 +1482,33 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "rotation-period" => Some(("rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "primary.destroy-time" => Some(("primary.destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.import-failure-reason" => Some(("primary.importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.protection-level" => Some(("primary.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.algorithm" => Some(("primary.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.attestation.cert-chains.cavium-certs" => Some(("primary.attestation.certChains.caviumCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "primary.attestation.cert-chains.google-card-certs" => Some(("primary.attestation.certChains.googleCardCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "primary.attestation.cert-chains.google-partition-certs" => Some(("primary.attestation.certChains.googlePartitionCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "primary.attestation.content" => Some(("primary.attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.attestation.format" => Some(("primary.attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.state" => Some(("primary.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.destroy-event-time" => Some(("primary.destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.generate-time" => Some(("primary.generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.import-time" => Some(("primary.importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.create-time" => Some(("primary.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.destroy-event-time" => Some(("primary.destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.destroy-time" => Some(("primary.destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.external-protection-level-options.external-key-uri" => Some(("primary.externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.generate-time" => Some(("primary.generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.import-failure-reason" => Some(("primary.importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-job" => Some(("primary.importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.import-time" => Some(("primary.importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.protection-level" => Some(("primary.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.state" => Some(("primary.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purpose" => Some(("purpose", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotation-period" => Some(("rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1549,7 +1557,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1564,7 +1572,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1636,7 +1644,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1651,7 +1659,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1721,7 +1729,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1736,7 +1744,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_crypto_keys_update_primary_version(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_crypto_keys_update_primary_version(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1806,7 +1814,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1821,7 +1829,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1858,7 +1866,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1873,7 +1881,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_get_iam_policy(opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1914,7 +1922,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1929,7 +1937,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_import_jobs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_import_jobs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1952,19 +1960,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "attestation.cert-chains.cavium-certs" => Some(("attestation.certChains.caviumCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.cert-chains.google-card-certs" => Some(("attestation.certChains.googleCardCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.cert-chains.google-partition-certs" => Some(("attestation.certChains.googlePartitionCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attestation.content" => Some(("attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attestation.format" => Some(("attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-event-time" => Some(("expireEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-method" => Some(("importMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "public-key.pem" => Some(("publicKey.pem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "expire-event-time" => Some(("expireEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attestation.content" => Some(("attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attestation.format" => Some(("attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "import-method" => Some(("importMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attestation", "content", "create-time", "expire-event-time", "expire-time", "format", "generate-time", "import-method", "name", "pem", "protection-level", "public-key", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attestation", "cavium-certs", "cert-chains", "content", "create-time", "expire-event-time", "expire-time", "format", "generate-time", "google-card-certs", "google-partition-certs", "import-method", "name", "pem", "protection-level", "public-key", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2013,7 +2024,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2028,7 +2039,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_import_jobs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_import_jobs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_import_jobs_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2065,7 +2076,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2080,7 +2091,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_import_jobs_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_import_jobs_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_import_jobs_get_iam_policy(opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2121,7 +2132,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2136,7 +2147,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_import_jobs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_import_jobs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_import_jobs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2167,7 +2178,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "filter", "order-by", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2186,7 +2197,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2201,7 +2212,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_import_jobs_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_import_jobs_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2273,7 +2284,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2288,7 +2299,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_import_jobs_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_import_jobs_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2358,7 +2369,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2373,7 +2384,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_key_rings_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2404,7 +2415,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "filter", "order-by", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2423,7 +2434,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2438,7 +2449,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2510,7 +2521,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2525,7 +2536,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_key_rings_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_key_rings_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2595,7 +2606,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2610,7 +2621,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2638,7 +2649,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "filter", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2657,7 +2668,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2672,7 +2683,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -2680,106 +2691,106 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-get", Some(opt)) => {
-                        call_result = self._projects_locations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-create", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-create", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-create", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-destroy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_destroy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_destroy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-get", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-get-public-key", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-import", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_import(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_import(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-list", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-patch", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-crypto-key-versions-restore", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_restore(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_crypto_key_versions_restore(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-decrypt", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_decrypt(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_decrypt(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-encrypt", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_encrypt(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_encrypt(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-get", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-list", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-patch", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-crypto-keys-update-primary-version", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_crypto_keys_update_primary_version(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_crypto_keys_update_primary_version(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-get", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-import-jobs-create", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_import_jobs_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_import_jobs_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-import-jobs-get", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_import_jobs_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_import_jobs_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-import-jobs-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_import_jobs_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_import_jobs_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-import-jobs-list", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_import_jobs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_import_jobs_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-import-jobs-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_import_jobs_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_import_jobs_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-import-jobs-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_import_jobs_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_import_jobs_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-list", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_key_rings_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_key_rings_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -2804,41 +2815,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "cloudkms1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "cloudkms1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "cloudkms1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/cloudkms1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudKMS::new(client, auth),
@@ -2854,22 +2850,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'locations-get', 'locations-key-rings-create', 'locations-key-rings-crypto-keys-create', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-create', 'locations-key-rings-crypto-keys-crypto-key-versions-destroy', 'locations-key-rings-crypto-keys-crypto-key-versions-get', 'locations-key-rings-crypto-keys-crypto-key-versions-get-public-key', 'locations-key-rings-crypto-keys-crypto-key-versions-import', 'locations-key-rings-crypto-keys-crypto-key-versions-list', 'locations-key-rings-crypto-keys-crypto-key-versions-patch', 'locations-key-rings-crypto-keys-crypto-key-versions-restore', 'locations-key-rings-crypto-keys-decrypt', 'locations-key-rings-crypto-keys-encrypt', 'locations-key-rings-crypto-keys-get', 'locations-key-rings-crypto-keys-get-iam-policy', 'locations-key-rings-crypto-keys-list', 'locations-key-rings-crypto-keys-patch', 'locations-key-rings-crypto-keys-set-iam-policy', 'locations-key-rings-crypto-keys-test-iam-permissions', 'locations-key-rings-crypto-keys-update-primary-version', 'locations-key-rings-get', 'locations-key-rings-get-iam-policy', 'locations-key-rings-import-jobs-create', 'locations-key-rings-import-jobs-get', 'locations-key-rings-import-jobs-get-iam-policy', 'locations-key-rings-import-jobs-list', 'locations-key-rings-import-jobs-set-iam-policy', 'locations-key-rings-import-jobs-test-iam-permissions', 'locations-key-rings-list', 'locations-key-rings-set-iam-policy', 'locations-key-rings-test-iam-permissions' and 'locations-list'", vec![
@@ -2901,8 +2898,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the location associated with the
-        KeyRings, in the format `projects/*/locations/*`."##),
+                     Some(r##"Required. The resource name of the location associated with the KeyRings, in the format `projects/*/locations/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -2925,17 +2921,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-create",
-                    Some(r##"Create a new CryptoKey within a KeyRing.
-        
-        CryptoKey.purpose and
-        CryptoKey.version_template.algorithm
-        are required."##),
+                    Some(r##"Create a new CryptoKey within a KeyRing. CryptoKey.purpose and CryptoKey.version_template.algorithm are required."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the KeyRing associated with the
-        CryptoKeys."##),
+                     Some(r##"Required. The name of the KeyRing associated with the CryptoKeys."##),
                      Some(true),
                      Some(false)),
         
@@ -2958,15 +2949,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt",
-                    Some(r##"Decrypts data that was encrypted with a public key retrieved from
-        GetPublicKey corresponding to a CryptoKeyVersion with
-        CryptoKey.purpose ASYMMETRIC_DECRYPT."##),
+                    Some(r##"Decrypts data that was encrypted with a public key retrieved from GetPublicKey corresponding to a CryptoKeyVersion with CryptoKey.purpose ASYMMETRIC_DECRYPT."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the CryptoKeyVersion to use for
-        decryption."##),
+                     Some(r##"Required. The resource name of the CryptoKeyVersion to use for decryption."##),
                      Some(true),
                      Some(false)),
         
@@ -2989,9 +2977,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign",
-                    Some(r##"Signs data using a CryptoKeyVersion with CryptoKey.purpose
-        ASYMMETRIC_SIGN, producing a signature that can be verified with the public
-        key retrieved from GetPublicKey."##),
+                    Some(r##"Signs data using a CryptoKeyVersion with CryptoKey.purpose ASYMMETRIC_SIGN, producing a signature that can be verified with the public key retrieved from GetPublicKey."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign",
                   vec![
                     (Some(r##"name"##),
@@ -3019,17 +3005,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-create",
-                    Some(r##"Create a new CryptoKeyVersion in a CryptoKey.
-        
-        The server will assign the next sequential id. If unset,
-        state will be set to
-        ENABLED."##),
+                    Some(r##"Create a new CryptoKeyVersion in a CryptoKey. The server will assign the next sequential id. If unset, state will be set to ENABLED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the CryptoKey associated with
-        the CryptoKeyVersions."##),
+                     Some(r##"Required. The name of the CryptoKey associated with the CryptoKeyVersions."##),
                      Some(true),
                      Some(false)),
         
@@ -3052,18 +3033,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-destroy",
-                    Some(r##"Schedule a CryptoKeyVersion for destruction.
-        
-        Upon calling this method, CryptoKeyVersion.state will be set to
-        DESTROY_SCHEDULED
-        and destroy_time will be set to a time 24
-        hours in the future, at which point the state
-        will be changed to
-        DESTROYED, and the key
-        material will be irrevocably destroyed.
-        
-        Before the destroy_time is reached,
-        RestoreCryptoKeyVersion may be called to reverse the process."##),
+                    Some(r##"Schedule a CryptoKeyVersion for destruction. Upon calling this method, CryptoKeyVersion.state will be set to DESTROY_SCHEDULED and destroy_time will be set to a time 24 hours in the future, at which point the state will be changed to DESTROYED, and the key material will be irrevocably destroyed. Before the destroy_time is reached, RestoreCryptoKeyVersion may be called to reverse the process."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-destroy",
                   vec![
                     (Some(r##"name"##),
@@ -3113,16 +3083,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-get-public-key",
-                    Some(r##"Returns the public key for the given CryptoKeyVersion. The
-        CryptoKey.purpose must be
-        ASYMMETRIC_SIGN or
-        ASYMMETRIC_DECRYPT."##),
+                    Some(r##"Returns the public key for the given CryptoKeyVersion. The CryptoKey.purpose must be ASYMMETRIC_SIGN or ASYMMETRIC_DECRYPT."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-get-public-key",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the CryptoKeyVersion public key to
-        get."##),
+                     Some(r##"Required. The name of the CryptoKeyVersion public key to get."##),
                      Some(true),
                      Some(false)),
         
@@ -3139,17 +3105,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-import",
-                    Some(r##"Imports a new CryptoKeyVersion into an existing CryptoKey using the
-        wrapped key material provided in the request.
-        
-        The version ID will be assigned the next sequential id within the
-        CryptoKey."##),
+                    Some(r##"Imports a new CryptoKeyVersion into an existing CryptoKey using the wrapped key material provided in the request. The version ID will be assigned the next sequential id within the CryptoKey."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-import",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the CryptoKey to
-        be imported into."##),
+                     Some(r##"Required. The name of the CryptoKey to be imported into."##),
                      Some(true),
                      Some(false)),
         
@@ -3177,8 +3138,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the CryptoKey to list, in the format
-        `projects/*/locations/*/keyRings/*/cryptoKeys/*`."##),
+                     Some(r##"Required. The resource name of the CryptoKey to list, in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3195,19 +3155,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-patch",
-                    Some(r##"Update a CryptoKeyVersion's metadata.
-        
-        state may be changed between
-        ENABLED and
-        DISABLED using this
-        method. See DestroyCryptoKeyVersion and RestoreCryptoKeyVersion to
-        move between other states."##),
+                    Some(r##"Update a CryptoKeyVersion's metadata. state may be changed between ENABLED and DISABLED using this method. See DestroyCryptoKeyVersion and RestoreCryptoKeyVersion to move between other states."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this CryptoKeyVersion in the format
-        `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`."##),
+                     Some(r##"Output only. The resource name for this CryptoKeyVersion in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3230,13 +3183,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-crypto-key-versions-restore",
-                    Some(r##"Restore a CryptoKeyVersion in the
-        DESTROY_SCHEDULED
-        state.
-        
-        Upon restoration of the CryptoKeyVersion, state
-        will be set to DISABLED,
-        and destroy_time will be cleared."##),
+                    Some(r##"Restore a CryptoKeyVersion in the DESTROY_SCHEDULED state. Upon restoration of the CryptoKeyVersion, state will be set to DISABLED, and destroy_time will be cleared."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-crypto-key-versions-restore",
                   vec![
                     (Some(r##"name"##),
@@ -3264,14 +3211,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-decrypt",
-                    Some(r##"Decrypts data that was protected by Encrypt. The CryptoKey.purpose
-        must be ENCRYPT_DECRYPT."##),
+                    Some(r##"Decrypts data that was protected by Encrypt. The CryptoKey.purpose must be ENCRYPT_DECRYPT."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-decrypt",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the CryptoKey to use for decryption.
-        The server will choose the appropriate version."##),
+                     Some(r##"Required. The resource name of the CryptoKey to use for decryption. The server will choose the appropriate version."##),
                      Some(true),
                      Some(false)),
         
@@ -3294,18 +3239,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-encrypt",
-                    Some(r##"Encrypts data, so that it can only be recovered by a call to Decrypt.
-        The CryptoKey.purpose must be
-        ENCRYPT_DECRYPT."##),
+                    Some(r##"Encrypts data, so that it can only be recovered by a call to Decrypt. The CryptoKey.purpose must be ENCRYPT_DECRYPT."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-encrypt",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the CryptoKey or CryptoKeyVersion
-        to use for encryption.
-        
-        If a CryptoKey is specified, the server will use its
-        primary version."##),
+                     Some(r##"Required. The resource name of the CryptoKey or CryptoKeyVersion to use for encryption. If a CryptoKey is specified, the server will use its primary version."##),
                      Some(true),
                      Some(false)),
         
@@ -3328,8 +3267,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-get",
-                    Some(r##"Returns metadata for a given CryptoKey, as well as its
-        primary CryptoKeyVersion."##),
+                    Some(r##"Returns metadata for a given CryptoKey, as well as its primary CryptoKeyVersion."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-get",
                   vec![
                     (Some(r##"name"##),
@@ -3351,15 +3289,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource.
-        Returns an empty policy if the resource exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3381,8 +3316,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the KeyRing to list, in the format
-        `projects/*/locations/*/keyRings/*`."##),
+                     Some(r##"Required. The resource name of the KeyRing to list, in the format `projects/*/locations/*/keyRings/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3404,8 +3338,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this CryptoKey in the format
-        `projects/*/locations/*/keyRings/*/cryptoKeys/*`."##),
+                     Some(r##"Output only. The resource name for this CryptoKey in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3428,16 +3361,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy.
-        
-        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3460,19 +3389,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource.
-        If the resource does not exist, this will return an empty set of
-        permissions, not a `NOT_FOUND` error.
-        
-        Note: This operation is designed to be used for building permission-aware
-        UIs and command-line tools, not for authorization checking. This operation
-        may "fail open" without warning."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3495,9 +3417,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-crypto-keys-update-primary-version",
-                    Some(r##"Update the version of a CryptoKey that will be used in Encrypt.
-        
-        Returns an error if called on an asymmetric key."##),
+                    Some(r##"Update the version of a CryptoKey that will be used in Encrypt. Returns an error if called on an asymmetric key."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-update-primary-version",
                   vec![
                     (Some(r##"name"##),
@@ -3547,15 +3467,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource.
-        Returns an empty policy if the resource exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3572,15 +3489,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-import-jobs-create",
-                    Some(r##"Create a new ImportJob within a KeyRing.
-        
-        ImportJob.import_method is required."##),
+                    Some(r##"Create a new ImportJob within a KeyRing. ImportJob.import_method is required."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-import-jobs-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the KeyRing associated with the
-        ImportJobs."##),
+                     Some(r##"Required. The name of the KeyRing associated with the ImportJobs."##),
                      Some(true),
                      Some(false)),
         
@@ -3625,15 +3539,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-import-jobs-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource.
-        Returns an empty policy if the resource exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-import-jobs-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3655,8 +3566,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the KeyRing to list, in the format
-        `projects/*/locations/*/keyRings/*`."##),
+                     Some(r##"Required. The resource name of the KeyRing to list, in the format `projects/*/locations/*/keyRings/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3673,16 +3583,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-import-jobs-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy.
-        
-        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-import-jobs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3705,19 +3611,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-import-jobs-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource.
-        If the resource does not exist, this will return an empty set of
-        permissions, not a `NOT_FOUND` error.
-        
-        Note: This operation is designed to be used for building permission-aware
-        UIs and command-line tools, not for authorization checking. This operation
-        may "fail open" without warning."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-import-jobs-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3745,8 +3644,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the location associated with the
-        KeyRings, in the format `projects/*/locations/*`."##),
+                     Some(r##"Required. The resource name of the location associated with the KeyRings, in the format `projects/*/locations/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3763,16 +3661,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy.
-        
-        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3795,19 +3689,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-key-rings-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource.
-        If the resource does not exist, this will return an empty set of
-        permissions, not a `NOT_FOUND` error.
-        
-        Note: This operation is designed to be used for building permission-aware
-        UIs and command-line tools, not for authorization checking. This operation
-        may "fail open" without warning."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3857,9 +3744,8 @@ fn main() {
     
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200623")
-           .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications.
-           ")
+           .version("2.0.0+20210318")
+           .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -3873,12 +3759,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -3926,13 +3807,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

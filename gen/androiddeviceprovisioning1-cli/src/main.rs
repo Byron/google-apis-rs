@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_androiddeviceprovisioning1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_androiddeviceprovisioning1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::AndroidProvisioningPartner<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::AndroidProvisioningPartner<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _customers_configurations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_configurations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,16 +65,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "dpc-extras" => Some(("dpcExtras", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-phone" => Some(("contactPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company-name" => Some(("companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-id" => Some(("configurationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "custom-message" => Some(("customMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dpc-resource-path" => Some(("dpcResourcePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-name" => Some(("configurationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-phone" => Some(("contactPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-message" => Some(("customMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dpc-extras" => Some(("dpcExtras", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dpc-resource-path" => Some(("dpcResourcePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["company-name", "configuration-id", "configuration-name", "contact-email", "contact-phone", "custom-message", "dpc-extras", "dpc-resource-path", "is-default", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -122,7 +118,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -137,7 +133,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_configurations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_configurations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().configurations_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -171,7 +167,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -186,7 +182,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_configurations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_configurations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().configurations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -220,7 +216,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -235,7 +231,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_configurations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_configurations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().configurations_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -269,7 +265,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -284,7 +280,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_configurations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_configurations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -307,16 +303,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "dpc-extras" => Some(("dpcExtras", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-phone" => Some(("contactPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "company-name" => Some(("companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-id" => Some(("configurationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "custom-message" => Some(("customMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dpc-resource-path" => Some(("dpcResourcePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-name" => Some(("configurationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-phone" => Some(("contactPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-message" => Some(("customMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dpc-extras" => Some(("dpcExtras", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dpc-resource-path" => Some(("dpcResourcePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["company-name", "configuration-id", "configuration-name", "contact-email", "contact-phone", "custom-message", "dpc-extras", "dpc-resource-path", "is-default", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -364,7 +360,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -379,7 +375,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_devices_apply_configuration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_devices_apply_configuration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -402,13 +398,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "configuration" => Some(("configuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.imei" => Some(("device.deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.model" => Some(("device.deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.serial-number" => Some(("device.deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "configuration" => Some(("configuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["configuration", "device", "device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -452,7 +448,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -467,7 +463,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().devices_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -501,7 +497,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -516,7 +512,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().devices_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -541,7 +537,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -557,7 +553,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -572,7 +568,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_devices_remove_configuration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_devices_remove_configuration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -595,12 +591,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.imei" => Some(("device.deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.model" => Some(("device.deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.serial-number" => Some(("device.deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["device", "device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -644,7 +640,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -659,7 +655,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_devices_unclaim(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_devices_unclaim(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -682,12 +678,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.imei" => Some(("device.deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.model" => Some(("device.deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-identifier.serial-number" => Some(("device.deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-identifier.meid" => Some(("device.deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-identifier.manufacturer" => Some(("device.deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device.device-id" => Some(("device.deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["device", "device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -731,7 +727,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -746,7 +742,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_dpcs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_dpcs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().dpcs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -780,7 +776,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -795,7 +791,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.customers().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -820,7 +816,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -836,7 +832,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -851,7 +847,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.operations().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -885,7 +881,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -900,7 +896,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_customers_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_customers_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -923,12 +919,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "customer.name" => Some(("customer.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "customer.company-name" => Some(("customer.companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer.admin-emails" => Some(("customer.adminEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "customer.company-id" => Some(("customer.companyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer.company-name" => Some(("customer.companyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer.name" => Some(("customer.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer.owner-emails" => Some(("customer.ownerEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "customer.terms-status" => Some(("customer.termsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "customer.admin-emails" => Some(("customer.adminEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-emails", "company-id", "company-name", "customer", "name", "owner-emails", "terms-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -972,7 +968,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -987,7 +983,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.partners().customers_list(opt.value_of("partner-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1012,7 +1008,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1028,7 +1024,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1043,7 +1039,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_claim(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_claim(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1066,14 +1062,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "device-metadata.entries" => Some(("deviceMetadata.entries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.model" => Some(("deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.serial-number" => Some(("deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-metadata.entries" => Some(("deviceMetadata.entries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "device-identifier", "device-metadata", "entries", "imei", "manufacturer", "meid", "model", "section-type", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1117,7 +1113,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1132,7 +1128,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_claim_async(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_claim_async(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1198,7 +1194,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1213,7 +1209,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_find_by_identifier(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_find_by_identifier(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1236,13 +1232,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.model" => Some(("deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.serial-number" => Some(("deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["device-identifier", "imei", "limit", "manufacturer", "meid", "model", "page-token", "serial-number"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1286,7 +1282,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1301,7 +1297,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_find_by_owner(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_find_by_owner(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1324,9 +1320,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["customer-id", "limit", "page-token", "section-type"]);
@@ -1371,7 +1367,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1386,7 +1382,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.partners().devices_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1420,7 +1416,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1435,7 +1431,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1502,7 +1498,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1517,7 +1513,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_unclaim(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_unclaim(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1540,15 +1536,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "vacation-mode-days" => Some(("vacationModeDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.model" => Some(("deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.serial-number" => Some(("deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "vacation-mode-expire-time" => Some(("vacationModeExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vacation-mode-days" => Some(("vacationModeDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "vacation-mode-expire-time" => Some(("vacationModeExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["device-id", "device-identifier", "imei", "manufacturer", "meid", "model", "section-type", "serial-number", "vacation-mode-days", "vacation-mode-expire-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1592,7 +1588,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1607,7 +1603,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_unclaim_async(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_unclaim_async(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1673,7 +1669,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1688,7 +1684,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_devices_update_metadata_async(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_devices_update_metadata_async(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1754,7 +1750,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1769,7 +1765,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_vendors_customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_vendors_customers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.partners().vendors_customers_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1794,7 +1790,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1810,7 +1806,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1825,7 +1821,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _partners_vendors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _partners_vendors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.partners().vendors_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1850,7 +1846,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1866,7 +1862,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1881,7 +1877,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1889,40 +1885,40 @@ impl<'n> Engine<'n> {
             ("customers", Some(opt)) => {
                 match opt.subcommand() {
                     ("configurations-create", Some(opt)) => {
-                        call_result = self._customers_configurations_create(opt, dry_run, &mut err);
+                        call_result = self._customers_configurations_create(opt, dry_run, &mut err).await;
                     },
                     ("configurations-delete", Some(opt)) => {
-                        call_result = self._customers_configurations_delete(opt, dry_run, &mut err);
+                        call_result = self._customers_configurations_delete(opt, dry_run, &mut err).await;
                     },
                     ("configurations-get", Some(opt)) => {
-                        call_result = self._customers_configurations_get(opt, dry_run, &mut err);
+                        call_result = self._customers_configurations_get(opt, dry_run, &mut err).await;
                     },
                     ("configurations-list", Some(opt)) => {
-                        call_result = self._customers_configurations_list(opt, dry_run, &mut err);
+                        call_result = self._customers_configurations_list(opt, dry_run, &mut err).await;
                     },
                     ("configurations-patch", Some(opt)) => {
-                        call_result = self._customers_configurations_patch(opt, dry_run, &mut err);
+                        call_result = self._customers_configurations_patch(opt, dry_run, &mut err).await;
                     },
                     ("devices-apply-configuration", Some(opt)) => {
-                        call_result = self._customers_devices_apply_configuration(opt, dry_run, &mut err);
+                        call_result = self._customers_devices_apply_configuration(opt, dry_run, &mut err).await;
                     },
                     ("devices-get", Some(opt)) => {
-                        call_result = self._customers_devices_get(opt, dry_run, &mut err);
+                        call_result = self._customers_devices_get(opt, dry_run, &mut err).await;
                     },
                     ("devices-list", Some(opt)) => {
-                        call_result = self._customers_devices_list(opt, dry_run, &mut err);
+                        call_result = self._customers_devices_list(opt, dry_run, &mut err).await;
                     },
                     ("devices-remove-configuration", Some(opt)) => {
-                        call_result = self._customers_devices_remove_configuration(opt, dry_run, &mut err);
+                        call_result = self._customers_devices_remove_configuration(opt, dry_run, &mut err).await;
                     },
                     ("devices-unclaim", Some(opt)) => {
-                        call_result = self._customers_devices_unclaim(opt, dry_run, &mut err);
+                        call_result = self._customers_devices_unclaim(opt, dry_run, &mut err).await;
                     },
                     ("dpcs-list", Some(opt)) => {
-                        call_result = self._customers_dpcs_list(opt, dry_run, &mut err);
+                        call_result = self._customers_dpcs_list(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._customers_list(opt, dry_run, &mut err);
+                        call_result = self._customers_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("customers".to_string()));
@@ -1933,7 +1929,7 @@ impl<'n> Engine<'n> {
             ("operations", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._operations_get(opt, dry_run, &mut err);
+                        call_result = self._operations_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("operations".to_string()));
@@ -1944,43 +1940,43 @@ impl<'n> Engine<'n> {
             ("partners", Some(opt)) => {
                 match opt.subcommand() {
                     ("customers-create", Some(opt)) => {
-                        call_result = self._partners_customers_create(opt, dry_run, &mut err);
+                        call_result = self._partners_customers_create(opt, dry_run, &mut err).await;
                     },
                     ("customers-list", Some(opt)) => {
-                        call_result = self._partners_customers_list(opt, dry_run, &mut err);
+                        call_result = self._partners_customers_list(opt, dry_run, &mut err).await;
                     },
                     ("devices-claim", Some(opt)) => {
-                        call_result = self._partners_devices_claim(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_claim(opt, dry_run, &mut err).await;
                     },
                     ("devices-claim-async", Some(opt)) => {
-                        call_result = self._partners_devices_claim_async(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_claim_async(opt, dry_run, &mut err).await;
                     },
                     ("devices-find-by-identifier", Some(opt)) => {
-                        call_result = self._partners_devices_find_by_identifier(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_find_by_identifier(opt, dry_run, &mut err).await;
                     },
                     ("devices-find-by-owner", Some(opt)) => {
-                        call_result = self._partners_devices_find_by_owner(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_find_by_owner(opt, dry_run, &mut err).await;
                     },
                     ("devices-get", Some(opt)) => {
-                        call_result = self._partners_devices_get(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_get(opt, dry_run, &mut err).await;
                     },
                     ("devices-metadata", Some(opt)) => {
-                        call_result = self._partners_devices_metadata(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_metadata(opt, dry_run, &mut err).await;
                     },
                     ("devices-unclaim", Some(opt)) => {
-                        call_result = self._partners_devices_unclaim(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_unclaim(opt, dry_run, &mut err).await;
                     },
                     ("devices-unclaim-async", Some(opt)) => {
-                        call_result = self._partners_devices_unclaim_async(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_unclaim_async(opt, dry_run, &mut err).await;
                     },
                     ("devices-update-metadata-async", Some(opt)) => {
-                        call_result = self._partners_devices_update_metadata_async(opt, dry_run, &mut err);
+                        call_result = self._partners_devices_update_metadata_async(opt, dry_run, &mut err).await;
                     },
                     ("vendors-customers-list", Some(opt)) => {
-                        call_result = self._partners_vendors_customers_list(opt, dry_run, &mut err);
+                        call_result = self._partners_vendors_customers_list(opt, dry_run, &mut err).await;
                     },
                     ("vendors-list", Some(opt)) => {
-                        call_result = self._partners_vendors_list(opt, dry_run, &mut err);
+                        call_result = self._partners_vendors_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("partners".to_string()));
@@ -2005,41 +2001,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "androiddeviceprovisioning1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "androiddeviceprovisioning1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "androiddeviceprovisioning1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/androiddeviceprovisioning1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::AndroidProvisioningPartner::new(client, auth),
@@ -2055,34 +2036,33 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("customers", "methods: 'configurations-create', 'configurations-delete', 'configurations-get', 'configurations-list', 'configurations-patch', 'devices-apply-configuration', 'devices-get', 'devices-list', 'devices-remove-configuration', 'devices-unclaim', 'dpcs-list' and 'list'", vec![
             ("configurations-create",
-                    Some(r##"Creates a new configuration. Once created, a customer can apply the
-        configuration to devices."##),
+                    Some(r##"Creates a new configuration. Once created, a customer can apply the configuration to devices."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/customers_configurations-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer that manages the configuration. An API resource name
-        in the format `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer that manages the configuration. An API resource name in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2105,15 +2085,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("configurations-delete",
-                    Some(r##"Deletes an unused configuration. The API call fails if the customer has
-        devices with the configuration applied."##),
+                    Some(r##"Deletes an unused configuration. The API call fails if the customer has devices with the configuration applied."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/customers_configurations-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The configuration to delete. An API resource name in the format
-        `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`. If the
-        configuration is applied to any devices, the API call fails."##),
+                     Some(r##"Required. The configuration to delete. An API resource name in the format `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`. If the configuration is applied to any devices, the API call fails."##),
                      Some(true),
                      Some(false)),
         
@@ -2135,8 +2112,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The configuration to get. An API resource name in the format
-        `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`."##),
+                     Some(r##"Required. The configuration to get. An API resource name in the format `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2158,8 +2134,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer that manages the listed configurations. An API
-        resource name in the format `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer that manages the listed configurations. An API resource name in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2181,9 +2156,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The API resource name in the format
-        `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`. Assigned by
-        the server."##),
+                     Some(r##"Output only. The API resource name in the format `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`. Assigned by the server."##),
                      Some(true),
                      Some(false)),
         
@@ -2206,15 +2179,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-apply-configuration",
-                    Some(r##"Applies a Configuration to the device to register the device for zero-touch
-        enrollment. After applying a configuration to a device, the device
-        automatically provisions itself on first boot, or next factory reset."##),
+                    Some(r##"Applies a Configuration to the device to register the device for zero-touch enrollment. After applying a configuration to a device, the device automatically provisions itself on first boot, or next factory reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/customers_devices-apply-configuration",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer managing the device. An API resource name in the
-        format `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer managing the device. An API resource name in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2242,8 +2212,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The device to get. An API resource name in the format
-        `customers/[CUSTOMER_ID]/devices/[DEVICE_ID]`."##),
+                     Some(r##"Required. The device to get. An API resource name in the format `customers/[CUSTOMER_ID]/devices/[DEVICE_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2265,8 +2234,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer managing the devices. An API resource name in the
-        format `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer managing the devices. An API resource name in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2288,8 +2256,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer managing the device in the format
-        `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer managing the device in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2312,17 +2279,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-unclaim",
-                    Some(r##"Unclaims a device from a customer and removes it from zero-touch
-        enrollment.
-        
-        After removing a device, a customer must contact their reseller to register
-        the device into zero-touch enrollment again."##),
+                    Some(r##"Unclaims a device from a customer and removes it from zero-touch enrollment. After removing a device, a customer must contact their reseller to register the device into zero-touch enrollment again."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/customers_devices-unclaim",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer managing the device. An API resource name in the
-        format `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer managing the device. An API resource name in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2345,14 +2307,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("dpcs-list",
-                    Some(r##"Lists the DPCs (device policy controllers) that support zero-touch
-        enrollment."##),
+                    Some(r##"Lists the DPCs (device policy controllers) that support zero-touch enrollment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/customers_dpcs-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The customer that can use the DPCs in configurations. An API
-        resource name in the format `customers/[CUSTOMER_ID]`."##),
+                     Some(r##"Required. The customer that can use the DPCs in configurations. An API resource name in the format `customers/[CUSTOMER_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2388,9 +2348,7 @@ fn main() {
         
         ("operations", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/operations_get",
                   vec![
                     (Some(r##"name"##),
@@ -2415,17 +2373,12 @@ fn main() {
         
         ("partners", "methods: 'customers-create', 'customers-list', 'devices-claim', 'devices-claim-async', 'devices-find-by-identifier', 'devices-find-by-owner', 'devices-get', 'devices-metadata', 'devices-unclaim', 'devices-unclaim-async', 'devices-update-metadata-async', 'vendors-customers-list' and 'vendors-list'", vec![
             ("customers-create",
-                    Some(r##"Creates a customer for zero-touch enrollment. After the method returns
-        successfully, admin and owner roles can manage devices and EMM configs
-        by calling API methods or using their zero-touch enrollment portal.
-        The customer receives an email that welcomes them to zero-touch enrollment
-        and explains how to sign into the portal."##),
+                    Some(r##"Creates a customer for zero-touch enrollment. After the method returns successfully, admin and owner roles can manage devices and EMM configs by calling API methods or using their zero-touch enrollment portal. The customer receives an email that welcomes them to zero-touch enrollment and explains how to sign into the portal."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_customers-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource ID in the format `partners/[PARTNER_ID]` that
-        identifies the reseller."##),
+                     Some(r##"Required. The parent resource ID in the format `partners/[PARTNER_ID]` that identifies the reseller."##),
                      Some(true),
                      Some(false)),
         
@@ -2448,9 +2401,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("customers-list",
-                    Some(r##"Lists the customers that are enrolled to the reseller identified by the
-        `partnerId` argument. This list includes customers that the reseller
-        created and customers that enrolled themselves using the portal."##),
+                    Some(r##"Lists the customers that are enrolled to the reseller identified by the `partnerId` argument. This list includes customers that the reseller created and customers that enrolled themselves using the portal."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_customers-list",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2472,8 +2423,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-claim",
-                    Some(r##"Claims a device for a customer and adds it to zero-touch enrollment. If the
-        device is already claimed by another customer, the call returns an error."##),
+                    Some(r##"Claims a device for a customer and adds it to zero-touch enrollment. If the device is already claimed by another customer, the call returns an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-claim",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2501,9 +2451,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-claim-async",
-                    Some(r##"Claims a batch of devices for a customer asynchronously. Adds the devices
-        to zero-touch enrollment. To learn more, read [Long‑running batch
-        operations](/zero-touch/guides/how-it-works#operations)."##),
+                    Some(r##"Claims a batch of devices for a customer asynchronously. Adds the devices to zero-touch enrollment. To learn more, read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-claim-async",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2559,10 +2507,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-find-by-owner",
-                    Some(r##"Finds devices claimed for customers. The results only contain devices
-        registered to the reseller that's identified by the `partnerId` argument.
-        The customer's devices purchased from other resellers don't appear in the
-        results."##),
+                    Some(r##"Finds devices claimed for customers. The results only contain devices registered to the reseller that's identified by the `partnerId` argument. The customer's devices purchased from other resellers don't appear in the results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-find-by-owner",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2595,8 +2540,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The device API resource name in the format
-        `partners/[PARTNER_ID]/devices/[DEVICE_ID]`."##),
+                     Some(r##"Required. The device API resource name in the format `partners/[PARTNER_ID]/devices/[DEVICE_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2647,8 +2591,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-unclaim",
-                    Some(r##"Unclaims a device from a customer and removes it from zero-touch
-        enrollment."##),
+                    Some(r##"Unclaims a device from a customer and removes it from zero-touch enrollment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-unclaim",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2676,9 +2619,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-unclaim-async",
-                    Some(r##"Unclaims a batch of devices for a customer asynchronously. Removes the
-        devices from zero-touch enrollment. To learn more, read [Long‑running batch
-        operations](/zero-touch/guides/how-it-works#operations)."##),
+                    Some(r##"Unclaims a batch of devices for a customer asynchronously. Removes the devices from zero-touch enrollment. To learn more, read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-unclaim-async",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2706,10 +2647,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-update-metadata-async",
-                    Some(r##"Updates the reseller metadata attached to a batch of devices. This method
-        updates devices asynchronously and returns an `Operation` that can be used
-        to track progress. Read [Long‑running batch
-        operations](/zero-touch/guides/how-it-works#operations)."##),
+                    Some(r##"Updates the reseller metadata attached to a batch of devices. This method updates devices asynchronously and returns an `Operation` that can be used to track progress. Read [Long‑running batch operations](/zero-touch/guides/how-it-works#operations)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-update-metadata-async",
                   vec![
                     (Some(r##"partner-id"##),
@@ -2742,8 +2680,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name in the format
-        `partners/[PARTNER_ID]/vendors/[VENDOR_ID]`."##),
+                     Some(r##"Required. The resource name in the format `partners/[PARTNER_ID]/vendors/[VENDOR_ID]`."##),
                      Some(true),
                      Some(false)),
         
@@ -2787,7 +2724,7 @@ fn main() {
     
     let mut app = App::new("androiddeviceprovisioning1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200708")
+           .version("2.0.0+20210331")
            .about("Automates Android zero-touch enrollment for device resellers, customers, and EMMs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli")
            .arg(Arg::with_name("folder")
@@ -2797,12 +2734,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -2850,13 +2782,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

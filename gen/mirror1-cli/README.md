@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *mirror* API at revision *20190424*. The CLI is at version *1.0.14*.
+This documentation was generated from the *mirror* API at revision *20190424*. The CLI is at version *2.0.0*.
 
 ```bash
 mirror1 [options]
@@ -51,14 +51,14 @@ mirror1 [options]
         timeline
                 attachments-delete <item-id> <attachment-id> [-p <v>]...
                 attachments-get <item-id> <attachment-id> [-p <v>]... [-o <out>]
-                attachments-insert <item-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                attachments-insert <item-id> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 attachments-list <item-id> [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]...
                 get <id> [-p <v>]... [-o <out>]
-                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <id> (-r <kv>)... [-p <v>]... [-o <out>]
-                update <id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                update <id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
   mirror1 --help
 
 Configuration:
@@ -70,12 +70,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -128,10 +122,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `mirror1 --debug <resource> <method> [options] 2>debug.txt`.
 

@@ -5,22 +5,22 @@ DO NOT EDIT !
 -->
 The `google-dlp2` library allows access to all features of the *Google DLP* service.
 
-This documentation was generated from *DLP* crate version *1.0.14+20200706*, where *20200706* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *DLP* crate version *2.0.0+20210326*, where *20210326* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *DLP* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/dlp/docs/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.DLP.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/DLP) ... 
 
 * info types
- * [*list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.InfoTypeListCall.html)
+ * [*list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::InfoTypeListCall)
 * locations
- * [*info types list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.LocationInfoTypeListCall.html)
+ * [*info types list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::LocationInfoTypeListCall)
 * organizations
- * [*deidentify templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationDeidentifyTemplateGetCall.html), [*deidentify templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationDeidentifyTemplateListCall.html), [*deidentify templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationDeidentifyTemplatePatchCall.html), [*inspect templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationInspectTemplateCreateCall.html), [*inspect templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationInspectTemplateDeleteCall.html), [*inspect templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationInspectTemplateGetCall.html), [*inspect templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationInspectTemplateListCall.html), [*inspect templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationInspectTemplatePatchCall.html), [*locations deidentify templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationDeidentifyTemplateCreateCall.html), [*locations deidentify templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationDeidentifyTemplateDeleteCall.html), [*locations deidentify templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationDeidentifyTemplateGetCall.html), [*locations deidentify templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationDeidentifyTemplateListCall.html), [*locations deidentify templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationDeidentifyTemplatePatchCall.html), [*locations inspect templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationInspectTemplateCreateCall.html), [*locations inspect templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationInspectTemplateDeleteCall.html), [*locations inspect templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationInspectTemplateGetCall.html), [*locations inspect templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationInspectTemplateListCall.html), [*locations inspect templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationInspectTemplatePatchCall.html), [*locations stored info types create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationStoredInfoTypeCreateCall.html), [*locations stored info types delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationStoredInfoTypeDeleteCall.html), [*locations stored info types get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationStoredInfoTypeGetCall.html), [*locations stored info types list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationStoredInfoTypeListCall.html), [*locations stored info types patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationLocationStoredInfoTypePatchCall.html), [*stored info types create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationStoredInfoTypeCreateCall.html), [*stored info types delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationStoredInfoTypeDeleteCall.html), [*stored info types get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationStoredInfoTypeGetCall.html), [*stored info types list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationStoredInfoTypeListCall.html) and [*stored info types patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.OrganizationStoredInfoTypePatchCall.html)
+ * [*deidentify templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationDeidentifyTemplateCreateCall), [*deidentify templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationDeidentifyTemplateDeleteCall), [*deidentify templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationDeidentifyTemplateGetCall), [*deidentify templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationDeidentifyTemplateListCall), [*deidentify templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationDeidentifyTemplatePatchCall), [*inspect templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationInspectTemplateCreateCall), [*inspect templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationInspectTemplateDeleteCall), [*inspect templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationInspectTemplateGetCall), [*inspect templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationInspectTemplateListCall), [*inspect templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationInspectTemplatePatchCall), [*locations deidentify templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationDeidentifyTemplateCreateCall), [*locations deidentify templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationDeidentifyTemplateDeleteCall), [*locations deidentify templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationDeidentifyTemplateGetCall), [*locations deidentify templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationDeidentifyTemplateListCall), [*locations deidentify templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationDeidentifyTemplatePatchCall), [*locations dlp jobs list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationDlpJobListCall), [*locations inspect templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationInspectTemplateCreateCall), [*locations inspect templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationInspectTemplateDeleteCall), [*locations inspect templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationInspectTemplateGetCall), [*locations inspect templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationInspectTemplateListCall), [*locations inspect templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationInspectTemplatePatchCall), [*locations job triggers create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationJobTriggerCreateCall), [*locations job triggers delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationJobTriggerDeleteCall), [*locations job triggers get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationJobTriggerGetCall), [*locations job triggers list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationJobTriggerListCall), [*locations job triggers patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationJobTriggerPatchCall), [*locations stored info types create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationStoredInfoTypeCreateCall), [*locations stored info types delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationStoredInfoTypeDeleteCall), [*locations stored info types get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationStoredInfoTypeGetCall), [*locations stored info types list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationStoredInfoTypeListCall), [*locations stored info types patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationLocationStoredInfoTypePatchCall), [*stored info types create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationStoredInfoTypeCreateCall), [*stored info types delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationStoredInfoTypeDeleteCall), [*stored info types get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationStoredInfoTypeGetCall), [*stored info types list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationStoredInfoTypeListCall) and [*stored info types patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::OrganizationStoredInfoTypePatchCall)
 * projects
- * [*content deidentify*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectContentDeidentifyCall.html), [*content inspect*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectContentInspectCall.html), [*content reidentify*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectContentReidentifyCall.html), [*deidentify templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDeidentifyTemplateGetCall.html), [*deidentify templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDeidentifyTemplateListCall.html), [*deidentify templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDeidentifyTemplatePatchCall.html), [*dlp jobs cancel*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDlpJobCancelCall.html), [*dlp jobs create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDlpJobCreateCall.html), [*dlp jobs delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDlpJobDeleteCall.html), [*dlp jobs get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDlpJobGetCall.html), [*dlp jobs list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectDlpJobListCall.html), [*image redact*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectImageRedactCall.html), [*inspect templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectInspectTemplateCreateCall.html), [*inspect templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectInspectTemplateDeleteCall.html), [*inspect templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectInspectTemplateGetCall.html), [*inspect templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectInspectTemplateListCall.html), [*inspect templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectInspectTemplatePatchCall.html), [*job triggers activate*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectJobTriggerActivateCall.html), [*job triggers create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectJobTriggerCreateCall.html), [*job triggers delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectJobTriggerDeleteCall.html), [*job triggers get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectJobTriggerGetCall.html), [*job triggers list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectJobTriggerListCall.html), [*job triggers patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectJobTriggerPatchCall.html), [*locations content deidentify*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationContentDeidentifyCall.html), [*locations content inspect*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationContentInspectCall.html), [*locations content reidentify*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationContentReidentifyCall.html), [*locations deidentify templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDeidentifyTemplateCreateCall.html), [*locations deidentify templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDeidentifyTemplateDeleteCall.html), [*locations deidentify templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDeidentifyTemplateGetCall.html), [*locations deidentify templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDeidentifyTemplateListCall.html), [*locations deidentify templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDeidentifyTemplatePatchCall.html), [*locations dlp jobs cancel*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobCancelCall.html), [*locations dlp jobs create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobCreateCall.html), [*locations dlp jobs delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobDeleteCall.html), [*locations dlp jobs finish*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobFinishCall.html), [*locations dlp jobs get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobGetCall.html), [*locations dlp jobs hybrid inspect*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobHybridInspectCall.html), [*locations dlp jobs list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationDlpJobListCall.html), [*locations image redact*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationImageRedactCall.html), [*locations inspect templates create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationInspectTemplateCreateCall.html), [*locations inspect templates delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationInspectTemplateDeleteCall.html), [*locations inspect templates get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationInspectTemplateGetCall.html), [*locations inspect templates list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationInspectTemplateListCall.html), [*locations inspect templates patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationInspectTemplatePatchCall.html), [*locations job triggers activate*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerActivateCall.html), [*locations job triggers create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerCreateCall.html), [*locations job triggers delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerDeleteCall.html), [*locations job triggers get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerGetCall.html), [*locations job triggers hybrid inspect*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerHybridInspectCall.html), [*locations job triggers list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerListCall.html), [*locations job triggers patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationJobTriggerPatchCall.html), [*locations stored info types create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationStoredInfoTypeCreateCall.html), [*locations stored info types delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationStoredInfoTypeDeleteCall.html), [*locations stored info types get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationStoredInfoTypeGetCall.html), [*locations stored info types list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationStoredInfoTypeListCall.html), [*locations stored info types patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectLocationStoredInfoTypePatchCall.html), [*stored info types create*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectStoredInfoTypeCreateCall.html), [*stored info types delete*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectStoredInfoTypeDeleteCall.html), [*stored info types get*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectStoredInfoTypeGetCall.html), [*stored info types list*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectStoredInfoTypeListCall.html) and [*stored info types patch*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.ProjectStoredInfoTypePatchCall.html)
+ * [*content deidentify*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectContentDeidentifyCall), [*content inspect*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectContentInspectCall), [*content reidentify*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectContentReidentifyCall), [*deidentify templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDeidentifyTemplateCreateCall), [*deidentify templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDeidentifyTemplateDeleteCall), [*deidentify templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDeidentifyTemplateGetCall), [*deidentify templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDeidentifyTemplateListCall), [*deidentify templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDeidentifyTemplatePatchCall), [*dlp jobs cancel*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDlpJobCancelCall), [*dlp jobs create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDlpJobCreateCall), [*dlp jobs delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDlpJobDeleteCall), [*dlp jobs get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDlpJobGetCall), [*dlp jobs list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectDlpJobListCall), [*image redact*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectImageRedactCall), [*inspect templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectInspectTemplateCreateCall), [*inspect templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectInspectTemplateDeleteCall), [*inspect templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectInspectTemplateGetCall), [*inspect templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectInspectTemplateListCall), [*inspect templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectInspectTemplatePatchCall), [*job triggers activate*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectJobTriggerActivateCall), [*job triggers create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectJobTriggerCreateCall), [*job triggers delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectJobTriggerDeleteCall), [*job triggers get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectJobTriggerGetCall), [*job triggers list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectJobTriggerListCall), [*job triggers patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectJobTriggerPatchCall), [*locations content deidentify*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationContentDeidentifyCall), [*locations content inspect*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationContentInspectCall), [*locations content reidentify*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationContentReidentifyCall), [*locations deidentify templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDeidentifyTemplateCreateCall), [*locations deidentify templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDeidentifyTemplateDeleteCall), [*locations deidentify templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDeidentifyTemplateGetCall), [*locations deidentify templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDeidentifyTemplateListCall), [*locations deidentify templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDeidentifyTemplatePatchCall), [*locations dlp jobs cancel*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobCancelCall), [*locations dlp jobs create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobCreateCall), [*locations dlp jobs delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobDeleteCall), [*locations dlp jobs finish*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobFinishCall), [*locations dlp jobs get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobGetCall), [*locations dlp jobs hybrid inspect*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobHybridInspectCall), [*locations dlp jobs list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationDlpJobListCall), [*locations image redact*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationImageRedactCall), [*locations inspect templates create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationInspectTemplateCreateCall), [*locations inspect templates delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationInspectTemplateDeleteCall), [*locations inspect templates get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationInspectTemplateGetCall), [*locations inspect templates list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationInspectTemplateListCall), [*locations inspect templates patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationInspectTemplatePatchCall), [*locations job triggers activate*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerActivateCall), [*locations job triggers create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerCreateCall), [*locations job triggers delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerDeleteCall), [*locations job triggers get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerGetCall), [*locations job triggers hybrid inspect*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerHybridInspectCall), [*locations job triggers list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerListCall), [*locations job triggers patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationJobTriggerPatchCall), [*locations stored info types create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationStoredInfoTypeCreateCall), [*locations stored info types delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationStoredInfoTypeDeleteCall), [*locations stored info types get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationStoredInfoTypeGetCall), [*locations stored info types list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationStoredInfoTypeListCall), [*locations stored info types patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectLocationStoredInfoTypePatchCall), [*stored info types create*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectStoredInfoTypeCreateCall), [*stored info types delete*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectStoredInfoTypeDeleteCall), [*stored info types get*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectStoredInfoTypeGetCall), [*stored info types list*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectStoredInfoTypeListCall) and [*stored info types patch*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/api::ProjectStoredInfoTypePatchCall)
 
 
 
@@ -29,17 +29,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/struct.DLP.html)**
+* **[Hub](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/DLP)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::CallBuilder)
+* **[Resources](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -47,31 +47,32 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.projects().deidentify_templates_delete(...).doit()
-let r = hub.organizations().locations_deidentify_templates_delete(...).doit()
-let r = hub.projects().locations_stored_info_types_delete(...).doit()
-let r = hub.organizations().locations_inspect_templates_delete(...).doit()
-let r = hub.projects().locations_deidentify_templates_delete(...).doit()
-let r = hub.projects().locations_dlp_jobs_finish(...).doit()
-let r = hub.projects().dlp_jobs_cancel(...).doit()
-let r = hub.projects().stored_info_types_delete(...).doit()
-let r = hub.organizations().locations_stored_info_types_delete(...).doit()
-let r = hub.projects().job_triggers_delete(...).doit()
-let r = hub.organizations().stored_info_types_delete(...).doit()
-let r = hub.projects().locations_dlp_jobs_delete(...).doit()
-let r = hub.projects().locations_dlp_jobs_cancel(...).doit()
-let r = hub.organizations().deidentify_templates_delete(...).doit()
-let r = hub.projects().dlp_jobs_delete(...).doit()
-let r = hub.projects().inspect_templates_delete(...).doit()
-let r = hub.projects().locations_job_triggers_delete(...).doit()
-let r = hub.organizations().inspect_templates_delete(...).doit()
-let r = hub.projects().locations_inspect_templates_delete(...).doit()
+let r = hub.organizations().deidentify_templates_delete(...).doit().await
+let r = hub.organizations().inspect_templates_delete(...).doit().await
+let r = hub.organizations().locations_deidentify_templates_delete(...).doit().await
+let r = hub.organizations().locations_inspect_templates_delete(...).doit().await
+let r = hub.organizations().locations_job_triggers_delete(...).doit().await
+let r = hub.organizations().locations_stored_info_types_delete(...).doit().await
+let r = hub.organizations().stored_info_types_delete(...).doit().await
+let r = hub.projects().deidentify_templates_delete(...).doit().await
+let r = hub.projects().dlp_jobs_cancel(...).doit().await
+let r = hub.projects().dlp_jobs_delete(...).doit().await
+let r = hub.projects().inspect_templates_delete(...).doit().await
+let r = hub.projects().job_triggers_delete(...).doit().await
+let r = hub.projects().locations_deidentify_templates_delete(...).doit().await
+let r = hub.projects().locations_dlp_jobs_cancel(...).doit().await
+let r = hub.projects().locations_dlp_jobs_delete(...).doit().await
+let r = hub.projects().locations_dlp_jobs_finish(...).doit().await
+let r = hub.projects().locations_inspect_templates_delete(...).doit().await
+let r = hub.projects().locations_job_triggers_delete(...).doit().await
+let r = hub.projects().locations_stored_info_types_delete(...).doit().await
+let r = hub.projects().stored_info_types_delete(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -91,11 +92,11 @@ google-dlp2 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -105,40 +106,42 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_dlp2 as dlp2;
-use dlp2::GooglePrivacyDlpV2FinishDlpJobRequest;
+use dlp2::api::GooglePrivacyDlpV2CancelDlpJobRequest;
 use dlp2::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use dlp2::DLP;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = GooglePrivacyDlpV2FinishDlpJobRequest::default();
+let mut req = GooglePrivacyDlpV2CancelDlpJobRequest::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().locations_dlp_jobs_finish(req, "name")
-             .doit();
+let result = hub.projects().dlp_jobs_cancel(req, "name")
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -154,17 +157,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -174,29 +177,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::RequestValue) and 
+[decodable](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-dlp2/1.0.14+20200706/google_dlp2/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-dlp2/2.0.0+20210326/google_dlp2/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

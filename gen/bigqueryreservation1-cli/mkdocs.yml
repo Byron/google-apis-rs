@@ -1,4 +1,4 @@
-site_name: BigQuery Reservation v1.0.14+20200702
+site_name: BigQuery Reservation v2.0.0+20210324
 site_url: http://byron.github.io/google-apis-rs/google-bigqueryreservation1-cli
 site_description: A complete library to interact with BigQuery Reservation (protocol v1)
 
@@ -9,8 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['operations_delete.md', 'Operations', 'Delete']
-- ['operations_list.md', 'Operations', 'List']
 - ['projects_locations-capacity-commitments-create.md', 'Projects', 'Locations Capacity Commitments Create']
 - ['projects_locations-capacity-commitments-delete.md', 'Projects', 'Locations Capacity Commitments Delete']
 - ['projects_locations-capacity-commitments-get.md', 'Projects', 'Locations Capacity Commitments Get']

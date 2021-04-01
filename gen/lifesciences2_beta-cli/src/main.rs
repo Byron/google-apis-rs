@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_lifesciences2_beta as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_lifesciences2_beta::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudLifeSciences<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudLifeSciences<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -126,7 +122,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -145,7 +141,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -160,7 +156,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -229,7 +225,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -244,7 +240,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -281,7 +277,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -296,7 +292,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -324,7 +320,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -343,7 +339,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -358,7 +354,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_pipelines_run(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_pipelines_run(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -381,27 +377,28 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "pipeline.environment" => Some(("pipeline.environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "pipeline.timeout" => Some(("pipeline.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pipeline.resources.regions" => Some(("pipeline.resources.regions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "pipeline.resources.zones" => Some(("pipeline.resources.zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "pipeline.resources.virtual-machine.cpu-platform" => Some(("pipeline.resources.virtualMachine.cpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pipeline.resources.virtual-machine.docker-cache-images" => Some(("pipeline.resources.virtualMachine.dockerCacheImages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "pipeline.resources.virtual-machine.machine-type" => Some(("pipeline.resources.virtualMachine.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pipeline.resources.virtual-machine.network.subnetwork" => Some(("pipeline.resources.virtualMachine.network.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pipeline.resources.virtual-machine.network.use-private-address" => Some(("pipeline.resources.virtualMachine.network.usePrivateAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "pipeline.resources.virtual-machine.network.network" => Some(("pipeline.resources.virtualMachine.network.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pipeline.resources.virtual-machine.nvidia-driver-version" => Some(("pipeline.resources.virtualMachine.nvidiaDriverVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "pipeline.resources.virtual-machine.labels" => Some(("pipeline.resources.virtualMachine.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "pipeline.resources.virtual-machine.service-account.scopes" => Some(("pipeline.resources.virtualMachine.serviceAccount.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "pipeline.resources.virtual-machine.service-account.email" => Some(("pipeline.resources.virtualMachine.serviceAccount.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pipeline.resources.virtual-machine.boot-disk-size-gb" => Some(("pipeline.resources.virtualMachine.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "pipeline.resources.virtual-machine.boot-image" => Some(("pipeline.resources.virtualMachine.bootImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.cpu-platform" => Some(("pipeline.resources.virtualMachine.cpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.docker-cache-images" => Some(("pipeline.resources.virtualMachine.dockerCacheImages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "pipeline.resources.virtual-machine.enable-stackdriver-monitoring" => Some(("pipeline.resources.virtualMachine.enableStackdriverMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.labels" => Some(("pipeline.resources.virtualMachine.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "pipeline.resources.virtual-machine.machine-type" => Some(("pipeline.resources.virtualMachine.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.network.network" => Some(("pipeline.resources.virtualMachine.network.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.network.subnetwork" => Some(("pipeline.resources.virtualMachine.network.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.network.use-private-address" => Some(("pipeline.resources.virtualMachine.network.usePrivateAddress", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.nvidia-driver-version" => Some(("pipeline.resources.virtualMachine.nvidiaDriverVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pipeline.resources.virtual-machine.preemptible" => Some(("pipeline.resources.virtualMachine.preemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "pipeline.resources.virtual-machine.service-account.email" => Some(("pipeline.resources.virtualMachine.serviceAccount.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pipeline.resources.virtual-machine.service-account.scopes" => Some(("pipeline.resources.virtualMachine.serviceAccount.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pipeline.resources.zones" => Some(("pipeline.resources.zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pipeline.timeout" => Some(("pipeline.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pub-sub-topic" => Some(("pubSubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-image", "cpu-platform", "docker-cache-images", "email", "enable-stackdriver-monitoring", "environment", "labels", "machine-type", "network", "nvidia-driver-version", "pipeline", "preemptible", "regions", "resources", "scopes", "service-account", "subnetwork", "timeout", "use-private-address", "virtual-machine", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-image", "cpu-platform", "docker-cache-images", "email", "enable-stackdriver-monitoring", "environment", "labels", "machine-type", "network", "nvidia-driver-version", "pipeline", "preemptible", "pub-sub-topic", "regions", "resources", "scopes", "service-account", "subnetwork", "timeout", "use-private-address", "virtual-machine", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -446,7 +443,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -461,7 +458,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -469,22 +466,22 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-get", Some(opt)) => {
-                        call_result = self._projects_locations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-cancel", Some(opt)) => {
-                        call_result = self._projects_locations_operations_cancel(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_cancel(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-get", Some(opt)) => {
-                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-list", Some(opt)) => {
-                        call_result = self._projects_locations_operations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-pipelines-run", Some(opt)) => {
-                        call_result = self._projects_locations_pipelines_run(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_pipelines_run(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -509,41 +506,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "lifesciences2-beta-secret.json",
+            match client::application_secret_from_directory(&config_dir, "lifesciences2-beta-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "lifesciences2-beta",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/lifesciences2-beta", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudLifeSciences::new(client, auth),
@@ -559,22 +541,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list' and 'locations-pipelines-run'", vec![
@@ -623,15 +606,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation.
-        The server makes a best effort to cancel the operation, but success is not
-        guaranteed. Clients may use Operations.GetOperation
-        or Operations.ListOperations
-        to check whether the cancellation succeeded or the operation completed
-        despite cancellation.
-        Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
-        
-        * `lifesciences.operations.cancel`"##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation. Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission: * `lifesciences.operations.cancel`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -659,12 +634,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-get",
-                    Some(r##"Gets the latest state of a long-running operation.
-        Clients can use this method to poll the operation result at intervals as
-        recommended by the API service.
-        Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
-        
-        * `lifesciences.operations.get`"##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service. Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission: * `lifesciences.operations.get`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli/projects_locations-operations-get",
                   vec![
                     (Some(r##"name"##),
@@ -686,10 +656,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request.
-        Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
-        
-        * `lifesciences.operations.list`"##),
+                    Some(r##"Lists operations that match the specified filter in the request. Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission: * `lifesciences.operations.list`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -711,22 +678,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-pipelines-run",
-                    Some(r##"Runs a pipeline.  The returned Operation's metadata field will contain a
-        google.cloud.lifesciences.v2beta.Metadata object describing the status
-        of the pipeline execution. The
-        response field will contain a
-        google.cloud.lifesciences.v2beta.RunPipelineResponse object if the
-        pipeline completes successfully.
-        
-        **Note:** Before you can use this method, the *Life Sciences Service Agent*
-        must have access to your project. This is done automatically when the
-        Cloud Life Sciences API is first enabled, but if you delete this permission
-        you must disable and re-enable the API to grant the Life Sciences
-        Service Agent the required permissions.
-        Authorization requires the following [Google
-        IAM](https://cloud.google.com/iam/) permission:
-        
-        * `lifesciences.workflows.run`"##),
+                    Some(r##"Runs a pipeline. The returned Operation's metadata field will contain a google.cloud.lifesciences.v2beta.Metadata object describing the status of the pipeline execution. The response field will contain a google.cloud.lifesciences.v2beta.RunPipelineResponse object if the pipeline completes successfully. **Note:** Before you can use this method, the *Life Sciences Service Agent* must have access to your project. This is done automatically when the Cloud Life Sciences API is first enabled, but if you delete this permission you must disable and re-enable the API to grant the Life Sciences Service Agent the required permissions. Authorization requires the following [Google IAM](https://cloud.google.com/iam/) permission: * `lifesciences.workflows.run`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli/projects_locations-pipelines-run",
                   vec![
                     (Some(r##"parent"##),
@@ -759,7 +711,7 @@ fn main() {
     
     let mut app = App::new("lifesciences2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200625")
+           .version("2.0.0+20210319")
            .about("Cloud Life Sciences is a suite of services and tools for managing, processing, and transforming life sciences data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli")
            .arg(Arg::with_name("url")
@@ -774,12 +726,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -827,13 +774,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

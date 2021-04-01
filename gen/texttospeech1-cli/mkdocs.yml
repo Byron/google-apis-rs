@@ -1,4 +1,4 @@
-site_name: Texttospeech v1.0.14+20200703
+site_name: Texttospeech v2.0.0+20210326
 site_url: http://byron.github.io/google-apis-rs/google-texttospeech1-cli
 site_description: A complete library to interact with Texttospeech (protocol v1)
 

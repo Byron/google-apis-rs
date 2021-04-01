@@ -3,146 +3,146 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-dfareporting3d3` library allows access to all features of the *Google dfareporting* service.
+The `google-dfareporting3d3` library allows access to all features of the *Google Dfareporting* service.
 
-This documentation was generated from *dfareporting* crate version *1.0.14+20200514*, where *20200514* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *Dfareporting* crate version *2.0.0+20210210*, where *20210210* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
-Everything else about the *dfareporting* *v3d3* API can be found at the
+Everything else about the *Dfareporting* *v3d3* API can be found at the
 [official documentation site](https://developers.google.com/doubleclick-advertisers/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Dfareporting.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/Dfareporting) ... 
 
-* [account active ad summaries](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountActiveAdSummary.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountActiveAdSummaryGetCall.html)
-* [account permission groups](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPermissionGroup.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPermissionGroupGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPermissionGroupListCall.html)
-* [account permissions](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPermission.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPermissionGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPermissionListCall.html)
-* [account user profiles](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUserProfile.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUserProfileGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUserProfileInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUserProfileListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUserProfilePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUserProfileUpdateCall.html)
-* [accounts](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Account.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountGetCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AccountUpdateCall.html)
-* [ads](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Ad.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdUpdateCall.html)
-* [advertiser groups](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroup.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroupDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroupGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroupInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroupListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroupPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGroupUpdateCall.html)
+* [account active ad summaries](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountActiveAdSummary)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountActiveAdSummaryGetCall)
+* [account permission groups](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPermissionGroup)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPermissionGroupGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPermissionGroupListCall)
+* [account permissions](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPermission)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPermissionGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPermissionListCall)
+* [account user profiles](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUserProfile)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUserProfileGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUserProfileInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUserProfileListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUserProfilePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUserProfileUpdateCall)
+* [accounts](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Account)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountGetCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AccountUpdateCall)
+* [ads](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Ad)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdUpdateCall)
+* [advertiser groups](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroup)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroupDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroupGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroupInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroupListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroupPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGroupUpdateCall)
 * advertiser landing pages
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserLandingPageGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserLandingPageInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserLandingPageListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserLandingPagePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserLandingPageUpdateCall.html)
-* [advertisers](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Advertiser.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.AdvertiserUpdateCall.html)
-* [browsers](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Browser.html)
- * [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.BrowserListCall.html)
-* [campaign creative associations](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignCreativeAssociation.html)
- * [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignCreativeAssociationInsertCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignCreativeAssociationListCall.html)
-* [campaigns](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Campaign.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CampaignUpdateCall.html)
-* [change logs](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ChangeLog.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ChangeLogGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ChangeLogListCall.html)
-* [cities](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.City.html)
- * [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CityListCall.html)
-* [connection types](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ConnectionType.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ConnectionTypeGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ConnectionTypeListCall.html)
-* [content categories](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategory.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategoryDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategoryGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategoryInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategoryListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategoryPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ContentCategoryUpdateCall.html)
-* [conversions](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Conversion.html)
- * [*batchinsert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ConversionBatchinsertCall.html) and [*batchupdate*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ConversionBatchupdateCall.html)
-* [countries](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Country.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CountryGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CountryListCall.html)
-* [creative assets](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeAsset.html)
- * [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeAssetInsertCall.html)
-* [creative field values](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValue.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValueDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValueGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValueInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValueListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValuePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldValueUpdateCall.html)
-* [creative fields](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeField.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeFieldUpdateCall.html)
-* [creative groups](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGroup.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGroupGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGroupInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGroupListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGroupPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGroupUpdateCall.html)
-* [creatives](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Creative.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeUpdateCall.html)
-* [dimension values](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DimensionValue.html)
- * [*query*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DimensionValueQueryCall.html)
-* [directory sites](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DirectorySite.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DirectorySiteGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DirectorySiteInsertCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DirectorySiteListCall.html)
-* [dynamic targeting keys](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DynamicTargetingKey.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DynamicTargetingKeyDeleteCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DynamicTargetingKeyInsertCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.DynamicTargetingKeyListCall.html)
-* [event tags](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTag.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTagDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTagGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTagInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTagListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTagPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.EventTagUpdateCall.html)
-* [files](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.File.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FileGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FileListCall.html)
-* [floodlight activities](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivity.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityDeleteCall.html), [*generatetag*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGeneratetagCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityUpdateCall.html)
-* [floodlight activity groups](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGroup.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGroupGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGroupInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGroupListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGroupPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightActivityGroupUpdateCall.html)
-* [floodlight configurations](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightConfiguration.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightConfigurationGetCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightConfigurationListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightConfigurationPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FloodlightConfigurationUpdateCall.html)
-* [inventory items](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.InventoryItem.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.InventoryItemGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.InventoryItemListCall.html)
-* [languages](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Language.html)
- * [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.LanguageListCall.html)
-* [metros](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Metro.html)
- * [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MetroListCall.html)
-* [mobile apps](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MobileApp.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MobileAppGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MobileAppListCall.html)
-* [mobile carriers](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MobileCarrier.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MobileCarrierGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.MobileCarrierListCall.html)
-* [operating system versions](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OperatingSystemVersion.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OperatingSystemVersionGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OperatingSystemVersionListCall.html)
-* [operating systems](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OperatingSystem.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OperatingSystemGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OperatingSystemListCall.html)
-* [order documents](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OrderDocument.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OrderDocumentGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OrderDocumentListCall.html)
-* [orders](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Order.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OrderGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.OrderListCall.html)
-* [placement groups](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGroup.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGroupGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGroupInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGroupListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGroupPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGroupUpdateCall.html)
-* [placement strategies](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategy.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategyDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategyGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategyInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategyListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategyPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementStrategyUpdateCall.html)
-* [placements](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Placement.html)
- * [*generatetags*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGeneratetagCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlacementUpdateCall.html)
-* [platform types](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlatformType.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlatformTypeGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PlatformTypeListCall.html)
-* [postal codes](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PostalCode.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PostalCodeGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.PostalCodeListCall.html)
-* [projects](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Project.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ProjectGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ProjectListCall.html)
-* [regions](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Region.html)
- * [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RegionListCall.html)
-* [remarketing list shares](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListShare.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListShareGetCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListSharePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListShareUpdateCall.html)
-* [remarketing lists](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingList.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.RemarketingListUpdateCall.html)
-* [reports](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Report.html)
- * [*compatible fields query*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportCompatibleFieldQueryCall.html), [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportDeleteCall.html), [*files get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportFileGetCall.html), [*files list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportFileListCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportPatchCall.html), [*run*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportRunCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportUpdateCall.html)
-* [sites](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Site.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SiteGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SiteInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SiteListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SitePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SiteUpdateCall.html)
-* [sizes](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Size.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SizeGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SizeInsertCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SizeListCall.html)
-* [subaccounts](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Subaccount.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SubaccountGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SubaccountInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SubaccountListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SubaccountPatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.SubaccountUpdateCall.html)
-* [targetable remarketing lists](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetableRemarketingList.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetableRemarketingListGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetableRemarketingListListCall.html)
-* [targeting templates](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetingTemplate.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetingTemplateGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetingTemplateInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetingTemplateListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetingTemplatePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.TargetingTemplateUpdateCall.html)
-* [user profiles](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserProfile.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserProfileGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserProfileListCall.html)
-* [user role permission groups](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePermissionGroup.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePermissionGroupGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePermissionGroupListCall.html)
-* [user role permissions](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePermission.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePermissionGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePermissionListCall.html)
-* [user roles](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRole.html)
- * [*delete*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRoleDeleteCall.html), [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRoleGetCall.html), [*insert*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRoleInsertCall.html), [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRoleListCall.html), [*patch*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRolePatchCall.html) and [*update*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.UserRoleUpdateCall.html)
-* [video formats](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.VideoFormat.html)
- * [*get*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.VideoFormatGetCall.html) and [*list*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.VideoFormatListCall.html)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserLandingPageGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserLandingPageInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserLandingPageListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserLandingPagePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserLandingPageUpdateCall)
+* [advertisers](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Advertiser)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::AdvertiserUpdateCall)
+* [browsers](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Browser)
+ * [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::BrowserListCall)
+* [campaign creative associations](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignCreativeAssociation)
+ * [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignCreativeAssociationInsertCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignCreativeAssociationListCall)
+* [campaigns](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Campaign)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CampaignUpdateCall)
+* [change logs](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ChangeLog)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ChangeLogGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ChangeLogListCall)
+* [cities](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::City)
+ * [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CityListCall)
+* [connection types](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ConnectionType)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ConnectionTypeGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ConnectionTypeListCall)
+* [content categories](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategory)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategoryDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategoryGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategoryInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategoryListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategoryPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ContentCategoryUpdateCall)
+* [conversions](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Conversion)
+ * [*batchinsert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ConversionBatchinsertCall) and [*batchupdate*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ConversionBatchupdateCall)
+* [countries](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Country)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CountryGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CountryListCall)
+* [creative assets](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeAsset)
+ * [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeAssetInsertCall)
+* [creative field values](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValue)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValueDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValueGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValueInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValueListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValuePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldValueUpdateCall)
+* [creative fields](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeField)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeFieldUpdateCall)
+* [creative groups](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGroup)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGroupGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGroupInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGroupListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGroupPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGroupUpdateCall)
+* [creatives](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Creative)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeUpdateCall)
+* [dimension values](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DimensionValue)
+ * [*query*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DimensionValueQueryCall)
+* [directory sites](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DirectorySite)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DirectorySiteGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DirectorySiteInsertCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DirectorySiteListCall)
+* [dynamic targeting keys](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DynamicTargetingKey)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DynamicTargetingKeyDeleteCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DynamicTargetingKeyInsertCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::DynamicTargetingKeyListCall)
+* [event tags](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTag)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTagDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTagGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTagInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTagListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTagPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::EventTagUpdateCall)
+* [files](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::File)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FileGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FileListCall)
+* [floodlight activities](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivity)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityDeleteCall), [*generatetag*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGeneratetagCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityUpdateCall)
+* [floodlight activity groups](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGroup)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGroupGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGroupInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGroupListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGroupPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightActivityGroupUpdateCall)
+* [floodlight configurations](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightConfiguration)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightConfigurationGetCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightConfigurationListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightConfigurationPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FloodlightConfigurationUpdateCall)
+* [inventory items](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::InventoryItem)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::InventoryItemGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::InventoryItemListCall)
+* [languages](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Language)
+ * [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::LanguageListCall)
+* [metros](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Metro)
+ * [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MetroListCall)
+* [mobile apps](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MobileApp)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MobileAppGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MobileAppListCall)
+* [mobile carriers](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MobileCarrier)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MobileCarrierGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::MobileCarrierListCall)
+* [operating system versions](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OperatingSystemVersion)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OperatingSystemVersionGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OperatingSystemVersionListCall)
+* [operating systems](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OperatingSystem)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OperatingSystemGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OperatingSystemListCall)
+* [order documents](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OrderDocument)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OrderDocumentGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OrderDocumentListCall)
+* [orders](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Order)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OrderGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::OrderListCall)
+* [placement groups](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGroup)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGroupGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGroupInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGroupListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGroupPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGroupUpdateCall)
+* [placement strategies](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategy)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategyDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategyGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategyInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategyListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategyPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementStrategyUpdateCall)
+* [placements](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Placement)
+ * [*generatetags*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGeneratetagCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlacementUpdateCall)
+* [platform types](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlatformType)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlatformTypeGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PlatformTypeListCall)
+* [postal codes](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PostalCode)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PostalCodeGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::PostalCodeListCall)
+* [projects](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Project)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ProjectGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ProjectListCall)
+* [regions](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Region)
+ * [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RegionListCall)
+* [remarketing list shares](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListShare)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListShareGetCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListSharePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListShareUpdateCall)
+* [remarketing lists](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingList)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::RemarketingListUpdateCall)
+* [reports](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Report)
+ * [*compatible fields query*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportCompatibleFieldQueryCall), [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportDeleteCall), [*files get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportFileGetCall), [*files list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportFileListCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportPatchCall), [*run*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportRunCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportUpdateCall)
+* [sites](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Site)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SiteGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SiteInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SiteListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SitePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SiteUpdateCall)
+* [sizes](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Size)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SizeGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SizeInsertCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SizeListCall)
+* [subaccounts](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::Subaccount)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SubaccountGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SubaccountInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SubaccountListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SubaccountPatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::SubaccountUpdateCall)
+* [targetable remarketing lists](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetableRemarketingList)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetableRemarketingListGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetableRemarketingListListCall)
+* [targeting templates](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetingTemplate)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetingTemplateGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetingTemplateInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetingTemplateListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetingTemplatePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::TargetingTemplateUpdateCall)
+* [user profiles](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserProfile)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserProfileGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserProfileListCall)
+* [user role permission groups](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePermissionGroup)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePermissionGroupGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePermissionGroupListCall)
+* [user role permissions](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePermission)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePermissionGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePermissionListCall)
+* [user roles](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRole)
+ * [*delete*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRoleDeleteCall), [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRoleGetCall), [*insert*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRoleInsertCall), [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRoleListCall), [*patch*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRolePatchCall) and [*update*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::UserRoleUpdateCall)
+* [video formats](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::VideoFormat)
+ * [*get*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::VideoFormatGetCall) and [*list*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::VideoFormatListCall)
 
 
 Upload supported by ...
 
-* [*insert creative assets*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.CreativeAssetInsertCall.html)
+* [*insert creative assets*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::CreativeAssetInsertCall)
 
 Download supported by ...
 
-* [*get files*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.FileGetCall.html)
-* [*files get reports*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.ReportFileGetCall.html)
+* [*get files*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::FileGetCall)
+* [*files get reports*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/api::ReportFileGetCall)
 
 
 
@@ -150,17 +150,17 @@ Download supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/struct.Dfareporting.html)**
+* **[Hub](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/Dfareporting)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::CallBuilder)
+* **[Resources](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -168,22 +168,22 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.reports().run(...).doit()
-let r = hub.reports().get(...).doit()
-let r = hub.reports().list(...).doit()
-let r = hub.reports().delete(...).doit()
-let r = hub.reports().files_list(...).doit()
-let r = hub.reports().insert(...).doit()
-let r = hub.reports().patch(...).doit()
-let r = hub.reports().compatible_fields_query(...).doit()
-let r = hub.reports().update(...).doit()
-let r = hub.reports().files_get(...).doit()
+let r = hub.reports().compatible_fields_query(...).doit().await
+let r = hub.reports().files_get(...).doit().await
+let r = hub.reports().files_list(...).doit().await
+let r = hub.reports().delete(...).doit().await
+let r = hub.reports().get(...).doit().await
+let r = hub.reports().insert(...).doit().await
+let r = hub.reports().list(...).doit().await
+let r = hub.reports().patch(...).doit().await
+let r = hub.reports().run(...).doit().await
+let r = hub.reports().update(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -203,11 +203,11 @@ google-dfareporting3d3 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -219,37 +219,38 @@ extern crate yup_oauth2 as oauth2;
 extern crate google_dfareporting3d3 as dfareporting3d3;
 use dfareporting3d3::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use dfareporting3d3::Dfareporting;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = Dfareporting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = Dfareporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.reports().list("profileId")
-             .sort_order("sit")
-             .sort_field("Stet")
-             .scope("sed")
-             .page_token("et")
-             .max_results(-18)
-             .doit();
+let result = hub.reports().files_list("profileId", "reportId")
+             .sort_order("no")
+             .sort_field("ipsum")
+             .page_token("voluptua.")
+             .max_results(-27)
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -265,17 +266,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -285,29 +286,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::RequestValue) and 
+[decodable](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-dfareporting3d3/1.0.14+20200514/google_dfareporting3d3/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-dfareporting3d3/2.0.0+20210210/google_dfareporting3d3/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

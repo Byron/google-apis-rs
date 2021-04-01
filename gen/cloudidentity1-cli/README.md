@@ -25,21 +25,44 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Identity* API at revision *20200707*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Cloud Identity* API at revision *20210310*. The CLI is at version *2.0.0*.
 
 ```bash
 cloudidentity1 [options]
+        devices
+                cancel-wipe <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                device-users-approve <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                device-users-block <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                device-users-cancel-wipe <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                device-users-client-states-get <name> [-p <v>]... [-o <out>]
+                device-users-client-states-list <parent> [-p <v>]... [-o <out>]
+                device-users-client-states-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                device-users-delete <name> [-p <v>]... [-o <out>]
+                device-users-get <name> [-p <v>]... [-o <out>]
+                device-users-list <parent> [-p <v>]... [-o <out>]
+                device-users-lookup <parent> [-p <v>]... [-o <out>]
+                device-users-wipe <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                wipe <name> (-r <kv>)... [-p <v>]... [-o <out>]
         groups
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 lookup [-p <v>]... [-o <out>]
+                memberships-check-transitive-membership <parent> [-p <v>]... [-o <out>]
                 memberships-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 memberships-delete <name> [-p <v>]... [-o <out>]
                 memberships-get <name> [-p <v>]... [-o <out>]
+                memberships-get-membership-graph <parent> [-p <v>]... [-o <out>]
                 memberships-list <parent> [-p <v>]... [-o <out>]
                 memberships-lookup <parent> [-p <v>]... [-o <out>]
+                memberships-modify-membership-roles <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                memberships-search-transitive-groups <parent> [-p <v>]... [-o <out>]
+                memberships-search-transitive-memberships <parent> [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 search [-p <v>]... [-o <out>]
   cloudidentity1 --help
@@ -53,12 +76,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -111,10 +128,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `cloudidentity1 --debug <resource> <method> [options] 2>debug.txt`.
 

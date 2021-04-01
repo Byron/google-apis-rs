@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_doubleclicksearch2 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_doubleclicksearch2::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Doubleclicksearch<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Doubleclicksearch<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _conversion_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _conversion_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let end_date: i32 = arg_from_str(&opt.value_of("end-date").unwrap_or(""), err, "<end-date>", "integer");
         let row_count: i32 = arg_from_str(&opt.value_of("row-count").unwrap_or(""), err, "<row-count>", "integer");
@@ -81,7 +77,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["ad-group-id", "ad-id", "criterion-id", "campaign-id"].iter().map(|v|*v));
+                                                                           v.extend(["ad-id", "ad-group-id", "campaign-id", "criterion-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -100,7 +96,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -115,7 +111,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _conversion_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _conversion_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -185,7 +181,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -200,7 +196,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _conversion_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _conversion_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -270,7 +266,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -285,7 +281,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _conversion_update_availability(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _conversion_update_availability(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -354,7 +350,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -369,7 +365,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _reports_generate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _reports_generate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -392,26 +388,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "report-scope.ad-group-id" => Some(("reportScope.adGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.agency-id" => Some(("reportScope.agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.engine-account-id" => Some(("reportScope.engineAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.campaign-id" => Some(("reportScope.campaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.advertiser-id" => Some(("reportScope.advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.keyword-id" => Some(("reportScope.keywordId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.ad-id" => Some(("reportScope.adId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-rows-per-file" => Some(("maxRowsPerFile", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "statistics-currency" => Some(("statisticsCurrency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.changed-metrics-since-timestamp" => Some(("timeRange.changedMetricsSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.end-date" => Some(("timeRange.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.changed-attributes-since-timestamp" => Some(("timeRange.changedAttributesSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.start-date" => Some(("timeRange.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "start-row" => Some(("startRow", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "row-count" => Some(("rowCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "report-type" => Some(("reportType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-format" => Some(("downloadFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-deleted-entities" => Some(("includeDeletedEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "verify-single-time-zone" => Some(("verifySingleTimeZone", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-removed-entities" => Some(("includeRemovedEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "max-rows-per-file" => Some(("maxRowsPerFile", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "report-scope.ad-group-id" => Some(("reportScope.adGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.ad-id" => Some(("reportScope.adId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.advertiser-id" => Some(("reportScope.advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.agency-id" => Some(("reportScope.agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.campaign-id" => Some(("reportScope.campaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.engine-account-id" => Some(("reportScope.engineAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.keyword-id" => Some(("reportScope.keywordId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-type" => Some(("reportType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "row-count" => Some(("rowCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "start-row" => Some(("startRow", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics-currency" => Some(("statisticsCurrency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.changed-attributes-since-timestamp" => Some(("timeRange.changedAttributesSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.changed-metrics-since-timestamp" => Some(("timeRange.changedMetricsSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.end-date" => Some(("timeRange.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.start-date" => Some(("timeRange.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-single-time-zone" => Some(("verifySingleTimeZone", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-group-id", "ad-id", "advertiser-id", "agency-id", "campaign-id", "changed-attributes-since-timestamp", "changed-metrics-since-timestamp", "download-format", "end-date", "engine-account-id", "include-deleted-entities", "include-removed-entities", "keyword-id", "max-rows-per-file", "report-scope", "report-type", "row-count", "start-date", "start-row", "statistics-currency", "time-range", "verify-single-time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -458,7 +454,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -473,7 +469,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _reports_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _reports_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.reports().get(opt.value_of("report-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -510,7 +506,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -525,7 +521,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _reports_get_file(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _reports_get_file(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let report_fragment: i32 = arg_from_str(&opt.value_of("report-fragment").unwrap_or(""), err, "<report-fragment>", "integer");
         let mut download_mode = false;
@@ -567,15 +563,16 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
                     if !download_mode {
                     } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
+                    let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+                    ostream.write_all(&bytes).expect("write to be complete");
+                    ostream.flush().expect("io to never fail which should really be fixed one day");
                     }
                     Ok(())
                 }
@@ -583,7 +580,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _reports_request(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _reports_request(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -606,26 +603,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "report-scope.ad-group-id" => Some(("reportScope.adGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.agency-id" => Some(("reportScope.agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.engine-account-id" => Some(("reportScope.engineAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.campaign-id" => Some(("reportScope.campaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.advertiser-id" => Some(("reportScope.advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.keyword-id" => Some(("reportScope.keywordId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-scope.ad-id" => Some(("reportScope.adId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-rows-per-file" => Some(("maxRowsPerFile", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "statistics-currency" => Some(("statisticsCurrency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.changed-metrics-since-timestamp" => Some(("timeRange.changedMetricsSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.end-date" => Some(("timeRange.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.changed-attributes-since-timestamp" => Some(("timeRange.changedAttributesSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-range.start-date" => Some(("timeRange.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "start-row" => Some(("startRow", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "row-count" => Some(("rowCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "report-type" => Some(("reportType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-format" => Some(("downloadFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-deleted-entities" => Some(("includeDeletedEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "verify-single-time-zone" => Some(("verifySingleTimeZone", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "include-removed-entities" => Some(("includeRemovedEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "max-rows-per-file" => Some(("maxRowsPerFile", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "report-scope.ad-group-id" => Some(("reportScope.adGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.ad-id" => Some(("reportScope.adId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.advertiser-id" => Some(("reportScope.advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.agency-id" => Some(("reportScope.agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.campaign-id" => Some(("reportScope.campaignId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.engine-account-id" => Some(("reportScope.engineAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-scope.keyword-id" => Some(("reportScope.keywordId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-type" => Some(("reportType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "row-count" => Some(("rowCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "start-row" => Some(("startRow", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics-currency" => Some(("statisticsCurrency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.changed-attributes-since-timestamp" => Some(("timeRange.changedAttributesSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.changed-metrics-since-timestamp" => Some(("timeRange.changedMetricsSinceTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.end-date" => Some(("timeRange.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time-range.start-date" => Some(("timeRange.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verify-single-time-zone" => Some(("verifySingleTimeZone", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-group-id", "ad-id", "advertiser-id", "agency-id", "campaign-id", "changed-attributes-since-timestamp", "changed-metrics-since-timestamp", "download-format", "end-date", "engine-account-id", "include-deleted-entities", "include-removed-entities", "keyword-id", "max-rows-per-file", "report-scope", "report-type", "row-count", "start-date", "start-row", "statistics-currency", "time-range", "verify-single-time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -672,7 +669,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -687,7 +684,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _saved_columns_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _saved_columns_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.saved_columns().list(opt.value_of("agency-id").unwrap_or(""), opt.value_of("advertiser-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -724,7 +721,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -739,7 +736,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -747,16 +744,16 @@ impl<'n> Engine<'n> {
             ("conversion", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._conversion_get(opt, dry_run, &mut err);
+                        call_result = self._conversion_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._conversion_insert(opt, dry_run, &mut err);
+                        call_result = self._conversion_insert(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._conversion_update(opt, dry_run, &mut err);
+                        call_result = self._conversion_update(opt, dry_run, &mut err).await;
                     },
                     ("update-availability", Some(opt)) => {
-                        call_result = self._conversion_update_availability(opt, dry_run, &mut err);
+                        call_result = self._conversion_update_availability(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("conversion".to_string()));
@@ -767,16 +764,16 @@ impl<'n> Engine<'n> {
             ("reports", Some(opt)) => {
                 match opt.subcommand() {
                     ("generate", Some(opt)) => {
-                        call_result = self._reports_generate(opt, dry_run, &mut err);
+                        call_result = self._reports_generate(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._reports_get(opt, dry_run, &mut err);
+                        call_result = self._reports_get(opt, dry_run, &mut err).await;
                     },
                     ("get-file", Some(opt)) => {
-                        call_result = self._reports_get_file(opt, dry_run, &mut err);
+                        call_result = self._reports_get_file(opt, dry_run, &mut err).await;
                     },
                     ("request", Some(opt)) => {
-                        call_result = self._reports_request(opt, dry_run, &mut err);
+                        call_result = self._reports_request(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("reports".to_string()));
@@ -787,7 +784,7 @@ impl<'n> Engine<'n> {
             ("saved-columns", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._saved_columns_list(opt, dry_run, &mut err);
+                        call_result = self._saved_columns_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("saved-columns".to_string()));
@@ -812,69 +809,58 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "doubleclicksearch2-secret.json",
+            match client::application_secret_from_directory(&config_dir, "doubleclicksearch2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "doubleclicksearch2",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/doubleclicksearch2", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Doubleclicksearch::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("conversion", "methods: 'get', 'insert', 'update' and 'update-availability'", vec![
@@ -1136,8 +1122,8 @@ fn main() {
     
     let mut app = App::new("doubleclicksearch2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200331")
-           .about("Reports and modifies your advertising data in DoubleClick Search (for example, campaigns, ad groups, keywords, and conversions).")
+           .version("2.0.0+20210323")
+           .about("The Search Ads 360 API allows developers to automate uploading conversions and downloading reports from Search Ads 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1151,12 +1137,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1204,13 +1185,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -1,4 +1,4 @@
-site_name: Data Fusion v1.0.14+20200609
+site_name: Data Fusion v2.0.0+20210322
 site_url: http://byron.github.io/google-apis-rs/google-datafusion1_beta1-cli
 site_description: A complete library to interact with Data Fusion (protocol v1beta1)
 
@@ -15,6 +15,9 @@ pages:
 - ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
 - ['projects_locations-instances-get-iam-policy.md', 'Projects', 'Locations Instances Get Iam Policy']
 - ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
+- ['projects_locations-instances-namespaces-get-iam-policy.md', 'Projects', 'Locations Instances Namespaces Get Iam Policy']
+- ['projects_locations-instances-namespaces-set-iam-policy.md', 'Projects', 'Locations Instances Namespaces Set Iam Policy']
+- ['projects_locations-instances-namespaces-test-iam-permissions.md', 'Projects', 'Locations Instances Namespaces Test Iam Permissions']
 - ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']
 - ['projects_locations-instances-restart.md', 'Projects', 'Locations Instances Restart']
 - ['projects_locations-instances-set-iam-policy.md', 'Projects', 'Locations Instances Set Iam Policy']
@@ -25,6 +28,7 @@ pages:
 - ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
 - ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
 - ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-remove-iam-policy.md', 'Projects', 'Locations Remove Iam Policy']
 - ['projects_locations-versions-list.md', 'Projects', 'Locations Versions List']
 
 theme: readthedocs

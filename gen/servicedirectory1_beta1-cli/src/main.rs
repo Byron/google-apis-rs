@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_servicedirectory1_beta1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_servicedirectory1_beta1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::ServiceDirectory<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::ServiceDirectory<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -126,7 +122,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "filter", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -145,7 +141,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -160,7 +156,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -235,7 +231,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -250,7 +246,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -287,7 +283,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -302,7 +298,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -339,7 +335,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -354,7 +350,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -424,7 +420,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -439,7 +435,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -470,7 +466,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "order-by", "filter", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -489,7 +485,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -504,7 +500,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -579,7 +575,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -594,7 +590,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -617,8 +613,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["metadata", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -669,7 +665,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -684,7 +680,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_services_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -721,7 +717,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -736,7 +732,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_endpoints_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_endpoints_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -759,10 +755,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "address" => Some(("address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "metadata", "name", "port"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -813,7 +809,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -828,7 +824,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_endpoints_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_endpoints_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_services_endpoints_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -865,7 +861,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -880,7 +876,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_endpoints_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_endpoints_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_services_endpoints_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -917,7 +913,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -932,7 +928,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_endpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_endpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_services_endpoints_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -963,7 +959,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "order-by", "filter", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -982,7 +978,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -997,7 +993,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_endpoints_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_endpoints_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1020,10 +1016,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "address" => Some(("address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "metadata", "name", "port"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1074,7 +1070,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1089,7 +1085,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_services_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1126,7 +1122,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1141,7 +1137,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1211,7 +1207,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1226,7 +1222,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_namespaces_services_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1257,7 +1253,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "order-by", "filter", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1276,7 +1272,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1291,7 +1287,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1314,8 +1310,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["metadata", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1366,7 +1362,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1381,7 +1377,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_resolve(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_resolve(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1404,8 +1400,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "max-endpoints" => Some(("maxEndpoints", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "endpoint-filter" => Some(("endpointFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-endpoints" => Some(("maxEndpoints", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["endpoint-filter", "max-endpoints"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1452,7 +1448,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1467,7 +1463,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1538,7 +1534,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1553,7 +1549,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_services_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_services_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1623,7 +1619,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1638,7 +1634,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1709,7 +1705,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1724,7 +1720,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_namespaces_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_namespaces_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1794,7 +1790,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1809,7 +1805,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1817,76 +1813,76 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-get", Some(opt)) => {
-                        call_result = self._projects_locations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-create", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-delete", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-get", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-list", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-patch", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-create", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-delete", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-endpoints-create", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_endpoints_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_endpoints_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-endpoints-delete", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_endpoints_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_endpoints_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-endpoints-get", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_endpoints_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_endpoints_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-endpoints-list", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_endpoints_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_endpoints_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-endpoints-patch", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_endpoints_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_endpoints_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-get", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-list", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-patch", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-resolve", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_resolve(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_resolve(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-services-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_services_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_services_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-namespaces-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_namespaces_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_namespaces_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1911,41 +1907,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "servicedirectory1-beta1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "servicedirectory1-beta1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "servicedirectory1-beta1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/servicedirectory1-beta1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::ServiceDirectory::new(client, auth),
@@ -1961,22 +1942,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'locations-get', 'locations-list', 'locations-namespaces-create', 'locations-namespaces-delete', 'locations-namespaces-get', 'locations-namespaces-get-iam-policy', 'locations-namespaces-list', 'locations-namespaces-patch', 'locations-namespaces-services-create', 'locations-namespaces-services-delete', 'locations-namespaces-services-endpoints-create', 'locations-namespaces-services-endpoints-delete', 'locations-namespaces-services-endpoints-get', 'locations-namespaces-services-endpoints-list', 'locations-namespaces-services-endpoints-patch', 'locations-namespaces-services-get', 'locations-namespaces-services-get-iam-policy', 'locations-namespaces-services-list', 'locations-namespaces-services-patch', 'locations-namespaces-services-resolve', 'locations-namespaces-services-set-iam-policy', 'locations-namespaces-services-test-iam-permissions', 'locations-namespaces-set-iam-policy' and 'locations-namespaces-test-iam-permissions'", vec![
@@ -2025,13 +2007,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-create",
-                    Some(r##"Creates a namespace, and returns the new Namespace."##),
+                    Some(r##"Creates a namespace, and returns the new namespace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the project and location the namespace
-        will be created in."##),
+                     Some(r##"Required. The resource name of the project and location the namespace will be created in."##),
                      Some(true),
                      Some(false)),
         
@@ -2054,8 +2035,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-delete",
-                    Some(r##"Deletes a namespace. This also deletes all services and endpoints in
-        the namespace."##),
+                    Some(r##"Deletes a namespace. This also deletes all services and endpoints in the namespace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2104,8 +2084,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2133,8 +2112,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the project and location whose namespaces we'd like to
-        list."##),
+                     Some(r##"Required. The resource name of the project and location whose namespaces you'd like to list."##),
                      Some(true),
                      Some(false)),
         
@@ -2156,8 +2134,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name for the namespace in the format
-        'projects/*/locations/*/namespaces/*'."##),
+                     Some(r##"Immutable. The resource name for the namespace in the format `projects/*/locations/*/namespaces/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -2180,7 +2157,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-create",
-                    Some(r##"Creates a service, and returns the new Service."##),
+                    Some(r##"Creates a service, and returns the new service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2208,8 +2185,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-delete",
-                    Some(r##"Deletes a service. This also deletes all endpoints associated with
-        the service."##),
+                    Some(r##"Deletes a service. This also deletes all endpoints associated with the service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2231,7 +2207,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-endpoints-create",
-                    Some(r##"Creates a endpoint, and returns the new Endpoint."##),
+                    Some(r##"Creates an endpoint, and returns the new endpoint."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-endpoints-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2259,7 +2235,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-endpoints-delete",
-                    Some(r##"Deletes a endpoint."##),
+                    Some(r##"Deletes an endpoint."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-endpoints-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2281,7 +2257,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-endpoints-get",
-                    Some(r##"Gets a endpoint."##),
+                    Some(r##"Gets an endpoint."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-endpoints-get",
                   vec![
                     (Some(r##"name"##),
@@ -2308,8 +2284,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the service whose endpoints we'd like to
-        list."##),
+                     Some(r##"Required. The resource name of the service whose endpoints you'd like to list."##),
                      Some(true),
                      Some(false)),
         
@@ -2326,13 +2301,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-endpoints-patch",
-                    Some(r##"Updates a endpoint."##),
+                    Some(r##"Updates an endpoint."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-endpoints-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name for the endpoint in the format
-        'projects/*/locations/*/namespaces/*/services/*/endpoints/*'."##),
+                     Some(r##"Immutable. The resource name for the endpoint in the format `projects/*/locations/*/namespaces/*/services/*/endpoints/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -2382,8 +2356,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2411,8 +2384,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the namespace whose services we'd
-        like to list."##),
+                     Some(r##"Required. The resource name of the namespace whose services you'd like to list."##),
                      Some(true),
                      Some(false)),
         
@@ -2434,8 +2406,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name for the service in the format
-        'projects/*/locations/*/namespaces/*/services/*'."##),
+                     Some(r##"Immutable. The resource name for the service in the format `projects/*/locations/*/namespaces/*/services/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -2458,9 +2429,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-namespaces-services-resolve",
-                    Some(r##"Returns a service and its
-        associated endpoints.
-        Resolving a service is not considered an active developer method."##),
+                    Some(r##"Returns a service and its associated endpoints. Resolving a service is not considered an active developer method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli/projects_locations-namespaces-services-resolve",
                   vec![
                     (Some(r##"name"##),
@@ -2493,8 +2462,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2522,8 +2490,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2551,8 +2518,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2580,8 +2546,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2609,9 +2574,8 @@ fn main() {
     
     let mut app = App::new("servicedirectory1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200624")
-           .about("Service Directory is a platform for discovering, publishing, and connecting services.
-           ")
+           .version("2.0.0+20210316")
+           .about("Service Directory is a platform for discovering, publishing, and connecting services. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicedirectory1_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -2625,12 +2589,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -2678,13 +2637,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

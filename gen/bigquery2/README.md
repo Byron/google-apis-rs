@@ -5,33 +5,35 @@ DO NOT EDIT !
 -->
 The `google-bigquery2` library allows access to all features of the *Google bigquery* service.
 
-This documentation was generated from *bigquery* crate version *1.0.14+20200625*, where *20200625* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *bigquery* crate version *2.0.0+20210327*, where *20210327* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *bigquery* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/bigquery/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Bigquery.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/Bigquery) ... 
 
-* [datasets](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Dataset.html)
- * [*delete*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.DatasetDeleteCall.html), [*get*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.DatasetGetCall.html), [*insert*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.DatasetInsertCall.html), [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.DatasetListCall.html), [*patch*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.DatasetPatchCall.html) and [*update*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.DatasetUpdateCall.html)
-* [jobs](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Job.html)
- * [*cancel*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobCancelCall.html), [*get*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobGetCall.html), [*get query results*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobGetQueryResultCall.html), [*insert*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobInsertCall.html), [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobListCall.html) and [*query*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobQueryCall.html)
-* [models](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Model.html)
- * [*delete*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.ModelDeleteCall.html), [*get*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.ModelGetCall.html), [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.ModelListCall.html) and [*patch*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.ModelPatchCall.html)
+* [datasets](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::Dataset)
+ * [*delete*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::DatasetDeleteCall), [*get*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::DatasetGetCall), [*insert*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::DatasetInsertCall), [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::DatasetListCall), [*patch*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::DatasetPatchCall) and [*update*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::DatasetUpdateCall)
+* [jobs](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::Job)
+ * [*cancel*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobCancelCall), [*delete*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobDeleteCall), [*get*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobGetCall), [*get query results*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobGetQueryResultCall), [*insert*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobInsertCall), [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobListCall) and [*query*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobQueryCall)
+* [models](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::Model)
+ * [*delete*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::ModelDeleteCall), [*get*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::ModelGetCall), [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::ModelListCall) and [*patch*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::ModelPatchCall)
 * projects
- * [*get service account*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.ProjectGetServiceAccountCall.html) and [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.ProjectListCall.html)
-* [routines](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Routine.html)
- * [*delete*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.RoutineDeleteCall.html), [*get*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.RoutineGetCall.html), [*insert*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.RoutineInsertCall.html), [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.RoutineListCall.html) and [*update*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.RoutineUpdateCall.html)
+ * [*get service account*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::ProjectGetServiceAccountCall) and [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::ProjectListCall)
+* [routines](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::Routine)
+ * [*delete*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RoutineDeleteCall), [*get*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RoutineGetCall), [*insert*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RoutineInsertCall), [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RoutineListCall) and [*update*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RoutineUpdateCall)
+* [row access policies](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RowAccessPolicy)
+ * [*get iam policy*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RowAccessPolicyGetIamPolicyCall), [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RowAccessPolicyListCall), [*set iam policy*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RowAccessPolicySetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::RowAccessPolicyTestIamPermissionCall)
 * tabledata
- * [*insert all*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TabledataInsertAllCall.html) and [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TabledataListCall.html)
-* [tables](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Table.html)
- * [*delete*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableDeleteCall.html), [*get*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableGetCall.html), [*get iam policy*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableGetIamPolicyCall.html), [*insert*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableInsertCall.html), [*list*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableListCall.html), [*patch*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TablePatchCall.html), [*set iam policy*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableSetIamPolicyCall.html), [*test iam permissions*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableTestIamPermissionCall.html) and [*update*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.TableUpdateCall.html)
+ * [*insert all*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TabledataInsertAllCall) and [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TabledataListCall)
+* [tables](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::Table)
+ * [*delete*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableDeleteCall), [*get*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableGetCall), [*get iam policy*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableGetIamPolicyCall), [*insert*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableInsertCall), [*list*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableListCall), [*patch*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TablePatchCall), [*set iam policy*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableSetIamPolicyCall), [*test iam permissions*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableTestIamPermissionCall) and [*update*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::TableUpdateCall)
 
 
 Upload supported by ...
 
-* [*insert jobs*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.JobInsertCall.html)
+* [*insert jobs*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/api::JobInsertCall)
 
 
 
@@ -39,17 +41,17 @@ Upload supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/struct.Bigquery.html)**
+* **[Hub](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/Bigquery)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::CallBuilder)
+* **[Resources](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -57,21 +59,21 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.tables().delete(...).doit()
-let r = hub.tables().update(...).doit()
-let r = hub.tables().insert(...).doit()
-let r = hub.tables().list(...).doit()
-let r = hub.tables().test_iam_permissions(...).doit()
-let r = hub.tables().get_iam_policy(...).doit()
-let r = hub.tables().get(...).doit()
-let r = hub.tables().set_iam_policy(...).doit()
-let r = hub.tables().patch(...).doit()
+let r = hub.tables().delete(...).doit().await
+let r = hub.tables().get(...).doit().await
+let r = hub.tables().get_iam_policy(...).doit().await
+let r = hub.tables().insert(...).doit().await
+let r = hub.tables().list(...).doit().await
+let r = hub.tables().patch(...).doit().await
+let r = hub.tables().set_iam_policy(...).doit().await
+let r = hub.tables().test_iam_permissions(...).doit().await
+let r = hub.tables().update(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -91,11 +93,11 @@ google-bigquery2 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -105,40 +107,37 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_bigquery2 as bigquery2;
-use bigquery2::Table;
 use bigquery2::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use bigquery2::Bigquery;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = Table::default();
-
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.tables().update(req, "projectId", "datasetId", "tableId")
-             .doit();
+let result = hub.tables().get("projectId", "datasetId", "tableId")
+             .selected_fields("ipsum")
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -154,17 +153,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -174,29 +173,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::RequestValue) and 
+[decodable](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-bigquery2/1.0.14+20200625/google_bigquery2/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-bigquery2/2.0.0+20210327/google_bigquery2/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_documentai1_beta2 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_documentai1_beta2::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Document<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Document<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_documents_batch_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_documents_batch_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -115,7 +111,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -130,7 +126,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_documents_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_documents_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -153,22 +149,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automl-params.model" => Some(("automlParams.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-type" => Some(("documentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity-extraction-params.enabled" => Some(("entityExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entity-extraction-params.model-version" => Some(("entityExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "form-extraction-params.enabled" => Some(("formExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "form-extraction-params.model-version" => Some(("formExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-config.contents" => Some(("inputConfig.contents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-config.gcs-source.uri" => Some(("inputConfig.gcsSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-config.mime-type" => Some(("inputConfig.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ocr-params.language-hints" => Some(("ocrParams.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-config.pages-per-shard" => Some(("outputConfig.pagesPerShard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "entity-extraction-params.model-version" => Some(("entityExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity-extraction-params.enabled" => Some(("entityExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-extraction-params.enabled" => Some(("tableExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "table-extraction-params.header-hints" => Some(("tableExtractionParams.headerHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "table-extraction-params.model-version" => Some(("tableExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "table-extraction-params.enabled" => Some(("tableExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "input-config.mime-type" => Some(("inputConfig.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.gcs-source.uri" => Some(("inputConfig.gcsSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.contents" => Some(("inputConfig.contents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ocr-params.language-hints" => Some(("ocrParams.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "document-type" => Some(("documentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automl-params.model" => Some(("automlParams.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "form-extraction-params.model-version" => Some(("formExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "form-extraction-params.enabled" => Some(("formExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["automl-params", "contents", "document-type", "enabled", "entity-extraction-params", "form-extraction-params", "gcs-destination", "gcs-source", "header-hints", "input-config", "language-hints", "mime-type", "model", "model-version", "ocr-params", "output-config", "pages-per-shard", "parent", "table-extraction-params", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -215,7 +211,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -230,7 +226,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_documents_batch_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_documents_batch_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -299,7 +295,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -314,7 +310,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_documents_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_documents_process(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -337,22 +333,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automl-params.model" => Some(("automlParams.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "document-type" => Some(("documentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity-extraction-params.enabled" => Some(("entityExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entity-extraction-params.model-version" => Some(("entityExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "form-extraction-params.enabled" => Some(("formExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "form-extraction-params.model-version" => Some(("formExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-config.contents" => Some(("inputConfig.contents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-config.gcs-source.uri" => Some(("inputConfig.gcsSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "input-config.mime-type" => Some(("inputConfig.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ocr-params.language-hints" => Some(("ocrParams.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "output-config.gcs-destination.uri" => Some(("outputConfig.gcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-config.pages-per-shard" => Some(("outputConfig.pagesPerShard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "entity-extraction-params.model-version" => Some(("entityExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity-extraction-params.enabled" => Some(("entityExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-extraction-params.enabled" => Some(("tableExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "table-extraction-params.header-hints" => Some(("tableExtractionParams.headerHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "table-extraction-params.model-version" => Some(("tableExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "table-extraction-params.enabled" => Some(("tableExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "input-config.mime-type" => Some(("inputConfig.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.gcs-source.uri" => Some(("inputConfig.gcsSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.contents" => Some(("inputConfig.contents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ocr-params.language-hints" => Some(("ocrParams.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "document-type" => Some(("documentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automl-params.model" => Some(("automlParams.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "form-extraction-params.model-version" => Some(("formExtractionParams.modelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "form-extraction-params.enabled" => Some(("formExtractionParams.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["automl-params", "contents", "document-type", "enabled", "entity-extraction-params", "form-extraction-params", "gcs-destination", "gcs-source", "header-hints", "input-config", "language-hints", "mime-type", "model", "model-version", "ocr-params", "output-config", "pages-per-shard", "parent", "table-extraction-params", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -399,7 +395,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -414,7 +410,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -451,7 +447,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -466,7 +462,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().operations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -503,7 +499,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -518,7 +514,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -526,22 +522,22 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("documents-batch-process", Some(opt)) => {
-                        call_result = self._projects_documents_batch_process(opt, dry_run, &mut err);
+                        call_result = self._projects_documents_batch_process(opt, dry_run, &mut err).await;
                     },
                     ("documents-process", Some(opt)) => {
-                        call_result = self._projects_documents_process(opt, dry_run, &mut err);
+                        call_result = self._projects_documents_process(opt, dry_run, &mut err).await;
                     },
                     ("locations-documents-batch-process", Some(opt)) => {
-                        call_result = self._projects_locations_documents_batch_process(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_documents_batch_process(opt, dry_run, &mut err).await;
                     },
                     ("locations-documents-process", Some(opt)) => {
-                        call_result = self._projects_locations_documents_process(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_documents_process(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-get", Some(opt)) => {
-                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err).await;
                     },
                     ("operations-get", Some(opt)) => {
-                        call_result = self._projects_operations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_operations_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -566,41 +562,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "documentai1-beta2-secret.json",
+            match client::application_secret_from_directory(&config_dir, "documentai1-beta2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "documentai1-beta2",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/documentai1-beta2", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Document::new(client, auth),
@@ -616,37 +597,33 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'documents-batch-process', 'documents-process', 'locations-documents-batch-process', 'locations-documents-process', 'locations-operations-get' and 'operations-get'", vec![
             ("documents-batch-process",
-                    Some(r##"LRO endpoint to batch process many documents. The output is written
-        to Cloud Storage as JSON in the [Document] format."##),
+                    Some(r##"LRO endpoint to batch process many documents. The output is written to Cloud Storage as JSON in the [Document] format."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_beta2_cli/projects_documents-batch-process",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Target project and location to make a call.
-        
-        Format: `projects/{project-id}/locations/{location-id}`.
-        
-        If no location is specified, a region will be chosen automatically."##),
+                     Some(r##"Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically."##),
                      Some(true),
                      Some(false)),
         
@@ -674,12 +651,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Target project and location to make a call.
-        
-        Format: `projects/{project-id}/locations/{location-id}`.
-        
-        If no location is specified, a region will be chosen automatically.
-        This field is only populated when used in ProcessDocument method."##),
+                     Some(r##"Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically. This field is only populated when used in ProcessDocument method."##),
                      Some(true),
                      Some(false)),
         
@@ -702,17 +674,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-documents-batch-process",
-                    Some(r##"LRO endpoint to batch process many documents. The output is written
-        to Cloud Storage as JSON in the [Document] format."##),
+                    Some(r##"LRO endpoint to batch process many documents. The output is written to Cloud Storage as JSON in the [Document] format."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_beta2_cli/projects_locations-documents-batch-process",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Target project and location to make a call.
-        
-        Format: `projects/{project-id}/locations/{location-id}`.
-        
-        If no location is specified, a region will be chosen automatically."##),
+                     Some(r##"Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically."##),
                      Some(true),
                      Some(false)),
         
@@ -740,12 +707,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Target project and location to make a call.
-        
-        Format: `projects/{project-id}/locations/{location-id}`.
-        
-        If no location is specified, a region will be chosen automatically.
-        This field is only populated when used in ProcessDocument method."##),
+                     Some(r##"Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically. This field is only populated when used in ProcessDocument method."##),
                      Some(true),
                      Some(false)),
         
@@ -768,9 +730,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_beta2_cli/projects_locations-operations-get",
                   vec![
                     (Some(r##"name"##),
@@ -792,9 +752,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("operations-get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_beta2_cli/projects_operations-get",
                   vec![
                     (Some(r##"name"##),
@@ -821,7 +779,7 @@ fn main() {
     
     let mut app = App::new("documentai1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200619")
+           .version("2.0.0+20210329")
            .about("Service to parse structured information from unstructured or semi-structured documents using state-of-the-art Google AI such as natural language, computer vision, translation, and AutoML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_documentai1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -836,12 +794,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -889,13 +842,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

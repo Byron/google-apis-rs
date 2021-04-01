@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_composer1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_composer1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudComposer<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudComposer<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_locations_environments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_environments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,43 +65,46 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.dag-gcs-prefix" => Some(("config.dagGcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.python-version" => Some(("config.softwareConfig.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.airflow-config-overrides" => Some(("config.softwareConfig.airflowConfigOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.airflow-uri" => Some(("config.airflowUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.dag-gcs-prefix" => Some(("config.dagGcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.database-config.machine-type" => Some(("config.databaseConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.encryption-config.kms-key-name" => Some(("config.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gke-cluster" => Some(("config.gkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.machine-type" => Some(("config.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.network" => Some(("config.nodeConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.tags" => Some(("config.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.node-config.service-account" => Some(("config.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.oauth-scopes" => Some(("config.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.node-config.disk-size-gb" => Some(("config.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.node-config.ip-allocation-policy.cluster-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.clusterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.ip-allocation-policy.services-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.ip-allocation-policy.use-ip-aliases" => Some(("config.nodeConfig.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.node-config.ip-allocation-policy.services-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.ip-allocation-policy.cluster-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.clusterSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.use-ip-aliases" => Some(("config.nodeConfig.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.node-config.location" => Some(("config.nodeConfig.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.machine-type" => Some(("config.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.network" => Some(("config.nodeConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.oauth-scopes" => Some(("config.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.node-config.service-account" => Some(("config.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.tags" => Some(("config.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.node-count" => Some(("config.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.private-environment-config.cloud-sql-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.cloudSqlIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.private-environment-config.web-server-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.webServerIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.private-environment-config.web-server-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.webServerIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.private-environment-config.enable-private-environment" => Some(("config.privateEnvironmentConfig.enablePrivateEnvironment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.private-environment-config.private-cluster-config.enable-private-endpoint" => Some(("config.privateEnvironmentConfig.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.private-environment-config.private-cluster-config.master-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.private-environment-config.private-cluster-config.master-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.master-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.webServerIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.webServerIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.airflow-config-overrides" => Some(("config.softwareConfig.airflowConfigOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.python-version" => Some(("config.softwareConfig.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.web-server-config.machine-type" => Some(("config.webServerConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "enable-private-endpoint", "enable-private-environment", "env-variables", "gke-cluster", "image-version", "ip-allocation-policy", "labels", "location", "machine-type", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "name", "network", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "software-config", "state", "subnetwork", "tags", "update-time", "use-ip-aliases", "uuid", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "config", "create-time", "dag-gcs-prefix", "database-config", "disk-size-gb", "enable-private-endpoint", "enable-private-environment", "encryption-config", "env-variables", "gke-cluster", "image-version", "ip-allocation-policy", "kms-key-name", "labels", "location", "machine-type", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "name", "network", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "software-config", "state", "subnetwork", "tags", "update-time", "use-ip-aliases", "uuid", "web-server-config", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -150,7 +149,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -165,7 +164,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_environments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_environments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_environments_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -202,7 +201,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -217,7 +216,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_environments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_environments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_environments_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -254,7 +253,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -269,7 +268,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_environments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_environments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_environments_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -313,7 +312,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -328,7 +327,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_environments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_environments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -351,43 +350,46 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.dag-gcs-prefix" => Some(("config.dagGcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.python-version" => Some(("config.softwareConfig.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.airflow-config-overrides" => Some(("config.softwareConfig.airflowConfigOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.airflow-uri" => Some(("config.airflowUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.dag-gcs-prefix" => Some(("config.dagGcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.database-config.machine-type" => Some(("config.databaseConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.encryption-config.kms-key-name" => Some(("config.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.gke-cluster" => Some(("config.gkeCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.machine-type" => Some(("config.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.network" => Some(("config.nodeConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.tags" => Some(("config.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.node-config.service-account" => Some(("config.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.oauth-scopes" => Some(("config.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.node-config.disk-size-gb" => Some(("config.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.node-config.ip-allocation-policy.cluster-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.clusterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.ip-allocation-policy.services-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.ip-allocation-policy.use-ip-aliases" => Some(("config.nodeConfig.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.node-config.ip-allocation-policy.services-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.ip-allocation-policy.cluster-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.clusterSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.use-ip-aliases" => Some(("config.nodeConfig.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.node-config.location" => Some(("config.nodeConfig.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.machine-type" => Some(("config.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.network" => Some(("config.nodeConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.oauth-scopes" => Some(("config.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.node-config.service-account" => Some(("config.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.tags" => Some(("config.nodeConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.node-count" => Some(("config.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.private-environment-config.cloud-sql-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.cloudSqlIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.private-environment-config.web-server-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.webServerIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.private-environment-config.web-server-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.webServerIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.private-environment-config.enable-private-environment" => Some(("config.privateEnvironmentConfig.enablePrivateEnvironment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.private-environment-config.private-cluster-config.enable-private-endpoint" => Some(("config.privateEnvironmentConfig.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.private-environment-config.private-cluster-config.master-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.private-environment-config.private-cluster-config.master-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.master-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.webServerIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.webServerIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.airflow-config-overrides" => Some(("config.softwareConfig.airflowConfigOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.env-variables" => Some(("config.softwareConfig.envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.pypi-packages" => Some(("config.softwareConfig.pypiPackages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.python-version" => Some(("config.softwareConfig.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.web-server-config.machine-type" => Some(("config.webServerConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "enable-private-endpoint", "enable-private-environment", "env-variables", "gke-cluster", "image-version", "ip-allocation-policy", "labels", "location", "machine-type", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "name", "network", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "software-config", "state", "subnetwork", "tags", "update-time", "use-ip-aliases", "uuid", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "config", "create-time", "dag-gcs-prefix", "database-config", "disk-size-gb", "enable-private-endpoint", "enable-private-environment", "encryption-config", "env-variables", "gke-cluster", "image-version", "ip-allocation-policy", "kms-key-name", "labels", "location", "machine-type", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "name", "network", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "software-config", "state", "subnetwork", "tags", "update-time", "use-ip-aliases", "uuid", "web-server-config", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -436,7 +438,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -451,7 +453,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_image_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_image_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_image_versions_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -462,6 +464,9 @@ impl<'n> Engine<'n> {
                 },
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "include-past-releases" => {
+                    call = call.include_past_releases(arg_from_str(value.unwrap_or("false"), err, "include-past-releases", "boolean"));
                 },
                 _ => {
                     let mut found = false;
@@ -476,7 +481,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["include-past-releases", "page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -495,7 +500,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -510,7 +515,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -547,7 +552,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -562,7 +567,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -599,7 +604,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -614,7 +619,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -661,7 +666,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -676,7 +681,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -684,31 +689,31 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-environments-create", Some(opt)) => {
-                        call_result = self._projects_locations_environments_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_environments_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-environments-delete", Some(opt)) => {
-                        call_result = self._projects_locations_environments_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_environments_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-environments-get", Some(opt)) => {
-                        call_result = self._projects_locations_environments_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_environments_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-environments-list", Some(opt)) => {
-                        call_result = self._projects_locations_environments_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_environments_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-environments-patch", Some(opt)) => {
-                        call_result = self._projects_locations_environments_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_environments_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-image-versions-list", Some(opt)) => {
-                        call_result = self._projects_locations_image_versions_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_image_versions_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-delete", Some(opt)) => {
-                        call_result = self._projects_locations_operations_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-get", Some(opt)) => {
-                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-operations-list", Some(opt)) => {
-                        call_result = self._projects_locations_operations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_operations_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -733,41 +738,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "composer1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "composer1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "composer1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/composer1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudComposer::new(client, auth),
@@ -783,22 +773,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'locations-environments-create', 'locations-environments-delete', 'locations-environments-get', 'locations-environments-list', 'locations-environments-patch', 'locations-image-versions-list', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
@@ -808,8 +799,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent must be of the form
-        "projects/{projectId}/locations/{locationId}"."##),
+                     Some(r##"The parent must be of the form "projects/{projectId}/locations/{locationId}"."##),
                      Some(true),
                      Some(false)),
         
@@ -837,8 +827,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The environment to delete, in the form:
-        "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
+                     Some(r##"The environment to delete, in the form: "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
                      Some(true),
                      Some(false)),
         
@@ -860,8 +849,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the environment to get, in the form:
-        "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
+                     Some(r##"The resource name of the environment to get, in the form: "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
                      Some(true),
                      Some(false)),
         
@@ -883,8 +871,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"List environments in the given project and location, in the form:
-        "projects/{projectId}/locations/{locationId}""##),
+                     Some(r##"List environments in the given project and location, in the form: "projects/{projectId}/locations/{locationId}""##),
                      Some(true),
                      Some(false)),
         
@@ -906,8 +893,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The relative resource name of the environment to update, in the form:
-        "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
+                     Some(r##"The relative resource name of the environment to update, in the form: "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
                      Some(true),
                      Some(false)),
         
@@ -935,8 +921,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"List ImageVersions in the given project and location, in the form:
-        "projects/{projectId}/locations/{locationId}""##),
+                     Some(r##"List ImageVersions in the given project and location, in the form: "projects/{projectId}/locations/{locationId}""##),
                      Some(true),
                      Some(false)),
         
@@ -953,10 +938,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-delete",
-                    Some(r##"Deletes a long-running operation. This method indicates that the client is
-        no longer interested in the operation result. It does not cancel the
-        operation. If the server doesn't support this method, it returns
-        `google.rpc.Code.UNIMPLEMENTED`."##),
+                    Some(r##"Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-operations-delete",
                   vec![
                     (Some(r##"name"##),
@@ -978,9 +960,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-operations-get",
                   vec![
                     (Some(r##"name"##),
@@ -1002,16 +982,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the
-        server doesn't support this method, it returns `UNIMPLEMENTED`.
-        
-        NOTE: the `name` binding allows API services to override the binding
-        to use different resource name schemes, such as `users/*/operations`. To
-        override the binding, API services can add a binding such as
-        `"/v1/{name=users/*}/operations"` to their service configuration.
-        For backwards compatibility, the default name includes the operations
-        collection id, however overriding users must ensure the name binding
-        is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -1038,7 +1009,7 @@ fn main() {
     
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200625")
+           .version("2.0.0+20210319")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")
@@ -1053,12 +1024,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1106,13 +1072,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_gamesmanagement1_management as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_gamesmanagement1_management::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::GamesManagement<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::GamesManagement<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _achievements_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievements_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievements().reset(opt.value_of("achievement-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievements_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievements_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievements().reset_all();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -135,7 +131,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -150,7 +146,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievements_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievements_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievements().reset_all_for_all_players();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -183,7 +179,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -194,7 +190,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievements_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievements_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievements().reset_for_all_players(opt.value_of("achievement-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -227,7 +223,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -238,7 +234,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievements_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _achievements_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -305,7 +301,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -316,7 +312,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _applications_list_hidden(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _applications_list_hidden(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.applications().list_hidden(opt.value_of("application-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -360,7 +356,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -375,7 +371,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _events_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _events_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.events().reset(opt.value_of("event-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -408,7 +404,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -419,7 +415,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _events_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _events_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.events().reset_all();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -452,7 +448,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -463,7 +459,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _events_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _events_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.events().reset_all_for_all_players();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -496,7 +492,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -507,7 +503,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _events_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _events_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.events().reset_for_all_players(opt.value_of("event-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -540,7 +536,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -551,7 +547,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _events_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _events_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -618,7 +614,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -629,7 +625,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _players_hide(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _players_hide(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.players().hide(opt.value_of("application-id").unwrap_or(""), opt.value_of("player-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -662,7 +658,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -673,7 +669,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _players_unhide(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _players_unhide(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.players().unhide(opt.value_of("application-id").unwrap_or(""), opt.value_of("player-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -706,7 +702,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -717,7 +713,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _scores_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _scores_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.scores().reset(opt.value_of("leaderboard-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -754,7 +750,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -769,7 +765,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _scores_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _scores_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.scores().reset_all();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -806,7 +802,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -821,7 +817,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _scores_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _scores_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.scores().reset_all_for_all_players();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -854,7 +850,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -865,7 +861,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _scores_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _scores_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.scores().reset_for_all_players(opt.value_of("leaderboard-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -898,7 +894,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -909,7 +905,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _scores_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _scores_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -932,8 +928,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "leaderboard-ids" => Some(("leaderboard_ids", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "leaderboard-ids" => Some(("leaderboard_ids", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "leaderboard-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -976,7 +972,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -987,7 +983,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -995,19 +991,19 @@ impl<'n> Engine<'n> {
             ("achievements", Some(opt)) => {
                 match opt.subcommand() {
                     ("reset", Some(opt)) => {
-                        call_result = self._achievements_reset(opt, dry_run, &mut err);
+                        call_result = self._achievements_reset(opt, dry_run, &mut err).await;
                     },
                     ("reset-all", Some(opt)) => {
-                        call_result = self._achievements_reset_all(opt, dry_run, &mut err);
+                        call_result = self._achievements_reset_all(opt, dry_run, &mut err).await;
                     },
                     ("reset-all-for-all-players", Some(opt)) => {
-                        call_result = self._achievements_reset_all_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._achievements_reset_all_for_all_players(opt, dry_run, &mut err).await;
                     },
                     ("reset-for-all-players", Some(opt)) => {
-                        call_result = self._achievements_reset_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._achievements_reset_for_all_players(opt, dry_run, &mut err).await;
                     },
                     ("reset-multiple-for-all-players", Some(opt)) => {
-                        call_result = self._achievements_reset_multiple_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._achievements_reset_multiple_for_all_players(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("achievements".to_string()));
@@ -1018,7 +1014,7 @@ impl<'n> Engine<'n> {
             ("applications", Some(opt)) => {
                 match opt.subcommand() {
                     ("list-hidden", Some(opt)) => {
-                        call_result = self._applications_list_hidden(opt, dry_run, &mut err);
+                        call_result = self._applications_list_hidden(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("applications".to_string()));
@@ -1029,19 +1025,19 @@ impl<'n> Engine<'n> {
             ("events", Some(opt)) => {
                 match opt.subcommand() {
                     ("reset", Some(opt)) => {
-                        call_result = self._events_reset(opt, dry_run, &mut err);
+                        call_result = self._events_reset(opt, dry_run, &mut err).await;
                     },
                     ("reset-all", Some(opt)) => {
-                        call_result = self._events_reset_all(opt, dry_run, &mut err);
+                        call_result = self._events_reset_all(opt, dry_run, &mut err).await;
                     },
                     ("reset-all-for-all-players", Some(opt)) => {
-                        call_result = self._events_reset_all_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._events_reset_all_for_all_players(opt, dry_run, &mut err).await;
                     },
                     ("reset-for-all-players", Some(opt)) => {
-                        call_result = self._events_reset_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._events_reset_for_all_players(opt, dry_run, &mut err).await;
                     },
                     ("reset-multiple-for-all-players", Some(opt)) => {
-                        call_result = self._events_reset_multiple_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._events_reset_multiple_for_all_players(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("events".to_string()));
@@ -1052,10 +1048,10 @@ impl<'n> Engine<'n> {
             ("players", Some(opt)) => {
                 match opt.subcommand() {
                     ("hide", Some(opt)) => {
-                        call_result = self._players_hide(opt, dry_run, &mut err);
+                        call_result = self._players_hide(opt, dry_run, &mut err).await;
                     },
                     ("unhide", Some(opt)) => {
-                        call_result = self._players_unhide(opt, dry_run, &mut err);
+                        call_result = self._players_unhide(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("players".to_string()));
@@ -1066,19 +1062,19 @@ impl<'n> Engine<'n> {
             ("scores", Some(opt)) => {
                 match opt.subcommand() {
                     ("reset", Some(opt)) => {
-                        call_result = self._scores_reset(opt, dry_run, &mut err);
+                        call_result = self._scores_reset(opt, dry_run, &mut err).await;
                     },
                     ("reset-all", Some(opt)) => {
-                        call_result = self._scores_reset_all(opt, dry_run, &mut err);
+                        call_result = self._scores_reset_all(opt, dry_run, &mut err).await;
                     },
                     ("reset-all-for-all-players", Some(opt)) => {
-                        call_result = self._scores_reset_all_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._scores_reset_all_for_all_players(opt, dry_run, &mut err).await;
                     },
                     ("reset-for-all-players", Some(opt)) => {
-                        call_result = self._scores_reset_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._scores_reset_for_all_players(opt, dry_run, &mut err).await;
                     },
                     ("reset-multiple-for-all-players", Some(opt)) => {
-                        call_result = self._scores_reset_multiple_for_all_players(opt, dry_run, &mut err);
+                        call_result = self._scores_reset_multiple_for_all_players(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("scores".to_string()));
@@ -1103,41 +1099,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "gamesmanagement1-management-secret.json",
+            match client::application_secret_from_directory(&config_dir, "gamesmanagement1-management-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "gamesmanagement1-management",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/gamesmanagement1-management", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::GamesManagement::new(client, auth),
@@ -1153,29 +1134,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("achievements", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets the achievement with the given ID for the currently authenticated
-        player. This method is only accessible to whitelisted tester accounts for
-        your application."##),
+                    Some(r##"Resets the achievement with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -1197,9 +1177,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all achievements for the currently authenticated player for your
-        application. This method is only accessible to whitelisted tester accounts
-        for your application."##),
+                    Some(r##"Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1215,8 +1193,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets all draft achievements for all players. This method is only
-        available to user accounts for your developer console."##),
+                    Some(r##"Resets all draft achievements for all players. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1226,9 +1203,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets the achievement with the given ID for all players. This method is
-        only available to user accounts for your developer console. Only draft
-        achievements can be reset."##),
+                    Some(r##"Resets the achievement with the given ID for all players. This method is only available to user accounts for your developer console. Only draft achievements can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-for-all-players",
                   vec![
                     (Some(r##"achievement-id"##),
@@ -1244,9 +1219,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets achievements with the given IDs for all players. This method is only
-        available to user accounts for your developer console. Only draft
-        achievements may be reset."##),
+                    Some(r##"Resets achievements with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft achievements may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/achievements_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1265,8 +1238,7 @@ fn main() {
         
         ("applications", "methods: 'list-hidden'", vec![
             ("list-hidden",
-                    Some(r##"Get the list of players hidden from the given application. This method is
-        only available to user accounts for your developer console."##),
+                    Some(r##"Get the list of players hidden from the given application. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/applications_list-hidden",
                   vec![
                     (Some(r##"application-id"##),
@@ -1291,9 +1263,7 @@ fn main() {
         
         ("events", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets all player progress on the event with the given ID for the currently
-        authenticated player. This method is only accessible to whitelisted tester
-        accounts for your application."##),
+                    Some(r##"Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset",
                   vec![
                     (Some(r##"event-id"##),
@@ -1309,9 +1279,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all player progress on all events for the currently authenticated
-        player. This method is only accessible to whitelisted tester accounts for
-        your application."##),
+                    Some(r##"Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1321,8 +1289,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets all draft events for all players. This method is only available to
-        user accounts for your developer console."##),
+                    Some(r##"Resets all draft events for all players. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1332,9 +1299,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets the event with the given ID for all players. This method is only
-        available to user accounts for your developer console. Only draft events
-        can be reset."##),
+                    Some(r##"Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-for-all-players",
                   vec![
                     (Some(r##"event-id"##),
@@ -1350,9 +1315,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets events with the given IDs for all players. This method is only
-        available to user accounts for your developer console. Only draft events
-        may be reset."##),
+                    Some(r##"Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1371,8 +1334,7 @@ fn main() {
         
         ("players", "methods: 'hide' and 'unhide'", vec![
             ("hide",
-                    Some(r##"Hide the given player's leaderboard scores from the given application. This
-        method is only available to user accounts for your developer console."##),
+                    Some(r##"Hide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/players_hide",
                   vec![
                     (Some(r##"application-id"##),
@@ -1383,8 +1345,7 @@ fn main() {
         
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of `me` may be used in place of the
-        authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -1395,8 +1356,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("unhide",
-                    Some(r##"Unhide the given player's leaderboard scores from the given application.
-        This method is only available to user accounts for your developer console."##),
+                    Some(r##"Unhide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/players_unhide",
                   vec![
                     (Some(r##"application-id"##),
@@ -1407,8 +1367,7 @@ fn main() {
         
                     (Some(r##"player-id"##),
                      None,
-                     Some(r##"A player ID. A value of `me` may be used in place of the
-        authenticated player's ID."##),
+                     Some(r##"A player ID. A value of `me` may be used in place of the authenticated player's ID."##),
                      Some(true),
                      Some(false)),
         
@@ -1422,9 +1381,7 @@ fn main() {
         
         ("scores", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets scores for the leaderboard with the given ID for the currently
-        authenticated player. This method is only accessible to whitelisted tester
-        accounts for your application."##),
+                    Some(r##"Resets scores for the leaderboard with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset",
                   vec![
                     (Some(r##"leaderboard-id"##),
@@ -1446,9 +1403,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all scores for all leaderboards for the currently authenticated
-        players. This method is only accessible to whitelisted tester accounts for
-        your application."##),
+                    Some(r##"Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1464,8 +1419,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets scores for all draft leaderboards for all players. This method is
-        only available to user accounts for your developer console."##),
+                    Some(r##"Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1475,9 +1429,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets scores for the leaderboard with the given ID for all players. This
-        method is only available to user accounts for your developer console. Only
-        draft leaderboards can be reset."##),
+                    Some(r##"Resets scores for the leaderboard with the given ID for all players. This method is only available to user accounts for your developer console. Only draft leaderboards can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-for-all-players",
                   vec![
                     (Some(r##"leaderboard-id"##),
@@ -1493,9 +1445,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets scores for the leaderboards with the given IDs for all players. This
-        method is only available to user accounts for your developer console. Only
-        draft leaderboards may be reset."##),
+                    Some(r##"Resets scores for the leaderboards with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft leaderboards may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/scores_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1516,9 +1466,8 @@ fn main() {
     
     let mut app = App::new("gamesmanagement1-management")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200701")
-           .about("The Google Play Game Management API allows developers to manage resources from the Google
-                Play Game service.")
+           .version("2.0.0+20210325")
+           .about("The Google Play Game Management API allows developers to manage resources from the Google Play Game service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1532,12 +1481,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1585,13 +1529,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

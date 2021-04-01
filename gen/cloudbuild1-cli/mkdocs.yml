@@ -1,4 +1,4 @@
-site_name: Cloud Build v1.0.14+20200704
+site_name: Cloud Build v2.0.0+20210329
 site_url: http://byron.github.io/google-apis-rs/google-cloudbuild1-cli
 site_description: A complete library to interact with Cloud Build (protocol v1)
 
@@ -16,6 +16,11 @@ pages:
 - ['projects_builds-get.md', 'Projects', 'Builds Get']
 - ['projects_builds-list.md', 'Projects', 'Builds List']
 - ['projects_builds-retry.md', 'Projects', 'Builds Retry']
+- ['projects_locations-builds-cancel.md', 'Projects', 'Locations Builds Cancel']
+- ['projects_locations-builds-create.md', 'Projects', 'Locations Builds Create']
+- ['projects_locations-builds-get.md', 'Projects', 'Locations Builds Get']
+- ['projects_locations-builds-list.md', 'Projects', 'Locations Builds List']
+- ['projects_locations-builds-retry.md', 'Projects', 'Locations Builds Retry']
 - ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
 - ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
 - ['projects_triggers-create.md', 'Projects', 'Triggers Create']
@@ -24,6 +29,7 @@ pages:
 - ['projects_triggers-list.md', 'Projects', 'Triggers List']
 - ['projects_triggers-patch.md', 'Projects', 'Triggers Patch']
 - ['projects_triggers-run.md', 'Projects', 'Triggers Run']
+- ['projects_triggers-webhook.md', 'Projects', 'Triggers Webhook']
 
 theme: readthedocs
 

@@ -25,11 +25,47 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Healthcare* API at revision *20200612*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Cloud Healthcare* API at revision *20210317*. The CLI is at version *2.0.0*.
 
 ```bash
 healthcare1 [options]
         projects
+                locations-datasets-consent-stores-attribute-definitions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-attribute-definitions-delete <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-attribute-definitions-get <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-attribute-definitions-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-attribute-definitions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-check-data-access <consent-store> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consent-artifacts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consent-artifacts-delete <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consent-artifacts-get <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consent-artifacts-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-activate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-delete <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-delete-revision <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-get <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-list-revisions <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-reject <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-consents-revoke <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-delete <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-evaluate-user-consents <consent-store> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-get <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-query-accessible-data <consent-store> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-user-data-mappings-archive <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-user-data-mappings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-user-data-mappings-delete <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-user-data-mappings-get <name> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-user-data-mappings-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-consent-stores-user-data-mappings-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-deidentify <source-dataset> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-delete <name> [-p <v>]... [-o <out>]
@@ -78,6 +114,7 @@ healthcare1 [options]
                 locations-datasets-fhir-stores-fhir-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir-read <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir-search <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-fhir-stores-fhir-search-type <parent> <resource-type> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir-vread <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-get <name> [-p <v>]... [-o <out>]
@@ -110,6 +147,8 @@ healthcare1 [options]
                 locations-datasets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
   healthcare1 --help
 
 Configuration:
@@ -121,12 +160,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -179,10 +212,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `healthcare1 --debug <resource> <method> [options] 2>debug.txt`.
 

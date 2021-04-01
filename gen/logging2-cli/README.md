@@ -25,19 +25,29 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20200624*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Logging* API at revision *20210325*. The CLI is at version *2.0.0*.
 
 ```bash
 logging2 [options]
         billing-accounts
                 buckets-get <name> [-p <v>]... [-o <out>]
+                buckets-views-get <name> [-p <v>]... [-o <out>]
                 exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 exclusions-delete <name> [-p <v>]... [-o <out>]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-delete <name> [-p <v>]... [-o <out>]
                 locations-buckets-list <parent> [-p <v>]... [-o <out>]
                 locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-delete <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-views-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -48,6 +58,7 @@ logging2 [options]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
         entries
                 list (-r <kv>)... [-p <v>]... [-o <out>]
+                tail (-r <kv>)... [-p <v>]... [-o <out>]
                 write (-r <kv>)... [-p <v>]... [-o <out>]
         exclusions
                 create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -61,9 +72,19 @@ logging2 [options]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-delete <name> [-p <v>]... [-o <out>]
                 locations-buckets-get <name> [-p <v>]... [-o <out>]
                 locations-buckets-list <parent> [-p <v>]... [-o <out>]
                 locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-delete <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-get <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-views-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -73,9 +94,19 @@ logging2 [options]
                 sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
         locations
+                buckets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                buckets-delete <name> [-p <v>]... [-o <out>]
                 buckets-get <name> [-p <v>]... [-o <out>]
                 buckets-list <parent> [-p <v>]... [-o <out>]
                 buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                buckets-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                buckets-views-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                buckets-views-delete <name> [-p <v>]... [-o <out>]
+                buckets-views-get <name> [-p <v>]... [-o <out>]
+                buckets-views-list <parent> [-p <v>]... [-o <out>]
+                buckets-views-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list <name> [-p <v>]... [-o <out>]
         logs
                 delete <log-name> [-p <v>]... [-o <out>]
                 list <parent> [-p <v>]... [-o <out>]
@@ -91,9 +122,19 @@ logging2 [options]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-cmek-settings <name> [-p <v>]... [-o <out>]
+                locations-buckets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-delete <name> [-p <v>]... [-o <out>]
                 locations-buckets-get <name> [-p <v>]... [-o <out>]
                 locations-buckets-list <parent> [-p <v>]... [-o <out>]
                 locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-delete <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-get <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-views-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -109,9 +150,19 @@ logging2 [options]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-delete <name> [-p <v>]... [-o <out>]
                 locations-buckets-get <name> [-p <v>]... [-o <out>]
                 locations-buckets-list <parent> [-p <v>]... [-o <out>]
                 locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-views-delete <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-get <name> [-p <v>]... [-o <out>]
+                locations-buckets-views-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-views-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 metrics-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -142,12 +193,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -200,10 +245,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `logging2 --debug <resource> <method> [options] 2>debug.txt`.
 

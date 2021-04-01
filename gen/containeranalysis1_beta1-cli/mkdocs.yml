@@ -1,4 +1,4 @@
-site_name: Container Analysis v1.0.14+20200704
+site_name: Container Analysis v2.0.0+20210326
 site_url: http://byron.github.io/google-apis-rs/google-containeranalysis1_beta1-cli
 site_description: A complete library to interact with Container Analysis (protocol v1beta1)
 

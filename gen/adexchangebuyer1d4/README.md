@@ -5,38 +5,38 @@ DO NOT EDIT !
 -->
 The `google-adexchangebuyer1d4` library allows access to all features of the *Google Ad Exchange Buyer* service.
 
-This documentation was generated from *Ad Exchange Buyer* crate version *1.0.14+20191204*, where *20191204* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *Ad Exchange Buyer* crate version *2.0.0+20210330*, where *20210330* is the exact revision of the *adexchangebuyer:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *Ad Exchange Buyer* *v1d4* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.AdExchangeBuyer.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/AdExchangeBuyer) ... 
 
-* [accounts](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.Account.html)
- * [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.AccountGetCall.html), [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.AccountListCall.html), [*patch*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.AccountPatchCall.html) and [*update*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.AccountUpdateCall.html)
-* [billing info](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.BillingInfo.html)
- * [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.BillingInfoGetCall.html) and [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.BillingInfoListCall.html)
-* [budget](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.Budget.html)
- * [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.BudgetGetCall.html), [*patch*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.BudgetPatchCall.html) and [*update*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.BudgetUpdateCall.html)
-* [creatives](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.Creative.html)
- * [*add deal*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.CreativeAddDealCall.html), [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.CreativeGetCall.html), [*insert*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.CreativeInsertCall.html), [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.CreativeListCall.html), [*list deals*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.CreativeListDealCall.html) and [*remove deal*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.CreativeRemoveDealCall.html)
+* [accounts](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::Account)
+ * [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::AccountGetCall), [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::AccountListCall), [*patch*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::AccountPatchCall) and [*update*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::AccountUpdateCall)
+* [billing info](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::BillingInfo)
+ * [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::BillingInfoGetCall) and [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::BillingInfoListCall)
+* [budget](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::Budget)
+ * [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::BudgetGetCall), [*patch*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::BudgetPatchCall) and [*update*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::BudgetUpdateCall)
+* [creatives](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::Creative)
+ * [*add deal*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::CreativeAddDealCall), [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::CreativeGetCall), [*insert*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::CreativeInsertCall), [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::CreativeListCall), [*list deals*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::CreativeListDealCall) and [*remove deal*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::CreativeRemoveDealCall)
 * marketplacedeals
- * [*delete*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplacedealDeleteCall.html), [*insert*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplacedealInsertCall.html), [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplacedealListCall.html) and [*update*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplacedealUpdateCall.html)
+ * [*delete*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplacedealDeleteCall), [*insert*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplacedealInsertCall), [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplacedealListCall) and [*update*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplacedealUpdateCall)
 * marketplacenotes
- * [*insert*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplacenoteInsertCall.html) and [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplacenoteListCall.html)
+ * [*insert*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplacenoteInsertCall) and [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplacenoteListCall)
 * marketplaceprivateauction
- * [*updateproposal*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.MarketplaceprivateauctionUpdateproposalCall.html)
-* [performance report](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PerformanceReport.html)
- * [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PerformanceReportListCall.html)
-* [pretargeting config](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfig.html)
- * [*delete*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfigDeleteCall.html), [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfigGetCall.html), [*insert*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfigInsertCall.html), [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfigListCall.html), [*patch*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfigPatchCall.html) and [*update*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PretargetingConfigUpdateCall.html)
-* [products](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.Product.html)
- * [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProductGetCall.html) and [*search*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProductSearchCall.html)
-* [proposals](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.Proposal.html)
- * [*get*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProposalGetCall.html), [*insert*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProposalInsertCall.html), [*patch*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProposalPatchCall.html), [*search*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProposalSearchCall.html), [*setupcomplete*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProposalSetupcompleteCall.html) and [*update*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.ProposalUpdateCall.html)
+ * [*updateproposal*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::MarketplaceprivateauctionUpdateproposalCall)
+* [performance report](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PerformanceReport)
+ * [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PerformanceReportListCall)
+* [pretargeting config](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfig)
+ * [*delete*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfigDeleteCall), [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfigGetCall), [*insert*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfigInsertCall), [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfigListCall), [*patch*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfigPatchCall) and [*update*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PretargetingConfigUpdateCall)
+* [products](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::Product)
+ * [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProductGetCall) and [*search*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProductSearchCall)
+* [proposals](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::Proposal)
+ * [*get*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProposalGetCall), [*insert*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProposalInsertCall), [*patch*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProposalPatchCall), [*search*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProposalSearchCall), [*setupcomplete*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProposalSetupcompleteCall) and [*update*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::ProposalUpdateCall)
 * pubprofiles
- * [*list*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.PubprofileListCall.html)
+ * [*list*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/api::PubprofileListCall)
 
 
 
@@ -45,17 +45,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/struct.AdExchangeBuyer.html)**
+* **[Hub](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/AdExchangeBuyer)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::CallBuilder)
+* **[Resources](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -63,18 +63,18 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.creatives().add_deal(...).doit()
-let r = hub.creatives().insert(...).doit()
-let r = hub.creatives().list(...).doit()
-let r = hub.creatives().list_deals(...).doit()
-let r = hub.creatives().remove_deal(...).doit()
-let r = hub.creatives().get(...).doit()
+let r = hub.creatives().add_deal(...).doit().await
+let r = hub.creatives().get(...).doit().await
+let r = hub.creatives().insert(...).doit().await
+let r = hub.creatives().list(...).doit().await
+let r = hub.creatives().list_deals(...).doit().await
+let r = hub.creatives().remove_deal(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -94,11 +94,11 @@ google-adexchangebuyer1d4 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -110,38 +110,40 @@ extern crate yup_oauth2 as oauth2;
 extern crate google_adexchangebuyer1d4 as adexchangebuyer1d4;
 use adexchangebuyer1d4::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use adexchangebuyer1d4::AdExchangeBuyer;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = AdExchangeBuyer::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = AdExchangeBuyer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.creatives().list()
-             .page_token("eirmod")
-             .open_auction_status_filter("sit")
-             .max_results(36)
-             .deals_status_filter("sed")
-             .add_buyer_creative_id("et")
-             .add_account_id(-18)
-             .doit();
+             .page_token("et")
+             .open_auction_status_filter("magna")
+             .max_results(90)
+             .deals_status_filter("ipsum")
+             .add_buyer_creative_id("voluptua.")
+             .add_account_id(-27)
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -157,17 +159,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -177,29 +179,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::RequestValue) and 
+[decodable](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-adexchangebuyer1d4/1.0.14+20191204/google_adexchangebuyer1d4/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-adexchangebuyer1d4/2.0.0+20210330/google_adexchangebuyer1d4/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

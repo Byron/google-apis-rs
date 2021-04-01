@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_sourcerepo1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_sourcerepo1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudSourceRepositories<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudSourceRepositories<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_config(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -121,12 +117,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mirror-config.deploy-key-id" => Some(("mirrorConfig.deployKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mirror-config.url" => Some(("mirrorConfig.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mirror-config.webhook-id" => Some(("mirrorConfig.webhookId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mirror-config.deploy-key-id" => Some(("mirrorConfig.deployKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deploy-key-id", "mirror-config", "name", "size", "url", "webhook-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -173,7 +169,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -188,7 +184,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().repos_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -225,7 +221,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -240,7 +236,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().repos_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -277,7 +273,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -292,7 +288,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().repos_get_iam_policy(opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -333,7 +329,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -348,7 +344,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().repos_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -373,7 +369,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -392,7 +388,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -407,7 +403,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -430,12 +426,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "repo.url" => Some(("repo.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "repo.size" => Some(("repo.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "repo.name" => Some(("repo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repo.mirror-config.deploy-key-id" => Some(("repo.mirrorConfig.deployKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "repo.mirror-config.url" => Some(("repo.mirrorConfig.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "repo.mirror-config.webhook-id" => Some(("repo.mirrorConfig.webhookId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "repo.mirror-config.deploy-key-id" => Some(("repo.mirrorConfig.deployKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repo.name" => Some(("repo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repo.size" => Some(("repo.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "repo.url" => Some(("repo.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deploy-key-id", "mirror-config", "name", "repo", "size", "update-mask", "url", "webhook-id"]);
@@ -483,7 +479,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -498,7 +494,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -570,7 +566,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -585,7 +581,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_sync(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_sync(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -654,7 +650,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -669,7 +665,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_repos_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_repos_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -739,7 +735,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -754,7 +750,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_update_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_update_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -826,7 +822,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -841,7 +837,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -849,37 +845,37 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("get-config", Some(opt)) => {
-                        call_result = self._projects_get_config(opt, dry_run, &mut err);
+                        call_result = self._projects_get_config(opt, dry_run, &mut err).await;
                     },
                     ("repos-create", Some(opt)) => {
-                        call_result = self._projects_repos_create(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_create(opt, dry_run, &mut err).await;
                     },
                     ("repos-delete", Some(opt)) => {
-                        call_result = self._projects_repos_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_delete(opt, dry_run, &mut err).await;
                     },
                     ("repos-get", Some(opt)) => {
-                        call_result = self._projects_repos_get(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_get(opt, dry_run, &mut err).await;
                     },
                     ("repos-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_repos_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("repos-list", Some(opt)) => {
-                        call_result = self._projects_repos_list(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_list(opt, dry_run, &mut err).await;
                     },
                     ("repos-patch", Some(opt)) => {
-                        call_result = self._projects_repos_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_patch(opt, dry_run, &mut err).await;
                     },
                     ("repos-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_repos_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("repos-sync", Some(opt)) => {
-                        call_result = self._projects_repos_sync(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_sync(opt, dry_run, &mut err).await;
                     },
                     ("repos-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_repos_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_repos_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("update-config", Some(opt)) => {
-                        call_result = self._projects_update_config(opt, dry_run, &mut err);
+                        call_result = self._projects_update_config(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -904,41 +900,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "sourcerepo1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "sourcerepo1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "sourcerepo1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/sourcerepo1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudSourceRepositories::new(client, auth),
@@ -954,22 +935,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'get-config', 'repos-create', 'repos-delete', 'repos-get', 'repos-get-iam-policy', 'repos-list', 'repos-patch', 'repos-set-iam-policy', 'repos-sync', 'repos-test-iam-permissions' and 'update-config'", vec![
@@ -979,8 +961,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the requested project. Values are of the form
-        `projects/<project>`."##),
+                     Some(r##"The name of the requested project. Values are of the form `projects/`."##),
                      Some(true),
                      Some(false)),
         
@@ -997,16 +978,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("repos-create",
-                    Some(r##"Creates a repo in the given project with the given name.
-        
-        If the named repository already exists, `CreateRepo` returns
-        `ALREADY_EXISTS`."##),
+                    Some(r##"Creates a repo in the given project with the given name. If the named repository already exists, `CreateRepo` returns `ALREADY_EXISTS`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project in which to create the repo. Values are of the form
-        `projects/<project>`."##),
+                     Some(r##"The project in which to create the repo. Values are of the form `projects/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1034,8 +1011,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the repo to delete. Values are of the form
-        `projects/<project>/repos/<repo>`."##),
+                     Some(r##"The name of the repo to delete. Values are of the form `projects//repos/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1057,8 +1033,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the requested repository. Values are of the form
-        `projects/<project>/repos/<repo>`."##),
+                     Some(r##"The name of the requested repository. Values are of the form `projects//repos/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1075,15 +1050,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("repos-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource.
-        Returns an empty policy if the resource exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1100,14 +1072,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("repos-list",
-                    Some(r##"Returns all repos belonging to a project. The sizes of the repos are
-        not set by ListRepos.  To get the size of a repo, use GetRepo."##),
+                    Some(r##"Returns all repos belonging to a project. The sizes of the repos are not set by ListRepos. To get the size of a repo, use GetRepo."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-list",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project ID whose repos should be listed. Values are of the form
-        `projects/<project>`."##),
+                     Some(r##"The project ID whose repos should be listed. Values are of the form `projects/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1129,8 +1099,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the requested repository. Values are of the form
-        `projects/<project>/repos/<repo>`."##),
+                     Some(r##"The name of the requested repository. Values are of the form `projects//repos/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1153,14 +1122,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("repos-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1183,15 +1150,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("repos-sync",
-                    Some(r##"Synchronize a connected repo.
-        
-        The response contains SyncRepoMetadata in the metadata field."##),
+                    Some(r##"Synchronize a connected repo. The response contains SyncRepoMetadata in the metadata field."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-sync",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the repo to synchronize. Values are of the form
-        `projects/<project>/repos/<repo>`."##),
+                     Some(r##"The name of the repo to synchronize. Values are of the form `projects//repos/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1214,15 +1178,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("repos-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource.
-        If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1250,8 +1211,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the requested project. Values are of the form
-        `projects/<project>`."##),
+                     Some(r##"The name of the requested project. Values are of the form `projects/`."##),
                      Some(true),
                      Some(false)),
         
@@ -1279,7 +1239,7 @@ fn main() {
     
     let mut app = App::new("sourcerepo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200520")
+           .version("2.0.0+20210125")
            .about("Accesses source code repositories hosted by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli")
            .arg(Arg::with_name("url")
@@ -1294,12 +1254,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1347,13 +1302,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

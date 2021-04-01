@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dialogflow* API at revision *20200706*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Dialogflow* API at revision *20210329*. The CLI is at version *2.0.0*.
 
 ```bash
 dialogflow2-beta1 [options]
@@ -40,6 +40,7 @@ dialogflow2-beta1 [options]
                 agent-entity-types-get <name> [-p <v>]... [-o <out>]
                 agent-entity-types-list <parent> [-p <v>]... [-o <out>]
                 agent-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-intents-list <parent> [-p <v>]... [-o <out>]
                 agent-environments-list <parent> [-p <v>]... [-o <out>]
                 agent-environments-users-sessions-contexts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-environments-users-sessions-contexts-delete <name> [-p <v>]... [-o <out>]
@@ -91,6 +92,30 @@ dialogflow2-beta1 [options]
                 agent-sessions-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-train <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-update-fulfillment <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                answer-records-get <name> [-p <v>]... [-o <out>]
+                answer-records-list <parent> [-p <v>]... [-o <out>]
+                answer-records-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversation-profiles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversation-profiles-delete <name> [-p <v>]... [-o <out>]
+                conversation-profiles-get <name> [-p <v>]... [-o <out>]
+                conversation-profiles-list <parent> [-p <v>]... [-o <out>]
+                conversation-profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-complete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-get <name> [-p <v>]... [-o <out>]
+                conversations-list <parent> [-p <v>]... [-o <out>]
+                conversations-messages-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-messages-list <parent> [-p <v>]... [-o <out>]
+                conversations-participants-analyze-content <participant> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-participants-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-participants-get <name> [-p <v>]... [-o <out>]
+                conversations-participants-list <parent> [-p <v>]... [-o <out>]
+                conversations-participants-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-participants-suggestions-compile <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-participants-suggestions-list <parent> [-p <v>]... [-o <out>]
+                conversations-participants-suggestions-suggest-articles <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-participants-suggestions-suggest-faq-answers <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                conversations-participants-suggestions-suggest-smart-replies <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete-agent <parent> [-p <v>]... [-o <out>]
                 get-agent <parent> [-p <v>]... [-o <out>]
                 knowledge-bases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -98,6 +123,7 @@ dialogflow2-beta1 [options]
                 knowledge-bases-documents-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 knowledge-bases-documents-delete <name> [-p <v>]... [-o <out>]
                 knowledge-bases-documents-get <name> [-p <v>]... [-o <out>]
+                knowledge-bases-documents-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 knowledge-bases-documents-list <parent> [-p <v>]... [-o <out>]
                 knowledge-bases-documents-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 knowledge-bases-documents-reload <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -129,6 +155,7 @@ dialogflow2-beta1 [options]
                 locations-agent-environments-users-sessions-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-agent-export <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-agent-get-fulfillment <name> [-p <v>]... [-o <out>]
+                locations-agent-get-validation-result <parent> [-p <v>]... [-o <out>]
                 locations-agent-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-agent-intents-batch-delete <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-agent-intents-batch-update <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -153,8 +180,42 @@ dialogflow2-beta1 [options]
                 locations-agent-sessions-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-agent-train <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-agent-update-fulfillment <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-answer-records-get <name> [-p <v>]... [-o <out>]
+                locations-answer-records-list <parent> [-p <v>]... [-o <out>]
+                locations-answer-records-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversation-profiles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversation-profiles-delete <name> [-p <v>]... [-o <out>]
+                locations-conversation-profiles-get <name> [-p <v>]... [-o <out>]
+                locations-conversation-profiles-list <parent> [-p <v>]... [-o <out>]
+                locations-conversation-profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-complete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-get <name> [-p <v>]... [-o <out>]
+                locations-conversations-list <parent> [-p <v>]... [-o <out>]
+                locations-conversations-messages-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-messages-list <parent> [-p <v>]... [-o <out>]
+                locations-conversations-participants-analyze-content <participant> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-participants-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-participants-get <name> [-p <v>]... [-o <out>]
+                locations-conversations-participants-list <parent> [-p <v>]... [-o <out>]
+                locations-conversations-participants-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-participants-suggestions-suggest-articles <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-participants-suggestions-suggest-faq-answers <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-participants-suggestions-suggest-smart-replies <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delete-agent <parent> [-p <v>]... [-o <out>]
                 locations-get-agent <parent> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-knowledge-bases-delete <name> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-delete <name> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-get <name> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-list <parent> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-knowledge-bases-documents-reload <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-knowledge-bases-get <name> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-list <parent> [-p <v>]... [-o <out>]
+                locations-knowledge-bases-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
@@ -174,12 +235,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -232,10 +287,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `dialogflow2-beta1 --debug <resource> <method> [options] 2>debug.txt`.
 

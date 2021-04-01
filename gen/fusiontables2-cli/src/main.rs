@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_fusiontables2 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_fusiontables2::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Fusiontables<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Fusiontables<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _column_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _column_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.column().delete(opt.value_of("table-id").unwrap_or(""), opt.value_of("column-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -79,7 +75,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -90,7 +86,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _column_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _column_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.column().get(opt.value_of("table-id").unwrap_or(""), opt.value_of("column-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -127,7 +123,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -142,7 +138,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _column_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _column_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -165,19 +161,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "graph-predicate" => Some(("graphPredicate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "validate-data" => Some(("validateData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -224,7 +220,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -239,7 +235,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _column_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _column_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.column().list(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -264,7 +260,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -283,7 +279,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -298,7 +294,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _column_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _column_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -321,19 +317,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "graph-predicate" => Some(("graphPredicate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "validate-data" => Some(("validateData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -380,7 +376,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -395,7 +391,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _column_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _column_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -418,19 +414,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "graph-predicate" => Some(("graphPredicate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "validate-data" => Some(("validateData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -477,7 +473,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -492,7 +488,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _query_sql(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _query_sql(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut download_mode = false;
         let mut call = self.hub.query().sql(opt.value_of("sql").unwrap_or(""));
@@ -521,7 +517,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["typed", "hdrs"].iter().map(|v|*v));
+                                                                           v.extend(["hdrs", "typed"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -540,7 +536,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -551,8 +547,9 @@ impl<'n> Engine<'n> {
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
+                    let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+                    ostream.write_all(&bytes).expect("write to be complete");
+                    ostream.flush().expect("io to never fail which should really be fixed one day");
                     }
                     Ok(())
                 }
@@ -560,7 +557,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _query_sql_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _query_sql_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut download_mode = false;
         let mut call = self.hub.query().sql_get(opt.value_of("sql").unwrap_or(""));
@@ -589,7 +586,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["typed", "hdrs"].iter().map(|v|*v));
+                                                                           v.extend(["hdrs", "typed"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -608,7 +605,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -619,8 +616,9 @@ impl<'n> Engine<'n> {
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
+                    let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+                    ostream.write_all(&bytes).expect("write to be complete");
+                    ostream.flush().expect("io to never fail which should really be fixed one day");
                     }
                     Ok(())
                 }
@@ -628,7 +626,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _style_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _style_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let style_id: i32 = arg_from_str(&opt.value_of("style-id").unwrap_or(""), err, "<style-id>", "integer");
         let mut call = self.hub.style().delete(opt.value_of("table-id").unwrap_or(""), style_id);
@@ -662,7 +660,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -673,7 +671,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _style_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _style_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let style_id: i32 = arg_from_str(&opt.value_of("style-id").unwrap_or(""), err, "<style-id>", "integer");
         let mut call = self.hub.style().get(opt.value_of("table-id").unwrap_or(""), style_id);
@@ -711,7 +709,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -726,7 +724,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _style_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _style_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -749,43 +747,43 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.gradient.max" => Some(("markerOptions.iconStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.gradient.min" => Some(("markerOptions.iconStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.kind" => Some(("markerOptions.iconStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.gradient.max" => Some(("polygonOptions.fillColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.gradient.min" => Some(("polygonOptions.fillColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.kind" => Some(("polygonOptions.fillColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-opacity" => Some(("polygonOptions.fillOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color" => Some(("polylineOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.gradient.max" => Some(("polylineOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.gradient.min" => Some(("polylineOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.kind" => Some(("polylineOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "style-id" => Some(("styleId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -832,7 +830,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -847,7 +845,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _style_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _style_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.style().list(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -872,7 +870,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -891,7 +889,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -906,7 +904,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _style_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _style_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -929,43 +927,43 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.gradient.max" => Some(("markerOptions.iconStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.gradient.min" => Some(("markerOptions.iconStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.kind" => Some(("markerOptions.iconStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.gradient.max" => Some(("polygonOptions.fillColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.gradient.min" => Some(("polygonOptions.fillColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.kind" => Some(("polygonOptions.fillColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-opacity" => Some(("polygonOptions.fillOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color" => Some(("polylineOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.gradient.max" => Some(("polylineOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.gradient.min" => Some(("polylineOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.kind" => Some(("polylineOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "style-id" => Some(("styleId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1013,7 +1011,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1028,7 +1026,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _style_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _style_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1051,43 +1049,43 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.gradient.max" => Some(("markerOptions.iconStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.gradient.min" => Some(("markerOptions.iconStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "marker-options.icon-styler.kind" => Some(("markerOptions.iconStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.gradient.max" => Some(("polygonOptions.fillColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.gradient.min" => Some(("polygonOptions.fillColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-color-styler.kind" => Some(("polygonOptions.fillColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polygon-options.fill-opacity" => Some(("polygonOptions.fillOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color" => Some(("polylineOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.gradient.max" => Some(("polylineOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.gradient.min" => Some(("polylineOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "polyline-options.stroke-color-styler.kind" => Some(("polylineOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "style-id" => Some(("styleId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1135,7 +1133,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1150,7 +1148,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_copy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_copy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().copy(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1191,7 +1189,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1206,7 +1204,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().delete(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1239,7 +1237,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1250,7 +1248,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().get(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1287,7 +1285,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1302,7 +1300,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_import_rows(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_import_rows(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().import_rows(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1336,14 +1334,14 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["encoding", "end-line", "start-line", "delimiter", "is-strict"].iter().map(|v|*v));
+                                                                           v.extend(["is-strict", "delimiter", "end-line", "encoding", "start-line"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1358,8 +1356,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1374,7 +1371,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_import_table(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_import_table(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().import_table(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1406,7 +1403,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1421,8 +1418,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1437,7 +1433,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1460,18 +1456,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution" => Some(("attribution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution-link" => Some(("attributionLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1518,7 +1514,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1533,7 +1529,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1558,7 +1554,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1577,7 +1573,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1592,7 +1588,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1615,18 +1611,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution" => Some(("attribution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution-link" => Some(("attributionLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1677,7 +1673,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1692,7 +1688,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_refetch_sheet(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_refetch_sheet(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().refetch_sheet(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1729,7 +1725,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1744,7 +1740,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_replace_rows(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_replace_rows(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().replace_rows(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1778,14 +1774,14 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["encoding", "end-line", "start-line", "delimiter", "is-strict"].iter().map(|v|*v));
+                                                                           v.extend(["is-strict", "delimiter", "end-line", "encoding", "start-line"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1800,8 +1796,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1816,7 +1811,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _table_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _table_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1839,18 +1834,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution" => Some(("attribution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution-link" => Some(("attributionLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1901,7 +1896,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1916,7 +1911,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _task_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _task_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.task().delete(opt.value_of("table-id").unwrap_or(""), opt.value_of("task-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1949,7 +1944,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1960,7 +1955,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _task_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _task_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.task().get(opt.value_of("table-id").unwrap_or(""), opt.value_of("task-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1997,7 +1992,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2012,7 +2007,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _task_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _task_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.task().list(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2040,7 +2035,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results", "start-index"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2059,7 +2054,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2074,7 +2069,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _template_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _template_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let template_id: i32 = arg_from_str(&opt.value_of("template-id").unwrap_or(""), err, "<template-id>", "integer");
         let mut call = self.hub.template().delete(opt.value_of("table-id").unwrap_or(""), template_id);
@@ -2108,7 +2103,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2119,7 +2114,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _template_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _template_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let template_id: i32 = arg_from_str(&opt.value_of("template-id").unwrap_or(""), err, "<template-id>", "integer");
         let mut call = self.hub.template().get(opt.value_of("table-id").unwrap_or(""), template_id);
@@ -2157,7 +2152,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2172,7 +2167,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _template_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _template_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2195,10 +2190,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "body" => Some(("body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
@@ -2247,7 +2242,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2262,7 +2257,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _template_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _template_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.template().list(opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2287,7 +2282,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2306,7 +2301,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2321,7 +2316,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _template_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _template_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2344,10 +2339,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "body" => Some(("body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
@@ -2397,7 +2392,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2412,7 +2407,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _template_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _template_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2435,10 +2430,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "body" => Some(("body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
@@ -2488,7 +2483,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2503,7 +2498,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -2511,22 +2506,22 @@ impl<'n> Engine<'n> {
             ("column", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._column_delete(opt, dry_run, &mut err);
+                        call_result = self._column_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._column_get(opt, dry_run, &mut err);
+                        call_result = self._column_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._column_insert(opt, dry_run, &mut err);
+                        call_result = self._column_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._column_list(opt, dry_run, &mut err);
+                        call_result = self._column_list(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
-                        call_result = self._column_patch(opt, dry_run, &mut err);
+                        call_result = self._column_patch(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._column_update(opt, dry_run, &mut err);
+                        call_result = self._column_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("column".to_string()));
@@ -2537,10 +2532,10 @@ impl<'n> Engine<'n> {
             ("query", Some(opt)) => {
                 match opt.subcommand() {
                     ("sql", Some(opt)) => {
-                        call_result = self._query_sql(opt, dry_run, &mut err);
+                        call_result = self._query_sql(opt, dry_run, &mut err).await;
                     },
                     ("sql-get", Some(opt)) => {
-                        call_result = self._query_sql_get(opt, dry_run, &mut err);
+                        call_result = self._query_sql_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("query".to_string()));
@@ -2551,22 +2546,22 @@ impl<'n> Engine<'n> {
             ("style", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._style_delete(opt, dry_run, &mut err);
+                        call_result = self._style_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._style_get(opt, dry_run, &mut err);
+                        call_result = self._style_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._style_insert(opt, dry_run, &mut err);
+                        call_result = self._style_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._style_list(opt, dry_run, &mut err);
+                        call_result = self._style_list(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
-                        call_result = self._style_patch(opt, dry_run, &mut err);
+                        call_result = self._style_patch(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._style_update(opt, dry_run, &mut err);
+                        call_result = self._style_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("style".to_string()));
@@ -2577,37 +2572,37 @@ impl<'n> Engine<'n> {
             ("table", Some(opt)) => {
                 match opt.subcommand() {
                     ("copy", Some(opt)) => {
-                        call_result = self._table_copy(opt, dry_run, &mut err);
+                        call_result = self._table_copy(opt, dry_run, &mut err).await;
                     },
                     ("delete", Some(opt)) => {
-                        call_result = self._table_delete(opt, dry_run, &mut err);
+                        call_result = self._table_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._table_get(opt, dry_run, &mut err);
+                        call_result = self._table_get(opt, dry_run, &mut err).await;
                     },
                     ("import-rows", Some(opt)) => {
-                        call_result = self._table_import_rows(opt, dry_run, &mut err);
+                        call_result = self._table_import_rows(opt, dry_run, &mut err).await;
                     },
                     ("import-table", Some(opt)) => {
-                        call_result = self._table_import_table(opt, dry_run, &mut err);
+                        call_result = self._table_import_table(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._table_insert(opt, dry_run, &mut err);
+                        call_result = self._table_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._table_list(opt, dry_run, &mut err);
+                        call_result = self._table_list(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
-                        call_result = self._table_patch(opt, dry_run, &mut err);
+                        call_result = self._table_patch(opt, dry_run, &mut err).await;
                     },
                     ("refetch-sheet", Some(opt)) => {
-                        call_result = self._table_refetch_sheet(opt, dry_run, &mut err);
+                        call_result = self._table_refetch_sheet(opt, dry_run, &mut err).await;
                     },
                     ("replace-rows", Some(opt)) => {
-                        call_result = self._table_replace_rows(opt, dry_run, &mut err);
+                        call_result = self._table_replace_rows(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._table_update(opt, dry_run, &mut err);
+                        call_result = self._table_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("table".to_string()));
@@ -2618,13 +2613,13 @@ impl<'n> Engine<'n> {
             ("task", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._task_delete(opt, dry_run, &mut err);
+                        call_result = self._task_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._task_get(opt, dry_run, &mut err);
+                        call_result = self._task_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._task_list(opt, dry_run, &mut err);
+                        call_result = self._task_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("task".to_string()));
@@ -2635,22 +2630,22 @@ impl<'n> Engine<'n> {
             ("template", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._template_delete(opt, dry_run, &mut err);
+                        call_result = self._template_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._template_get(opt, dry_run, &mut err);
+                        call_result = self._template_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._template_insert(opt, dry_run, &mut err);
+                        call_result = self._template_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._template_list(opt, dry_run, &mut err);
+                        call_result = self._template_list(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
-                        call_result = self._template_patch(opt, dry_run, &mut err);
+                        call_result = self._template_patch(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._template_update(opt, dry_run, &mut err);
+                        call_result = self._template_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("template".to_string()));
@@ -2675,41 +2670,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "fusiontables2-secret.json",
+            match client::application_secret_from_directory(&config_dir, "fusiontables2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "fusiontables2",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/fusiontables2", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Fusiontables::new(client, auth),
@@ -2722,22 +2702,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
@@ -3223,7 +3204,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -3251,7 +3232,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -3367,7 +3348,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -3663,7 +3644,7 @@ fn main() {
     
     let mut app = App::new("fusiontables2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20171117")
+           .version("2.0.0+20171117")
            .about("API for working with Fusion Tables data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fusiontables2_cli")
            .arg(Arg::with_name("url")
@@ -3678,12 +3659,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -3742,13 +3718,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

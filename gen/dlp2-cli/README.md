@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DLP* API at revision *20200706*. The CLI is at version *1.0.14*.
+This documentation was generated from the *DLP* API at revision *20210326*. The CLI is at version *2.0.0*.
 
 ```bash
 dlp2 [options]
@@ -49,11 +49,17 @@ dlp2 [options]
                 locations-deidentify-templates-get <name> [-p <v>]... [-o <out>]
                 locations-deidentify-templates-list <parent> [-p <v>]... [-o <out>]
                 locations-deidentify-templates-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-dlp-jobs-list <parent> [-p <v>]... [-o <out>]
                 locations-inspect-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-inspect-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-inspect-templates-get <name> [-p <v>]... [-o <out>]
                 locations-inspect-templates-list <parent> [-p <v>]... [-o <out>]
                 locations-inspect-templates-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-job-triggers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-job-triggers-delete <name> [-p <v>]... [-o <out>]
+                locations-job-triggers-get <name> [-p <v>]... [-o <out>]
+                locations-job-triggers-list <parent> [-p <v>]... [-o <out>]
+                locations-job-triggers-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-stored-info-types-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-stored-info-types-delete <name> [-p <v>]... [-o <out>]
                 locations-stored-info-types-get <name> [-p <v>]... [-o <out>]
@@ -139,12 +145,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -197,10 +197,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `dlp2 --debug <resource> <method> [options] 2>debug.txt`.
 

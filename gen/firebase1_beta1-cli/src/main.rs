@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_firebase1_beta1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_firebase1_beta1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::FirebaseManagement<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::FirebaseManagement<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _available_projects_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _available_projects_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.available_projects().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -71,7 +67,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -90,7 +86,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -105,7 +101,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.operations().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -142,7 +138,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -157,7 +153,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_add_firebase(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_add_firebase(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -180,8 +176,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "region-code" => Some(("regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "region-code" => Some(("regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["location-id", "region-code", "time-zone"]);
@@ -229,7 +225,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -244,7 +240,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_add_google_analytics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_add_google_analytics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -315,7 +311,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -330,7 +326,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -353,11 +349,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "display-name", "name", "package-name", "project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -404,7 +400,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -419,7 +415,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().android_apps_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -456,7 +452,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -471,7 +467,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().android_apps_get_config(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -508,7 +504,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -523,7 +519,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().android_apps_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -548,7 +544,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -567,7 +563,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -582,7 +578,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -605,11 +601,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "display-name", "name", "package-name", "project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -660,7 +656,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -675,7 +671,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_sha_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_sha_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -698,9 +694,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "sha-hash" => Some(("shaHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cert-type" => Some(("certType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sha-hash" => Some(("shaHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["cert-type", "name", "sha-hash"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -747,7 +743,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -762,7 +758,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_sha_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_sha_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().android_apps_sha_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -799,7 +795,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -814,7 +810,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_android_apps_sha_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_android_apps_sha_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().android_apps_sha_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -851,7 +847,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -866,7 +862,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_available_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_available_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().available_locations_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -891,7 +887,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -910,7 +906,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -925,7 +921,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_default_location_finalize(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_default_location_finalize(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -995,7 +991,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1010,7 +1006,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1047,7 +1043,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1062,7 +1058,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get_admin_sdk_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_admin_sdk_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_admin_sdk_config(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1099,7 +1095,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1114,7 +1110,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get_analytics_details(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_analytics_details(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_analytics_details(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1151,7 +1147,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1166,7 +1162,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_ios_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_ios_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1189,12 +1185,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-store-id" => Some(("appStoreId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bundle-id" => Some(("bundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "app-store-id", "bundle-id", "display-name", "name", "project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1241,7 +1237,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1256,7 +1252,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_ios_apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_ios_apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().ios_apps_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1293,7 +1289,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1308,7 +1304,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_ios_apps_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_ios_apps_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().ios_apps_get_config(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1345,7 +1341,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1360,7 +1356,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_ios_apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_ios_apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().ios_apps_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1385,7 +1381,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1404,7 +1400,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1419,7 +1415,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_ios_apps_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_ios_apps_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1442,12 +1438,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-store-id" => Some(("appStoreId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bundle-id" => Some(("bundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "app-store-id", "bundle-id", "display-name", "name", "project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1498,7 +1494,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1513,7 +1509,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1538,7 +1534,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1557,7 +1553,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1572,7 +1568,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1595,16 +1591,17 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resources.storage-bucket" => Some(("resources.storageBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resources.location-id" => Some(("resources.locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resources.hosting-site" => Some(("resources.hostingSite", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resources.realtime-database-instance" => Some(("resources.realtimeDatabaseInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resources.hosting-site" => Some(("resources.hostingSite", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resources.location-id" => Some(("resources.locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resources.realtime-database-instance" => Some(("resources.realtimeDatabaseInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resources.storage-bucket" => Some(("resources.storageBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "hosting-site", "location-id", "name", "project-id", "project-number", "realtime-database-instance", "resources", "storage-bucket"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "hosting-site", "location-id", "name", "project-id", "project-number", "realtime-database-instance", "resources", "state", "storage-bucket"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1653,7 +1650,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1668,7 +1665,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_remove_analytics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_remove_analytics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1738,7 +1735,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1753,7 +1750,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_search_apps(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_search_apps(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().search_apps(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1764,6 +1761,9 @@ impl<'n> Engine<'n> {
                 },
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -1778,7 +1778,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1797,7 +1797,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1812,7 +1812,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_web_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_web_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1835,13 +1835,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-urls" => Some(("appUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-id" => Some(("webId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "app-urls", "display-name", "name", "project-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "app-urls", "display-name", "name", "project-id", "web-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1886,7 +1887,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1901,7 +1902,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_web_apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_web_apps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().web_apps_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1938,7 +1939,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1953,7 +1954,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_web_apps_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_web_apps_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().web_apps_get_config(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1990,7 +1991,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2005,7 +2006,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_web_apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_web_apps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().web_apps_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2030,7 +2031,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2049,7 +2050,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2064,7 +2065,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_web_apps_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_web_apps_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2087,13 +2088,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-urls" => Some(("appUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-id" => Some(("appId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-id" => Some(("webId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "app-urls", "display-name", "name", "project-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-id", "app-urls", "display-name", "name", "project-id", "web-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2142,7 +2144,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2157,7 +2159,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -2165,7 +2167,7 @@ impl<'n> Engine<'n> {
             ("available-projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._available_projects_list(opt, dry_run, &mut err);
+                        call_result = self._available_projects_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("available-projects".to_string()));
@@ -2176,7 +2178,7 @@ impl<'n> Engine<'n> {
             ("operations", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._operations_get(opt, dry_run, &mut err);
+                        call_result = self._operations_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("operations".to_string()));
@@ -2187,91 +2189,91 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("add-firebase", Some(opt)) => {
-                        call_result = self._projects_add_firebase(opt, dry_run, &mut err);
+                        call_result = self._projects_add_firebase(opt, dry_run, &mut err).await;
                     },
                     ("add-google-analytics", Some(opt)) => {
-                        call_result = self._projects_add_google_analytics(opt, dry_run, &mut err);
+                        call_result = self._projects_add_google_analytics(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-create", Some(opt)) => {
-                        call_result = self._projects_android_apps_create(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_create(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-get", Some(opt)) => {
-                        call_result = self._projects_android_apps_get(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_get(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-get-config", Some(opt)) => {
-                        call_result = self._projects_android_apps_get_config(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_get_config(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-list", Some(opt)) => {
-                        call_result = self._projects_android_apps_list(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_list(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-patch", Some(opt)) => {
-                        call_result = self._projects_android_apps_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_patch(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-sha-create", Some(opt)) => {
-                        call_result = self._projects_android_apps_sha_create(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_sha_create(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-sha-delete", Some(opt)) => {
-                        call_result = self._projects_android_apps_sha_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_sha_delete(opt, dry_run, &mut err).await;
                     },
                     ("android-apps-sha-list", Some(opt)) => {
-                        call_result = self._projects_android_apps_sha_list(opt, dry_run, &mut err);
+                        call_result = self._projects_android_apps_sha_list(opt, dry_run, &mut err).await;
                     },
                     ("available-locations-list", Some(opt)) => {
-                        call_result = self._projects_available_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_available_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("default-location-finalize", Some(opt)) => {
-                        call_result = self._projects_default_location_finalize(opt, dry_run, &mut err);
+                        call_result = self._projects_default_location_finalize(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._projects_get(opt, dry_run, &mut err);
+                        call_result = self._projects_get(opt, dry_run, &mut err).await;
                     },
                     ("get-admin-sdk-config", Some(opt)) => {
-                        call_result = self._projects_get_admin_sdk_config(opt, dry_run, &mut err);
+                        call_result = self._projects_get_admin_sdk_config(opt, dry_run, &mut err).await;
                     },
                     ("get-analytics-details", Some(opt)) => {
-                        call_result = self._projects_get_analytics_details(opt, dry_run, &mut err);
+                        call_result = self._projects_get_analytics_details(opt, dry_run, &mut err).await;
                     },
                     ("ios-apps-create", Some(opt)) => {
-                        call_result = self._projects_ios_apps_create(opt, dry_run, &mut err);
+                        call_result = self._projects_ios_apps_create(opt, dry_run, &mut err).await;
                     },
                     ("ios-apps-get", Some(opt)) => {
-                        call_result = self._projects_ios_apps_get(opt, dry_run, &mut err);
+                        call_result = self._projects_ios_apps_get(opt, dry_run, &mut err).await;
                     },
                     ("ios-apps-get-config", Some(opt)) => {
-                        call_result = self._projects_ios_apps_get_config(opt, dry_run, &mut err);
+                        call_result = self._projects_ios_apps_get_config(opt, dry_run, &mut err).await;
                     },
                     ("ios-apps-list", Some(opt)) => {
-                        call_result = self._projects_ios_apps_list(opt, dry_run, &mut err);
+                        call_result = self._projects_ios_apps_list(opt, dry_run, &mut err).await;
                     },
                     ("ios-apps-patch", Some(opt)) => {
-                        call_result = self._projects_ios_apps_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_ios_apps_patch(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._projects_list(opt, dry_run, &mut err);
+                        call_result = self._projects_list(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
-                        call_result = self._projects_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_patch(opt, dry_run, &mut err).await;
                     },
                     ("remove-analytics", Some(opt)) => {
-                        call_result = self._projects_remove_analytics(opt, dry_run, &mut err);
+                        call_result = self._projects_remove_analytics(opt, dry_run, &mut err).await;
                     },
                     ("search-apps", Some(opt)) => {
-                        call_result = self._projects_search_apps(opt, dry_run, &mut err);
+                        call_result = self._projects_search_apps(opt, dry_run, &mut err).await;
                     },
                     ("web-apps-create", Some(opt)) => {
-                        call_result = self._projects_web_apps_create(opt, dry_run, &mut err);
+                        call_result = self._projects_web_apps_create(opt, dry_run, &mut err).await;
                     },
                     ("web-apps-get", Some(opt)) => {
-                        call_result = self._projects_web_apps_get(opt, dry_run, &mut err);
+                        call_result = self._projects_web_apps_get(opt, dry_run, &mut err).await;
                     },
                     ("web-apps-get-config", Some(opt)) => {
-                        call_result = self._projects_web_apps_get_config(opt, dry_run, &mut err);
+                        call_result = self._projects_web_apps_get_config(opt, dry_run, &mut err).await;
                     },
                     ("web-apps-list", Some(opt)) => {
-                        call_result = self._projects_web_apps_list(opt, dry_run, &mut err);
+                        call_result = self._projects_web_apps_list(opt, dry_run, &mut err).await;
                     },
                     ("web-apps-patch", Some(opt)) => {
-                        call_result = self._projects_web_apps_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_web_apps_patch(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -2296,41 +2298,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "firebase1-beta1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "firebase1-beta1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "firebase1-beta1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/firebase1-beta1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::FirebaseManagement::new(client, auth),
@@ -2346,39 +2333,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("available-projects", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of [Google Cloud Platform (GCP) `Projects`]
-        (https://cloud.google.com/resource-manager/reference/rest/v1/projects)
-        that are available to have Firebase resources added to them.
-        <br>
-        <br>A GCP `Project` will only be returned if:
-        <ol>
-          <li><p>The caller has sufficient
-                 [Google IAM](https://cloud.google.com/iam) permissions to call
-                 AddFirebase.</p></li>
-          <li><p>The GCP `Project` is not already a FirebaseProject.</p></li>
-          <li><p>The GCP `Project` is not in an Organization which has policies
-                 that prevent Firebase resources from being added.</p></li>
-        </ol>"##),
+                    Some(r##"Lists each [Google Cloud Platform (GCP) `Project`] (https://cloud.google.com/resource-manager/reference/rest/v1/projects) that can have Firebase resources added to it. A Project will only be listed if: - The caller has sufficient [Google IAM](https://cloud.google.com/iam) permissions to call AddFirebase. - The Project is not already a FirebaseProject. - The Project is not in an Organization which has policies that prevent Firebase resources from being added. "##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/available-projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -2397,9 +2373,7 @@ fn main() {
         
         ("operations", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/operations_get",
                   vec![
                     (Some(r##"name"##),
@@ -2424,45 +2398,12 @@ fn main() {
         
         ("projects", "methods: 'add-firebase', 'add-google-analytics', 'android-apps-create', 'android-apps-get', 'android-apps-get-config', 'android-apps-list', 'android-apps-patch', 'android-apps-sha-create', 'android-apps-sha-delete', 'android-apps-sha-list', 'available-locations-list', 'default-location-finalize', 'get', 'get-admin-sdk-config', 'get-analytics-details', 'ios-apps-create', 'ios-apps-get', 'ios-apps-get-config', 'ios-apps-list', 'ios-apps-patch', 'list', 'patch', 'remove-analytics', 'search-apps', 'web-apps-create', 'web-apps-get', 'web-apps-get-config', 'web-apps-list' and 'web-apps-patch'", vec![
             ("add-firebase",
-                    Some(r##"Adds Firebase resources to the specified existing
-        [Google Cloud Platform (GCP) `Project`]
-        (https://cloud.google.com/resource-manager/reference/rest/v1/projects).
-        <br>
-        <br>Since a FirebaseProject is actually also a GCP `Project`, a
-        `FirebaseProject` uses underlying GCP identifiers (most importantly,
-        the `PROJECT_NUMBER`) as its own for easy interop with GCP APIs.
-        <br>
-        <br>The result of this call is an [`Operation`](../../v1beta1/operations).
-        Poll the `Operation` to track the provisioning process by calling
-        GetOperation until
-        [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When
-        `done` is `true`, the `Operation` has either succeeded or failed. If the
-        `Operation` succeeded, its
-        [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to
-        a FirebaseProject; if the `Operation` failed, its
-        [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a
-        google.rpc.Status. The `Operation` is automatically deleted after
-        completion, so there is no need to call
-        DeleteOperation.
-        <br>
-        <br>This method does not modify any billing account information on the
-        underlying GCP `Project`.
-        <br>
-        <br>To call `AddFirebase`, a project member or service account must have
-        the following permissions (the IAM roles of Editor and Owner contain these
-        permissions):
-        `firebase.projects.update`, `resourcemanager.projects.get`,
-        `serviceusage.services.enable`, and `serviceusage.services.get`."##),
+                    Some(r##"Adds Firebase resources to the specified existing [Google Cloud Platform (GCP) `Project`] (https://cloud.google.com/resource-manager/reference/rest/v1/projects). Since a FirebaseProject is actually also a GCP `Project`, a `FirebaseProject` has the same underlying GCP identifiers (`projectNumber` and `projectId`). This allows for easy interop with Google APIs. The result of this call is an [`Operation`](../../v1beta1/operations). Poll the `Operation` to track the provisioning process by calling GetOperation until [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When `done` is `true`, the `Operation` has either succeeded or failed. If the `Operation` succeeded, its [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to a FirebaseProject; if the `Operation` failed, its [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a google.rpc.Status. The `Operation` is automatically deleted after completion, so there is no need to call DeleteOperation. This method does not modify any billing account information on the underlying GCP `Project`. To call `AddFirebase`, a project member or service account must have the following permissions (the IAM roles of Editor and Owner contain these permissions): `firebase.projects.update`, `resourcemanager.projects.get`, `serviceusage.services.enable`, and `serviceusage.services.get`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_add-firebase",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The resource name of the GCP `Project` to which Firebase resources will be
-        added, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>
-        After calling `AddFirebase`, the
-        [`project_id`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)
-        of the GCP `Project` is also the `project_id` of the FirebaseProject."##),
+                     Some(r##"The resource name of the GCP `Project` to which Firebase resources will be added, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values. After calling `AddFirebase`, the unique Project identifiers ( [`projectNumber`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_number) and [`projectId`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)) of the underlying GCP `Project` are also the identifiers of the FirebaseProject."##),
                      Some(true),
                      Some(false)),
         
@@ -2485,66 +2426,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("add-google-analytics",
-                    Some(r##"Links a FirebaseProject with an existing
-        [Google Analytics account](http://www.google.com/analytics/).
-        <br>
-        <br>Using this call, you can either:
-        <ul>
-        <li>Specify an `analyticsAccountId` to provision a new Google Analytics
-        property within the specified account and associate the new property with
-        your `FirebaseProject`.</li>
-        <li>Specify an existing `analyticsPropertyId` to associate the property
-        with your `FirebaseProject`.</li>
-        </ul>
-        <br>
-        Note that when you call `AddGoogleAnalytics`:
-        <ol>
-        <li>The first check determines if any existing data streams in the
-        Google Analytics property correspond to any existing Firebase Apps in your
-        `FirebaseProject` (based on the `packageName` or `bundleId` associated with
-        the data stream). Then, as applicable, the data streams and apps are
-        linked. Note that this auto-linking only applies to Android Apps and iOS
-        Apps.</li>
-        <li>If no corresponding data streams are found for your Firebase Apps,
-        new data streams are provisioned in the Google Analytics property
-        for each of your Firebase Apps. Note that a new data stream is always
-        provisioned for a Web App even if it was previously associated with a
-        data stream in your Analytics property.</li>
-        </ol>
-        Learn more about the hierarchy and structure of Google Analytics
-        accounts in the
-        [Analytics
-        documentation](https://support.google.com/analytics/answer/9303323).
-        <br>
-        <br>The result of this call is an [`Operation`](../../v1beta1/operations).
-        Poll the `Operation` to track the provisioning process by calling
-        GetOperation until
-        [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When
-        `done` is `true`, the `Operation` has either succeeded or failed. If the
-        `Operation` succeeded, its
-        [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to
-        an AnalyticsDetails; if the `Operation` failed, its
-        [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a
-        google.rpc.Status.
-        <br>
-        <br>To call `AddGoogleAnalytics`, a member must be an Owner for
-        the existing `FirebaseProject` and have the
-        [`Edit` permission](https://support.google.com/analytics/answer/2884495)
-        for the Google Analytics account.
-        <br>
-        <br>If a `FirebaseProject` already has Google Analytics enabled, and you
-        call `AddGoogleAnalytics` using an `analyticsPropertyId` that's different
-        from the currently associated property, then the call will fail. Analytics
-        may have already been enabled in the Firebase console or by specifying
-        `timeZone` and `regionCode` in the call to
-        [`AddFirebase`](../../v1beta1/projects/addFirebase)."##),
+                    Some(r##"Links the specified FirebaseProject with an existing [Google Analytics account](http://www.google.com/analytics/). Using this call, you can either: - Specify an `analyticsAccountId` to provision a new Google Analytics property within the specified account and associate the new property with the `FirebaseProject`. - Specify an existing `analyticsPropertyId` to associate the property with the `FirebaseProject`. Note that when you call `AddGoogleAnalytics`: 1. The first check determines if any existing data streams in the Google Analytics property correspond to any existing Firebase Apps in the `FirebaseProject` (based on the `packageName` or `bundleId` associated with the data stream). Then, as applicable, the data streams and apps are linked. Note that this auto-linking only applies to `AndroidApps` and `IosApps`. 2. If no corresponding data streams are found for the Firebase Apps, new data streams are provisioned in the Google Analytics property for each of the Firebase Apps. Note that a new data stream is always provisioned for a Web App even if it was previously associated with a data stream in the Analytics property. Learn more about the hierarchy and structure of Google Analytics accounts in the [Analytics documentation](https://support.google.com/analytics/answer/9303323). The result of this call is an [`Operation`](../../v1beta1/operations). Poll the `Operation` to track the provisioning process by calling GetOperation until [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When `done` is `true`, the `Operation` has either succeeded or failed. If the `Operation` succeeded, its [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to an AnalyticsDetails; if the `Operation` failed, its [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a google.rpc.Status. To call `AddGoogleAnalytics`, a project member must be an Owner for the existing `FirebaseProject` and have the [`Edit` permission](https://support.google.com/analytics/answer/2884495) for the Google Analytics account. If the `FirebaseProject` already has Google Analytics enabled, and you call `AddGoogleAnalytics` using an `analyticsPropertyId` that's different from the currently associated property, then the call will fail. Analytics may have already been enabled in the Firebase console or by specifying `timeZone` and `regionCode` in the call to [`AddFirebase`](../../v1beta1/projects/addFirebase)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_add-google-analytics",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent `FirebaseProject` to link to an existing Google Analytics
-        account, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the FirebaseProject to link to an existing Google Analytics account, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2567,17 +2454,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-create",
-                    Some(r##"Requests that a new AndroidApp be created.
-        <br>
-        <br>The result of this call is an `Operation` which can be used to track
-        the provisioning process. The `Operation` is automatically deleted after
-        completion, so there is no need to call `DeleteOperation`."##),
+                    Some(r##"Requests the creation of a new AndroidApp in the specified FirebaseProject. The result of this call is an `Operation` which can be used to track the provisioning process. The `Operation` is automatically deleted after completion, so there is no need to call `DeleteOperation`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project in which to create an App, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the parent FirebaseProject in which to create an AndroidApp, in the format: projects/PROJECT_IDENTIFIER/androidApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2600,16 +2482,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-get",
-                    Some(r##"Gets the AndroidApp identified by the specified resource name."##),
+                    Some(r##"Gets the specified AndroidApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the App, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the AndroidApp, in the format: projects/ PROJECT_IDENTIFIER/androidApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -2626,17 +2504,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-get-config",
-                    Some(r##"Gets the configuration artifact associated with the specified
-        AndroidApp."##),
+                    Some(r##"Gets the configuration artifact associated with the specified AndroidApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-get-config",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the App configuration to download, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/config</code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the AndroidApp configuration to download, in the format: projects/PROJECT_IDENTIFIER/androidApps/APP_ID/config Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -2653,17 +2526,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-list",
-                    Some(r##"Lists each AndroidApp associated with the specified parent Project.
-        <br>
-        <br>The elements are returned in no particular order, but will be a
-        consistent view of the Apps when additional requests are made with a
-        `pageToken`."##),
+                    Some(r##"Lists each AndroidApp associated with the specified FirebaseProject. The elements are returned in no particular order, but will be a consistent view of the Apps when additional requests are made with a `pageToken`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the parent FirebaseProject for which to list each associated AndroidApp, in the format: projects/PROJECT_IDENTIFIER /androidApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2680,14 +2548,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-patch",
-                    Some(r##"Updates the attributes of the AndroidApp identified by the specified
-        resource name."##),
+                    Some(r##"Updates the attributes of the specified AndroidApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the App, in the format:
-        <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>"##),
+                     Some(r##"The resource name of the AndroidApp, in the format: projects/ PROJECT_IDENTIFIER/androidApps/APP_ID * PROJECT_IDENTIFIER: the parent Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](../projects.androidApps#AndroidApp.FIELDS.app_id))."##),
                      Some(true),
                      Some(false)),
         
@@ -2710,16 +2576,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-sha-create",
-                    Some(r##"Adds a SHA certificate to the specified AndroidApp."##),
+                    Some(r##"Adds a ShaCertificate to the specified AndroidApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-sha-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent App to which a SHA certificate will be added, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the parent AndroidApp to which to add a ShaCertificate, in the format: projects/PROJECT_IDENTIFIER/androidApps/ APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -2742,16 +2604,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-sha-delete",
-                    Some(r##"Removes a SHA certificate from the specified AndroidApp."##),
+                    Some(r##"Removes a ShaCertificate from the specified AndroidApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-sha-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the `sha-key`, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var>/sha/<var>SHA_ID</var></code>
-        <br>You can obtain the full name from the response of
-        [`ListShaCertificates`](../projects.androidApps.sha/list) or the original
-        [`CreateShaCertificate`](../projects.androidApps.sha/create)."##),
+                     Some(r##"The resource name of the ShaCertificate to remove from the parent AndroidApp, in the format: projects/PROJECT_IDENTIFIER/androidApps/APP_ID /sha/SHA_HASH Refer to the `ShaCertificate` [`name`](../projects.androidApps.sha#ShaCertificate.FIELDS.name) field for details about PROJECT_IDENTIFIER, APP_ID, and SHA_HASH values. You can obtain the full resource name of the `ShaCertificate` from the response of [`ListShaCertificates`](../projects.androidApps.sha/list) or the original [`CreateShaCertificate`](../projects.androidApps.sha/create)."##),
                      Some(true),
                      Some(false)),
         
@@ -2768,17 +2626,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("android-apps-sha-list",
-                    Some(r##"Returns the list of SHA-1 and SHA-256 certificates for the specified
-        AndroidApp."##),
+                    Some(r##"Lists the SHA-1 and SHA-256 certificates for the specified AndroidApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_android-apps-sha-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent App for which to list SHA certificates, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/androidApps/<var>APP_ID</var></code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/androidApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the parent AndroidApp for which to list each associated ShaCertificate, in the format: projects/PROJECT_IDENTIFIER /androidApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -2795,35 +2648,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("available-locations-list",
-                    Some(r##"Returns a list of valid Google Cloud Platform (GCP) resource locations for
-        the specified Project (including a FirebaseProject).
-        <br>
-        <br>One of these locations can be selected as the Project's [_default_ GCP
-        resource location](https://firebase.google.com/docs/projects/locations),
-        which is the geographical location where project resources, such as Cloud
-        Firestore, will be provisioned by default. However, if the default GCP
-        resource location has already been set for the Project, then this setting
-        cannot be changed.
-        <br>
-        <br>This call checks for any possible
-        [location
-        restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
-        for the specified Project and, thus, might return a subset of all possible
-        GCP resource locations. To list all GCP resource locations (regardless of
-        any restrictions), call the endpoint without specifying a `PROJECT_NUMBER`
-        (that is, `/v1beta1/{parent=projects/-}/listAvailableLocations`). <br>
-        <br>To call `ListAvailableLocations` with a specified project, a member
-        must be at minimum a Viewer of the project. Calls without a specified
-        project do not require any specific project permissions."##),
+                    Some(r##"Lists the valid Google Cloud Platform (GCP) resource locations for the specified Project (including a FirebaseProject). One of these locations can be selected as the Project's [_default_ GCP resource location](https://firebase.google.com/docs/projects/locations), which is the geographical location where the Project's resources, such as Cloud Firestore, will be provisioned by default. However, if the default GCP resource location has already been set for the Project, then this setting cannot be changed. This call checks for any possible [location restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations) for the specified Project and, thus, might return a subset of all possible GCP resource locations. To list all GCP resource locations (regardless of any restrictions), call the endpoint without specifying a unique project identifier (that is, `/v1beta1/{parent=projects/-}/listAvailableLocations`). To call `ListAvailableLocations` with a specified project, a member must be at minimum a Viewer of the Project. Calls without a specified project do not require any specific project permissions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_available-locations-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The Project for which to list GCP resource locations, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>
-        <br>If no project is specified (that is, `projects/-`), the returned list
-        does not take into account org-specific or project-specific location
-        restrictions."##),
+                     Some(r##"The FirebaseProject for which to list GCP resource locations, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values. If no unique project identifier is specified (that is, `projects/-`), the returned list does not take into account org-specific or project-specific location restrictions."##),
                      Some(true),
                      Some(false)),
         
@@ -2840,51 +2670,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("default-location-finalize",
-                    Some(r##"Sets the default Google Cloud Platform (GCP) resource location for the
-        specified FirebaseProject.
-        <br>
-        <br>This method creates an App Engine application with a
-        [default Cloud Storage
-        bucket](https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/setting-up-cloud-storage#activating_a_cloud_storage_bucket),
-        located in the specified
-        [`location_id`](#body.request_body.FIELDS.location_id).
-        This location must be one of the available
-        [GCP resource
-        locations](https://firebase.google.com/docs/projects/locations). <br>
-        <br>After the default GCP resource location is finalized, or if it was
-        already set, it cannot be changed. The default GCP resource location for
-        the specified FirebaseProject might already be set because either the
-        GCP `Project` already has an App Engine application or
-        `FinalizeDefaultLocation` was previously called with a specified
-        `location_id`. Any new calls to `FinalizeDefaultLocation` with a
-        <em>different</em> specified `location_id` will return a 409 error.
-        <br>
-        <br>The result of this call is an [`Operation`](../../v1beta1/operations),
-        which can be used to track the provisioning process. The
-        [`response`](../../v1beta1/operations#Operation.FIELDS.response) type of
-        the `Operation` is google.protobuf.Empty.
-        <br>
-        <br>The `Operation` can be polled by its `name` using
-        GetOperation until `done` is
-        true. When `done` is true, the `Operation` has either succeeded or failed.
-        If the `Operation` has succeeded, its
-        [`response`](../../v1beta1/operations#Operation.FIELDS.response) will be
-        set to a google.protobuf.Empty; if the `Operation` has failed, its
-        `error` will be set to a google.rpc.Status. The `Operation` is
-        automatically deleted after completion, so there is no need to call
-        DeleteOperation.
-        <br>
-        <br>All fields listed in the [request body](#request-body) are required.
-        <br>
-        <br>To call `FinalizeDefaultLocation`, a member must be an Owner
-        of the project."##),
+                    Some(r##"Sets the default Google Cloud Platform (GCP) resource location for the specified FirebaseProject. This method creates an App Engine application with a [default Cloud Storage bucket](https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/setting-up-cloud-storage#activating_a_cloud_storage_bucket), located in the specified [`locationId`](#body.request_body.FIELDS.location_id). This location must be one of the available [GCP resource locations](https://firebase.google.com/docs/projects/locations). After the default GCP resource location is finalized, or if it was already set, it cannot be changed. The default GCP resource location for the specified `FirebaseProject` might already be set because either the underlying GCP `Project` already has an App Engine application or `FinalizeDefaultLocation` was previously called with a specified `locationId`. Any new calls to `FinalizeDefaultLocation` with a *different* specified `locationId` will return a 409 error. The result of this call is an [`Operation`](../../v1beta1/operations), which can be used to track the provisioning process. The [`response`](../../v1beta1/operations#Operation.FIELDS.response) type of the `Operation` is google.protobuf.Empty. The `Operation` can be polled by its `name` using GetOperation until `done` is true. When `done` is true, the `Operation` has either succeeded or failed. If the `Operation` has succeeded, its [`response`](../../v1beta1/operations#Operation.FIELDS.response) will be set to a google.protobuf.Empty; if the `Operation` has failed, its `error` will be set to a google.rpc.Status. The `Operation` is automatically deleted after completion, so there is no need to call DeleteOperation. All fields listed in the [request body](#request-body) are required. To call `FinalizeDefaultLocation`, a member must be an Owner of the Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_default-location-finalize",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The resource name of the Project for which the default GCP resource
-        location will be set, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the FirebaseProject for which the default GCP resource location will be set, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2907,13 +2698,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Gets the FirebaseProject identified by the specified resource name."##),
+                    Some(r##"Gets the specified FirebaseProject."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the Project, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the FirebaseProject, in the format: projects/ PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2930,17 +2720,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-admin-sdk-config",
-                    Some(r##"Gets the configuration artifact used by servers to simplify initialization.
-        <br>
-        <br>Typically, this configuration is used with the Firebase Admin SDK
-        [initializeApp](https://firebase.google.com/docs/admin/setup#initialize_the_sdk)
-        command."##),
+                    Some(r##"Gets the configuration artifact associated with the specified FirebaseProject, which can be used by servers to simplify initialization. Typically, this configuration is used with the Firebase Admin SDK [initializeApp](https://firebase.google.com/docs/admin/setup#initialize_the_sdk) command."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_get-admin-sdk-config",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the Project, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/adminSdkConfig</code>"##),
+                     Some(r##"The resource name of the FirebaseProject, in the format: projects/ PROJECT_IDENTIFIER/adminSdkConfig Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2957,17 +2742,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-analytics-details",
-                    Some(r##"Gets the Google Analytics details currently associated with a
-        FirebaseProject.
-        <br>
-        <br>If the `FirebaseProject` is not yet linked to Google Analytics, then
-        the response to `GetAnalyticsDetails` is NOT_FOUND."##),
+                    Some(r##"Gets the Google Analytics details currently associated with the specified FirebaseProject. If the `FirebaseProject` is not yet linked to Google Analytics, then the response to `GetAnalyticsDetails` is `NOT_FOUND`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_get-analytics-details",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/analyticsDetails</code>"##),
+                     Some(r##"The resource name of the FirebaseProject, in the format: projects/ PROJECT_IDENTIFIER/analyticsDetails Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -2984,17 +2764,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("ios-apps-create",
-                    Some(r##"Requests that a new IosApp be created.
-        <br>
-        <br>The result of this call is an `Operation` which can be used to track
-        the provisioning process. The `Operation` is automatically deleted after
-        completion, so there is no need to call `DeleteOperation`."##),
+                    Some(r##"Requests the creation of a new IosApp in the specified FirebaseProject. The result of this call is an `Operation` which can be used to track the provisioning process. The `Operation` is automatically deleted after completion, so there is no need to call `DeleteOperation`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_ios-apps-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project in which to create an App, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the parent FirebaseProject in which to create an IosApp, in the format: projects/PROJECT_IDENTIFIER/iosApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -3017,16 +2792,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("ios-apps-get",
-                    Some(r##"Gets the IosApp identified by the specified resource name."##),
+                    Some(r##"Gets the specified IosApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_ios-apps-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the App, in the format:
-        <code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var></code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/iosApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the IosApp, in the format: projects/PROJECT_IDENTIFIER /iosApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/iosApps/APP_ID Refer to the `IosApp` [`name`](../projects.iosApps#IosApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -3048,11 +2819,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the App configuration to download, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/iosApps/<var>APP_ID</var>/config</code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/iosApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the App configuration to download, in the format: projects/PROJECT_IDENTIFIER/iosApps/APP_ID/config Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/iosApps/APP_ID Refer to the `IosApp` [`name`](../projects.iosApps#IosApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -3069,17 +2836,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("ios-apps-list",
-                    Some(r##"Lists each IosApp associated with the specified parent Project.
-        <br>
-        <br>The elements are returned in no particular order, but will be a
-        consistent view of the Apps when additional requests are made with a
-        `pageToken`."##),
+                    Some(r##"Lists each IosApp associated with the specified FirebaseProject. The elements are returned in no particular order, but will be a consistent view of the Apps when additional requests are made with a `pageToken`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_ios-apps-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the parent FirebaseProject for which to list each associated IosApp, in the format: projects/PROJECT_IDENTIFIER/iosApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -3096,14 +2858,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("ios-apps-patch",
-                    Some(r##"Updates the attributes of the IosApp identified by the specified
-        resource name."##),
+                    Some(r##"Updates the attributes of the specified IosApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_ios-apps-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the App, in the format:
-        <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>"##),
+                     Some(r##"The resource name of the IosApp, in the format: projects/PROJECT_IDENTIFIER /iosApps/APP_ID * PROJECT_IDENTIFIER: the parent Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](../projects.iosApps#IosApp.FIELDS.app_id))."##),
                      Some(true),
                      Some(false)),
         
@@ -3126,20 +2886,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists each FirebaseProject accessible to the caller.
-        <br>
-        <br>The elements are returned in no particular order, but they will be a
-        consistent view of the Projects when additional requests are made with a
-        `pageToken`.
-        <br>
-        <br>This method is eventually consistent with Project mutations, which
-        means newly provisioned Projects and recent modifications to existing
-        Projects might not be reflected in the set of Projects. The list will
-        include only ACTIVE Projects.
-        <br>
-        <br>Use
-        GetFirebaseProject
-        for consistent reads as well as for additional Project details."##),
+                    Some(r##"Lists each FirebaseProject accessible to the caller. The elements are returned in no particular order, but they will be a consistent view of the Projects when additional requests are made with a `pageToken`. This method is eventually consistent with Project mutations, which means newly provisioned Projects and recent modifications to existing Projects might not be reflected in the set of Projects. The list will include only ACTIVE Projects. Use GetFirebaseProject for consistent reads as well as for additional Project details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -3155,16 +2902,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates the attributes of the FirebaseProject identified by the
-        specified resource name.
-        <br>
-        <br>All [query parameters](#query-parameters) are required."##),
+                    Some(r##"Updates the attributes of the specified FirebaseProject. All [query parameters](#query-parameters) are required."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the Project, in the format:
-        <br><code>projects/<var>projectId</var></code>"##),
+                     Some(r##"The resource name of the Project, in the format: projects/PROJECT_IDENTIFIER PROJECT_IDENTIFIER: the Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`."##),
                      Some(true),
                      Some(false)),
         
@@ -3187,30 +2930,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("remove-analytics",
-                    Some(r##"Unlinks the specified `FirebaseProject` from its Google Analytics account.
-        <br>
-        <br>This call removes the association of the specified `FirebaseProject`
-        with its current Google Analytics property. However, this call does not
-        delete the Google Analytics resources, such as the Google Analytics
-        property or any data streams.
-        <br>
-        <br>These resources may be re-associated later to the `FirebaseProject` by
-        calling
-        [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics) and
-        specifying the same `analyticsPropertyId`. For Android Apps and iOS Apps,
-        this call re-links data streams with their corresponding apps. However,
-        for Web Apps, this call provisions a <em>new</em> data stream for each Web
-        App.
-        <br>
-        <br>To call `RemoveAnalytics`, a member must be an Owner for
-        the `FirebaseProject`."##),
+                    Some(r##"Unlinks the specified FirebaseProject from its Google Analytics account. This call removes the association of the specified `FirebaseProject` with its current Google Analytics property. However, this call does not delete the Google Analytics resources, such as the Google Analytics property or any data streams. These resources may be re-associated later to the `FirebaseProject` by calling [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics) and specifying the same `analyticsPropertyId`. For Android Apps and iOS Apps, this call re-links data streams with their corresponding apps. However, for Web Apps, this call provisions a *new* data stream for each Web App. To call `RemoveAnalytics`, a project member must be an Owner for the `FirebaseProject`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_remove-analytics",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent `FirebaseProject` to unlink from its Google Analytics account,
-        in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the FirebaseProject to unlink from its Google Analytics account, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -3233,18 +2958,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("search-apps",
-                    Some(r##"A convenience method that lists all available Apps for the specified
-        FirebaseProject.
-        <br>
-        <br>Typically, interaction with an App should be done using the
-        platform-specific service, but some tool use-cases require a summary of all
-        known Apps (such as for App selector interfaces)."##),
+                    Some(r##"Lists all available Apps for the specified FirebaseProject. This is a convenience method. Typically, interaction with an App should be done using the platform-specific service, but some tool use-cases require a summary of all known Apps (such as for App selector interfaces)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_search-apps",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The parent FirebaseProject for which to list Apps, in the format: projects/ PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -3261,17 +2980,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-apps-create",
-                    Some(r##"Requests that a new WebApp be created.
-        <br>
-        <br>The result of this call is an `Operation` which can be used to track
-        the provisioning process. The `Operation` is automatically deleted after
-        completion, so there is no need to call `DeleteOperation`."##),
+                    Some(r##"Requests the creation of a new WebApp in the specified FirebaseProject. The result of this call is an `Operation` which can be used to track the provisioning process. The `Operation` is automatically deleted after completion, so there is no need to call `DeleteOperation`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_web-apps-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project in which to create an App, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the parent FirebaseProject in which to create a WebApp, in the format: projects/PROJECT_IDENTIFIER/webApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -3294,16 +3008,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-apps-get",
-                    Some(r##"Gets the WebApp identified by the specified resource name."##),
+                    Some(r##"Gets the specified WebApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_web-apps-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the App, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var></code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/webApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the WebApp, in the format: projects/PROJECT_IDENTIFIER /webApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/webApps/APP_ID Refer to the `WebApp` [`name`](../projects.webApps#WebApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -3325,11 +3035,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the App configuration to download, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var>/webApps/<var>APP_ID</var>/config</code>
-        <br>As an <var>APP_ID</var> is a unique identifier, the Unique Resource
-        from Sub-Collection access pattern may be used here, in the format:
-        <br><code>projects/-/webApps/<var>APP_ID</var></code>"##),
+                     Some(r##"The resource name of the WebApp configuration to download, in the format: projects/PROJECT_IDENTIFIER/webApps/APP_ID/config Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/webApps/APP_ID Refer to the `WebApp` [`name`](../projects.webApps#WebApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values."##),
                      Some(true),
                      Some(false)),
         
@@ -3346,17 +3052,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-apps-list",
-                    Some(r##"Lists each WebApp associated with the specified parent Project.
-        <br>
-        <br>The elements are returned in no particular order, but will be a
-        consistent view of the Apps when additional requests are made with a
-        `pageToken`."##),
+                    Some(r##"Lists each WebApp associated with the specified FirebaseProject. The elements are returned in no particular order, but will be a consistent view of the Apps when additional requests are made with a `pageToken`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_web-apps-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
-        <br><code>projects/<var>PROJECT_NUMBER</var></code>"##),
+                     Some(r##"The resource name of the parent FirebaseProject for which to list each associated WebApp, in the format: projects/PROJECT_IDENTIFIER/webApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values."##),
                      Some(true),
                      Some(false)),
         
@@ -3373,14 +3074,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("web-apps-patch",
-                    Some(r##"Updates the attributes of the WebApp identified by the specified
-        resource name."##),
+                    Some(r##"Updates the attributes of the specified WebApp."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_web-apps-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fully qualified resource name of the App, for example:
-        <br><code>projects/<var>projectId</var>/webApps/<var>appId</var></code>"##),
+                     Some(r##"The resource name of the WebApp, in the format: projects/PROJECT_IDENTIFIER /webApps/APP_ID * PROJECT_IDENTIFIER: the parent Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](../projects.webApps#WebApp.FIELDS.app_id))."##),
                      Some(true),
                      Some(false)),
         
@@ -3408,7 +3107,7 @@ fn main() {
     
     let mut app = App::new("firebase1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200707")
+           .version("2.0.0+20210329")
            .about("The Firebase Management API enables programmatic setup and management of Firebase projects, including a project's Firebase resources and Firebase apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -3423,12 +3122,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -3476,13 +3170,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

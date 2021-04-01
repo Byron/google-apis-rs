@@ -1,4 +1,4 @@
-site_name: Translate v1.0.14+20200629
+site_name: Translate v2.0.0+20210312
 site_url: http://byron.github.io/google-apis-rs/google-translate3-cli
 site_description: A complete library to interact with Translate (protocol v3)
 

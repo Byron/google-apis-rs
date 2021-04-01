@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20200612*. The CLI is at version *1.0.14*.
+This documentation was generated from the *compute* API at revision *20210316*. The CLI is at version *2.0.0*.
 
 ```bash
 compute1 [options]
@@ -93,6 +93,25 @@ compute1 [options]
                 list <project> [-p <v>]... [-o <out>]
                 set-labels <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        firewall-policies
+                add-association <firewall-policy> (-r <kv>)... [-p <v>]... [-o <out>]
+                add-rule <firewall-policy> (-r <kv>)... [-p <v>]... [-o <out>]
+                clone-rules <firewall-policy> [-p <v>]... [-o <out>]
+                delete <firewall-policy> [-p <v>]... [-o <out>]
+                get <firewall-policy> [-p <v>]... [-o <out>]
+                get-association <firewall-policy> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> [-p <v>]... [-o <out>]
+                get-rule <firewall-policy> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                list-associations [-p <v>]... [-o <out>]
+                move <firewall-policy> [-p <v>]... [-o <out>]
+                patch <firewall-policy> (-r <kv>)... [-p <v>]... [-o <out>]
+                patch-rule <firewall-policy> (-r <kv>)... [-p <v>]... [-o <out>]
+                remove-association <firewall-policy> [-p <v>]... [-o <out>]
+                remove-rule <firewall-policy> [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
         firewalls
                 delete <project> <firewall> [-p <v>]... [-o <out>]
                 get <project> <firewall> [-p <v>]... [-o <out>]
@@ -107,6 +126,7 @@ compute1 [options]
                 insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
                 patch <project> <region> <forwarding-rule> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-labels <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-target <project> <region> <forwarding-rule> (-r <kv>)... [-p <v>]... [-o <out>]
         global-addresses
                 delete <project> <address> [-p <v>]... [-o <out>]
@@ -119,6 +139,7 @@ compute1 [options]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 patch <project> <forwarding-rule> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-labels <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-target <project> <forwarding-rule> (-r <kv>)... [-p <v>]... [-o <out>]
         global-network-endpoint-groups
                 attach-network-endpoints <project> <network-endpoint-group> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -134,6 +155,16 @@ compute1 [options]
                 get <project> <operation> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 wait <project> <operation> [-p <v>]... [-o <out>]
+        global-organization-operations
+                delete <operation> [-p <v>]...
+                get <operation> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        global-public-delegated-prefixes
+                delete <project> <public-delegated-prefix> [-p <v>]... [-o <out>]
+                get <project> <public-delegated-prefix> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <public-delegated-prefix> (-r <kv>)... [-p <v>]... [-o <out>]
         health-checks
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <health-check> [-p <v>]... [-o <out>]
@@ -164,6 +195,7 @@ compute1 [options]
                 get-iam-policy <project> <resource> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+                patch <project> <image> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-labels <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -174,16 +206,20 @@ compute1 [options]
                 create-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
                 delete-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-per-instance-configs <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
                 insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <zone> [-p <v>]... [-o <out>]
                 list-errors <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
                 list-managed-instances <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
+                list-per-instance-configs <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
                 patch <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                patch-per-instance-configs <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 recreate-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 resize <project> <zone> <instance-group-manager> <size> [-p <v>]... [-o <out>]
                 set-instance-template <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-target-pools <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-per-instance-configs <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
         instance-groups
                 add-instances <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 aggregated-list <project> [-p <v>]... [-o <out>]
@@ -207,12 +243,15 @@ compute1 [options]
                 add-resource-policies <project> <zone> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 attach-disk <project> <zone> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                bulk-insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <zone> <instance> [-p <v>]... [-o <out>]
                 delete-access-config <project> <zone> <instance> <access-config> <network-interface> [-p <v>]... [-o <out>]
                 detach-disk <project> <zone> <instance> <device-name> [-p <v>]... [-o <out>]
                 get <project> <zone> <instance> [-p <v>]... [-o <out>]
+                get-effective-firewalls <project> <zone> <instance> <network-interface> [-p <v>]... [-o <out>]
                 get-guest-attributes <project> <zone> <instance> [-p <v>]... [-o <out>]
                 get-iam-policy <project> <zone> <resource> [-p <v>]... [-o <out>]
+                get-screenshot <project> <zone> <instance> [-p <v>]... [-o <out>]
                 get-serial-port-output <project> <zone> <instance> [-p <v>]... [-o <out>]
                 get-shielded-instance-identity <project> <zone> <instance> [-p <v>]... [-o <out>]
                 insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -288,6 +327,7 @@ compute1 [options]
                 add-peering <project> <network> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <network> [-p <v>]... [-o <out>]
                 get <project> <network> [-p <v>]... [-o <out>]
+                get-effective-firewalls <project> <network> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 list-peering-routes <project> <network> [-p <v>]... [-o <out>]
@@ -344,6 +384,19 @@ compute1 [options]
                 set-common-instance-metadata <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-default-network-tier <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-usage-export-bucket <project> (-r <kv>)... [-p <v>]... [-o <out>]
+        public-advertised-prefixes
+                delete <project> <public-advertised-prefix> [-p <v>]... [-o <out>]
+                get <project> <public-advertised-prefix> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <public-advertised-prefix> (-r <kv>)... [-p <v>]... [-o <out>]
+        public-delegated-prefixes
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <region> <public-delegated-prefix> [-p <v>]... [-o <out>]
+                get <project> <region> <public-delegated-prefix> [-p <v>]... [-o <out>]
+                insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <region> [-p <v>]... [-o <out>]
+                patch <project> <region> <public-delegated-prefix> (-r <kv>)... [-p <v>]... [-o <out>]
         region-autoscalers
                 delete <project> <region> <autoscaler> [-p <v>]... [-o <out>]
                 get <project> <region> <autoscaler> [-p <v>]... [-o <out>]
@@ -399,21 +452,32 @@ compute1 [options]
                 create-instances <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <region> <instance-group-manager> [-p <v>]... [-o <out>]
                 delete-instances <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-per-instance-configs <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <region> <instance-group-manager> [-p <v>]... [-o <out>]
                 insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
                 list-errors <project> <region> <instance-group-manager> [-p <v>]... [-o <out>]
                 list-managed-instances <project> <region> <instance-group-manager> [-p <v>]... [-o <out>]
+                list-per-instance-configs <project> <region> <instance-group-manager> [-p <v>]... [-o <out>]
                 patch <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                patch-per-instance-configs <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 recreate-instances <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 resize <project> <region> <instance-group-manager> <size> [-p <v>]... [-o <out>]
                 set-instance-template <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-target-pools <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-per-instance-configs <project> <region> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
         region-instance-groups
                 get <project> <region> <instance-group> [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
                 list-instances <project> <region> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-named-ports <project> <region> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
+        region-instances
+                bulk-insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+        region-network-endpoint-groups
+                delete <project> <region> <network-endpoint-group> [-p <v>]... [-o <out>]
+                get <project> <region> <network-endpoint-group> [-p <v>]... [-o <out>]
+                insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <region> [-p <v>]... [-o <out>]
         region-notification-endpoints
                 delete <project> <region> <notification-endpoint> [-p <v>]... [-o <out>]
                 get <project> <region> <notification-endpoint> [-p <v>]... [-o <out>]
@@ -533,12 +597,19 @@ compute1 [options]
                 set-iam-policy <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-private-ip-google-access <project> <region> <subnetwork> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <project> <region> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        target-grpc-proxies
+                delete <project> <target-grpc-proxy> [-p <v>]... [-o <out>]
+                get <project> <target-grpc-proxy> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <target-grpc-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
         target-http-proxies
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <target-http-proxy> [-p <v>]... [-o <out>]
                 get <project> <target-http-proxy> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+                patch <project> <target-http-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-url-map <project> <target-http-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
         target-https-proxies
                 aggregated-list <project> [-p <v>]... [-o <out>]
@@ -546,6 +617,7 @@ compute1 [options]
                 get <project> <target-https-proxy> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+                patch <project> <target-https-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-quic-override <project> <target-https-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-ssl-certificates <project> <target-https-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-ssl-policy <project> <target-https-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -634,12 +706,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -692,10 +758,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `compute1 --debug <resource> <method> [options] 2>debug.txt`.
 

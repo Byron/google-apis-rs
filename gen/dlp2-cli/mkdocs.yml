@@ -1,4 +1,4 @@
-site_name: DLP v1.0.14+20200706
+site_name: DLP v2.0.0+20210326
 site_url: http://byron.github.io/google-apis-rs/google-dlp2-cli
 site_description: A complete library to interact with DLP (protocol v2)
 
@@ -26,11 +26,17 @@ pages:
 - ['organizations_locations-deidentify-templates-get.md', 'Organizations', 'Locations Deidentify Templates Get']
 - ['organizations_locations-deidentify-templates-list.md', 'Organizations', 'Locations Deidentify Templates List']
 - ['organizations_locations-deidentify-templates-patch.md', 'Organizations', 'Locations Deidentify Templates Patch']
+- ['organizations_locations-dlp-jobs-list.md', 'Organizations', 'Locations Dlp Jobs List']
 - ['organizations_locations-inspect-templates-create.md', 'Organizations', 'Locations Inspect Templates Create']
 - ['organizations_locations-inspect-templates-delete.md', 'Organizations', 'Locations Inspect Templates Delete']
 - ['organizations_locations-inspect-templates-get.md', 'Organizations', 'Locations Inspect Templates Get']
 - ['organizations_locations-inspect-templates-list.md', 'Organizations', 'Locations Inspect Templates List']
 - ['organizations_locations-inspect-templates-patch.md', 'Organizations', 'Locations Inspect Templates Patch']
+- ['organizations_locations-job-triggers-create.md', 'Organizations', 'Locations Job Triggers Create']
+- ['organizations_locations-job-triggers-delete.md', 'Organizations', 'Locations Job Triggers Delete']
+- ['organizations_locations-job-triggers-get.md', 'Organizations', 'Locations Job Triggers Get']
+- ['organizations_locations-job-triggers-list.md', 'Organizations', 'Locations Job Triggers List']
+- ['organizations_locations-job-triggers-patch.md', 'Organizations', 'Locations Job Triggers Patch']
 - ['organizations_locations-stored-info-types-create.md', 'Organizations', 'Locations Stored Info Types Create']
 - ['organizations_locations-stored-info-types-delete.md', 'Organizations', 'Locations Stored Info Types Delete']
 - ['organizations_locations-stored-info-types-get.md', 'Organizations', 'Locations Stored Info Types Get']

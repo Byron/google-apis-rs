@@ -1,0 +1,2288 @@
+use std::collections::HashMap;
+use std::cell::RefCell;
+use std::borrow::BorrowMut;
+use std::default::Default;
+use std::collections::BTreeMap;
+use serde_json as json;
+use std::io;
+use std::fs;
+use std::mem;
+use std::thread::sleep;
+
+use crate::client;
+
+// ##############
+// UTILITIES ###
+// ############
+
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+#[derive(PartialEq, Eq, Hash)]
+pub enum Scope {
+    /// View your email address
+    UserinfoEmail,
+}
+
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
+        match *self {
+            Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+        Scope::UserinfoEmail
+    }
+}
+
+
+
+// ########
+// HUB ###
+// ######
+
+/// Central instance to access all FactCheckTools related resource activities
+///
+/// # Examples
+///
+/// Instantiate a new hub
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// use factchecktools1_alpha1::api::GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage;
+/// use factchecktools1_alpha1::{Result, Error};
+/// # async fn dox() {
+/// use std::default::Default;
+/// use oauth2;
+/// use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// // `client_secret`, among other things.
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// // unless you replace  `None` with the desired Flow.
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+/// // retrieve them from storage.
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pages().update(req, "name")
+///              .doit().await;
+/// 
+/// match result {
+///     Err(e) => match e {
+///         // The Error enum provides details about what exactly happened.
+///         // You can also just use its `Debug`, `Display` or `Error` traits
+///          Error::HttpError(_)
+///         |Error::Io(_)
+///         |Error::MissingAPIKey
+///         |Error::MissingToken(_)
+///         |Error::Cancelled
+///         |Error::UploadSizeLimitExceeded(_, _)
+///         |Error::Failure(_)
+///         |Error::BadRequest(_)
+///         |Error::FieldClash(_)
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
+///     },
+///     Ok(res) => println!("Success: {:?}", res),
+/// }
+/// # }
+/// ```
+pub struct FactCheckTools<C> {
+    client: RefCell<C>,
+    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+    _user_agent: String,
+    _base_url: String,
+    _root_url: String,
+}
+
+impl<'a, C> client::Hub for FactCheckTools<C> {}
+
+impl<'a, C> FactCheckTools<C>
+    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FactCheckTools<C> {
+        FactCheckTools {
+            client: RefCell::new(client),
+            auth: RefCell::new(authenticator),
+            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            _base_url: "https://factchecktools.googleapis.com/".to_string(),
+            _root_url: "https://factchecktools.googleapis.com/".to_string(),
+        }
+    }
+
+    pub fn claims(&'a self) -> ClaimMethods<'a, C> {
+        ClaimMethods { hub: &self }
+    }
+    pub fn pages(&'a self) -> PageMethods<'a, C> {
+        PageMethods { hub: &self }
+    }
+
+    /// Set the user-agent header field to use in all requests to the server.
+    /// It defaults to `google-api-rust-client/2.0.0`.
+    ///
+    /// Returns the previously set user-agent.
+    pub fn user_agent(&mut self, agent_name: String) -> String {
+        mem::replace(&mut self._user_agent, agent_name)
+    }
+
+    /// Set the base url to use in all requests to the server.
+    /// It defaults to `https://factchecktools.googleapis.com/`.
+    ///
+    /// Returns the previously set base url.
+    pub fn base_url(&mut self, new_base_url: String) -> String {
+        mem::replace(&mut self._base_url, new_base_url)
+    }
+
+    /// Set the root url to use in all requests to the server.
+    /// It defaults to `https://factchecktools.googleapis.com/`.
+    ///
+    /// Returns the previously set root url.
+    pub fn root_url(&mut self, new_root_url: String) -> String {
+        mem::replace(&mut self._root_url, new_root_url)
+    }
+}
+
+
+// ############
+// SCHEMAS ###
+// ##########
+/// Information about the claim.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1Claim {
+    /// The date that the claim was made.
+    #[serde(rename="claimDate")]
+    pub claim_date: Option<String>,
+    /// One or more reviews of this claim (namely, a fact-checking article).
+    #[serde(rename="claimReview")]
+    pub claim_review: Option<Vec<GoogleFactcheckingFactchecktoolsV1alpha1ClaimReview>>,
+    /// A person or organization stating the claim. For instance, "John Doe".
+    pub claimant: Option<String>,
+    /// The claim text. For instance, "Crime has doubled in the last 2 years."
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1Claim {}
+
+
+/// Information about the claim author.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimAuthor {
+    /// Corresponds to `ClaimReview.itemReviewed.author.image`.
+    #[serde(rename="imageUrl")]
+    pub image_url: Option<String>,
+    /// Corresponds to `ClaimReview.itemReviewed.author.jobTitle`.
+    #[serde(rename="jobTitle")]
+    pub job_title: Option<String>,
+    /// A person or organization stating the claim. For instance, "John Doe". Corresponds to `ClaimReview.itemReviewed.author.name`.
+    pub name: Option<String>,
+    /// Corresponds to `ClaimReview.itemReviewed.author.sameAs`.
+    #[serde(rename="sameAs")]
+    pub same_as: Option<String>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimAuthor {}
+
+
+/// Information about the claim rating.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {
+    /// For numeric ratings, the best value possible in the scale from worst to best. Corresponds to `ClaimReview.reviewRating.bestRating`.
+    #[serde(rename="bestRating")]
+    pub best_rating: Option<i32>,
+    /// Corresponds to `ClaimReview.reviewRating.image`.
+    #[serde(rename="imageUrl")]
+    pub image_url: Option<String>,
+    /// Corresponds to `ClaimReview.reviewRating.ratingExplanation`.
+    #[serde(rename="ratingExplanation")]
+    pub rating_explanation: Option<String>,
+    /// A numeric rating of this claim, in the range worstRating — bestRating inclusive. Corresponds to `ClaimReview.reviewRating.ratingValue`.
+    #[serde(rename="ratingValue")]
+    pub rating_value: Option<i32>,
+    /// The truthfulness rating as a human-readible short word or phrase. Corresponds to `ClaimReview.reviewRating.alternateName`.
+    #[serde(rename="textualRating")]
+    pub textual_rating: Option<String>,
+    /// For numeric ratings, the worst value possible in the scale from worst to best. Corresponds to `ClaimReview.reviewRating.worstRating`.
+    #[serde(rename="worstRating")]
+    pub worst_rating: Option<i32>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {}
+
+
+/// Information about a claim review.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReview {
+    /// The language this review was written in. For instance, "en" or "de".
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// The publisher of this claim review.
+    pub publisher: Option<GoogleFactcheckingFactchecktoolsV1alpha1Publisher>,
+    /// The date the claim was reviewed.
+    #[serde(rename="reviewDate")]
+    pub review_date: Option<String>,
+    /// Textual rating. For instance, "Mostly false".
+    #[serde(rename="textualRating")]
+    pub textual_rating: Option<String>,
+    /// The title of this claim review, if it can be determined.
+    pub title: Option<String>,
+    /// The URL of this claim review.
+    pub url: Option<String>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReview {}
+
+
+/// Information about the claim review author.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewAuthor {
+    /// Corresponds to `ClaimReview.author.image`.
+    #[serde(rename="imageUrl")]
+    pub image_url: Option<String>,
+    /// Name of the organization that is publishing the fact check. Corresponds to `ClaimReview.author.name`.
+    pub name: Option<String>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewAuthor {}
+
+
+/// Fields for an individual `ClaimReview` element. Except for sub-messages that group fields together, each of these fields correspond those in https://schema.org/ClaimReview. We list the precise mapping for each field.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkup {
+    /// A list of links to works in which this claim appears, aside from the one specified in `claim_first_appearance`. Corresponds to `ClaimReview.itemReviewed[@type=Claim].appearance.url`.
+    #[serde(rename="claimAppearances")]
+    pub claim_appearances: Option<Vec<String>>,
+    /// Info about the author of this claim.
+    #[serde(rename="claimAuthor")]
+    pub claim_author: Option<GoogleFactcheckingFactchecktoolsV1alpha1ClaimAuthor>,
+    /// The date when the claim was made or entered public discourse. Corresponds to `ClaimReview.itemReviewed.datePublished`.
+    #[serde(rename="claimDate")]
+    pub claim_date: Option<String>,
+    /// A link to a work in which this claim first appears. Corresponds to `ClaimReview.itemReviewed[@type=Claim].firstAppearance.url`.
+    #[serde(rename="claimFirstAppearance")]
+    pub claim_first_appearance: Option<String>,
+    /// The location where this claim was made. Corresponds to `ClaimReview.itemReviewed.name`.
+    #[serde(rename="claimLocation")]
+    pub claim_location: Option<String>,
+    /// A short summary of the claim being evaluated. Corresponds to `ClaimReview.claimReviewed`.
+    #[serde(rename="claimReviewed")]
+    pub claim_reviewed: Option<String>,
+    /// Info about the rating of this claim review.
+    pub rating: Option<GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating>,
+    /// This field is optional, and will default to the page URL. We provide this field to allow you the override the default value, but the only permitted override is the page URL plus an optional anchor link ("page jump"). Corresponds to `ClaimReview.url`
+    pub url: Option<String>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkup {}
+
+
+/// Holds one or more instances of `ClaimReview` markup for a webpage.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create pages](PageCreateCall) (request|response)
+/// * [get pages](PageGetCall) (response)
+/// * [update pages](PageUpdateCall) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage {
+    /// Info about the author of this claim review. Similar to the above, semantically these are page-level fields, and each `ClaimReview` on this page will contain the same values.
+    #[serde(rename="claimReviewAuthor")]
+    pub claim_review_author: Option<GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewAuthor>,
+    /// A list of individual claim reviews for this page. Each item in the list corresponds to one `ClaimReview` element.
+    #[serde(rename="claimReviewMarkups")]
+    pub claim_review_markups: Option<Vec<GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkup>>,
+    /// The name of this `ClaimReview` markup page resource, in the form of `pages/{page_id}`. Except for update requests, this field is output-only and should not be set by the user.
+    pub name: Option<String>,
+    /// The URL of the page associated with this `ClaimReview` markup. While every individual `ClaimReview` has its own URL field, semantically this is a page-level field, and each `ClaimReview` on this page will use this value unless individually overridden. Corresponds to `ClaimReview.url`
+    #[serde(rename="pageUrl")]
+    pub page_url: Option<String>,
+    /// The date when the fact check was published. Similar to the URL, semantically this is a page-level field, and each `ClaimReview` on this page will contain the same value. Corresponds to `ClaimReview.datePublished`
+    #[serde(rename="publishDate")]
+    pub publish_date: Option<String>,
+    /// The version ID for this markup. Except for update requests, this field is output-only and should not be set by the user.
+    #[serde(rename="versionId")]
+    pub version_id: Option<String>,
+}
+
+impl client::RequestValue for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage {}
+impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage {}
+
+
+/// Response from searching fact-checked claims.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search claims](ClaimSearchCall) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimSearchResponse {
+    /// The list of claims and all of their associated information.
+    pub claims: Option<Vec<GoogleFactcheckingFactchecktoolsV1alpha1Claim>>,
+    /// The next pagination token in the Search response. It should be used as the `page_token` for the following request. An empty value means no more results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimSearchResponse {}
+
+
+/// Response from listing `ClaimReview` markup.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list pages](PageListCall) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1ListClaimReviewMarkupPagesResponse {
+    /// The result list of pages of `ClaimReview` markup.
+    #[serde(rename="claimReviewMarkupPages")]
+    pub claim_review_markup_pages: Option<Vec<GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage>>,
+    /// The next pagination token in the Search response. It should be used as the `page_token` for the following request. An empty value means no more results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1ListClaimReviewMarkupPagesResponse {}
+
+
+/// Information about the publisher.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1Publisher {
+    /// The name of this publisher. For instance, "Awesome Fact Checks".
+    pub name: Option<String>,
+    /// Host-level site name, without the protocol or "www" prefix. For instance, "awesomefactchecks.com". This value of this field is based purely on the claim review URL.
+    pub site: Option<String>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1Publisher {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [delete pages](PageDeleteCall) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
+
+impl client::ResponseResult for GoogleProtobufEmpty {}
+
+
+
+// ###################
+// MethodBuilders ###
+// #################
+
+/// A builder providing access to all methods supported on *claim* resources.
+/// It is not used directly, but through the `FactCheckTools` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use oauth2;
+/// use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `search(...)`
+/// // to build up your call.
+/// let rb = hub.claims();
+/// # }
+/// ```
+pub struct ClaimMethods<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+}
+
+impl<'a, C> client::MethodsBuilder for ClaimMethods<'a, C> {}
+
+impl<'a, C> ClaimMethods<'a, C> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Search through fact-checked claims.
+    pub fn search(&self) -> ClaimSearchCall<'a, C> {
+        ClaimSearchCall {
+            hub: self.hub,
+            _review_publisher_site_filter: Default::default(),
+            _query: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _offset: Default::default(),
+            _max_age_days: Default::default(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *page* resources.
+/// It is not used directly, but through the `FactCheckTools` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use oauth2;
+/// use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
+/// let rb = hub.pages();
+/// # }
+/// ```
+pub struct PageMethods<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+}
+
+impl<'a, C> client::MethodsBuilder for PageMethods<'a, C> {}
+
+impl<'a, C> PageMethods<'a, C> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create `ClaimReview` markup on a page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageCreateCall<'a, C> {
+        PageCreateCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Delete all `ClaimReview` markup on a page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the resource to delete, in the form of `pages/{page_id}`.
+    pub fn delete(&self, name: &str) -> PageDeleteCall<'a, C> {
+        PageDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get all `ClaimReview` markup on a page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the resource to get, in the form of `pages/{page_id}`.
+    pub fn get(&self, name: &str) -> PageGetCall<'a, C> {
+        PageGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List the `ClaimReview` markup pages for a specific URL or for an organization.
+    pub fn list(&self) -> PageListCall<'a, C> {
+        PageListCall {
+            hub: self.hub,
+            _url: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _organization: Default::default(),
+            _offset: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update for all `ClaimReview` markup on a page Note that this is a full update. To retain the existing `ClaimReview` markup on a page, first perform a Get operation, then modify the returned markup, and finally call Update with the entire `ClaimReview` markup as the body.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of this `ClaimReview` markup page resource, in the form of `pages/{page_id}`. Except for update requests, this field is output-only and should not be set by the user.
+    pub fn update(&self, request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage, name: &str) -> PageUpdateCall<'a, C> {
+        PageUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+
+
+
+
+// ###################
+// CallBuilders   ###
+// #################
+
+/// Search through fact-checked claims.
+///
+/// A builder for the *search* method supported by a *claim* resource.
+/// It is not used directly, but through a `ClaimMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use oauth2;
+/// # use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.claims().search()
+///              .review_publisher_site_filter("ipsum")
+///              .query("voluptua.")
+///              .page_token("At")
+///              .page_size(-8)
+///              .offset(-80)
+///              .max_age_days(-2)
+///              .language_code("takimata")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ClaimSearchCall<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+    _review_publisher_site_filter: Option<String>,
+    _query: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _offset: Option<i32>,
+    _max_age_days: Option<i32>,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C> client::CallBuilder for ClaimSearchCall<'a, C> {}
+
+impl<'a, C> ClaimSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimSearchResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "factchecktools.claims.search",
+                               http_method: hyper::Method::GET });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        if let Some(value) = self._review_publisher_site_filter {
+            params.push(("reviewPublisherSiteFilter", value.to_string()));
+        }
+        if let Some(value) = self._query {
+            params.push(("query", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._offset {
+            params.push(("offset", value.to_string()));
+        }
+        if let Some(value) = self._max_age_days {
+            params.push(("maxAgeDays", value.to_string()));
+        }
+        if let Some(value) = self._language_code {
+            params.push(("languageCode", value.to_string()));
+        }
+        for &field in ["alt", "reviewPublisherSiteFilter", "query", "pageToken", "pageSize", "offset", "maxAgeDays", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1alpha1/claims:search";
+        
+        let key = dlg.api_key();
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.borrow_mut().request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
+                            .ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Ok(serr) => Err(client::Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The review publisher site to filter results by, e.g. nytimes.com.
+    ///
+    /// Sets the *review publisher site filter* query property to the given value.
+    pub fn review_publisher_site_filter(mut self, new_value: &str) -> ClaimSearchCall<'a, C> {
+        self._review_publisher_site_filter = Some(new_value.to_string());
+        self
+    }
+    /// Textual query string. Required unless `review_publisher_site_filter` is specified.
+    ///
+    /// Sets the *query* query property to the given value.
+    pub fn query(mut self, new_value: &str) -> ClaimSearchCall<'a, C> {
+        self._query = Some(new_value.to_string());
+        self
+    }
+    /// The pagination token. You may provide the `next_page_token` returned from a previous List request, if any, in order to get the next page. All other fields must have the same values as in the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ClaimSearchCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The pagination size. We will return up to that many results. Defaults to 10 if not set.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ClaimSearchCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An integer that specifies the current offset (that is, starting result location) in search results. This field is only considered if `page_token` is unset. For example, 0 means to return results starting from the first matching result, and 10 means to return from the 11th result.
+    ///
+    /// Sets the *offset* query property to the given value.
+    pub fn offset(mut self, new_value: i32) -> ClaimSearchCall<'a, C> {
+        self._offset = Some(new_value);
+        self
+    }
+    /// The maximum age of the returned search results, in days. Age is determined by either claim date or review date, whichever is newer.
+    ///
+    /// Sets the *max age days* query property to the given value.
+    pub fn max_age_days(mut self, new_value: i32) -> ClaimSearchCall<'a, C> {
+        self._max_age_days = Some(new_value);
+        self
+    }
+    /// The BCP-47 language code, such as "en-US" or "sr-Latn". Can be used to restrict results by language, though we do not currently consider the region.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ClaimSearchCall<'a, C> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ClaimSearchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ClaimSearchCall<'a, C>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Create `ClaimReview` markup on a page.
+///
+/// A builder for the *create* method supported by a *page* resource.
+/// It is not used directly, but through a `PageMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// use factchecktools1_alpha1::api::GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use oauth2;
+/// # use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pages().create(req)
+///              .doit().await;
+/// # }
+/// ```
+pub struct PageCreateCall<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+    _request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C> client::CallBuilder for PageCreateCall<'a, C> {}
+
+impl<'a, C> PageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "factchecktools.pages.create",
+                               http_method: hyper::Method::POST });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1alpha1/pages";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        }
+
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let authenticator = self.hub.auth.borrow_mut();
+            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.borrow_mut().request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
+                            .ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Ok(serr) => Err(client::Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PageCreateCall<'a, C>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::UserinfoEmail`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PageCreateCall<'a, C>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Delete all `ClaimReview` markup on a page.
+///
+/// A builder for the *delete* method supported by a *page* resource.
+/// It is not used directly, but through a `PageMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use oauth2;
+/// # use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pages().delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct PageDeleteCall<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C> client::CallBuilder for PageDeleteCall<'a, C> {}
+
+impl<'a, C> PageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "factchecktools.pages.delete",
+                               http_method: hyper::Method::DELETE });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1alpha1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let authenticator = self.hub.auth.borrow_mut();
+            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.borrow_mut().request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
+                            .ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Ok(serr) => Err(client::Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the resource to delete, in the form of `pages/{page_id}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> PageDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a, C>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::UserinfoEmail`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PageDeleteCall<'a, C>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Get all `ClaimReview` markup on a page.
+///
+/// A builder for the *get* method supported by a *page* resource.
+/// It is not used directly, but through a `PageMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use oauth2;
+/// # use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pages().get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct PageGetCall<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C> client::CallBuilder for PageGetCall<'a, C> {}
+
+impl<'a, C> PageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "factchecktools.pages.get",
+                               http_method: hyper::Method::GET });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1alpha1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let authenticator = self.hub.auth.borrow_mut();
+            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.borrow_mut().request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
+                            .ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Ok(serr) => Err(client::Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the resource to get, in the form of `pages/{page_id}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> PageGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a, C>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::UserinfoEmail`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PageGetCall<'a, C>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// List the `ClaimReview` markup pages for a specific URL or for an organization.
+///
+/// A builder for the *list* method supported by a *page* resource.
+/// It is not used directly, but through a `PageMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use oauth2;
+/// # use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pages().list()
+///              .url("ipsum")
+///              .page_token("gubergren")
+///              .page_size(-51)
+///              .organization("gubergren")
+///              .offset(-75)
+///              .doit().await;
+/// # }
+/// ```
+pub struct PageListCall<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+    _url: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _organization: Option<String>,
+    _offset: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C> client::CallBuilder for PageListCall<'a, C> {}
+
+impl<'a, C> PageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFactcheckingFactchecktoolsV1alpha1ListClaimReviewMarkupPagesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "factchecktools.pages.list",
+                               http_method: hyper::Method::GET });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        if let Some(value) = self._url {
+            params.push(("url", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._organization {
+            params.push(("organization", value.to_string()));
+        }
+        if let Some(value) = self._offset {
+            params.push(("offset", value.to_string()));
+        }
+        for &field in ["alt", "url", "pageToken", "pageSize", "organization", "offset"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1alpha1/pages";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        }
+
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let authenticator = self.hub.auth.borrow_mut();
+            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.borrow_mut().request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
+                            .ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Ok(serr) => Err(client::Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The URL from which to get `ClaimReview` markup. There will be at most one result. If markup is associated with a more canonical version of the URL provided, we will return that URL instead. Cannot be specified along with an organization.
+    ///
+    /// Sets the *url* query property to the given value.
+    pub fn url(mut self, new_value: &str) -> PageListCall<'a, C> {
+        self._url = Some(new_value.to_string());
+        self
+    }
+    /// The pagination token. You may provide the `next_page_token` returned from a previous List request, if any, in order to get the next page. All other fields must have the same values as in the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The pagination size. We will return up to that many results. Defaults to 10 if not set. Has no effect if a URL is requested.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> PageListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The organization for which we want to fetch markups for. For instance, "site.com". Cannot be specified along with an URL.
+    ///
+    /// Sets the *organization* query property to the given value.
+    pub fn organization(mut self, new_value: &str) -> PageListCall<'a, C> {
+        self._organization = Some(new_value.to_string());
+        self
+    }
+    /// An integer that specifies the current offset (that is, starting result location) in search results. This field is only considered if `page_token` is unset, and if the request is not for a specific URL. For example, 0 means to return results starting from the first matching result, and 10 means to return from the 11th result.
+    ///
+    /// Sets the *offset* query property to the given value.
+    pub fn offset(mut self, new_value: i32) -> PageListCall<'a, C> {
+        self._offset = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a, C>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::UserinfoEmail`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PageListCall<'a, C>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update for all `ClaimReview` markup on a page Note that this is a full update. To retain the existing `ClaimReview` markup on a page, first perform a Get operation, then modify the returned markup, and finally call Update with the entire `ClaimReview` markup as the body.
+///
+/// A builder for the *update* method supported by a *page* resource.
+/// It is not used directly, but through a `PageMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// use factchecktools1_alpha1::api::GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use oauth2;
+/// # use factchecktools1_alpha1::FactCheckTools;
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pages().update(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct PageUpdateCall<'a, C>
+    where C: 'a {
+
+    hub: &'a FactCheckTools<C>,
+    _request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C> client::CallBuilder for PageUpdateCall<'a, C> {}
+
+impl<'a, C> PageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::ToParts;
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(client::MethodInfo { id: "factchecktools.pages.update",
+                               http_method: hyper::Method::PUT });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1alpha1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = url::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type: mime::Mime = "application/json".parse().unwrap();
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let authenticator = self.hub.auth.borrow_mut();
+            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+                Ok(token) => token.clone(),
+                Err(err) => {
+                    match  dlg.token(&err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
+                        .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, format!("{}", json_mime_type.to_string()))
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.borrow_mut().request(request.unwrap()).await
+                
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    let (res_parts, res_body) = res.into_parts();
+                    let res_body_string: String = String::from_utf8(
+                        hyper::body::to_bytes(res_body)
+                            .await
+                            .unwrap()
+                            .into_iter()
+                            .collect(),
+                    )
+                    .unwrap();
+                    let reconstructed_result =
+                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+
+                    if !reconstructed_result.status().is_success() {
+                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
+                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
+                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
+                            .ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&reconstructed_result,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
+                            Err(_) => Err(client::Error::Failure(reconstructed_result)),
+                            Ok(serr) => Err(client::Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (reconstructed_result, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageUpdateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// The name of this `ClaimReview` markup page resource, in the form of `pages/{page_id}`. Except for update requests, this field is output-only and should not be set by the user.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> PageUpdateCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageUpdateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a, C>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::UserinfoEmail`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PageUpdateCall<'a, C>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+

@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-managedidentities1` library allows access to all features of the *Google Managed Service for Microsoft Active Directory Consumer API* service.
 
-This documentation was generated from *Managed Service for Microsoft Active Directory Consumer API* crate version *1.0.14+20200622*, where *20200622* is the exact revision of the *managedidentities:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *Managed Service for Microsoft Active Directory Consumer API* crate version *2.0.0+20210324*, where *20210324* is the exact revision of the *managedidentities:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *Managed Service for Microsoft Active Directory Consumer API* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/managed-microsoft-ad/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ManagedServiceForMicrosoftActiveDirectoryConsumerAPI.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/ManagedServiceForMicrosoftActiveDirectoryConsumerAPI) ... 
 
 * projects
- * [*locations get*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGetCall.html), [*locations global domains attach trust*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainAttachTrustCall.html), [*locations global domains create*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainCreateCall.html), [*locations global domains delete*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainDeleteCall.html), [*locations global domains detach trust*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainDetachTrustCall.html), [*locations global domains get*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainGetCall.html), [*locations global domains get iam policy*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainGetIamPolicyCall.html), [*locations global domains list*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainListCall.html), [*locations global domains patch*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainPatchCall.html), [*locations global domains reconfigure trust*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainReconfigureTrustCall.html), [*locations global domains reset admin password*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainResetAdminPasswordCall.html), [*locations global domains set iam policy*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainSetIamPolicyCall.html), [*locations global domains test iam permissions*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainTestIamPermissionCall.html), [*locations global domains validate trust*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalDomainValidateTrustCall.html), [*locations global operations cancel*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalOperationCancelCall.html), [*locations global operations delete*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalOperationDeleteCall.html), [*locations global operations get*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalOperationGetCall.html), [*locations global operations list*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationGlobalOperationListCall.html) and [*locations list*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ProjectLocationListCall.html)
+ * [*locations get*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGetCall), [*locations global domains attach trust*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainAttachTrustCall), [*locations global domains create*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainCreateCall), [*locations global domains delete*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainDeleteCall), [*locations global domains detach trust*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainDetachTrustCall), [*locations global domains get*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainGetCall), [*locations global domains get iam policy*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainGetIamPolicyCall), [*locations global domains list*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainListCall), [*locations global domains patch*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainPatchCall), [*locations global domains reconfigure trust*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainReconfigureTrustCall), [*locations global domains reset admin password*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainResetAdminPasswordCall), [*locations global domains set iam policy*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainSetIamPolicyCall), [*locations global domains test iam permissions*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainTestIamPermissionCall), [*locations global domains validate trust*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalDomainValidateTrustCall), [*locations global operations cancel*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalOperationCancelCall), [*locations global operations delete*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalOperationDeleteCall), [*locations global operations get*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalOperationGetCall), [*locations global operations list*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationGlobalOperationListCall) and [*locations list*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/api::ProjectLocationListCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/struct.ManagedServiceForMicrosoftActiveDirectoryConsumerAPI.html)**
+* **[Hub](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/ManagedServiceForMicrosoftActiveDirectoryConsumerAPI)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -41,20 +41,20 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.projects().locations_global_domains_attach_trust(...).doit()
-let r = hub.projects().locations_global_domains_patch(...).doit()
-let r = hub.projects().locations_global_operations_get(...).doit()
-let r = hub.projects().locations_global_domains_validate_trust(...).doit()
-let r = hub.projects().locations_global_domains_delete(...).doit()
-let r = hub.projects().locations_global_domains_create(...).doit()
-let r = hub.projects().locations_global_domains_reconfigure_trust(...).doit()
-let r = hub.projects().locations_global_domains_detach_trust(...).doit()
+let r = hub.projects().locations_global_domains_attach_trust(...).doit().await
+let r = hub.projects().locations_global_domains_create(...).doit().await
+let r = hub.projects().locations_global_domains_delete(...).doit().await
+let r = hub.projects().locations_global_domains_detach_trust(...).doit().await
+let r = hub.projects().locations_global_domains_patch(...).doit().await
+let r = hub.projects().locations_global_domains_reconfigure_trust(...).doit().await
+let r = hub.projects().locations_global_domains_validate_trust(...).doit().await
+let r = hub.projects().locations_global_operations_get(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -74,11 +74,11 @@ google-managedidentities1 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -88,24 +88,25 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_managedidentities1 as managedidentities1;
-use managedidentities1::Domain;
+use managedidentities1::api::Domain;
 use managedidentities1::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use managedidentities1::ManagedServiceForMicrosoftActiveDirectoryConsumerAPI;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
@@ -114,15 +115,16 @@ let mut req = Domain::default();
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().locations_global_domains_patch(req, "name")
-             .update_mask("sit")
-             .doit();
+let result = hub.projects().locations_global_domains_create(req, "parent")
+             .domain_name("magna")
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -138,17 +140,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -158,29 +160,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::RequestValue) and 
+[decodable](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-managedidentities1/1.0.14+20200622/google_managedidentities1/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-managedidentities1/2.0.0+20210324/google_managedidentities1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

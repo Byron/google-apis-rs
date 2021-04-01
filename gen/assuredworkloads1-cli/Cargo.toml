@@ -1,0 +1,40 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-assuredworkloads1-cli"
+version = "2.0.0+20210325"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Assuredworkloads (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/assuredworkloads1-cli"
+homepage = "https://cloud.google.com"
+documentation = "http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli"
+license = "MIT"
+keywords = ["assuredworkloads", "google", "cli"]
+autobins = false
+edition = "2018"
+
+[[bin]]
+name = "assuredworkloads1"
+path = "src/main.rs"
+
+[dependencies]
+hyper-rustls = "^0.22"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 5.0"
+itertools = "^ 0.10"
+strsim = "^0.5"
+clap = "^2.0"
+hyper = { version = "0.14", features = ["full"] }
+tokio = { version = "^ 1.0", features = ["full"] }
+
+
+
+
+[dependencies.google-assuredworkloads1]
+path = "../assuredworkloads1"
+version = "2.0.0+20210325"

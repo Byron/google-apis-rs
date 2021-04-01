@@ -1,6 +1,6 @@
-site_name: dns v1.0.14+20200515
+site_name: Dns v2.0.0+20210319
 site_url: http://byron.github.io/google-apis-rs/google-dns1-cli
-site_description: A complete library to interact with dns (protocol v1)
+site_description: A complete library to interact with Dns (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dns1-cli
 
@@ -29,6 +29,10 @@ pages:
 - ['policies_patch.md', 'Policies', 'Patch']
 - ['policies_update.md', 'Policies', 'Update']
 - ['projects_get.md', 'Projects', 'Get']
+- ['projects_managed-zones-rrsets-create.md', 'Projects', 'Managed Zones Rrsets Create']
+- ['projects_managed-zones-rrsets-delete.md', 'Projects', 'Managed Zones Rrsets Delete']
+- ['projects_managed-zones-rrsets-get.md', 'Projects', 'Managed Zones Rrsets Get']
+- ['projects_managed-zones-rrsets-patch.md', 'Projects', 'Managed Zones Rrsets Patch']
 - ['resource-record-sets_list.md', 'Resource Record Sets', 'List']
 
 theme: readthedocs

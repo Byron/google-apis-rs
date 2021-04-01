@@ -25,19 +25,31 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Hangouts Chat* API at revision *20200701*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Hangouts Chat* API at revision *20210324*. The CLI is at version *2.0.0*.
 
 ```bash
 chat1 [options]
+        dms
+                conversations-messages <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                messages <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                webhooks <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+        media
+                download <resource-name> [-p <v>]... [-o <out>]
+        rooms
+                conversations-messages <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                messages <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                webhooks <parent> (-r <kv>)... [-p <v>]... [-o <out>]
         spaces
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 members-get <name> [-p <v>]... [-o <out>]
                 members-list <parent> [-p <v>]... [-o <out>]
+                messages-attachments-get <name> [-p <v>]... [-o <out>]
                 messages-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 messages-delete <name> [-p <v>]... [-o <out>]
                 messages-get <name> [-p <v>]... [-o <out>]
                 messages-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                webhooks <parent> (-r <kv>)... [-p <v>]... [-o <out>]
   chat1 --help
 
 Configuration:
@@ -45,12 +57,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -103,10 +109,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `chat1 --debug <resource> <method> [options] 2>debug.txt`.
 

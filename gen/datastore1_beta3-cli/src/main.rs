@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_datastore1_beta3 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_datastore1_beta3::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Datastore<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Datastore<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_allocate_ids(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_allocate_ids(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -115,7 +111,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -130,7 +126,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_begin_transaction(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_begin_transaction(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -200,7 +196,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -215,7 +211,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_commit(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_commit(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -238,8 +234,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mode" => Some(("mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["mode", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -286,7 +282,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -301,7 +297,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_lookup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_lookup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -324,8 +320,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["read-consistency", "read-options", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -372,7 +368,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -387,7 +383,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_reserve_ids(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_reserve_ids(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -457,7 +453,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -472,7 +468,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_rollback(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_rollback(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -542,7 +538,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -557,7 +553,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_run_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_run_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -580,34 +576,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "gql-query.allow-literals" => Some(("gqlQuery.allowLiterals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gql-query.query-string" => Some(("gqlQuery.queryString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-id.namespace-id" => Some(("partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-id.project-id" => Some(("partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.end-cursor" => Some(("query.endCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.composite-filter.op" => Some(("query.filter.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.op" => Some(("query.filter.propertyFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.property.name" => Some(("query.filter.propertyFilter.property.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.entity-value.key.partition-id.project-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.entity-value.key.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.timestamp-value" => Some(("query.filter.propertyFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.null-value" => Some(("query.filter.propertyFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.double-value" => Some(("query.filter.propertyFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.meaning" => Some(("query.filter.propertyFilter.value.meaning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.exclude-from-indexes" => Some(("query.filter.propertyFilter.value.excludeFromIndexes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.key-value.partition-id.project-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.key-value.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.string-value" => Some(("query.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.blob-value" => Some(("query.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.boolean-value" => Some(("query.filter.propertyFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.integer-value" => Some(("query.filter.propertyFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.double-value" => Some(("query.filter.propertyFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.entity-value.key.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.entity-value.key.partition-id.project-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.exclude-from-indexes" => Some(("query.filter.propertyFilter.value.excludeFromIndexes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.geo-point-value.latitude" => Some(("query.filter.propertyFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.geo-point-value.longitude" => Some(("query.filter.propertyFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.op" => Some(("query.filter.propertyFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.start-cursor" => Some(("query.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.end-cursor" => Some(("query.endCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.integer-value" => Some(("query.filter.propertyFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.key-value.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.key-value.partition-id.project-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.meaning" => Some(("query.filter.propertyFilter.value.meaning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.null-value" => Some(("query.filter.propertyFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.string-value" => Some(("query.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.timestamp-value" => Some(("query.filter.propertyFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.limit" => Some(("query.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query.offset" => Some(("query.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "partition-id.project-id" => Some(("partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "partition-id.namespace-id" => Some(("partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gql-query.query-string" => Some(("gqlQuery.queryString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gql-query.allow-literals" => Some(("gqlQuery.allowLiterals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.start-cursor" => Some(("query.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literals", "blob-value", "boolean-value", "composite-filter", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "null-value", "offset", "op", "partition-id", "project-id", "property", "property-filter", "query", "query-string", "read-consistency", "read-options", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -654,7 +650,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -669,7 +665,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -677,25 +673,25 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("allocate-ids", Some(opt)) => {
-                        call_result = self._projects_allocate_ids(opt, dry_run, &mut err);
+                        call_result = self._projects_allocate_ids(opt, dry_run, &mut err).await;
                     },
                     ("begin-transaction", Some(opt)) => {
-                        call_result = self._projects_begin_transaction(opt, dry_run, &mut err);
+                        call_result = self._projects_begin_transaction(opt, dry_run, &mut err).await;
                     },
                     ("commit", Some(opt)) => {
-                        call_result = self._projects_commit(opt, dry_run, &mut err);
+                        call_result = self._projects_commit(opt, dry_run, &mut err).await;
                     },
                     ("lookup", Some(opt)) => {
-                        call_result = self._projects_lookup(opt, dry_run, &mut err);
+                        call_result = self._projects_lookup(opt, dry_run, &mut err).await;
                     },
                     ("reserve-ids", Some(opt)) => {
-                        call_result = self._projects_reserve_ids(opt, dry_run, &mut err);
+                        call_result = self._projects_reserve_ids(opt, dry_run, &mut err).await;
                     },
                     ("rollback", Some(opt)) => {
-                        call_result = self._projects_rollback(opt, dry_run, &mut err);
+                        call_result = self._projects_rollback(opt, dry_run, &mut err).await;
                     },
                     ("run-query", Some(opt)) => {
-                        call_result = self._projects_run_query(opt, dry_run, &mut err);
+                        call_result = self._projects_run_query(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -720,41 +716,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "datastore1-beta3-secret.json",
+            match client::application_secret_from_directory(&config_dir, "datastore1-beta3-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "datastore1-beta3",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/datastore1-beta3", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Datastore::new(client, auth),
@@ -770,28 +751,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'allocate-ids', 'begin-transaction', 'commit', 'lookup', 'reserve-ids', 'rollback' and 'run-query'", vec![
             ("allocate-ids",
-                    Some(r##"Allocates IDs for the given keys, which is useful for referencing an entity
-        before it is inserted."##),
+                    Some(r##"Allocates IDs for the given keys, which is useful for referencing an entity before it is inserted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli/projects_allocate-ids",
                   vec![
                     (Some(r##"project-id"##),
@@ -847,8 +828,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("commit",
-                    Some(r##"Commits a transaction, optionally creating, deleting or modifying some
-        entities."##),
+                    Some(r##"Commits a transaction, optionally creating, deleting or modifying some entities."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli/projects_commit",
                   vec![
                     (Some(r##"project-id"##),
@@ -904,8 +884,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("reserve-ids",
-                    Some(r##"Prevents the supplied keys' IDs from being auto-allocated by Cloud
-        Datastore."##),
+                    Some(r##"Prevents the supplied keys' IDs from being auto-allocated by Cloud Datastore."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli/projects_reserve-ids",
                   vec![
                     (Some(r##"project-id"##),
@@ -994,9 +973,8 @@ fn main() {
     
     let mut app = App::new("datastore1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200524")
-           .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application.
-           ")
+           .version("2.0.0+20210317")
+           .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1010,12 +988,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1063,13 +1036,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

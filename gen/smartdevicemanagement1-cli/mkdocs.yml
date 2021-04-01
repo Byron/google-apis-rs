@@ -1,0 +1,23 @@
+site_name: Smart Device Management v2.0.0+20210319
+site_url: http://byron.github.io/google-apis-rs/google-smartdevicemanagement1-cli
+site_description: A complete library to interact with Smart Device Management (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/smartdevicemanagement1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['enterprises_devices-execute-command.md', 'Enterprises', 'Devices Execute Command']
+- ['enterprises_devices-get.md', 'Enterprises', 'Devices Get']
+- ['enterprises_devices-list.md', 'Enterprises', 'Devices List']
+- ['enterprises_structures-get.md', 'Enterprises', 'Structures Get']
+- ['enterprises_structures-list.md', 'Enterprises', 'Structures List']
+- ['enterprises_structures-rooms-get.md', 'Enterprises', 'Structures Rooms Get']
+- ['enterprises_structures-rooms-list.md', 'Enterprises', 'Structures Rooms List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

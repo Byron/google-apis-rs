@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_doubleclickbidmanager1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_doubleclickbidmanager1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::DoubleClickBidManager<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::DoubleClickBidManager<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _lineitems_downloadlineitems(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _lineitems_downloadlineitems(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -70,8 +66,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "file-spec" => Some(("fileSpec", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ids" => Some(("filterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["file-spec", "filter-ids", "filter-type", "format"]);
@@ -119,7 +115,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -134,7 +130,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _lineitems_uploadlineitems(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _lineitems_uploadlineitems(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -157,9 +153,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "line-items" => Some(("lineItems", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dry-run" => Some(("dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "line-items" => Some(("lineItems", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["dry-run", "format", "line-items"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -206,7 +202,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -221,7 +217,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _queries_createquery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _queries_createquery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -245,29 +241,29 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "schedule.end-time-ms" => Some(("schedule.endTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "schedule.next-run-timezone-code" => Some(("schedule.nextRunTimezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "schedule.frequency" => Some(("schedule.frequency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "schedule.next-run-minute-of-day" => Some(("schedule.nextRunMinuteOfDay", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "timezone-code" => Some(("timezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-data-end-time-ms" => Some(("reportDataEndTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-id" => Some(("queryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "params.metrics" => Some(("params.metrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "params.type" => Some(("params.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "params.group-bys" => Some(("params.groupBys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "params.include-invite-data" => Some(("params.includeInviteData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "report-data-start-time-ms" => Some(("reportDataStartTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.google-cloud-storage-path-for-latest-report" => Some(("metadata.googleCloudStoragePathForLatestReport", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.data-range" => Some(("metadata.dataRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.format" => Some(("metadata.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.locale" => Some(("metadata.locale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.google-cloud-storage-path-for-latest-report" => Some(("metadata.googleCloudStoragePathForLatestReport", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.google-drive-path-for-latest-report" => Some(("metadata.googleDrivePathForLatestReport", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.send-notification" => Some(("metadata.sendNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "metadata.share-email-address" => Some(("metadata.shareEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "metadata.latest-report-run-time-ms" => Some(("metadata.latestReportRunTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.locale" => Some(("metadata.locale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.report-count" => Some(("metadata.reportCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "metadata.running" => Some(("metadata.running", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "metadata.latest-report-run-time-ms" => Some(("metadata.latestReportRunTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.send-notification" => Some(("metadata.sendNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "metadata.share-email-address" => Some(("metadata.shareEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.title" => Some(("metadata.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "params.group-bys" => Some(("params.groupBys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "params.include-invite-data" => Some(("params.includeInviteData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "params.metrics" => Some(("params.metrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "params.type" => Some(("params.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-id" => Some(("queryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-data-end-time-ms" => Some(("reportDataEndTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-data-start-time-ms" => Some(("reportDataStartTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.end-time-ms" => Some(("schedule.endTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.frequency" => Some(("schedule.frequency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.next-run-minute-of-day" => Some(("schedule.nextRunMinuteOfDay", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.next-run-timezone-code" => Some(("schedule.nextRunTimezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timezone-code" => Some(("timezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data-range", "end-time-ms", "format", "frequency", "google-cloud-storage-path-for-latest-report", "google-drive-path-for-latest-report", "group-bys", "include-invite-data", "kind", "latest-report-run-time-ms", "locale", "metadata", "metrics", "next-run-minute-of-day", "next-run-timezone-code", "params", "query-id", "report-count", "report-data-end-time-ms", "report-data-start-time-ms", "running", "schedule", "send-notification", "share-email-address", "timezone-code", "title", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -314,7 +310,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -329,7 +325,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _queries_deletequery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _queries_deletequery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.queries().deletequery(opt.value_of("query-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -362,7 +358,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -373,7 +369,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _queries_getquery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _queries_getquery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.queries().getquery(opt.value_of("query-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -410,7 +406,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -425,7 +421,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _queries_listqueries(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _queries_listqueries(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.queries().listqueries();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -462,7 +458,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -477,7 +473,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _queries_runquery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _queries_runquery(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -500,10 +496,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "report-data-end-time-ms" => Some(("reportDataEndTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timezone-code" => Some(("timezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "report-data-start-time-ms" => Some(("reportDataStartTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-range" => Some(("dataRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-data-end-time-ms" => Some(("reportDataEndTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "report-data-start-time-ms" => Some(("reportDataStartTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timezone-code" => Some(("timezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data-range", "report-data-end-time-ms", "report-data-start-time-ms", "timezone-code"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -546,7 +542,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -557,7 +553,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _reports_listreports(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _reports_listreports(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.reports().listreports(opt.value_of("query-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -594,7 +590,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -609,7 +605,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _sdf_download(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _sdf_download(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -632,10 +628,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-types" => Some(("fileTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "filter-ids" => Some(("filterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["file-types", "filter-ids", "filter-type", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -682,7 +678,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -697,7 +693,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -705,10 +701,10 @@ impl<'n> Engine<'n> {
             ("lineitems", Some(opt)) => {
                 match opt.subcommand() {
                     ("downloadlineitems", Some(opt)) => {
-                        call_result = self._lineitems_downloadlineitems(opt, dry_run, &mut err);
+                        call_result = self._lineitems_downloadlineitems(opt, dry_run, &mut err).await;
                     },
                     ("uploadlineitems", Some(opt)) => {
-                        call_result = self._lineitems_uploadlineitems(opt, dry_run, &mut err);
+                        call_result = self._lineitems_uploadlineitems(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("lineitems".to_string()));
@@ -719,19 +715,19 @@ impl<'n> Engine<'n> {
             ("queries", Some(opt)) => {
                 match opt.subcommand() {
                     ("createquery", Some(opt)) => {
-                        call_result = self._queries_createquery(opt, dry_run, &mut err);
+                        call_result = self._queries_createquery(opt, dry_run, &mut err).await;
                     },
                     ("deletequery", Some(opt)) => {
-                        call_result = self._queries_deletequery(opt, dry_run, &mut err);
+                        call_result = self._queries_deletequery(opt, dry_run, &mut err).await;
                     },
                     ("getquery", Some(opt)) => {
-                        call_result = self._queries_getquery(opt, dry_run, &mut err);
+                        call_result = self._queries_getquery(opt, dry_run, &mut err).await;
                     },
                     ("listqueries", Some(opt)) => {
-                        call_result = self._queries_listqueries(opt, dry_run, &mut err);
+                        call_result = self._queries_listqueries(opt, dry_run, &mut err).await;
                     },
                     ("runquery", Some(opt)) => {
-                        call_result = self._queries_runquery(opt, dry_run, &mut err);
+                        call_result = self._queries_runquery(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("queries".to_string()));
@@ -742,7 +738,7 @@ impl<'n> Engine<'n> {
             ("reports", Some(opt)) => {
                 match opt.subcommand() {
                     ("listreports", Some(opt)) => {
-                        call_result = self._reports_listreports(opt, dry_run, &mut err);
+                        call_result = self._reports_listreports(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("reports".to_string()));
@@ -753,7 +749,7 @@ impl<'n> Engine<'n> {
             ("sdf", Some(opt)) => {
                 match opt.subcommand() {
                     ("download", Some(opt)) => {
-                        call_result = self._sdf_download(opt, dry_run, &mut err);
+                        call_result = self._sdf_download(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("sdf".to_string()));
@@ -778,74 +774,63 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "doubleclickbidmanager1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "doubleclickbidmanager1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "doubleclickbidmanager1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/doubleclickbidmanager1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::DoubleClickBidManager::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("lineitems", "methods: 'downloadlineitems' and 'uploadlineitems'", vec![
             ("downloadlineitems",
-                    Some(r##"Retrieves line items in CSV format. TrueView line items are not supported."##),
+                    Some(r##"Retrieves line items in CSV format. YouTube & partners line items are not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/lineitems_downloadlineitems",
                   vec![
                     (Some(r##"kv"##),
@@ -867,7 +852,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("uploadlineitems",
-                    Some(r##"Uploads line items in CSV format. TrueView line items are not supported."##),
+                    Some(r##"Uploads line items in CSV format. YouTube & partners line items are not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/lineitems_uploadlineitems",
                   vec![
                     (Some(r##"kv"##),
@@ -1045,8 +1030,8 @@ fn main() {
     
     let mut app = App::new("doubleclickbidmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200616")
-           .about("API for viewing and managing your reports in DoubleClick Bid Manager.")
+           .version("2.0.0+20210323")
+           .about("DoubleClick Bid Manager API allows users to manage and create campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1060,12 +1045,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1113,13 +1093,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_clouderrorreporting1_beta1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_clouderrorreporting1_beta1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Clouderrorreporting<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Clouderrorreporting<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_delete_events(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_delete_events(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().delete_events(opt.value_of("project-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_events_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_events_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().events_list(opt.value_of("project-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -138,7 +134,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["service-filter-resource-type", "time-range-period", "page-size", "service-filter-service", "page-token", "service-filter-version", "group-id"].iter().map(|v|*v));
+                                                                           v.extend(["time-range-period", "service-filter-version", "service-filter-resource-type", "page-token", "page-size", "group-id", "service-filter-service"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -157,7 +153,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -172,7 +168,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_events_report(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_events_report(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -195,21 +191,21 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "service-context.resource-type" => Some(("serviceContext.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-context.version" => Some(("serviceContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-context.service" => Some(("serviceContext.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.http-request.response-status-code" => Some(("context.httpRequest.responseStatusCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "context.http-request.url" => Some(("context.httpRequest.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.http-request.method" => Some(("context.httpRequest.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.referrer" => Some(("context.httpRequest.referrer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.remote-ip" => Some(("context.httpRequest.remoteIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.http-request.response-status-code" => Some(("context.httpRequest.responseStatusCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "context.http-request.url" => Some(("context.httpRequest.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.user-agent" => Some(("context.httpRequest.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.http-request.method" => Some(("context.httpRequest.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.report-location.line-number" => Some(("context.reportLocation.lineNumber", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "context.report-location.function-name" => Some(("context.reportLocation.functionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.report-location.file-path" => Some(("context.reportLocation.filePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.report-location.function-name" => Some(("context.reportLocation.functionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.report-location.line-number" => Some(("context.reportLocation.lineNumber", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "context.user" => Some(("context.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-context.resource-type" => Some(("serviceContext.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-context.service" => Some(("serviceContext.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-context.version" => Some(("serviceContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["context", "event-time", "file-path", "function-name", "http-request", "line-number", "message", "method", "referrer", "remote-ip", "report-location", "resource-type", "response-status-code", "service", "service-context", "url", "user", "user-agent", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -256,7 +252,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -271,7 +267,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_group_stats_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_group_stats_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().group_stats_list(opt.value_of("project-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -323,7 +319,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["service-filter-resource-type", "time-range-period", "timed-count-duration", "page-size", "alignment-time", "service-filter-service", "group-id", "page-token", "service-filter-version", "order", "alignment"].iter().map(|v|*v));
+                                                                           v.extend(["time-range-period", "service-filter-version", "timed-count-duration", "order", "service-filter-resource-type", "page-token", "page-size", "group-id", "service-filter-service", "alignment", "alignment-time"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -342,7 +338,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -357,7 +353,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().groups_get(opt.value_of("group-name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -394,7 +390,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -409,7 +405,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -434,8 +430,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "group-id" => Some(("groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resolution-status" => Some(("resolutionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["group-id", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["group-id", "name", "resolution-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -480,7 +477,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -495,7 +492,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -503,22 +500,22 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete-events", Some(opt)) => {
-                        call_result = self._projects_delete_events(opt, dry_run, &mut err);
+                        call_result = self._projects_delete_events(opt, dry_run, &mut err).await;
                     },
                     ("events-list", Some(opt)) => {
-                        call_result = self._projects_events_list(opt, dry_run, &mut err);
+                        call_result = self._projects_events_list(opt, dry_run, &mut err).await;
                     },
                     ("events-report", Some(opt)) => {
-                        call_result = self._projects_events_report(opt, dry_run, &mut err);
+                        call_result = self._projects_events_report(opt, dry_run, &mut err).await;
                     },
                     ("group-stats-list", Some(opt)) => {
-                        call_result = self._projects_group_stats_list(opt, dry_run, &mut err);
+                        call_result = self._projects_group_stats_list(opt, dry_run, &mut err).await;
                     },
                     ("groups-get", Some(opt)) => {
-                        call_result = self._projects_groups_get(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_get(opt, dry_run, &mut err).await;
                     },
                     ("groups-update", Some(opt)) => {
-                        call_result = self._projects_groups_update(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -543,41 +540,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "clouderrorreporting1-beta1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "clouderrorreporting1-beta1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "clouderrorreporting1-beta1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/clouderrorreporting1-beta1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Clouderrorreporting::new(client, auth),
@@ -593,22 +575,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'delete-events', 'events-list', 'events-report', 'group-stats-list', 'groups-get' and 'groups-update'", vec![
@@ -618,12 +601,7 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
-        as `projects/{projectID}`, where `{projectID}` is the
-        [Google Cloud Platform project
-        ID](https://support.google.com/cloud/answer/6158840).
-        
-        Example: `projects/my-project-123`."##),
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written as `projects/{projectID}`, where `{projectID}` is the [Google Cloud Platform project ID](https://support.google.com/cloud/answer/6158840). Example: `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -645,12 +623,7 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
-        as `projects/{projectID}`, where `{projectID}` is the
-        [Google Cloud Platform project
-        ID](https://support.google.com/cloud/answer/6158840).
-        
-        Example: `projects/my-project-123`."##),
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written as `projects/{projectID}`, where `{projectID}` is the [Google Cloud Platform project ID](https://support.google.com/cloud/answer/6158840). Example: `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -667,25 +640,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("events-report",
-                    Some(r##"Report an individual error event.
-        
-        This endpoint accepts **either** an OAuth token,
-        **or** an [API key](https://support.google.com/cloud/answer/6158862)
-        for authentication. To use an API key, append it to the URL as the value of
-        a `key` parameter. For example:
-        
-        `POST
-        https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456`"##),
+                    Some(r##"Report an individual error event and record the event to a log. This endpoint accepts **either** an OAuth token, **or** an [API key](https://support.google.com/cloud/answer/6158862) for authentication. To use an API key, append it to the URL as the value of a `key` parameter. For example: `POST https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456` **Note:** [Error Reporting](/error-reporting) is a global service built on Cloud Logging and doesn't analyze logs stored in regional log buckets or logs routed to other Google Cloud projects. For more information, see [Using Error Reporting with regionalized logs](/error-reporting/docs/regionalization)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli/projects_events-report",
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
-        as `projects/{projectId}`, where `{projectId}` is the
-        [Google Cloud Platform project
-        ID](https://support.google.com/cloud/answer/6158840).
-        
-        Example: // `projects/my-project-123`."##),
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written as `projects/{projectId}`, where `{projectId}` is the [Google Cloud Platform project ID](https://support.google.com/cloud/answer/6158840). Example: // `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -713,12 +673,7 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
-        as `projects/{projectID}`, where `{projectID}` is the
-        [Google Cloud Platform project
-        ID](https://support.google.com/cloud/answer/6158840).
-        
-        Example: `projects/my-project-123`."##),
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written as `projects/{projectID}` or `projects/{projectNumber}`, where `{projectID}` and `{projectNumber}` can be found in the [Google Cloud Console](https://support.google.com/cloud/answer/6158840). Examples: `projects/my-project-123`, `projects/5551234`."##),
                      Some(true),
                      Some(false)),
         
@@ -740,12 +695,7 @@ fn main() {
                   vec![
                     (Some(r##"group-name"##),
                      None,
-                     Some(r##"Required. The group resource name. Written as
-        `projects/{projectID}/groups/{group_name}`. Call
-        [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list)
-        to return a list of groups belonging to this project.
-        
-        Example: `projects/my-project-123/groups/my-group`"##),
+                     Some(r##"Required. The group resource name. Written as `projects/{projectID}/groups/{group_name}`. Call [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list) to return a list of groups belonging to this project. Example: `projects/my-project-123/groups/my-group`"##),
                      Some(true),
                      Some(false)),
         
@@ -762,14 +712,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("groups-update",
-                    Some(r##"Replace the data for the specified group.
-        Fails if the group does not exist."##),
+                    Some(r##"Replace the data for the specified group. Fails if the group does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli/projects_groups-update",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group resource name.
-        Example: <code>projects/my-project-123/groups/CNSgkpnppqKCUw</code>"##),
+                     Some(r##"The group resource name. Example: projects/my-project-123/groups/CNSgkpnppqKCUw"##),
                      Some(true),
                      Some(false)),
         
@@ -797,9 +745,8 @@ fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200610")
-           .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors.
-           ")
+           .version("2.0.0+20210323")
+           .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -813,12 +760,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -866,13 +808,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

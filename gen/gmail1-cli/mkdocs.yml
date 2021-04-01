@@ -1,6 +1,6 @@
-site_name: gmail v1.0.7+20180904
+site_name: Gmail v2.0.0+20210322
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
-site_description: A complete library to interact with gmail (protocol v1)
+site_description: A complete library to interact with Gmail (protocol v1)
 
 repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1-cli
 
@@ -49,6 +49,7 @@ pages:
 - ['users_settings-forwarding-addresses-list.md', 'Users', 'Settings Forwarding Addresses List']
 - ['users_settings-get-auto-forwarding.md', 'Users', 'Settings Get Auto Forwarding']
 - ['users_settings-get-imap.md', 'Users', 'Settings Get Imap']
+- ['users_settings-get-language.md', 'Users', 'Settings Get Language']
 - ['users_settings-get-pop.md', 'Users', 'Settings Get Pop']
 - ['users_settings-get-vacation.md', 'Users', 'Settings Get Vacation']
 - ['users_settings-send-as-create.md', 'Users', 'Settings Send As Create']
@@ -65,6 +66,7 @@ pages:
 - ['users_settings-send-as-verify.md', 'Users', 'Settings Send As Verify']
 - ['users_settings-update-auto-forwarding.md', 'Users', 'Settings Update Auto Forwarding']
 - ['users_settings-update-imap.md', 'Users', 'Settings Update Imap']
+- ['users_settings-update-language.md', 'Users', 'Settings Update Language']
 - ['users_settings-update-pop.md', 'Users', 'Settings Update Pop']
 - ['users_settings-update-vacation.md', 'Users', 'Settings Update Vacation']
 - ['users_stop.md', 'Users', 'Stop']
@@ -78,5 +80,5 @@ pages:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
 

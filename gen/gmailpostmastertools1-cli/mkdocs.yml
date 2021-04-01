@@ -1,0 +1,20 @@
+site_name: Postmaster Tools v2.0.0+20210330
+site_url: http://byron.github.io/google-apis-rs/google-gmailpostmastertools1-cli
+site_description: A complete library to interact with Postmaster Tools (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gmailpostmastertools1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['domains_get.md', 'Domains', 'Get']
+- ['domains_list.md', 'Domains', 'List']
+- ['domains_traffic-stats-get.md', 'Domains', 'Traffic Stats Get']
+- ['domains_traffic-stats-list.md', 'Domains', 'Traffic Stats List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

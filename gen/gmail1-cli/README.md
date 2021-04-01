@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `gmail1` command-line interface *(CLI)* allows to use most features of the *Google gmail* service from the comfort of your terminal.
+The `gmail1` command-line interface *(CLI)* allows to use most features of the *Google Gmail* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *gmail* API can be found at the
+Everything else about the *Gmail* API can be found at the
 [official documentation site](https://developers.google.com/gmail/api/).
 
 # Installation and Source Code
@@ -25,17 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *gmail* API at revision *20180904*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Gmail* API at revision *20210322*. The CLI is at version *2.0.0*.
 
 ```bash
 gmail1 [options]
         users
-                drafts-create <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                drafts-create <user-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 drafts-delete <user-id> <id> [-p <v>]...
                 drafts-get <user-id> <id> [-p <v>]... [-o <out>]
                 drafts-list <user-id> [-p <v>]... [-o <out>]
-                drafts-send <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
-                drafts-update <user-id> <id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                drafts-send <user-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                drafts-update <user-id> <id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 get-profile <user-id> [-p <v>]... [-o <out>]
                 history-list <user-id> [-p <v>]... [-o <out>]
                 labels-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -49,11 +49,11 @@ gmail1 [options]
                 messages-batch-modify <user-id> (-r <kv>)... [-p <v>]...
                 messages-delete <user-id> <id> [-p <v>]...
                 messages-get <user-id> <id> [-p <v>]... [-o <out>]
-                messages-import <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
-                messages-insert <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                messages-import <user-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                messages-insert <user-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 messages-list <user-id> [-p <v>]... [-o <out>]
                 messages-modify <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
-                messages-send <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                messages-send <user-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 messages-trash <user-id> <id> [-p <v>]... [-o <out>]
                 messages-untrash <user-id> <id> [-p <v>]... [-o <out>]
                 settings-delegates-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -70,6 +70,7 @@ gmail1 [options]
                 settings-forwarding-addresses-list <user-id> [-p <v>]... [-o <out>]
                 settings-get-auto-forwarding <user-id> [-p <v>]... [-o <out>]
                 settings-get-imap <user-id> [-p <v>]... [-o <out>]
+                settings-get-language <user-id> [-p <v>]... [-o <out>]
                 settings-get-pop <user-id> [-p <v>]... [-o <out>]
                 settings-get-vacation <user-id> [-p <v>]... [-o <out>]
                 settings-send-as-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -86,6 +87,7 @@ gmail1 [options]
                 settings-send-as-verify <user-id> <send-as-email> [-p <v>]...
                 settings-update-auto-forwarding <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 settings-update-imap <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                settings-update-language <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 settings-update-pop <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 settings-update-vacation <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 stop <user-id> [-p <v>]...
@@ -107,12 +109,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -165,10 +161,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `gmail1 --debug <resource> <method> [options] 2>debug.txt`.
 

@@ -1,4 +1,4 @@
-site_name: Pubsub v1.0.14+20200627
+site_name: Pubsub v2.0.0+20210322
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1-cli
 site_description: A complete library to interact with Pubsub (protocol v1)
 
@@ -9,6 +9,15 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_schemas-create.md', 'Projects', 'Schemas Create']
+- ['projects_schemas-delete.md', 'Projects', 'Schemas Delete']
+- ['projects_schemas-get.md', 'Projects', 'Schemas Get']
+- ['projects_schemas-get-iam-policy.md', 'Projects', 'Schemas Get Iam Policy']
+- ['projects_schemas-list.md', 'Projects', 'Schemas List']
+- ['projects_schemas-set-iam-policy.md', 'Projects', 'Schemas Set Iam Policy']
+- ['projects_schemas-test-iam-permissions.md', 'Projects', 'Schemas Test Iam Permissions']
+- ['projects_schemas-validate.md', 'Projects', 'Schemas Validate']
+- ['projects_schemas-validate-message.md', 'Projects', 'Schemas Validate Message']
 - ['projects_snapshots-create.md', 'Projects', 'Snapshots Create']
 - ['projects_snapshots-delete.md', 'Projects', 'Snapshots Delete']
 - ['projects_snapshots-get.md', 'Projects', 'Snapshots Get']

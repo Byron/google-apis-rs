@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.14+20200707
+site_name: Android Enterprise v2.0.0+20210324
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 

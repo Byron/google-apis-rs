@@ -1,4 +1,4 @@
-site_name: Cloud Run v1.0.14+20200622
+site_name: Cloud Run v2.0.0+20210326
 site_url: http://byron.github.io/google-apis-rs/google-run1-cli
 site_description: A complete library to interact with Cloud Run (protocol v1)
 
@@ -9,11 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['api_v1-namespaces-get.md', 'Api', 'V1 Namespaces Get']
-- ['api_v1-namespaces-patch.md', 'Api', 'V1 Namespaces Patch']
-- ['api_v1-namespaces-secrets-create.md', 'Api', 'V1 Namespaces Secrets Create']
-- ['api_v1-namespaces-secrets-get.md', 'Api', 'V1 Namespaces Secrets Get']
-- ['api_v1-namespaces-secrets-replace-secret.md', 'Api', 'V1 Namespaces Secrets Replace Secret']
 - ['namespaces_authorizeddomains-list.md', 'Namespaces', 'Authorizeddomains List']
 - ['namespaces_configurations-get.md', 'Namespaces', 'Configurations Get']
 - ['namespaces_configurations-list.md', 'Namespaces', 'Configurations List']
@@ -31,6 +26,7 @@ pages:
 - ['namespaces_services-get.md', 'Namespaces', 'Services Get']
 - ['namespaces_services-list.md', 'Namespaces', 'Services List']
 - ['namespaces_services-replace-service.md', 'Namespaces', 'Services Replace Service']
+- ['projects_authorizeddomains-list.md', 'Projects', 'Authorizeddomains List']
 - ['projects_locations-authorizeddomains-list.md', 'Projects', 'Locations Authorizeddomains List']
 - ['projects_locations-configurations-get.md', 'Projects', 'Locations Configurations Get']
 - ['projects_locations-configurations-list.md', 'Projects', 'Locations Configurations List']
@@ -39,16 +35,11 @@ pages:
 - ['projects_locations-domainmappings-get.md', 'Projects', 'Locations Domainmappings Get']
 - ['projects_locations-domainmappings-list.md', 'Projects', 'Locations Domainmappings List']
 - ['projects_locations-list.md', 'Projects', 'Locations List']
-- ['projects_locations-namespaces-get.md', 'Projects', 'Locations Namespaces Get']
-- ['projects_locations-namespaces-patch.md', 'Projects', 'Locations Namespaces Patch']
 - ['projects_locations-revisions-delete.md', 'Projects', 'Locations Revisions Delete']
 - ['projects_locations-revisions-get.md', 'Projects', 'Locations Revisions Get']
 - ['projects_locations-revisions-list.md', 'Projects', 'Locations Revisions List']
 - ['projects_locations-routes-get.md', 'Projects', 'Locations Routes Get']
 - ['projects_locations-routes-list.md', 'Projects', 'Locations Routes List']
-- ['projects_locations-secrets-create.md', 'Projects', 'Locations Secrets Create']
-- ['projects_locations-secrets-get.md', 'Projects', 'Locations Secrets Get']
-- ['projects_locations-secrets-replace-secret.md', 'Projects', 'Locations Secrets Replace Secret']
 - ['projects_locations-services-create.md', 'Projects', 'Locations Services Create']
 - ['projects_locations-services-delete.md', 'Projects', 'Locations Services Delete']
 - ['projects_locations-services-get.md', 'Projects', 'Locations Services Get']

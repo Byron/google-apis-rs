@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-tagmanager2` library allows access to all features of the *Google Tag Manager* service.
 
-This documentation was generated from *Tag Manager* crate version *1.0.14+20200708*, where *20200708* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *Tag Manager* crate version *2.0.0+20210330*, where *20210330* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *Tag Manager* *v2* API can be found at the
 [official documentation site](https://developers.google.com/tag-manager).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.TagManager.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/TagManager) ... 
 
-* [accounts](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.Account.html)
- * [*containers create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerCreateCall.html), [*containers delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerDeleteCall.html), [*containers environments create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerEnvironmentCreateCall.html), [*containers environments delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerEnvironmentDeleteCall.html), [*containers environments get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerEnvironmentGetCall.html), [*containers environments list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerEnvironmentListCall.html), [*containers environments reauthorize*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerEnvironmentReauthorizeCall.html), [*containers environments update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerEnvironmentUpdateCall.html), [*containers get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerGetCall.html), [*containers list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerListCall.html), [*containers update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerUpdateCall.html), [*containers version_headers latest*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionHeaderLatestCall.html), [*containers version_headers list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionHeaderListCall.html), [*containers versions delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionGetCall.html), [*containers versions live*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionLiveCall.html), [*containers versions publish*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionPublishCall.html), [*containers versions set_latest*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionSetLatestCall.html), [*containers versions undelete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerVersionUpdateCall.html), [*containers workspaces built_in_variables create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceBuiltInVariableCreateCall.html), [*containers workspaces built_in_variables delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceBuiltInVariableDeleteCall.html), [*containers workspaces built_in_variables list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceBuiltInVariableListCall.html), [*containers workspaces built_in_variables revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceBuiltInVariableRevertCall.html), [*containers workspaces create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceCreateCall.html), [*containers workspaces create_version*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceCreateVersionCall.html), [*containers workspaces delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceDeleteCall.html), [*containers workspaces folders create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderCreateCall.html), [*containers workspaces folders delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderDeleteCall.html), [*containers workspaces folders entities*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderEntityCall.html), [*containers workspaces folders get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderGetCall.html), [*containers workspaces folders list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderListCall.html), [*containers workspaces folders move_entities_to_folder*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderMoveEntitiesToFolderCall.html), [*containers workspaces folders revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderRevertCall.html), [*containers workspaces folders update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceFolderUpdateCall.html), [*containers workspaces get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceGetCall.html), [*containers workspaces get status*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceGetStatuCall.html), [*containers workspaces list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceListCall.html), [*containers workspaces quick_preview*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceQuickPreviewCall.html), [*containers workspaces resolve_conflict*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceResolveConflictCall.html), [*containers workspaces sync*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceSyncCall.html), [*containers workspaces tags create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTagCreateCall.html), [*containers workspaces tags delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTagDeleteCall.html), [*containers workspaces tags get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTagGetCall.html), [*containers workspaces tags list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTagListCall.html), [*containers workspaces tags revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTagRevertCall.html), [*containers workspaces tags update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTagUpdateCall.html), [*containers workspaces templates create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTemplateCreateCall.html), [*containers workspaces templates delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTemplateDeleteCall.html), [*containers workspaces templates get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTemplateGetCall.html), [*containers workspaces templates list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTemplateListCall.html), [*containers workspaces templates revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTemplateRevertCall.html), [*containers workspaces templates update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTemplateUpdateCall.html), [*containers workspaces triggers create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTriggerCreateCall.html), [*containers workspaces triggers delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTriggerDeleteCall.html), [*containers workspaces triggers get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTriggerGetCall.html), [*containers workspaces triggers list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTriggerListCall.html), [*containers workspaces triggers revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTriggerRevertCall.html), [*containers workspaces triggers update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceTriggerUpdateCall.html), [*containers workspaces update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceUpdateCall.html), [*containers workspaces variables create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceVariableCreateCall.html), [*containers workspaces variables delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceVariableDeleteCall.html), [*containers workspaces variables get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceVariableGetCall.html), [*containers workspaces variables list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceVariableListCall.html), [*containers workspaces variables revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceVariableRevertCall.html), [*containers workspaces variables update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceVariableUpdateCall.html), [*containers workspaces zones create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceZoneCreateCall.html), [*containers workspaces zones delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceZoneDeleteCall.html), [*containers workspaces zones get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceZoneGetCall.html), [*containers workspaces zones list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceZoneListCall.html), [*containers workspaces zones revert*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceZoneRevertCall.html), [*containers workspaces zones update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountContainerWorkspaceZoneUpdateCall.html), [*get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountGetCall.html), [*list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountListCall.html), [*update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountUpdateCall.html), [*user_permissions create*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountUserPermissionCreateCall.html), [*user_permissions delete*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountUserPermissionDeleteCall.html), [*user_permissions get*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountUserPermissionGetCall.html), [*user_permissions list*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountUserPermissionListCall.html) and [*user_permissions update*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.AccountUserPermissionUpdateCall.html)
+* [accounts](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::Account)
+ * [*containers create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerCreateCall), [*containers delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerDeleteCall), [*containers environments create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerEnvironmentCreateCall), [*containers environments delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerEnvironmentDeleteCall), [*containers environments get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerEnvironmentGetCall), [*containers environments list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerEnvironmentListCall), [*containers environments reauthorize*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerEnvironmentReauthorizeCall), [*containers environments update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerEnvironmentUpdateCall), [*containers get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerGetCall), [*containers list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerListCall), [*containers update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerUpdateCall), [*containers version_headers latest*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionHeaderLatestCall), [*containers version_headers list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionHeaderListCall), [*containers versions delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionDeleteCall), [*containers versions get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionGetCall), [*containers versions live*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionLiveCall), [*containers versions publish*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionPublishCall), [*containers versions set_latest*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionSetLatestCall), [*containers versions undelete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionUndeleteCall), [*containers versions update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerVersionUpdateCall), [*containers workspaces built_in_variables create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceBuiltInVariableCreateCall), [*containers workspaces built_in_variables delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceBuiltInVariableDeleteCall), [*containers workspaces built_in_variables list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceBuiltInVariableListCall), [*containers workspaces built_in_variables revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceBuiltInVariableRevertCall), [*containers workspaces create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceCreateCall), [*containers workspaces create_version*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceCreateVersionCall), [*containers workspaces delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceDeleteCall), [*containers workspaces folders create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderCreateCall), [*containers workspaces folders delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderDeleteCall), [*containers workspaces folders entities*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderEntityCall), [*containers workspaces folders get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderGetCall), [*containers workspaces folders list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderListCall), [*containers workspaces folders move_entities_to_folder*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderMoveEntitiesToFolderCall), [*containers workspaces folders revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderRevertCall), [*containers workspaces folders update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceFolderUpdateCall), [*containers workspaces get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceGetCall), [*containers workspaces get status*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceGetStatuCall), [*containers workspaces list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceListCall), [*containers workspaces quick_preview*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceQuickPreviewCall), [*containers workspaces resolve_conflict*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceResolveConflictCall), [*containers workspaces sync*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceSyncCall), [*containers workspaces tags create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTagCreateCall), [*containers workspaces tags delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTagDeleteCall), [*containers workspaces tags get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTagGetCall), [*containers workspaces tags list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTagListCall), [*containers workspaces tags revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTagRevertCall), [*containers workspaces tags update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTagUpdateCall), [*containers workspaces templates create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTemplateCreateCall), [*containers workspaces templates delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTemplateDeleteCall), [*containers workspaces templates get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTemplateGetCall), [*containers workspaces templates list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTemplateListCall), [*containers workspaces templates revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTemplateRevertCall), [*containers workspaces templates update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTemplateUpdateCall), [*containers workspaces triggers create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTriggerCreateCall), [*containers workspaces triggers delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTriggerDeleteCall), [*containers workspaces triggers get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTriggerGetCall), [*containers workspaces triggers list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTriggerListCall), [*containers workspaces triggers revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTriggerRevertCall), [*containers workspaces triggers update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceTriggerUpdateCall), [*containers workspaces update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceUpdateCall), [*containers workspaces variables create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceVariableCreateCall), [*containers workspaces variables delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceVariableDeleteCall), [*containers workspaces variables get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceVariableGetCall), [*containers workspaces variables list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceVariableListCall), [*containers workspaces variables revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceVariableRevertCall), [*containers workspaces variables update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceVariableUpdateCall), [*containers workspaces zones create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceZoneCreateCall), [*containers workspaces zones delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceZoneDeleteCall), [*containers workspaces zones get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceZoneGetCall), [*containers workspaces zones list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceZoneListCall), [*containers workspaces zones revert*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceZoneRevertCall), [*containers workspaces zones update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountContainerWorkspaceZoneUpdateCall), [*get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountGetCall), [*list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountListCall), [*update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountUpdateCall), [*user_permissions create*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountUserPermissionCreateCall), [*user_permissions delete*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountUserPermissionDeleteCall), [*user_permissions get*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountUserPermissionGetCall), [*user_permissions list*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountUserPermissionListCall) and [*user_permissions update*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/api::AccountUserPermissionUpdateCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/struct.TagManager.html)**
+* **[Hub](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/TagManager)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::CallBuilder)
+* **[Resources](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -41,92 +41,92 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.accounts().containers_workspaces_zones_create(...).doit()
-let r = hub.accounts().containers_workspaces_folders_move_entities_to_folder(...).doit()
-let r = hub.accounts().containers_version_headers_latest(...).doit()
-let r = hub.accounts().containers_workspaces_triggers_create(...).doit()
-let r = hub.accounts().containers_workspaces_list(...).doit()
-let r = hub.accounts().containers_workspaces_built_in_variables_revert(...).doit()
-let r = hub.accounts().containers_workspaces_built_in_variables_delete(...).doit()
-let r = hub.accounts().containers_environments_create(...).doit()
-let r = hub.accounts().containers_versions_publish(...).doit()
-let r = hub.accounts().containers_workspaces_templates_get(...).doit()
-let r = hub.accounts().containers_workspaces_zones_revert(...).doit()
-let r = hub.accounts().containers_workspaces_tags_create(...).doit()
-let r = hub.accounts().containers_environments_delete(...).doit()
-let r = hub.accounts().containers_workspaces_get(...).doit()
-let r = hub.accounts().containers_get(...).doit()
-let r = hub.accounts().user_permissions_create(...).doit()
-let r = hub.accounts().containers_workspaces_folders_list(...).doit()
-let r = hub.accounts().containers_environments_reauthorize(...).doit()
-let r = hub.accounts().containers_workspaces_delete(...).doit()
-let r = hub.accounts().containers_workspaces_create(...).doit()
-let r = hub.accounts().user_permissions_list(...).doit()
-let r = hub.accounts().containers_workspaces_templates_delete(...).doit()
-let r = hub.accounts().containers_workspaces_quick_preview(...).doit()
-let r = hub.accounts().containers_workspaces_variables_get(...).doit()
-let r = hub.accounts().containers_versions_set_latest(...).doit()
-let r = hub.accounts().containers_workspaces_variables_update(...).doit()
-let r = hub.accounts().containers_environments_list(...).doit()
-let r = hub.accounts().containers_workspaces_tags_list(...).doit()
-let r = hub.accounts().containers_workspaces_templates_list(...).doit()
-let r = hub.accounts().containers_workspaces_zones_update(...).doit()
-let r = hub.accounts().containers_workspaces_zones_get(...).doit()
-let r = hub.accounts().containers_workspaces_create_version(...).doit()
-let r = hub.accounts().containers_delete(...).doit()
-let r = hub.accounts().containers_workspaces_templates_create(...).doit()
-let r = hub.accounts().containers_versions_delete(...).doit()
-let r = hub.accounts().update(...).doit()
-let r = hub.accounts().containers_version_headers_list(...).doit()
-let r = hub.accounts().containers_workspaces_built_in_variables_list(...).doit()
-let r = hub.accounts().containers_workspaces_triggers_list(...).doit()
-let r = hub.accounts().user_permissions_update(...).doit()
-let r = hub.accounts().containers_workspaces_zones_list(...).doit()
-let r = hub.accounts().containers_workspaces_templates_update(...).doit()
-let r = hub.accounts().get(...).doit()
-let r = hub.accounts().containers_versions_live(...).doit()
-let r = hub.accounts().list(...).doit()
-let r = hub.accounts().containers_workspaces_variables_list(...).doit()
-let r = hub.accounts().containers_versions_undelete(...).doit()
-let r = hub.accounts().containers_workspaces_variables_revert(...).doit()
-let r = hub.accounts().containers_workspaces_zones_delete(...).doit()
-let r = hub.accounts().containers_workspaces_folders_get(...).doit()
-let r = hub.accounts().containers_workspaces_folders_create(...).doit()
-let r = hub.accounts().containers_workspaces_tags_delete(...).doit()
-let r = hub.accounts().containers_update(...).doit()
-let r = hub.accounts().containers_environments_get(...).doit()
-let r = hub.accounts().containers_workspaces_folders_update(...).doit()
-let r = hub.accounts().containers_workspaces_built_in_variables_create(...).doit()
-let r = hub.accounts().containers_list(...).doit()
-let r = hub.accounts().containers_workspaces_folders_entities(...).doit()
-let r = hub.accounts().containers_workspaces_triggers_delete(...).doit()
-let r = hub.accounts().containers_workspaces_folders_delete(...).doit()
-let r = hub.accounts().containers_workspaces_sync(...).doit()
-let r = hub.accounts().containers_workspaces_tags_revert(...).doit()
-let r = hub.accounts().containers_workspaces_tags_update(...).doit()
-let r = hub.accounts().containers_workspaces_templates_revert(...).doit()
-let r = hub.accounts().containers_create(...).doit()
-let r = hub.accounts().containers_workspaces_triggers_update(...).doit()
-let r = hub.accounts().containers_workspaces_variables_create(...).doit()
-let r = hub.accounts().user_permissions_get(...).doit()
-let r = hub.accounts().containers_workspaces_triggers_revert(...).doit()
-let r = hub.accounts().containers_workspaces_variables_delete(...).doit()
-let r = hub.accounts().containers_workspaces_tags_get(...).doit()
-let r = hub.accounts().containers_workspaces_resolve_conflict(...).doit()
-let r = hub.accounts().containers_environments_update(...).doit()
-let r = hub.accounts().containers_workspaces_triggers_get(...).doit()
-let r = hub.accounts().containers_workspaces_folders_revert(...).doit()
-let r = hub.accounts().containers_workspaces_get_status(...).doit()
-let r = hub.accounts().containers_versions_update(...).doit()
-let r = hub.accounts().containers_versions_get(...).doit()
-let r = hub.accounts().containers_workspaces_update(...).doit()
-let r = hub.accounts().user_permissions_delete(...).doit()
+let r = hub.accounts().containers_environments_create(...).doit().await
+let r = hub.accounts().containers_environments_delete(...).doit().await
+let r = hub.accounts().containers_environments_get(...).doit().await
+let r = hub.accounts().containers_environments_list(...).doit().await
+let r = hub.accounts().containers_environments_reauthorize(...).doit().await
+let r = hub.accounts().containers_environments_update(...).doit().await
+let r = hub.accounts().containers_version_headers_latest(...).doit().await
+let r = hub.accounts().containers_version_headers_list(...).doit().await
+let r = hub.accounts().containers_versions_delete(...).doit().await
+let r = hub.accounts().containers_versions_get(...).doit().await
+let r = hub.accounts().containers_versions_live(...).doit().await
+let r = hub.accounts().containers_versions_publish(...).doit().await
+let r = hub.accounts().containers_versions_set_latest(...).doit().await
+let r = hub.accounts().containers_versions_undelete(...).doit().await
+let r = hub.accounts().containers_versions_update(...).doit().await
+let r = hub.accounts().containers_workspaces_built_in_variables_create(...).doit().await
+let r = hub.accounts().containers_workspaces_built_in_variables_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_built_in_variables_list(...).doit().await
+let r = hub.accounts().containers_workspaces_built_in_variables_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_create(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_entities(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_get(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_list(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_move_entities_to_folder(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_folders_update(...).doit().await
+let r = hub.accounts().containers_workspaces_tags_create(...).doit().await
+let r = hub.accounts().containers_workspaces_tags_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_tags_get(...).doit().await
+let r = hub.accounts().containers_workspaces_tags_list(...).doit().await
+let r = hub.accounts().containers_workspaces_tags_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_tags_update(...).doit().await
+let r = hub.accounts().containers_workspaces_templates_create(...).doit().await
+let r = hub.accounts().containers_workspaces_templates_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_templates_get(...).doit().await
+let r = hub.accounts().containers_workspaces_templates_list(...).doit().await
+let r = hub.accounts().containers_workspaces_templates_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_templates_update(...).doit().await
+let r = hub.accounts().containers_workspaces_triggers_create(...).doit().await
+let r = hub.accounts().containers_workspaces_triggers_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_triggers_get(...).doit().await
+let r = hub.accounts().containers_workspaces_triggers_list(...).doit().await
+let r = hub.accounts().containers_workspaces_triggers_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_triggers_update(...).doit().await
+let r = hub.accounts().containers_workspaces_variables_create(...).doit().await
+let r = hub.accounts().containers_workspaces_variables_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_variables_get(...).doit().await
+let r = hub.accounts().containers_workspaces_variables_list(...).doit().await
+let r = hub.accounts().containers_workspaces_variables_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_variables_update(...).doit().await
+let r = hub.accounts().containers_workspaces_zones_create(...).doit().await
+let r = hub.accounts().containers_workspaces_zones_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_zones_get(...).doit().await
+let r = hub.accounts().containers_workspaces_zones_list(...).doit().await
+let r = hub.accounts().containers_workspaces_zones_revert(...).doit().await
+let r = hub.accounts().containers_workspaces_zones_update(...).doit().await
+let r = hub.accounts().containers_workspaces_create(...).doit().await
+let r = hub.accounts().containers_workspaces_create_version(...).doit().await
+let r = hub.accounts().containers_workspaces_delete(...).doit().await
+let r = hub.accounts().containers_workspaces_get(...).doit().await
+let r = hub.accounts().containers_workspaces_get_status(...).doit().await
+let r = hub.accounts().containers_workspaces_list(...).doit().await
+let r = hub.accounts().containers_workspaces_quick_preview(...).doit().await
+let r = hub.accounts().containers_workspaces_resolve_conflict(...).doit().await
+let r = hub.accounts().containers_workspaces_sync(...).doit().await
+let r = hub.accounts().containers_workspaces_update(...).doit().await
+let r = hub.accounts().containers_create(...).doit().await
+let r = hub.accounts().containers_delete(...).doit().await
+let r = hub.accounts().containers_get(...).doit().await
+let r = hub.accounts().containers_list(...).doit().await
+let r = hub.accounts().containers_update(...).doit().await
+let r = hub.accounts().user_permissions_create(...).doit().await
+let r = hub.accounts().user_permissions_delete(...).doit().await
+let r = hub.accounts().user_permissions_get(...).doit().await
+let r = hub.accounts().user_permissions_list(...).doit().await
+let r = hub.accounts().user_permissions_update(...).doit().await
+let r = hub.accounts().get(...).doit().await
+let r = hub.accounts().list(...).doit().await
+let r = hub.accounts().update(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -146,11 +146,11 @@ google-tagmanager2 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -160,24 +160,25 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_tagmanager2 as tagmanager2;
-use tagmanager2::Folder;
+use tagmanager2::api::Folder;
 use tagmanager2::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use tagmanager2::TagManager;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = TagManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
@@ -187,16 +188,17 @@ let mut req = Folder::default();
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.accounts().containers_workspaces_folders_move_entities_to_folder(req, "path")
-             .add_variable_id("sit")
-             .add_trigger_id("Stet")
-             .add_tag_id("sed")
-             .doit();
+             .add_variable_id("magna")
+             .add_trigger_id("no")
+             .add_tag_id("ipsum")
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -212,17 +214,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -232,29 +234,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::RequestValue) and 
+[decodable](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-tagmanager2/1.0.14+20200708/google_tagmanager2/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-tagmanager2/2.0.0+20210330/google_tagmanager2/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

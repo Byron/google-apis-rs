@@ -1,0 +1,17 @@
+site_name: Traffic Director Service v2.0.0+20210325
+site_url: http://byron.github.io/google-apis-rs/google-trafficdirector2-cli
+site_description: A complete library to interact with Traffic Director Service (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/trafficdirector2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['discovery_client-status.md', 'Discovery', 'Client Status']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

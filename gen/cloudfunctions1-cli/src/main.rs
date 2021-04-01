@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_cloudfunctions1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_cloudfunctions1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudFunctions<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudFunctions<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.operations().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -83,7 +79,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -98,7 +94,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.operations().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -129,7 +125,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "name", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "name", "page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -148,7 +144,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -163,7 +159,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_call(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_call(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -233,7 +229,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -248,7 +244,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -271,34 +267,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "build-environment-variables" => Some(("buildEnvironmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build-worker-pool" => Some(("buildWorkerPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-trigger.security-level" => Some(("httpsTrigger.securityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "https-trigger.url" => Some(("httpsTrigger.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ingress-settings" => Some(("ingressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-token" => Some(("sourceToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-id", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-environment-variables", "build-id", "build-worker-pool", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "security-level", "service", "service-account-email", "source-archive-url", "source-repository", "source-token", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -343,7 +343,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -358,7 +358,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_functions_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -395,7 +395,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -410,7 +410,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_generate_download_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_generate_download_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -480,7 +480,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -495,7 +495,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_generate_upload_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_generate_upload_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -564,7 +564,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -579,7 +579,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_functions_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -616,7 +616,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -631,7 +631,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_functions_get_iam_policy(opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -672,7 +672,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -687,7 +687,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_functions_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -731,7 +731,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -746,7 +746,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -769,34 +769,38 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "build-environment-variables" => Some(("buildEnvironmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "build-worker-pool" => Some(("buildWorkerPool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "https-trigger.security-level" => Some(("httpsTrigger.securityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "https-trigger.url" => Some(("httpsTrigger.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "build-id" => Some(("buildId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ingress-settings" => Some(("ingressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-token" => Some(("sourceToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-id", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "build-environment-variables", "build-id", "build-worker-pool", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "security-level", "service", "service-account-email", "source-archive-url", "source-repository", "source-token", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -845,7 +849,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -860,7 +864,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -932,7 +936,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -947,7 +951,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_functions_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_functions_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1017,7 +1021,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1032,7 +1036,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1079,7 +1083,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1094,7 +1098,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1102,10 +1106,10 @@ impl<'n> Engine<'n> {
             ("operations", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._operations_get(opt, dry_run, &mut err);
+                        call_result = self._operations_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._operations_list(opt, dry_run, &mut err);
+                        call_result = self._operations_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("operations".to_string()));
@@ -1116,40 +1120,40 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-functions-call", Some(opt)) => {
-                        call_result = self._projects_locations_functions_call(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_call(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-create", Some(opt)) => {
-                        call_result = self._projects_locations_functions_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-delete", Some(opt)) => {
-                        call_result = self._projects_locations_functions_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-generate-download-url", Some(opt)) => {
-                        call_result = self._projects_locations_functions_generate_download_url(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_generate_download_url(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-generate-upload-url", Some(opt)) => {
-                        call_result = self._projects_locations_functions_generate_upload_url(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_generate_upload_url(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-get", Some(opt)) => {
-                        call_result = self._projects_locations_functions_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_functions_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-list", Some(opt)) => {
-                        call_result = self._projects_locations_functions_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-patch", Some(opt)) => {
-                        call_result = self._projects_locations_functions_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_functions_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-functions-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_functions_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_functions_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-list", Some(opt)) => {
-                        call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1174,41 +1178,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "cloudfunctions1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "cloudfunctions1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "cloudfunctions1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/cloudfunctions1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudFunctions::new(client, auth),
@@ -1224,29 +1213,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("operations", "methods: 'get' and 'list'", vec![
             ("get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/operations_get",
                   vec![
                     (Some(r##"name"##),
@@ -1268,16 +1256,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the
-        server doesn't support this method, it returns `UNIMPLEMENTED`.
-        
-        NOTE: the `name` binding allows API services to override the binding
-        to use different resource name schemes, such as `users/*/operations`. To
-        override the binding, API services can add a binding such as
-        `"/v1/{name=users/*}/operations"` to their service configuration.
-        For backwards compatibility, the default name includes the operations
-        collection id, however overriding users must ensure the name binding
-        is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/operations_list",
                   vec![
                     (Some(r##"v"##),
@@ -1296,10 +1275,7 @@ fn main() {
         
         ("projects", "methods: 'locations-functions-call', 'locations-functions-create', 'locations-functions-delete', 'locations-functions-generate-download-url', 'locations-functions-generate-upload-url', 'locations-functions-get', 'locations-functions-get-iam-policy', 'locations-functions-list', 'locations-functions-patch', 'locations-functions-set-iam-policy', 'locations-functions-test-iam-permissions' and 'locations-list'", vec![
             ("locations-functions-call",
-                    Some(r##"Synchronously invokes a deployed Cloud Function. To be used for testing
-        purposes as very limited traffic is allowed. For more information on
-        the actual limits, refer to
-        [Rate Limits](https://cloud.google.com/functions/quotas#rate_limits)."##),
+                    Some(r##"Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to [Rate Limits](https://cloud.google.com/functions/quotas#rate_limits)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-call",
                   vec![
                     (Some(r##"name"##),
@@ -1327,15 +1303,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-create",
-                    Some(r##"Creates a new function. If a function with the given name already exists in
-        the specified project, the long running operation will return
-        `ALREADY_EXISTS` error."##),
+                    Some(r##"Creates a new function. If a function with the given name already exists in the specified project, the long running operation will return `ALREADY_EXISTS` error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-create",
                   vec![
                     (Some(r##"location"##),
                      None,
-                     Some(r##"Required. The project and location in which the function should be created, specified
-        in the format `projects/*/locations/*`"##),
+                     Some(r##"Required. The project and location in which the function should be created, specified in the format `projects/*/locations/*`"##),
                      Some(true),
                      Some(false)),
         
@@ -1358,9 +1331,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-delete",
-                    Some(r##"Deletes a function with the given name from the specified project. If the
-        given function is used by some trigger, the trigger will be updated to
-        remove this function."##),
+                    Some(r##"Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-delete",
                   vec![
                     (Some(r##"name"##),
@@ -1382,17 +1353,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-generate-download-url",
-                    Some(r##"Returns a signed URL for downloading deployed function source code.
-        The URL is only valid for a limited period and should be used within
-        minutes after generation.
-        For more information about the signed URL usage see:
-        https://cloud.google.com/storage/docs/access-control/signed-urls"##),
+                    Some(r##"Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within minutes after generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-generate-download-url",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of function for which source code Google Cloud Storage signed
-        URL should be generated."##),
+                     Some(r##"The name of function for which source code Google Cloud Storage signed URL should be generated."##),
                      Some(true),
                      Some(false)),
         
@@ -1415,37 +1381,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-generate-upload-url",
-                    Some(r##"Returns a signed URL for uploading a function source code.
-        For more information about the signed URL usage see:
-        https://cloud.google.com/storage/docs/access-control/signed-urls.
-        Once the function source code upload is complete, the used signed
-        URL should be provided in CreateFunction or UpdateFunction request
-        as a reference to the function source code.
-        
-        When uploading source code to the generated signed URL, please follow
-        these restrictions:
-        
-        * Source file type should be a zip file.
-        * Source file size should not exceed 100MB limit.
-        * No credentials should be attached - the signed URLs provide access to the
-          target bucket using internal service identity; if credentials were
-          attached, the identity from the credentials would be used, but that
-          identity does not have permissions to upload files to the URL.
-        
-        When making a HTTP PUT request, these two headers need to be specified:
-        
-        * `content-type: application/zip`
-        * `x-goog-content-length-range: 0,104857600`
-        
-        And this header SHOULD NOT be specified:
-        
-        * `Authorization: Bearer YOUR_TOKEN`"##),
+                    Some(r##"Returns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in CreateFunction or UpdateFunction request as a reference to the function source code. When uploading source code to the generated signed URL, please follow these restrictions: * Source file type should be a zip file. * Source file size should not exceed 100MB limit. * No credentials should be attached - the signed URLs provide access to the target bucket using internal service identity; if credentials were attached, the identity from the credentials would be used, but that identity does not have permissions to upload files to the URL. When making a HTTP PUT request, these two headers need to be specified: * `content-type: application/zip` * `x-goog-content-length-range: 0,104857600` And this header SHOULD NOT be specified: * `Authorization: Bearer YOUR_TOKEN`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-generate-upload-url",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project and location in which the Google Cloud Storage signed URL
-        should be generated, specified in the format `projects/*/locations/*`."##),
+                     Some(r##"The project and location in which the Google Cloud Storage signed URL should be generated, specified in the format `projects/*/locations/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1490,15 +1431,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-get-iam-policy",
-                    Some(r##"Gets the IAM access control policy for a function.
-        Returns an empty policy if the function exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the IAM access control policy for a function. Returns an empty policy if the function exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1520,12 +1458,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project and location from which the function should be listed,
-        specified in the format `projects/*/locations/*`
-        If you want to list functions in all locations, use "-" in place of a
-        location. When listing functions in all locations, if one or more
-        location(s) are unreachable, the response will contain functions from all
-        reachable locations along with the names of any unreachable locations."##),
+                     Some(r##"The project and location from which the function should be listed, specified in the format `projects/*/locations/*` If you want to list functions in all locations, use "-" in place of a location. When listing functions in all locations, if one or more location(s) are unreachable, the response will contain functions from all reachable locations along with the names of any unreachable locations."##),
                      Some(true),
                      Some(false)),
         
@@ -1547,8 +1480,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"A user-defined name of the function. Function names must be unique
-        globally and match pattern `projects/*/locations/*/functions/*`"##),
+                     Some(r##"A user-defined name of the function. Function names must be unique globally and match pattern `projects/*/locations/*/functions/*`"##),
                      Some(true),
                      Some(false)),
         
@@ -1571,14 +1503,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-set-iam-policy",
-                    Some(r##"Sets the IAM access control policy on the specified function.
-        Replaces any existing policy."##),
+                    Some(r##"Sets the IAM access control policy on the specified function. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1601,16 +1531,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-functions-test-iam-permissions",
-                    Some(r##"Tests the specified permissions against the IAM access control policy
-        for a function.
-        If the function does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error."##),
+                    Some(r##"Tests the specified permissions against the IAM access control policy for a function. If the function does not exist, this will return an empty set of permissions, not a NOT_FOUND error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1660,7 +1586,7 @@ fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200629")
+           .version("2.0.0+20210325")
            .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")
@@ -1675,12 +1601,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1728,13 +1649,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

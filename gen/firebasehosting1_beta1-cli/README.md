@@ -25,23 +25,34 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Hosting* API at revision *20200709*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Firebase Hosting* API at revision *20210315*. The CLI is at version *2.0.0*.
 
 ```bash
 firebasehosting1-beta1 [options]
         projects
                 operations-get <name> [-p <v>]... [-o <out>]
+                sites-channels-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-channels-delete <name> [-p <v>]... [-o <out>]
+                sites-channels-get <name> [-p <v>]... [-o <out>]
+                sites-channels-list <parent> [-p <v>]... [-o <out>]
+                sites-channels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-channels-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-channels-releases-list <parent> [-p <v>]... [-o <out>]
+                sites-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-delete <name> [-p <v>]... [-o <out>]
                 sites-domains-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-domains-delete <name> [-p <v>]... [-o <out>]
                 sites-domains-get <name> [-p <v>]... [-o <out>]
                 sites-domains-list <parent> [-p <v>]... [-o <out>]
                 sites-domains-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-get <name> [-p <v>]... [-o <out>]
                 sites-get-config <name> [-p <v>]... [-o <out>]
+                sites-list <parent> [-p <v>]... [-o <out>]
+                sites-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-releases-list <parent> [-p <v>]... [-o <out>]
                 sites-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-versions-clone <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-versions-delete <name> [-p <v>]... [-o <out>]
                 sites-versions-files-list <parent> [-p <v>]... [-o <out>]
@@ -49,6 +60,11 @@ firebasehosting1-beta1 [options]
                 sites-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sites-versions-populate-files <parent> (-r <kv>)... [-p <v>]... [-o <out>]
         sites
+                channels-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                channels-delete <name> [-p <v>]... [-o <out>]
+                channels-get <name> [-p <v>]... [-o <out>]
+                channels-list <parent> [-p <v>]... [-o <out>]
+                channels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-releases-list <parent> [-p <v>]... [-o <out>]
                 domains-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -60,6 +76,7 @@ firebasehosting1-beta1 [options]
                 releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 releases-list <parent> [-p <v>]... [-o <out>]
                 update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                versions-clone <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-delete <name> [-p <v>]... [-o <out>]
                 versions-files-list <parent> [-p <v>]... [-o <out>]
@@ -77,12 +94,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -135,10 +146,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `firebasehosting1-beta1 --debug <resource> <method> [options] 2>debug.txt`.
 

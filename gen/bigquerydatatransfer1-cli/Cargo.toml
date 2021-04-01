@@ -4,42 +4,37 @@
 [package]
 
 name = "google-bigquerydatatransfer1-cli"
-version = "1.0.14+20200502"
+version = "2.0.0+20210324"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with BigQuery Data Transfer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquerydatatransfer1-cli"
-homepage = "https://cloud.google.com/bigquery/"
+homepage = "https://cloud.google.com/bigquery-transfer/"
 documentation = "http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli"
 license = "MIT"
 keywords = ["bigquerydatatransfer", "google", "cli"]
 autobins = false
+edition = "2018"
 
 [[bin]]
 name = "bigquerydatatransfer1"
 path = "src/main.rs"
 
-[dev-dependencies]
-hyper-rustls = "^0.6"
-
 [dependencies]
-hyper = "^ 0.10"
+hyper-rustls = "^0.22"
 mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = { version = "^ 1.0", default-features = false }
+yup-oauth2 = "^ 5.0"
+itertools = "^ 0.10"
 strsim = "^0.5"
-hyper-rustls = "^0.6"
-yup-hyper-mock = "^2.0"
 clap = "^2.0"
+hyper = { version = "0.14", features = ["full"] }
+tokio = { version = "^ 1.0", features = ["full"] }
 
-[features]
-default = ["openssl"]
-openssl = ["yup-oauth2/default"]
-rustls = ["yup-oauth2/no-openssl"]
 
 
 
 [dependencies.google-bigquerydatatransfer1]
 path = "../bigquerydatatransfer1"
-version = "1.0.14+20200502"
+version = "2.0.0+20210324"

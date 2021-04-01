@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_cloudiot1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_cloudiot1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudIot<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudIot<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_locations_registries_bind_device_to_gateway(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_bind_device_to_gateway(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,8 +65,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "gateway-id" => Some(("gatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-id" => Some(("gatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["device-id", "gateway-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -117,7 +113,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -132,7 +128,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -155,12 +151,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-config.http-enabled-state" => Some(("httpConfig.httpEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["http-config", "http-enabled-state", "id", "log-level", "mqtt-config", "mqtt-enabled-state", "name", "pubsub-topic-name", "state-notification-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -207,7 +203,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -222,7 +218,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -259,7 +255,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -274,7 +270,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_config_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_config_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_devices_config_versions_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -315,7 +311,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -330,7 +326,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -353,30 +349,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.gateway-type" => Some(("gatewayConfig.gatewayType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.last-accessed-gateway-time" => Some(("gatewayConfig.lastAccessedGatewayTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.gateway-auth-method" => Some(("gatewayConfig.gatewayAuthMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.last-accessed-gateway-id" => Some(("gatewayConfig.lastAccessedGatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.binary-data" => Some(("config.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.device-ack-time" => Some(("config.deviceAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.gateway-auth-method" => Some(("gatewayConfig.gatewayAuthMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.gateway-type" => Some(("gatewayConfig.gatewayType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.last-accessed-gateway-id" => Some(("gatewayConfig.lastAccessedGatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.last-accessed-gateway-time" => Some(("gatewayConfig.lastAccessedGatewayTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "gateway-auth-method", "gateway-config", "gateway-type", "id", "last-accessed-gateway-id", "last-accessed-gateway-time", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "log-level", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -423,7 +419,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -438,7 +434,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_devices_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -475,7 +471,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -490,7 +486,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_devices_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -531,7 +527,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -546,7 +542,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_devices_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -589,7 +585,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "gateway-list-options-associations-gateway-id", "field-mask", "device-ids", "device-num-ids", "page-token", "gateway-list-options-gateway-type", "gateway-list-options-associations-device-id"].iter().map(|v|*v));
+                                                                           v.extend(["gateway-list-options-associations-device-id", "field-mask", "device-ids", "page-size", "page-token", "gateway-list-options-gateway-type", "gateway-list-options-associations-gateway-id", "device-num-ids"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -608,7 +604,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -623,7 +619,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_modify_cloud_to_device_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_modify_cloud_to_device_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -646,8 +642,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "version-to-update" => Some(("versionToUpdate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binary-data" => Some(("binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-to-update" => Some(("versionToUpdate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "version-to-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -694,7 +690,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -709,7 +705,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -732,30 +728,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.gateway-type" => Some(("gatewayConfig.gatewayType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.last-accessed-gateway-time" => Some(("gatewayConfig.lastAccessedGatewayTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.gateway-auth-method" => Some(("gatewayConfig.gatewayAuthMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gateway-config.last-accessed-gateway-id" => Some(("gatewayConfig.lastAccessedGatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.binary-data" => Some(("config.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.device-ack-time" => Some(("config.deviceAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.gateway-auth-method" => Some(("gatewayConfig.gatewayAuthMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.gateway-type" => Some(("gatewayConfig.gatewayType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.last-accessed-gateway-id" => Some(("gatewayConfig.lastAccessedGatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-config.last-accessed-gateway-time" => Some(("gatewayConfig.lastAccessedGatewayTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "gateway-auth-method", "gateway-config", "gateway-type", "id", "last-accessed-gateway-id", "last-accessed-gateway-time", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "log-level", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -806,7 +802,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -821,7 +817,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_send_command_to_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_send_command_to_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -892,7 +888,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -907,7 +903,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_devices_states_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_devices_states_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_devices_states_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -948,7 +944,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -963,7 +959,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1000,7 +996,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1015,7 +1011,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1085,7 +1081,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1100,7 +1096,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_groups_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_groups_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_groups_devices_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1143,7 +1139,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "gateway-list-options-associations-gateway-id", "field-mask", "device-ids", "device-num-ids", "page-token", "gateway-list-options-gateway-type", "gateway-list-options-associations-device-id"].iter().map(|v|*v));
+                                                                           v.extend(["gateway-list-options-associations-device-id", "field-mask", "device-ids", "page-size", "page-token", "gateway-list-options-gateway-type", "gateway-list-options-associations-gateway-id", "device-num-ids"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1162,7 +1158,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1177,7 +1173,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_groups_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_groups_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1247,7 +1243,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1262,7 +1258,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_groups_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_groups_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1333,7 +1329,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1348,7 +1344,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_groups_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_groups_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1418,7 +1414,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1433,7 +1429,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1477,7 +1473,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1492,7 +1488,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1515,12 +1511,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-config.http-enabled-state" => Some(("httpConfig.httpEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["http-config", "http-enabled-state", "id", "log-level", "mqtt-config", "mqtt-enabled-state", "name", "pubsub-topic-name", "state-notification-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1571,7 +1567,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1586,7 +1582,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1657,7 +1653,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1672,7 +1668,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1742,7 +1738,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1757,7 +1753,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_registries_unbind_device_from_gateway(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_registries_unbind_device_from_gateway(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1780,8 +1776,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "gateway-id" => Some(("gatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gateway-id" => Some(("gatewayId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["device-id", "gateway-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1828,7 +1824,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1843,7 +1839,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -1851,73 +1847,73 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-registries-bind-device-to-gateway", Some(opt)) => {
-                        call_result = self._projects_locations_registries_bind_device_to_gateway(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_bind_device_to_gateway(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-create", Some(opt)) => {
-                        call_result = self._projects_locations_registries_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-delete", Some(opt)) => {
-                        call_result = self._projects_locations_registries_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-config-versions-list", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_config_versions_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_config_versions_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-create", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_create(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-delete", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-get", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-list", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-modify-cloud-to-device-config", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_modify_cloud_to_device_config(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_modify_cloud_to_device_config(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-patch", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-send-command-to-device", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_send_command_to_device(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_send_command_to_device(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-devices-states-list", Some(opt)) => {
-                        call_result = self._projects_locations_registries_devices_states_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_devices_states_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-get", Some(opt)) => {
-                        call_result = self._projects_locations_registries_get(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_registries_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-groups-devices-list", Some(opt)) => {
-                        call_result = self._projects_locations_registries_groups_devices_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_groups_devices_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-groups-get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_registries_groups_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_groups_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-groups-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_registries_groups_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_groups_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-groups-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_registries_groups_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_groups_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-list", Some(opt)) => {
-                        call_result = self._projects_locations_registries_list(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-patch", Some(opt)) => {
-                        call_result = self._projects_locations_registries_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_locations_registries_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_locations_registries_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("locations-registries-unbind-device-from-gateway", Some(opt)) => {
-                        call_result = self._projects_locations_registries_unbind_device_from_gateway(opt, dry_run, &mut err);
+                        call_result = self._projects_locations_registries_unbind_device_from_gateway(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1942,41 +1938,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "cloudiot1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "cloudiot1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "cloudiot1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/cloudiot1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudIot::new(client, auth),
@@ -1992,22 +1973,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'locations-registries-bind-device-to-gateway', 'locations-registries-create', 'locations-registries-delete', 'locations-registries-devices-config-versions-list', 'locations-registries-devices-create', 'locations-registries-devices-delete', 'locations-registries-devices-get', 'locations-registries-devices-list', 'locations-registries-devices-modify-cloud-to-device-config', 'locations-registries-devices-patch', 'locations-registries-devices-send-command-to-device', 'locations-registries-devices-states-list', 'locations-registries-get', 'locations-registries-get-iam-policy', 'locations-registries-groups-devices-list', 'locations-registries-groups-get-iam-policy', 'locations-registries-groups-set-iam-policy', 'locations-registries-groups-test-iam-permissions', 'locations-registries-list', 'locations-registries-patch', 'locations-registries-set-iam-policy', 'locations-registries-test-iam-permissions' and 'locations-registries-unbind-device-from-gateway'", vec![
@@ -2017,8 +1999,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the registry. For example,
-        `projects/example-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The name of the registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2046,8 +2027,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The project and cloud region where this device registry must be created.
-        For example, `projects/example-project/locations/us-central1`."##),
+                     Some(r##"Required. The project and cloud region where this device registry must be created. For example, `projects/example-project/locations/us-central1`."##),
                      Some(true),
                      Some(false)),
         
@@ -2075,8 +2055,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device registry. For example,
-        `projects/example-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The name of the device registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2093,15 +2072,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-devices-config-versions-list",
-                    Some(r##"Lists the last few versions of the device configuration in descending
-        order (i.e.: newest first)."##),
+                    Some(r##"Lists the last few versions of the device configuration in descending order (i.e.: newest first)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-devices-config-versions-list",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device. For example,
-        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
-        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(r##"Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2123,9 +2099,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the device registry where this device should be created.
-        For example,
-        `projects/example-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The name of the device registry where this device should be created. For example, `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2153,9 +2127,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device. For example,
-        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
-        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(r##"Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2177,9 +2149,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device. For example,
-        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
-        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(r##"Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2201,8 +2171,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The device registry path. Required. For example,
-        `projects/my-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The device registry path. Required. For example, `projects/my-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2219,16 +2188,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-devices-modify-cloud-to-device-config",
-                    Some(r##"Modifies the configuration for the device, which is eventually sent from
-        the Cloud IoT Core servers. Returns the modified configuration version and
-        its metadata."##),
+                    Some(r##"Modifies the configuration for the device, which is eventually sent from the Cloud IoT Core servers. Returns the modified configuration version and its metadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-devices-modify-cloud-to-device-config",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device. For example,
-        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
-        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(r##"Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2256,11 +2221,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource path name. For example,
-        `projects/p1/locations/us-central1/registries/registry0/devices/dev0` or
-        `projects/p1/locations/us-central1/registries/registry0/devices/{num_id}`.
-        When `name` is populated as a response from the service, it always ends
-        in the device numeric ID."##),
+                     Some(r##"The resource path name. For example, `projects/p1/locations/us-central1/registries/registry0/devices/dev0` or `projects/p1/locations/us-central1/registries/registry0/devices/{num_id}`. When `name` is populated as a response from the service, it always ends in the device numeric ID."##),
                      Some(true),
                      Some(false)),
         
@@ -2283,26 +2244,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-devices-send-command-to-device",
-                    Some(r##"Sends a command to the specified device. In order for a device to be able
-        to receive commands, it must:
-        1) be connected to Cloud IoT Core using the MQTT protocol, and
-        2) be subscribed to the group of MQTT topics specified by
-           /devices/{device-id}/commands/#. This subscription will receive commands
-           at the top-level topic /devices/{device-id}/commands as well as commands
-           for subfolders, like /devices/{device-id}/commands/subfolder.
-           Note that subscribing to specific subfolders is not supported.
-        If the command could not be delivered to the device, this method will
-        return an error; in particular, if the device is not subscribed, this
-        method will return FAILED_PRECONDITION. Otherwise, this method will
-        return OK. If the subscription is QoS 1, at least once delivery will be
-        guaranteed; for QoS 0, no acknowledgment will be expected from the device."##),
+                    Some(r##"Sends a command to the specified device. In order for a device to be able to receive commands, it must: 1) be connected to Cloud IoT Core using the MQTT protocol, and 2) be subscribed to the group of MQTT topics specified by /devices/{device-id}/commands/#. This subscription will receive commands at the top-level topic /devices/{device-id}/commands as well as commands for subfolders, like /devices/{device-id}/commands/subfolder. Note that subscribing to specific subfolders is not supported. If the command could not be delivered to the device, this method will return an error; in particular, if the device is not subscribed, this method will return FAILED_PRECONDITION. Otherwise, this method will return OK. If the subscription is QoS 1, at least once delivery will be guaranteed; for QoS 0, no acknowledgment will be expected from the device."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-devices-send-command-to-device",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device. For example,
-        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
-        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(r##"Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2325,15 +2272,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-devices-states-list",
-                    Some(r##"Lists the last few versions of the device state in descending order (i.e.:
-        newest first)."##),
+                    Some(r##"Lists the last few versions of the device state in descending order (i.e.: newest first)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-devices-states-list",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device. For example,
-        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
-        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(r##"Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2355,8 +2299,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the device registry. For example,
-        `projects/example-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The name of the device registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2373,15 +2316,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource.
-        Returns an empty policy if the resource exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2409,8 +2349,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The device registry path. Required. For example,
-        `projects/my-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The device registry path. Required. For example, `projects/my-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2427,15 +2366,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-groups-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource.
-        Returns an empty policy if the resource exists and does not have a policy
-        set."##),
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2458,14 +2394,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-groups-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2488,15 +2422,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-groups-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource.
-        If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2524,8 +2455,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The project and cloud region path. For example,
-        `projects/example-project/locations/us-central1`."##),
+                     Some(r##"Required. The project and cloud region path. For example, `projects/example-project/locations/us-central1`."##),
                      Some(true),
                      Some(false)),
         
@@ -2547,8 +2477,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource path name. For example,
-        `projects/example-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"The resource path name. For example, `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2571,14 +2500,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2601,15 +2528,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-registries-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource.
-        If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error."##),
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -2637,8 +2561,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the registry. For example,
-        `projects/example-project/locations/us-central1/registries/my-registry`."##),
+                     Some(r##"Required. The name of the registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
         
@@ -2666,9 +2589,8 @@ fn main() {
     
     let mut app = App::new("cloudiot1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200519")
-           .about("Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform.
-           ")
+           .version("2.0.0+20210323")
+           .about("Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudiot1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -2682,12 +2604,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -2735,13 +2652,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

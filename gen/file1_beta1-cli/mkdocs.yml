@@ -1,4 +1,4 @@
-site_name: Cloud Filestore v1.0.14+20200613
+site_name: Cloud Filestore v2.0.0+20210304
 site_url: http://byron.github.io/google-apis-rs/google-file1_beta1-cli
 site_description: A complete library to interact with Cloud Filestore (protocol v1beta1)
 
@@ -9,12 +9,18 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_locations-backups-create.md', 'Projects', 'Locations Backups Create']
+- ['projects_locations-backups-delete.md', 'Projects', 'Locations Backups Delete']
+- ['projects_locations-backups-get.md', 'Projects', 'Locations Backups Get']
+- ['projects_locations-backups-list.md', 'Projects', 'Locations Backups List']
+- ['projects_locations-backups-patch.md', 'Projects', 'Locations Backups Patch']
 - ['projects_locations-get.md', 'Projects', 'Locations Get']
 - ['projects_locations-instances-create.md', 'Projects', 'Locations Instances Create']
 - ['projects_locations-instances-delete.md', 'Projects', 'Locations Instances Delete']
 - ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
 - ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
 - ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']
+- ['projects_locations-instances-restore.md', 'Projects', 'Locations Instances Restore']
 - ['projects_locations-list.md', 'Projects', 'Locations List']
 - ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
 - ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']

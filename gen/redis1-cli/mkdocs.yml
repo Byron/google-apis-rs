@@ -1,4 +1,4 @@
-site_name: Cloud Redis v1.0.14+20200623
+site_name: Cloud Redis v2.0.0+20210325
 site_url: http://byron.github.io/google-apis-rs/google-redis1-cli
 site_description: A complete library to interact with Cloud Redis (protocol v1)
 
@@ -15,6 +15,7 @@ pages:
 - ['projects_locations-instances-export.md', 'Projects', 'Locations Instances Export']
 - ['projects_locations-instances-failover.md', 'Projects', 'Locations Instances Failover']
 - ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
+- ['projects_locations-instances-get-auth-string.md', 'Projects', 'Locations Instances Get Auth String']
 - ['projects_locations-instances-import.md', 'Projects', 'Locations Instances Import']
 - ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
 - ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']

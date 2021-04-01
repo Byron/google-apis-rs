@@ -1,4 +1,4 @@
-site_name: Binary Authorization v1.0.14+20200619
+site_name: Binary Authorization v2.0.0+20210318
 site_url: http://byron.github.io/google-apis-rs/google-binaryauthorization1-cli
 site_description: A complete library to interact with Binary Authorization (protocol v1)
 
@@ -17,11 +17,13 @@ pages:
 - ['projects_attestors-set-iam-policy.md', 'Projects', 'Attestors Set Iam Policy']
 - ['projects_attestors-test-iam-permissions.md', 'Projects', 'Attestors Test Iam Permissions']
 - ['projects_attestors-update.md', 'Projects', 'Attestors Update']
+- ['projects_attestors-validate-attestation-occurrence.md', 'Projects', 'Attestors Validate Attestation Occurrence']
 - ['projects_get-policy.md', 'Projects', 'Get Policy']
 - ['projects_policy-get-iam-policy.md', 'Projects', 'Policy Get Iam Policy']
 - ['projects_policy-set-iam-policy.md', 'Projects', 'Policy Set Iam Policy']
 - ['projects_policy-test-iam-permissions.md', 'Projects', 'Policy Test Iam Permissions']
 - ['projects_update-policy.md', 'Projects', 'Update Policy']
+- ['systempolicy_get-policy.md', 'Systempolicy', 'Get Policy']
 
 theme: readthedocs
 

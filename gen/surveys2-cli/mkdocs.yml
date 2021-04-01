@@ -1,4 +1,4 @@
-site_name: Surveys v1.0.14+20180508
+site_name: Surveys v2.0.0+20180508
 site_url: http://byron.github.io/google-apis-rs/google-surveys2-cli
 site_description: A complete library to interact with Surveys (protocol v2)
 

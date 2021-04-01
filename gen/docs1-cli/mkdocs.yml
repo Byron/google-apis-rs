@@ -1,4 +1,4 @@
-site_name: Docs v1.0.14+20200706
+site_name: Docs v2.0.0+20210323
 site_url: http://byron.github.io/google-apis-rs/google-docs1-cli
 site_description: A complete library to interact with Docs (protocol v1)
 

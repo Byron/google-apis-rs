@@ -1,4 +1,4 @@
-site_name: Security Command Center v1.0.14+20200703
+site_name: Security Command Center v2.0.0+20210326
 site_url: http://byron.github.io/google-apis-rs/google-securitycenter1-cli
 site_description: A complete library to interact with Security Command Center (protocol v1)
 
@@ -9,6 +9,15 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['folders_assets-group.md', 'Folders', 'Assets Group']
+- ['folders_assets-list.md', 'Folders', 'Assets List']
+- ['folders_assets-update-security-marks.md', 'Folders', 'Assets Update Security Marks']
+- ['folders_sources-findings-group.md', 'Folders', 'Sources Findings Group']
+- ['folders_sources-findings-list.md', 'Folders', 'Sources Findings List']
+- ['folders_sources-findings-patch.md', 'Folders', 'Sources Findings Patch']
+- ['folders_sources-findings-set-state.md', 'Folders', 'Sources Findings Set State']
+- ['folders_sources-findings-update-security-marks.md', 'Folders', 'Sources Findings Update Security Marks']
+- ['folders_sources-list.md', 'Folders', 'Sources List']
 - ['organizations_assets-group.md', 'Organizations', 'Assets Group']
 - ['organizations_assets-list.md', 'Organizations', 'Assets List']
 - ['organizations_assets-run-discovery.md', 'Organizations', 'Assets Run Discovery']
@@ -37,6 +46,15 @@ pages:
 - ['organizations_sources-set-iam-policy.md', 'Organizations', 'Sources Set Iam Policy']
 - ['organizations_sources-test-iam-permissions.md', 'Organizations', 'Sources Test Iam Permissions']
 - ['organizations_update-organization-settings.md', 'Organizations', 'Update Organization Settings']
+- ['projects_assets-group.md', 'Projects', 'Assets Group']
+- ['projects_assets-list.md', 'Projects', 'Assets List']
+- ['projects_assets-update-security-marks.md', 'Projects', 'Assets Update Security Marks']
+- ['projects_sources-findings-group.md', 'Projects', 'Sources Findings Group']
+- ['projects_sources-findings-list.md', 'Projects', 'Sources Findings List']
+- ['projects_sources-findings-patch.md', 'Projects', 'Sources Findings Patch']
+- ['projects_sources-findings-set-state.md', 'Projects', 'Sources Findings Set State']
+- ['projects_sources-findings-update-security-marks.md', 'Projects', 'Sources Findings Update Security Marks']
+- ['projects_sources-list.md', 'Projects', 'Sources List']
 
 theme: readthedocs
 

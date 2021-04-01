@@ -1,0 +1,46 @@
+site_name: apigateway v2.0.0+20210318
+site_url: http://byron.github.io/google-apis-rs/google-apigateway1-cli
+site_description: A complete library to interact with apigateway (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/apigateway1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-apis-configs-create.md', 'Projects', 'Locations Apis Configs Create']
+- ['projects_locations-apis-configs-delete.md', 'Projects', 'Locations Apis Configs Delete']
+- ['projects_locations-apis-configs-get.md', 'Projects', 'Locations Apis Configs Get']
+- ['projects_locations-apis-configs-get-iam-policy.md', 'Projects', 'Locations Apis Configs Get Iam Policy']
+- ['projects_locations-apis-configs-list.md', 'Projects', 'Locations Apis Configs List']
+- ['projects_locations-apis-configs-patch.md', 'Projects', 'Locations Apis Configs Patch']
+- ['projects_locations-apis-configs-set-iam-policy.md', 'Projects', 'Locations Apis Configs Set Iam Policy']
+- ['projects_locations-apis-configs-test-iam-permissions.md', 'Projects', 'Locations Apis Configs Test Iam Permissions']
+- ['projects_locations-apis-create.md', 'Projects', 'Locations Apis Create']
+- ['projects_locations-apis-delete.md', 'Projects', 'Locations Apis Delete']
+- ['projects_locations-apis-get.md', 'Projects', 'Locations Apis Get']
+- ['projects_locations-apis-get-iam-policy.md', 'Projects', 'Locations Apis Get Iam Policy']
+- ['projects_locations-apis-list.md', 'Projects', 'Locations Apis List']
+- ['projects_locations-apis-patch.md', 'Projects', 'Locations Apis Patch']
+- ['projects_locations-apis-set-iam-policy.md', 'Projects', 'Locations Apis Set Iam Policy']
+- ['projects_locations-apis-test-iam-permissions.md', 'Projects', 'Locations Apis Test Iam Permissions']
+- ['projects_locations-gateways-create.md', 'Projects', 'Locations Gateways Create']
+- ['projects_locations-gateways-delete.md', 'Projects', 'Locations Gateways Delete']
+- ['projects_locations-gateways-get.md', 'Projects', 'Locations Gateways Get']
+- ['projects_locations-gateways-get-iam-policy.md', 'Projects', 'Locations Gateways Get Iam Policy']
+- ['projects_locations-gateways-list.md', 'Projects', 'Locations Gateways List']
+- ['projects_locations-gateways-patch.md', 'Projects', 'Locations Gateways Patch']
+- ['projects_locations-gateways-set-iam-policy.md', 'Projects', 'Locations Gateways Set Iam Policy']
+- ['projects_locations-gateways-test-iam-permissions.md', 'Projects', 'Locations Gateways Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -3,15 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `dns1` command-line interface *(CLI)* allows to use most features of the *Google dns* service from the comfort of your terminal.
+The `dns1` command-line interface *(CLI)* allows to use most features of the *Google Dns* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *dns* API can be found at the
-[official documentation site](https://developers.google.com/cloud-dns).
+Everything else about the *Dns* API can be found at the
+[official documentation site](https://cloud.google.com/dns/docs).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dns* API at revision *20200515*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Dns* API at revision *20210319*. The CLI is at version *2.0.0*.
 
 ```bash
 dns1 [options]
@@ -55,6 +55,10 @@ dns1 [options]
                 update <project> <policy> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 get <project> [-p <v>]... [-o <out>]
+                managed-zones-rrsets-create <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                managed-zones-rrsets-delete <project> <managed-zone> <name> <type> [-p <v>]... [-o <out>]
+                managed-zones-rrsets-get <project> <managed-zone> <name> <type> [-p <v>]... [-o <out>]
+                managed-zones-rrsets-patch <project> <managed-zone> <name> <type> (-r <kv>)... [-p <v>]... [-o <out>]
         resource-record-sets
                 list <project> <managed-zone> [-p <v>]... [-o <out>]
   dns1 --help
@@ -68,12 +72,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -126,10 +124,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `dns1 --debug <resource> <method> [options] 2>debug.txt`.
 

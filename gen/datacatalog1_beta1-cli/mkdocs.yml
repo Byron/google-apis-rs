@@ -1,4 +1,4 @@
-site_name: Data Catalog v1.0.14+20200528
+site_name: Data Catalog v2.0.0+20210316
 site_url: http://byron.github.io/google-apis-rs/google-datacatalog1_beta1-cli
 site_description: A complete library to interact with Data Catalog (protocol v1beta1)
 
@@ -38,6 +38,7 @@ pages:
 - ['projects_locations-tag-templates-delete.md', 'Projects', 'Locations Tag Templates Delete']
 - ['projects_locations-tag-templates-fields-create.md', 'Projects', 'Locations Tag Templates Fields Create']
 - ['projects_locations-tag-templates-fields-delete.md', 'Projects', 'Locations Tag Templates Fields Delete']
+- ['projects_locations-tag-templates-fields-enum-values-rename.md', 'Projects', 'Locations Tag Templates Fields Enum Values Rename']
 - ['projects_locations-tag-templates-fields-patch.md', 'Projects', 'Locations Tag Templates Fields Patch']
 - ['projects_locations-tag-templates-fields-rename.md', 'Projects', 'Locations Tag Templates Fields Rename']
 - ['projects_locations-tag-templates-get.md', 'Projects', 'Locations Tag Templates Get']

@@ -1,4 +1,4 @@
-site_name: Games v1.0.14+20200701
+site_name: Games v2.0.0+20210325
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -17,6 +17,7 @@ pages:
 - ['achievements_unlock.md', 'Achievements', 'Unlock']
 - ['achievements_update-multiple.md', 'Achievements', 'Update Multiple']
 - ['applications_get.md', 'Applications', 'Get']
+- ['applications_get-end-point.md', 'Applications', 'Get End Point']
 - ['applications_played.md', 'Applications', 'Played']
 - ['applications_verify.md', 'Applications', 'Verify']
 - ['events_list-by-player.md', 'Events', 'List By Player']
@@ -36,6 +37,7 @@ pages:
 - ['scores_submit-multiple.md', 'Scores', 'Submit Multiple']
 - ['snapshots_get.md', 'Snapshots', 'Get']
 - ['snapshots_list.md', 'Snapshots', 'List']
+- ['snapshots-extended_resolve-snapshot-head.md', 'Snapshots Extended', 'Resolve Snapshot Head']
 - ['stats_get.md', 'Stats', 'Get']
 
 theme: readthedocs

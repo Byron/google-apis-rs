@@ -25,19 +25,23 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Display Video* API at revision *20200707*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Display Video* API at revision *20210325*. The CLI is at version *2.0.0*.
 
 ```bash
 displayvideo1 [options]
         advertisers
                 assets-upload <advertiser-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                audit <advertiser-id> [-p <v>]... [-o <out>]
                 bulk-edit-advertiser-assigned-targeting-options <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 bulk-list-advertiser-assigned-targeting-options <advertiser-id> [-p <v>]... [-o <out>]
+                campaigns-bulk-list-campaign-assigned-targeting-options <advertiser-id> <campaign-id> [-p <v>]... [-o <out>]
                 campaigns-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 campaigns-delete <advertiser-id> <campaign-id> [-p <v>]... [-o <out>]
                 campaigns-get <advertiser-id> <campaign-id> [-p <v>]... [-o <out>]
                 campaigns-list <advertiser-id> [-p <v>]... [-o <out>]
                 campaigns-patch <advertiser-id> <campaign-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                campaigns-targeting-types-assigned-targeting-options-get <advertiser-id> <campaign-id> <targeting-type> <assigned-targeting-option-id> [-p <v>]... [-o <out>]
+                campaigns-targeting-types-assigned-targeting-options-list <advertiser-id> <campaign-id> <targeting-type> [-p <v>]... [-o <out>]
                 channels-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-get <advertiser-id> <channel-id> [-p <v>]... [-o <out>]
                 channels-list <advertiser-id> [-p <v>]... [-o <out>]
@@ -46,6 +50,7 @@ displayvideo1 [options]
                 channels-sites-create <advertiser-id> <channel-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-sites-delete <advertiser-id> <channel-id> <url-or-app-id> [-p <v>]... [-o <out>]
                 channels-sites-list <advertiser-id> <channel-id> [-p <v>]... [-o <out>]
+                channels-sites-replace <advertiser-id> <channel-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-delete <advertiser-id> <creative-id> [-p <v>]... [-o <out>]
@@ -54,15 +59,19 @@ displayvideo1 [options]
                 creatives-patch <advertiser-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <advertiser-id> [-p <v>]... [-o <out>]
                 get <advertiser-id> [-p <v>]... [-o <out>]
+                insertion-orders-bulk-list-insertion-order-assigned-targeting-options <advertiser-id> <insertion-order-id> [-p <v>]... [-o <out>]
                 insertion-orders-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 insertion-orders-delete <advertiser-id> <insertion-order-id> [-p <v>]... [-o <out>]
                 insertion-orders-get <advertiser-id> <insertion-order-id> [-p <v>]... [-o <out>]
                 insertion-orders-list <advertiser-id> [-p <v>]... [-o <out>]
                 insertion-orders-patch <advertiser-id> <insertion-order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                insertion-orders-targeting-types-assigned-targeting-options-get <advertiser-id> <insertion-order-id> <targeting-type> <assigned-targeting-option-id> [-p <v>]... [-o <out>]
+                insertion-orders-targeting-types-assigned-targeting-options-list <advertiser-id> <insertion-order-id> <targeting-type> [-p <v>]... [-o <out>]
                 line-items-bulk-edit-line-item-assigned-targeting-options <advertiser-id> <line-item-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 line-items-bulk-list-line-item-assigned-targeting-options <advertiser-id> <line-item-id> [-p <v>]... [-o <out>]
                 line-items-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 line-items-delete <advertiser-id> <line-item-id> [-p <v>]... [-o <out>]
+                line-items-generate-default <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 line-items-get <advertiser-id> <line-item-id> [-p <v>]... [-o <out>]
                 line-items-list <advertiser-id> [-p <v>]... [-o <out>]
                 line-items-patch <advertiser-id> <line-item-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -79,6 +88,12 @@ displayvideo1 [options]
                 location-lists-get <advertiser-id> <location-list-id> [-p <v>]... [-o <out>]
                 location-lists-list <advertiser-id> [-p <v>]... [-o <out>]
                 location-lists-patch <advertiser-id> <location-list-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                manual-triggers-activate <advertiser-id> <trigger-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                manual-triggers-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                manual-triggers-deactivate <advertiser-id> <trigger-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                manual-triggers-get <advertiser-id> <trigger-id> [-p <v>]... [-o <out>]
+                manual-triggers-list <advertiser-id> [-p <v>]... [-o <out>]
+                manual-triggers-patch <advertiser-id> <trigger-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 negative-keyword-lists-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 negative-keyword-lists-delete <advertiser-id> <negative-keyword-list-id> [-p <v>]... [-o <out>]
                 negative-keyword-lists-get <advertiser-id> <negative-keyword-list-id> [-p <v>]... [-o <out>]
@@ -87,6 +102,7 @@ displayvideo1 [options]
                 negative-keyword-lists-negative-keywords-create <advertiser-id> <negative-keyword-list-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 negative-keyword-lists-negative-keywords-delete <advertiser-id> <negative-keyword-list-id> <keyword-value> [-p <v>]... [-o <out>]
                 negative-keyword-lists-negative-keywords-list <advertiser-id> <negative-keyword-list-id> [-p <v>]... [-o <out>]
+                negative-keyword-lists-negative-keywords-replace <advertiser-id> <negative-keyword-list-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 negative-keyword-lists-patch <advertiser-id> <negative-keyword-list-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 targeting-types-assigned-targeting-options-create <advertiser-id> <targeting-type> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -95,6 +111,9 @@ displayvideo1 [options]
                 targeting-types-assigned-targeting-options-list <advertiser-id> <targeting-type> [-p <v>]... [-o <out>]
         combined-audiences
                 get <combined-audience-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        custom-bidding-algorithms
+                get <custom-bidding-algorithm-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
         custom-lists
                 get <custom-list-id> [-p <v>]... [-o <out>]
@@ -124,6 +143,7 @@ displayvideo1 [options]
         media
                 download <resource-name> [-p <v>]... [-o <out>]
         partners
+                bulk-edit-partner-assigned-targeting-options <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-create <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-get <partner-id> <channel-id> [-p <v>]... [-o <out>]
                 channels-list <partner-id> [-p <v>]... [-o <out>]
@@ -132,12 +152,27 @@ displayvideo1 [options]
                 channels-sites-create <partner-id> <channel-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-sites-delete <partner-id> <channel-id> <url-or-app-id> [-p <v>]... [-o <out>]
                 channels-sites-list <partner-id> <channel-id> [-p <v>]... [-o <out>]
+                channels-sites-replace <partner-id> <channel-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <partner-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                targeting-types-assigned-targeting-options-create <partner-id> <targeting-type> (-r <kv>)... [-p <v>]... [-o <out>]
+                targeting-types-assigned-targeting-options-delete <partner-id> <targeting-type> <assigned-targeting-option-id> [-p <v>]... [-o <out>]
+                targeting-types-assigned-targeting-options-get <partner-id> <targeting-type> <assigned-targeting-option-id> [-p <v>]... [-o <out>]
+                targeting-types-assigned-targeting-options-list <partner-id> <targeting-type> [-p <v>]... [-o <out>]
         sdfdownloadtasks
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]
         targeting-types
                 targeting-options-get <targeting-type> <targeting-option-id> [-p <v>]... [-o <out>]
                 targeting-options-list <targeting-type> [-p <v>]... [-o <out>]
+                targeting-options-search <targeting-type> (-r <kv>)... [-p <v>]... [-o <out>]
+        users
+                bulk-edit-assigned-user-roles <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <user-id> [-p <v>]... [-o <out>]
+                get <user-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
   displayvideo1 --help
 
 Configuration:
@@ -149,12 +184,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -207,10 +236,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `displayvideo1 --debug <resource> <method> [options] 2>debug.txt`.
 

@@ -1,4 +1,4 @@
-site_name: Cloud Composer v1.0.14+20200625
+site_name: Cloud Composer v2.0.0+20210319
 site_url: http://byron.github.io/google-apis-rs/google-composer1-cli
 site_description: A complete library to interact with Cloud Composer (protocol v1)
 

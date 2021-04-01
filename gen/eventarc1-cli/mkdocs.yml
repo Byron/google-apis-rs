@@ -1,0 +1,30 @@
+site_name: Eventarc v2.0.0+20210325
+site_url: http://byron.github.io/google-apis-rs/google-eventarc1-cli
+site_description: A complete library to interact with Eventarc (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/eventarc1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_locations-triggers-create.md', 'Projects', 'Locations Triggers Create']
+- ['projects_locations-triggers-delete.md', 'Projects', 'Locations Triggers Delete']
+- ['projects_locations-triggers-get.md', 'Projects', 'Locations Triggers Get']
+- ['projects_locations-triggers-get-iam-policy.md', 'Projects', 'Locations Triggers Get Iam Policy']
+- ['projects_locations-triggers-list.md', 'Projects', 'Locations Triggers List']
+- ['projects_locations-triggers-patch.md', 'Projects', 'Locations Triggers Patch']
+- ['projects_locations-triggers-set-iam-policy.md', 'Projects', 'Locations Triggers Set Iam Policy']
+- ['projects_locations-triggers-test-iam-permissions.md', 'Projects', 'Locations Triggers Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

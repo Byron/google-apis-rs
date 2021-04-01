@@ -5,158 +5,174 @@ DO NOT EDIT !
 -->
 The `google-compute1` library allows access to all features of the *Google compute* service.
 
-This documentation was generated from *compute* crate version *1.0.14+20200612*, where *20200612* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *compute* crate version *2.0.0+20210316*, where *20210316* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *compute* *v1* API can be found at the
 [official documentation site](https://developers.google.com/compute/docs/reference/latest/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Compute.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/Compute) ... 
 
-* [accelerator types](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AcceleratorType.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AcceleratorTypeAggregatedListCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AcceleratorTypeGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AcceleratorTypeListCall.html)
+* [accelerator types](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AcceleratorType)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AcceleratorTypeAggregatedListCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AcceleratorTypeGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AcceleratorTypeListCall)
 * addresses
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AddresseAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AddresseDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AddresseGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AddresseInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AddresseListCall.html)
-* [autoscalers](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Autoscaler.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.AutoscalerUpdateCall.html)
-* [backend buckets](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucket.html)
- * [*add signed url key*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketAddSignedUrlKeyCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketDeleteCall.html), [*delete signed url key*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketDeleteSignedUrlKeyCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendBucketUpdateCall.html)
-* [backend services](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendService.html)
- * [*add signed url key*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceAddSignedUrlKeyCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceDeleteCall.html), [*delete signed url key*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceDeleteSignedUrlKeyCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceGetCall.html), [*get health*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceGetHealthCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServicePatchCall.html), [*set security policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceSetSecurityPolicyCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.BackendServiceUpdateCall.html)
-* [disk types](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskType.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskTypeAggregatedListCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskTypeGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskTypeListCall.html)
-* [disks](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Disk.html)
- * [*add resource policies*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskAddResourcePolicyCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskAggregatedListCall.html), [*create snapshot*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskCreateSnapshotCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskListCall.html), [*remove resource policies*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskRemoveResourcePolicyCall.html), [*resize*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskResizeCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskSetIamPolicyCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskSetLabelCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.DiskTestIamPermissionCall.html)
-* [external vpn gateways](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGateway.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGatewayDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGatewayGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGatewayInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGatewayListCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGatewaySetLabelCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ExternalVpnGatewayTestIamPermissionCall.html)
-* [firewalls](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Firewall.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.FirewallDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.FirewallGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.FirewallInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.FirewallListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.FirewallPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.FirewallUpdateCall.html)
-* [forwarding rules](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRule.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRuleAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRuleDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRuleGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRuleInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRuleListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRulePatchCall.html) and [*set target*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ForwardingRuleSetTargetCall.html)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AddresseAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AddresseDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AddresseGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AddresseInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AddresseListCall)
+* [autoscalers](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Autoscaler)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::AutoscalerUpdateCall)
+* [backend buckets](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucket)
+ * [*add signed url key*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketAddSignedUrlKeyCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketDeleteCall), [*delete signed url key*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketDeleteSignedUrlKeyCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendBucketUpdateCall)
+* [backend services](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendService)
+ * [*add signed url key*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceAddSignedUrlKeyCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceDeleteCall), [*delete signed url key*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceDeleteSignedUrlKeyCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceGetCall), [*get health*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceGetHealthCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServicePatchCall), [*set security policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceSetSecurityPolicyCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::BackendServiceUpdateCall)
+* [disk types](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskType)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskTypeAggregatedListCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskTypeGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskTypeListCall)
+* [disks](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Disk)
+ * [*add resource policies*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskAddResourcePolicyCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskAggregatedListCall), [*create snapshot*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskCreateSnapshotCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskListCall), [*remove resource policies*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskRemoveResourcePolicyCall), [*resize*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskResizeCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskSetIamPolicyCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskSetLabelCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::DiskTestIamPermissionCall)
+* [external vpn gateways](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGateway)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGatewayDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGatewayGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGatewayInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGatewayListCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGatewaySetLabelCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ExternalVpnGatewayTestIamPermissionCall)
+* [firewall policies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicy)
+ * [*add association*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyAddAssociationCall), [*add rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyAddRuleCall), [*clone rules*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyCloneRuleCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyGetCall), [*get association*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyGetAssociationCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyGetIamPolicyCall), [*get rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyGetRuleCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyListCall), [*list associations*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyListAssociationCall), [*move*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyMoveCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyPatchCall), [*patch rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyPatchRuleCall), [*remove association*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyRemoveAssociationCall), [*remove rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyRemoveRuleCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicySetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPolicyTestIamPermissionCall)
+* [firewalls](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Firewall)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::FirewallUpdateCall)
+* [forwarding rules](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRule)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRulePatchCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleSetLabelCall) and [*set target*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ForwardingRuleSetTargetCall)
 * global addresses
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalAddresseDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalAddresseGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalAddresseInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalAddresseListCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalAddresseDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalAddresseGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalAddresseInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalAddresseListCall)
 * global forwarding rules
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalForwardingRuleDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalForwardingRuleGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalForwardingRuleInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalForwardingRuleListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalForwardingRulePatchCall.html) and [*set target*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalForwardingRuleSetTargetCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRuleDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRuleGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRuleInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRuleListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRulePatchCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRuleSetLabelCall) and [*set target*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalForwardingRuleSetTargetCall)
 * global network endpoint groups
- * [*attach network endpoints*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupAttachNetworkEndpointCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupDeleteCall.html), [*detach network endpoints*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupDetachNetworkEndpointCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupListCall.html) and [*list network endpoints*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalNetworkEndpointGroupListNetworkEndpointCall.html)
+ * [*attach network endpoints*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupAttachNetworkEndpointCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupDeleteCall), [*detach network endpoints*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupDetachNetworkEndpointCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupListCall) and [*list network endpoints*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalNetworkEndpointGroupListNetworkEndpointCall)
 * global operations
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalOperationAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalOperationDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalOperationGetCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalOperationListCall.html) and [*wait*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.GlobalOperationWaitCall.html)
-* [health checks](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheck.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HealthCheckUpdateCall.html)
-* [http health checks](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheck.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheckDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheckGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheckInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheckListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheckPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpHealthCheckUpdateCall.html)
-* [https health checks](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheck.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheckDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheckGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheckInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheckListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheckPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.HttpsHealthCheckUpdateCall.html)
-* [images](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Image.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageDeleteCall.html), [*deprecate*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageDeprecateCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageGetCall.html), [*get from family*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageGetFromFamilyCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageListCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageSetIamPolicyCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageSetLabelCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ImageTestIamPermissionCall.html)
-* [instance group managers](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManager.html)
- * [*abandon instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerAbandonInstanceCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerAggregatedListCall.html), [*apply updates to instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerApplyUpdatesToInstanceCall.html), [*create instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerCreateInstanceCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerDeleteCall.html), [*delete instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerDeleteInstanceCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerListCall.html), [*list errors*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerListErrorCall.html), [*list managed instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerListManagedInstanceCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerPatchCall.html), [*recreate instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerRecreateInstanceCall.html), [*resize*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerResizeCall.html), [*set instance template*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerSetInstanceTemplateCall.html) and [*set target pools*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupManagerSetTargetPoolCall.html)
-* [instance groups](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroup.html)
- * [*add instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupAddInstanceCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupListCall.html), [*list instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupListInstanceCall.html), [*remove instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupRemoveInstanceCall.html) and [*set named ports*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGroupSetNamedPortCall.html)
-* [instance templates](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplate.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateListCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateSetIamPolicyCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTemplateTestIamPermissionCall.html)
-* [instances](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Instance.html)
- * [*add access config*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceAddAccessConfigCall.html), [*add resource policies*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceAddResourcePolicyCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceAggregatedListCall.html), [*attach disk*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceAttachDiskCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceDeleteCall.html), [*delete access config*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceDeleteAccessConfigCall.html), [*detach disk*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceDetachDiskCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGetCall.html), [*get guest attributes*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGetGuestAttributeCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGetIamPolicyCall.html), [*get serial port output*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGetSerialPortOutputCall.html), [*get shielded instance identity*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceGetShieldedInstanceIdentityCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceListCall.html), [*list referrers*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceListReferrerCall.html), [*remove resource policies*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceRemoveResourcePolicyCall.html), [*reset*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceResetCall.html), [*set deletion protection*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetDeletionProtectionCall.html), [*set disk auto delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetDiskAutoDeleteCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetIamPolicyCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetLabelCall.html), [*set machine resources*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetMachineResourceCall.html), [*set machine type*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetMachineTypeCall.html), [*set metadata*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetMetadataCall.html), [*set min cpu platform*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetMinCpuPlatformCall.html), [*set scheduling*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetSchedulingCall.html), [*set service account*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetServiceAccountCall.html), [*set shielded instance integrity policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetShieldedInstanceIntegrityPolicyCall.html), [*set tags*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSetTagCall.html), [*simulate maintenance event*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceSimulateMaintenanceEventCall.html), [*start*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceStartCall.html), [*start with encryption key*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceStartWithEncryptionKeyCall.html), [*stop*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceStopCall.html), [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceTestIamPermissionCall.html), [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceUpdateCall.html), [*update access config*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceUpdateAccessConfigCall.html), [*update display device*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceUpdateDisplayDeviceCall.html), [*update network interface*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceUpdateNetworkInterfaceCall.html) and [*update shielded instance config*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InstanceUpdateShieldedInstanceConfigCall.html)
-* [interconnect attachments](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachment.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachmentAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachmentDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachmentGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachmentInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachmentListCall.html) and [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectAttachmentPatchCall.html)
-* [interconnect locations](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectLocation.html)
- * [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectLocationGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectLocationListCall.html)
-* [interconnects](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Interconnect.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectGetCall.html), [*get diagnostics*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectGetDiagnosticCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectListCall.html) and [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.InterconnectPatchCall.html)
-* [license codes](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseCode.html)
- * [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseCodeGetCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseCodeTestIamPermissionCall.html)
-* [licenses](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.License.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseListCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseSetIamPolicyCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.LicenseTestIamPermissionCall.html)
-* [machine types](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.MachineType.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.MachineTypeAggregatedListCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.MachineTypeGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.MachineTypeListCall.html)
-* [network endpoint groups](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroup.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupAggregatedListCall.html), [*attach network endpoints*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupAttachNetworkEndpointCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupDeleteCall.html), [*detach network endpoints*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupDetachNetworkEndpointCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupListCall.html), [*list network endpoints*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupListNetworkEndpointCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkEndpointGroupTestIamPermissionCall.html)
-* [networks](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Network.html)
- * [*add peering*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkAddPeeringCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkListCall.html), [*list peering routes*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkListPeeringRouteCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkPatchCall.html), [*remove peering*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkRemovePeeringCall.html), [*switch to custom mode*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkSwitchToCustomModeCall.html) and [*update peering*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NetworkUpdatePeeringCall.html)
-* [node groups](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroup.html)
- * [*add nodes*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupAddNodeCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupDeleteCall.html), [*delete nodes*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupDeleteNodeCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupListCall.html), [*list nodes*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupListNodeCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupPatchCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupSetIamPolicyCall.html), [*set node template*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupSetNodeTemplateCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeGroupTestIamPermissionCall.html)
-* [node templates](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplate.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateListCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateSetIamPolicyCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTemplateTestIamPermissionCall.html)
-* [node types](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeType.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTypeAggregatedListCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTypeGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.NodeTypeListCall.html)
-* [packet mirrorings](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroring.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringPatchCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.PacketMirroringTestIamPermissionCall.html)
-* [projects](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Project.html)
- * [*disable xpn host*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectDisableXpnHostCall.html), [*disable xpn resource*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectDisableXpnResourceCall.html), [*enable xpn host*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectEnableXpnHostCall.html), [*enable xpn resource*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectEnableXpnResourceCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectGetCall.html), [*get xpn host*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectGetXpnHostCall.html), [*get xpn resources*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectGetXpnResourceCall.html), [*list xpn hosts*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectListXpnHostCall.html), [*move disk*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectMoveDiskCall.html), [*move instance*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectMoveInstanceCall.html), [*set common instance metadata*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectSetCommonInstanceMetadataCall.html), [*set default network tier*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectSetDefaultNetworkTierCall.html) and [*set usage export bucket*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ProjectSetUsageExportBucketCall.html)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOperationAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOperationDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOperationGetCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOperationListCall) and [*wait*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOperationWaitCall)
+* global organization operations
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOrganizationOperationDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOrganizationOperationGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalOrganizationOperationListCall)
+* global public delegated prefixes
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalPublicDelegatedPrefixeDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalPublicDelegatedPrefixeGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalPublicDelegatedPrefixeInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalPublicDelegatedPrefixeListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::GlobalPublicDelegatedPrefixePatchCall)
+* [health checks](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheck)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HealthCheckUpdateCall)
+* [http health checks](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheck)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheckDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheckGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheckInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheckListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheckPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpHealthCheckUpdateCall)
+* [https health checks](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheck)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheckDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheckGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheckInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheckListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheckPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::HttpsHealthCheckUpdateCall)
+* [images](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Image)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageDeleteCall), [*deprecate*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageDeprecateCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageGetCall), [*get from family*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageGetFromFamilyCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImagePatchCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageSetIamPolicyCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageSetLabelCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ImageTestIamPermissionCall)
+* [instance group managers](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManager)
+ * [*abandon instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerAbandonInstanceCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerAggregatedListCall), [*apply updates to instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerApplyUpdatesToInstanceCall), [*create instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerCreateInstanceCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerDeleteCall), [*delete instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerDeleteInstanceCall), [*delete per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerDeletePerInstanceConfigCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerListCall), [*list errors*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerListErrorCall), [*list managed instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerListManagedInstanceCall), [*list per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerListPerInstanceConfigCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerPatchCall), [*patch per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerPatchPerInstanceConfigCall), [*recreate instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerRecreateInstanceCall), [*resize*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerResizeCall), [*set instance template*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerSetInstanceTemplateCall), [*set target pools*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerSetTargetPoolCall) and [*update per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupManagerUpdatePerInstanceConfigCall)
+* [instance groups](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroup)
+ * [*add instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupAddInstanceCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupListCall), [*list instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupListInstanceCall), [*remove instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupRemoveInstanceCall) and [*set named ports*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGroupSetNamedPortCall)
+* [instance templates](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplate)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateListCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateSetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTemplateTestIamPermissionCall)
+* [instances](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Instance)
+ * [*add access config*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceAddAccessConfigCall), [*add resource policies*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceAddResourcePolicyCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceAggregatedListCall), [*attach disk*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceAttachDiskCall), [*bulk insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceBulkInsertCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceDeleteCall), [*delete access config*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceDeleteAccessConfigCall), [*detach disk*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceDetachDiskCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetCall), [*get effective firewalls*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetEffectiveFirewallCall), [*get guest attributes*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetGuestAttributeCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetIamPolicyCall), [*get screenshot*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetScreenshotCall), [*get serial port output*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetSerialPortOutputCall), [*get shielded instance identity*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceGetShieldedInstanceIdentityCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceListCall), [*list referrers*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceListReferrerCall), [*remove resource policies*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceRemoveResourcePolicyCall), [*reset*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceResetCall), [*set deletion protection*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetDeletionProtectionCall), [*set disk auto delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetDiskAutoDeleteCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetIamPolicyCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetLabelCall), [*set machine resources*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetMachineResourceCall), [*set machine type*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetMachineTypeCall), [*set metadata*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetMetadataCall), [*set min cpu platform*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetMinCpuPlatformCall), [*set scheduling*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetSchedulingCall), [*set service account*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetServiceAccountCall), [*set shielded instance integrity policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetShieldedInstanceIntegrityPolicyCall), [*set tags*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSetTagCall), [*simulate maintenance event*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceSimulateMaintenanceEventCall), [*start*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceStartCall), [*start with encryption key*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceStartWithEncryptionKeyCall), [*stop*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceStopCall), [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceTestIamPermissionCall), [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceUpdateCall), [*update access config*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceUpdateAccessConfigCall), [*update display device*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceUpdateDisplayDeviceCall), [*update network interface*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceUpdateNetworkInterfaceCall) and [*update shielded instance config*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InstanceUpdateShieldedInstanceConfigCall)
+* [interconnect attachments](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachment)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachmentAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachmentDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachmentGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachmentInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachmentListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectAttachmentPatchCall)
+* [interconnect locations](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectLocation)
+ * [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectLocationGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectLocationListCall)
+* [interconnects](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Interconnect)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectGetCall), [*get diagnostics*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectGetDiagnosticCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::InterconnectPatchCall)
+* [license codes](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseCode)
+ * [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseCodeGetCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseCodeTestIamPermissionCall)
+* [licenses](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::License)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseListCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseSetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::LicenseTestIamPermissionCall)
+* [machine types](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::MachineType)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::MachineTypeAggregatedListCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::MachineTypeGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::MachineTypeListCall)
+* [network endpoint groups](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroup)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupAggregatedListCall), [*attach network endpoints*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupAttachNetworkEndpointCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupDeleteCall), [*detach network endpoints*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupDetachNetworkEndpointCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupListCall), [*list network endpoints*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupListNetworkEndpointCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkEndpointGroupTestIamPermissionCall)
+* [networks](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Network)
+ * [*add peering*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkAddPeeringCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkGetCall), [*get effective firewalls*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkGetEffectiveFirewallCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkListCall), [*list peering routes*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkListPeeringRouteCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkPatchCall), [*remove peering*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkRemovePeeringCall), [*switch to custom mode*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkSwitchToCustomModeCall) and [*update peering*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NetworkUpdatePeeringCall)
+* [node groups](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroup)
+ * [*add nodes*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupAddNodeCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupDeleteCall), [*delete nodes*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupDeleteNodeCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupListCall), [*list nodes*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupListNodeCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupPatchCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupSetIamPolicyCall), [*set node template*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupSetNodeTemplateCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeGroupTestIamPermissionCall)
+* [node templates](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplate)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateListCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateSetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTemplateTestIamPermissionCall)
+* [node types](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeType)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTypeAggregatedListCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTypeGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::NodeTypeListCall)
+* [packet mirrorings](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroring)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringPatchCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PacketMirroringTestIamPermissionCall)
+* [projects](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Project)
+ * [*disable xpn host*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectDisableXpnHostCall), [*disable xpn resource*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectDisableXpnResourceCall), [*enable xpn host*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectEnableXpnHostCall), [*enable xpn resource*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectEnableXpnResourceCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectGetCall), [*get xpn host*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectGetXpnHostCall), [*get xpn resources*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectGetXpnResourceCall), [*list xpn hosts*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectListXpnHostCall), [*move disk*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectMoveDiskCall), [*move instance*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectMoveInstanceCall), [*set common instance metadata*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectSetCommonInstanceMetadataCall), [*set default network tier*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectSetDefaultNetworkTierCall) and [*set usage export bucket*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ProjectSetUsageExportBucketCall)
+* public advertised prefixes
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicAdvertisedPrefixeDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicAdvertisedPrefixeGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicAdvertisedPrefixeInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicAdvertisedPrefixeListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicAdvertisedPrefixePatchCall)
+* public delegated prefixes
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicDelegatedPrefixeAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicDelegatedPrefixeDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicDelegatedPrefixeGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicDelegatedPrefixeInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicDelegatedPrefixeListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::PublicDelegatedPrefixePatchCall)
 * region autoscalers
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionAutoscalerDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionAutoscalerGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionAutoscalerInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionAutoscalerListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionAutoscalerPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionAutoscalerUpdateCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionAutoscalerDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionAutoscalerGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionAutoscalerInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionAutoscalerListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionAutoscalerPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionAutoscalerUpdateCall)
 * region backend services
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServiceDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServiceGetCall.html), [*get health*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServiceGetHealthCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServiceInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServiceListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServicePatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionBackendServiceUpdateCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServiceDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServiceGetCall), [*get health*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServiceGetHealthCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServiceInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServiceListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServicePatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionBackendServiceUpdateCall)
 * region commitments
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionCommitmentAggregatedListCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionCommitmentGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionCommitmentInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionCommitmentListCall.html)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionCommitmentAggregatedListCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionCommitmentGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionCommitmentInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionCommitmentListCall)
 * region disk types
- * [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskTypeGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskTypeListCall.html)
+ * [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskTypeGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskTypeListCall)
 * region disks
- * [*add resource policies*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskAddResourcePolicyCall.html), [*create snapshot*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskCreateSnapshotCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskListCall.html), [*remove resource policies*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskRemoveResourcePolicyCall.html), [*resize*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskResizeCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskSetIamPolicyCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskSetLabelCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionDiskTestIamPermissionCall.html)
+ * [*add resource policies*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskAddResourcePolicyCall), [*create snapshot*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskCreateSnapshotCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskListCall), [*remove resource policies*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskRemoveResourcePolicyCall), [*resize*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskResizeCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskSetIamPolicyCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskSetLabelCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionDiskTestIamPermissionCall)
 * region health check services
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckServiceDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckServiceGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckServiceInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckServiceListCall.html) and [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckServicePatchCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckServiceDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckServiceGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckServiceInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckServiceListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckServicePatchCall)
 * region health checks
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckPatchCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionHealthCheckUpdateCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckPatchCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionHealthCheckUpdateCall)
 * region instance group managers
- * [*abandon instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerAbandonInstanceCall.html), [*apply updates to instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerApplyUpdatesToInstanceCall.html), [*create instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerCreateInstanceCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerDeleteCall.html), [*delete instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerDeleteInstanceCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerListCall.html), [*list errors*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerListErrorCall.html), [*list managed instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerListManagedInstanceCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerPatchCall.html), [*recreate instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerRecreateInstanceCall.html), [*resize*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerResizeCall.html), [*set instance template*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerSetInstanceTemplateCall.html) and [*set target pools*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupManagerSetTargetPoolCall.html)
+ * [*abandon instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerAbandonInstanceCall), [*apply updates to instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerApplyUpdatesToInstanceCall), [*create instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerCreateInstanceCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerDeleteCall), [*delete instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerDeleteInstanceCall), [*delete per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerDeletePerInstanceConfigCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerListCall), [*list errors*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerListErrorCall), [*list managed instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerListManagedInstanceCall), [*list per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerListPerInstanceConfigCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerPatchCall), [*patch per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerPatchPerInstanceConfigCall), [*recreate instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerRecreateInstanceCall), [*resize*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerResizeCall), [*set instance template*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerSetInstanceTemplateCall), [*set target pools*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerSetTargetPoolCall) and [*update per instance configs*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupManagerUpdatePerInstanceConfigCall)
 * region instance groups
- * [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupGetCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupListCall.html), [*list instances*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupListInstanceCall.html) and [*set named ports*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionInstanceGroupSetNamedPortCall.html)
+ * [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupGetCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupListCall), [*list instances*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupListInstanceCall) and [*set named ports*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceGroupSetNamedPortCall)
+* region instances
+ * [*bulk insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionInstanceBulkInsertCall)
+* region network endpoint groups
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNetworkEndpointGroupDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNetworkEndpointGroupGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNetworkEndpointGroupInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNetworkEndpointGroupListCall)
 * region notification endpoints
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionNotificationEndpointDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionNotificationEndpointGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionNotificationEndpointInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionNotificationEndpointListCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNotificationEndpointDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNotificationEndpointGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNotificationEndpointInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionNotificationEndpointListCall)
 * region operations
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionOperationDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionOperationGetCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionOperationListCall.html) and [*wait*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionOperationWaitCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionOperationDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionOperationGetCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionOperationListCall) and [*wait*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionOperationWaitCall)
 * region ssl certificates
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionSslCertificateDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionSslCertificateGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionSslCertificateInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionSslCertificateListCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionSslCertificateDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionSslCertificateGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionSslCertificateInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionSslCertificateListCall)
 * region target http proxies
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpProxyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpProxyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpProxyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpProxyListCall.html) and [*set url map*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpProxySetUrlMapCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpProxyListCall) and [*set url map*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpProxySetUrlMapCall)
 * region target https proxies
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpsProxyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpsProxyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpsProxyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpsProxyListCall.html), [*set ssl certificates*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpsProxySetSslCertificateCall.html) and [*set url map*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionTargetHttpsProxySetUrlMapCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpsProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpsProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpsProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpsProxyListCall), [*set ssl certificates*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpsProxySetSslCertificateCall) and [*set url map*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionTargetHttpsProxySetUrlMapCall)
 * region url maps
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapPatchCall.html), [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapUpdateCall.html) and [*validate*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionUrlMapValidateCall.html)
-* [regions](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Region.html)
- * [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RegionListCall.html)
-* [reservations](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Reservation.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationListCall.html), [*resize*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationResizeCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationSetIamPolicyCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ReservationTestIamPermissionCall.html)
-* [resource policies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicy.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyListCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicySetIamPolicyCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ResourcePolicyTestIamPermissionCall.html)
-* [routers](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Router.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterGetCall.html), [*get nat mapping info*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterGetNatMappingInfoCall.html), [*get router status*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterGetRouterStatuCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterPatchCall.html), [*preview*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterPreviewCall.html) and [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouterUpdateCall.html)
-* [routes](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Route.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouteDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouteGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouteInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.RouteListCall.html)
-* [security policies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicy.html)
- * [*add rule*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyAddRuleCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyGetCall.html), [*get rule*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyGetRuleCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyListCall.html), [*list preconfigured expression sets*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyListPreconfiguredExpressionSetCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyPatchCall.html), [*patch rule*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyPatchRuleCall.html) and [*remove rule*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SecurityPolicyRemoveRuleCall.html)
-* [snapshots](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Snapshot.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotGetIamPolicyCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotListCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotSetIamPolicyCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotSetLabelCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SnapshotTestIamPermissionCall.html)
-* [ssl certificates](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslCertificate.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslCertificateAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslCertificateDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslCertificateGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslCertificateInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslCertificateListCall.html)
-* [ssl policies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicy.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicyListCall.html), [*list available features*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicyListAvailableFeatureCall.html) and [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SslPolicyPatchCall.html)
-* [subnetworks](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Subnetwork.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkDeleteCall.html), [*expand ip cidr range*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkExpandIpCidrRangeCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkGetCall.html), [*get iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkGetIamPolicyCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkListCall.html), [*list usable*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkListUsableCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkPatchCall.html), [*set iam policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkSetIamPolicyCall.html), [*set private ip google access*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkSetPrivateIpGoogleAccesCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.SubnetworkTestIamPermissionCall.html)
-* [target http proxies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxy.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxyAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxyListCall.html) and [*set url map*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpProxySetUrlMapCall.html)
-* [target https proxies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxy.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxyAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxyListCall.html), [*set quic override*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxySetQuicOverrideCall.html), [*set ssl certificates*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxySetSslCertificateCall.html), [*set ssl policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxySetSslPolicyCall.html) and [*set url map*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetHttpsProxySetUrlMapCall.html)
-* [target instances](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetInstance.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetInstanceAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetInstanceDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetInstanceGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetInstanceInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetInstanceListCall.html)
-* [target pools](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPool.html)
- * [*add health check*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolAddHealthCheckCall.html), [*add instance*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolAddInstanceCall.html), [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolGetCall.html), [*get health*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolGetHealthCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolListCall.html), [*remove health check*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolRemoveHealthCheckCall.html), [*remove instance*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolRemoveInstanceCall.html) and [*set backup*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetPoolSetBackupCall.html)
-* [target ssl proxies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxy.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxyListCall.html), [*set backend service*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxySetBackendServiceCall.html), [*set proxy header*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxySetProxyHeaderCall.html), [*set ssl certificates*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxySetSslCertificateCall.html) and [*set ssl policy*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetSslProxySetSslPolicyCall.html)
-* [target tcp proxies](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxy.html)
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxyDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxyGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxyInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxyListCall.html), [*set backend service*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxySetBackendServiceCall.html) and [*set proxy header*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetTcpProxySetProxyHeaderCall.html)
-* [target vpn gateways](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetVpnGateway.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetVpnGatewayAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetVpnGatewayDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetVpnGatewayGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetVpnGatewayInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.TargetVpnGatewayListCall.html)
-* [url maps](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMap.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapInsertCall.html), [*invalidate cache*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapInvalidateCacheCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapListCall.html), [*patch*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapPatchCall.html), [*update*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapUpdateCall.html) and [*validate*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.UrlMapValidateCall.html)
-* [vpn gateways](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGateway.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayGetCall.html), [*get status*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayGetStatuCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayInsertCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayListCall.html), [*set labels*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewaySetLabelCall.html) and [*test iam permissions*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnGatewayTestIamPermissionCall.html)
-* [vpn tunnels](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnTunnel.html)
- * [*aggregated list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnTunnelAggregatedListCall.html), [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnTunnelDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnTunnelGetCall.html), [*insert*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnTunnelInsertCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.VpnTunnelListCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapPatchCall), [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapUpdateCall) and [*validate*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionUrlMapValidateCall)
+* [regions](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Region)
+ * [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RegionListCall)
+* [reservations](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Reservation)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationListCall), [*resize*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationResizeCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationSetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ReservationTestIamPermissionCall)
+* [resource policies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicy)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyListCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicySetIamPolicyCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ResourcePolicyTestIamPermissionCall)
+* [routers](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Router)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterGetCall), [*get nat mapping info*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterGetNatMappingInfoCall), [*get router status*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterGetRouterStatuCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterPatchCall), [*preview*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterPreviewCall) and [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouterUpdateCall)
+* [routes](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Route)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouteDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouteGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouteInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::RouteListCall)
+* [security policies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicy)
+ * [*add rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyAddRuleCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyGetCall), [*get rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyGetRuleCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyListCall), [*list preconfigured expression sets*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyListPreconfiguredExpressionSetCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyPatchCall), [*patch rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyPatchRuleCall) and [*remove rule*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SecurityPolicyRemoveRuleCall)
+* [snapshots](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Snapshot)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotGetIamPolicyCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotListCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotSetIamPolicyCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotSetLabelCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SnapshotTestIamPermissionCall)
+* [ssl certificates](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslCertificate)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslCertificateAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslCertificateDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslCertificateGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslCertificateInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslCertificateListCall)
+* [ssl policies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicy)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicyListCall), [*list available features*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicyListAvailableFeatureCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SslPolicyPatchCall)
+* [subnetworks](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Subnetwork)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkDeleteCall), [*expand ip cidr range*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkExpandIpCidrRangeCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkGetCall), [*get iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkGetIamPolicyCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkListCall), [*list usable*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkListUsableCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkPatchCall), [*set iam policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkSetIamPolicyCall), [*set private ip google access*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkSetPrivateIpGoogleAccesCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::SubnetworkTestIamPermissionCall)
+* [target grpc proxies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetGrpcProxy)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetGrpcProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetGrpcProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetGrpcProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetGrpcProxyListCall) and [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetGrpcProxyPatchCall)
+* [target http proxies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxy)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxyAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxyListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxyPatchCall) and [*set url map*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpProxySetUrlMapCall)
+* [target https proxies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxy)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxyAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxyListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxyPatchCall), [*set quic override*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxySetQuicOverrideCall), [*set ssl certificates*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxySetSslCertificateCall), [*set ssl policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxySetSslPolicyCall) and [*set url map*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetHttpsProxySetUrlMapCall)
+* [target instances](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetInstance)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetInstanceAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetInstanceDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetInstanceGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetInstanceInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetInstanceListCall)
+* [target pools](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPool)
+ * [*add health check*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolAddHealthCheckCall), [*add instance*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolAddInstanceCall), [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolGetCall), [*get health*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolGetHealthCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolListCall), [*remove health check*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolRemoveHealthCheckCall), [*remove instance*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolRemoveInstanceCall) and [*set backup*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetPoolSetBackupCall)
+* [target ssl proxies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxy)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxyListCall), [*set backend service*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxySetBackendServiceCall), [*set proxy header*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxySetProxyHeaderCall), [*set ssl certificates*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxySetSslCertificateCall) and [*set ssl policy*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetSslProxySetSslPolicyCall)
+* [target tcp proxies](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxy)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxyDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxyGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxyInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxyListCall), [*set backend service*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxySetBackendServiceCall) and [*set proxy header*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetTcpProxySetProxyHeaderCall)
+* [target vpn gateways](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetVpnGateway)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetVpnGatewayAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetVpnGatewayDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetVpnGatewayGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetVpnGatewayInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::TargetVpnGatewayListCall)
+* [url maps](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMap)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapInsertCall), [*invalidate cache*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapInvalidateCacheCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapListCall), [*patch*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapPatchCall), [*update*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapUpdateCall) and [*validate*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::UrlMapValidateCall)
+* [vpn gateways](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGateway)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayGetCall), [*get status*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayGetStatuCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayInsertCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayListCall), [*set labels*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewaySetLabelCall) and [*test iam permissions*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnGatewayTestIamPermissionCall)
+* [vpn tunnels](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnTunnel)
+ * [*aggregated list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnTunnelAggregatedListCall), [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnTunnelDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnTunnelGetCall), [*insert*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnTunnelInsertCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::VpnTunnelListCall)
 * zone operations
- * [*delete*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ZoneOperationDeleteCall.html), [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ZoneOperationGetCall.html), [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ZoneOperationListCall.html) and [*wait*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ZoneOperationWaitCall.html)
-* [zones](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Zone.html)
- * [*get*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ZoneGetCall.html) and [*list*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.ZoneListCall.html)
+ * [*delete*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ZoneOperationDeleteCall), [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ZoneOperationGetCall), [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ZoneOperationListCall) and [*wait*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ZoneOperationWaitCall)
+* [zones](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::Zone)
+ * [*get*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ZoneGetCall) and [*list*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/api::ZoneListCall)
 
 
 
@@ -165,17 +181,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/struct.Compute.html)**
+* **[Hub](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/Compute)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -183,286 +199,324 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.backend_buckets().delete(...).doit()
-let r = hub.instance_group_managers().resize(...).doit()
-let r = hub.ssl_certificates().delete(...).doit()
-let r = hub.region_disks().resize(...).doit()
-let r = hub.autoscalers().patch(...).doit()
-let r = hub.external_vpn_gateways().insert(...).doit()
-let r = hub.images().delete(...).doit()
-let r = hub.region_autoscalers().delete(...).doit()
-let r = hub.region_health_check_services().insert(...).doit()
-let r = hub.images().deprecate(...).doit()
-let r = hub.region_instance_group_managers().patch(...).doit()
-let r = hub.region_backend_services().delete(...).doit()
-let r = hub.interconnects().delete(...).doit()
-let r = hub.instances().update_shielded_instance_config(...).doit()
-let r = hub.region_url_maps().insert(...).doit()
-let r = hub.firewalls().patch(...).doit()
-let r = hub.vpn_tunnels().delete(...).doit()
-let r = hub.region_disks().set_labels(...).doit()
-let r = hub.region_operations().wait(...).doit()
-let r = hub.instances().set_machine_type(...).doit()
-let r = hub.global_forwarding_rules().set_target(...).doit()
-let r = hub.instance_groups().set_named_ports(...).doit()
-let r = hub.node_groups().delete(...).doit()
-let r = hub.ssl_policies().delete(...).doit()
-let r = hub.ssl_policies().insert(...).doit()
-let r = hub.projects().disable_xpn_host(...).doit()
-let r = hub.region_instance_group_managers().resize(...).doit()
-let r = hub.instances().set_service_account(...).doit()
-let r = hub.global_forwarding_rules().delete(...).doit()
-let r = hub.vpn_tunnels().insert(...).doit()
-let r = hub.disks().delete(...).doit()
-let r = hub.region_disks().insert(...).doit()
-let r = hub.instance_groups().add_instances(...).doit()
-let r = hub.disks().add_resource_policies(...).doit()
-let r = hub.subnetworks().insert(...).doit()
-let r = hub.health_checks().patch(...).doit()
-let r = hub.instances().set_scheduling(...).doit()
-let r = hub.instances().delete(...).doit()
-let r = hub.target_pools().add_health_check(...).doit()
-let r = hub.instance_group_managers().insert(...).doit()
-let r = hub.global_addresses().insert(...).doit()
-let r = hub.health_checks().update(...).doit()
-let r = hub.target_ssl_proxies().set_ssl_certificates(...).doit()
-let r = hub.https_health_checks().delete(...).doit()
-let r = hub.zone_operations().wait(...).doit()
-let r = hub.autoscalers().insert(...).doit()
-let r = hub.networks().update_peering(...).doit()
-let r = hub.snapshots().delete(...).doit()
-let r = hub.security_policies().add_rule(...).doit()
-let r = hub.instance_group_managers().delete_instances(...).doit()
-let r = hub.routes().insert(...).doit()
-let r = hub.disks().resize(...).doit()
-let r = hub.node_templates().insert(...).doit()
-let r = hub.target_ssl_proxies().set_backend_service(...).doit()
-let r = hub.target_vpn_gateways().insert(...).doit()
-let r = hub.projects().set_default_network_tier(...).doit()
-let r = hub.instance_group_managers().set_instance_template(...).doit()
-let r = hub.node_groups().set_node_template(...).doit()
-let r = hub.resource_policies().delete(...).doit()
-let r = hub.security_policies().insert(...).doit()
-let r = hub.networks().remove_peering(...).doit()
-let r = hub.region_target_https_proxies().delete(...).doit()
-let r = hub.ssl_policies().patch(...).doit()
-let r = hub.interconnect_attachments().delete(...).doit()
-let r = hub.region_target_https_proxies().insert(...).doit()
-let r = hub.target_pools().insert(...).doit()
-let r = hub.target_tcp_proxies().delete(...).doit()
-let r = hub.projects().disable_xpn_resource(...).doit()
-let r = hub.global_network_endpoint_groups().delete(...).doit()
-let r = hub.region_instance_group_managers().insert(...).doit()
-let r = hub.instances().set_disk_auto_delete(...).doit()
-let r = hub.region_instance_group_managers().recreate_instances(...).doit()
-let r = hub.instance_group_managers().set_target_pools(...).doit()
-let r = hub.disks().insert(...).doit()
-let r = hub.target_ssl_proxies().delete(...).doit()
-let r = hub.autoscalers().update(...).doit()
-let r = hub.region_backend_services().insert(...).doit()
-let r = hub.https_health_checks().insert(...).doit()
-let r = hub.instances().simulate_maintenance_event(...).doit()
-let r = hub.target_pools().remove_health_check(...).doit()
-let r = hub.backend_buckets().add_signed_url_key(...).doit()
-let r = hub.region_instance_group_managers().create_instances(...).doit()
-let r = hub.target_https_proxies().set_url_map(...).doit()
-let r = hub.region_disks().create_snapshot(...).doit()
-let r = hub.backend_services().delete(...).doit()
-let r = hub.region_target_http_proxies().set_url_map(...).doit()
-let r = hub.instances().update_network_interface(...).doit()
-let r = hub.url_maps().insert(...).doit()
-let r = hub.instances().add_access_config(...).doit()
-let r = hub.instances().set_machine_resources(...).doit()
-let r = hub.region_instance_group_managers().apply_updates_to_instances(...).doit()
-let r = hub.instances().update_access_config(...).doit()
-let r = hub.networks().delete(...).doit()
-let r = hub.addresses().insert(...).doit()
-let r = hub.health_checks().insert(...).doit()
-let r = hub.global_forwarding_rules().insert(...).doit()
-let r = hub.target_https_proxies().delete(...).doit()
-let r = hub.instances().update(...).doit()
-let r = hub.target_tcp_proxies().insert(...).doit()
-let r = hub.global_network_endpoint_groups().detach_network_endpoints(...).doit()
-let r = hub.global_operations().get(...).doit()
-let r = hub.region_url_maps().update(...).doit()
-let r = hub.addresses().delete(...).doit()
-let r = hub.region_target_http_proxies().delete(...).doit()
-let r = hub.target_tcp_proxies().set_backend_service(...).doit()
-let r = hub.disks().create_snapshot(...).doit()
-let r = hub.region_url_maps().patch(...).doit()
-let r = hub.instance_groups().remove_instances(...).doit()
-let r = hub.snapshots().set_labels(...).doit()
-let r = hub.region_health_checks().delete(...).doit()
-let r = hub.region_commitments().insert(...).doit()
-let r = hub.backend_services().add_signed_url_key(...).doit()
-let r = hub.region_target_https_proxies().set_url_map(...).doit()
-let r = hub.instances().start(...).doit()
-let r = hub.vpn_gateways().insert(...).doit()
-let r = hub.instance_group_managers().delete(...).doit()
-let r = hub.instances().set_deletion_protection(...).doit()
-let r = hub.subnetworks().expand_ip_cidr_range(...).doit()
-let r = hub.interconnects().insert(...).doit()
-let r = hub.projects().move_disk(...).doit()
-let r = hub.region_autoscalers().patch(...).doit()
-let r = hub.firewalls().insert(...).doit()
-let r = hub.global_forwarding_rules().patch(...).doit()
-let r = hub.disks().set_labels(...).doit()
-let r = hub.target_pools().set_backup(...).doit()
-let r = hub.backend_services().set_security_policy(...).doit()
-let r = hub.region_instance_group_managers().delete_instances(...).doit()
-let r = hub.instances().detach_disk(...).doit()
-let r = hub.routers().update(...).doit()
-let r = hub.instance_groups().delete(...).doit()
-let r = hub.instances().delete_access_config(...).doit()
-let r = hub.target_https_proxies().set_ssl_certificates(...).doit()
-let r = hub.region_notification_endpoints().insert(...).doit()
-let r = hub.networks().insert(...).doit()
-let r = hub.instances().update_display_device(...).doit()
-let r = hub.instance_group_managers().abandon_instances(...).doit()
-let r = hub.instances().set_tags(...).doit()
-let r = hub.network_endpoint_groups().attach_network_endpoints(...).doit()
-let r = hub.region_health_check_services().patch(...).doit()
-let r = hub.reservations().resize(...).doit()
-let r = hub.instances().set_metadata(...).doit()
-let r = hub.target_https_proxies().insert(...).doit()
-let r = hub.instance_group_managers().create_instances(...).doit()
-let r = hub.node_groups().add_nodes(...).doit()
-let r = hub.forwarding_rules().set_target(...).doit()
-let r = hub.target_tcp_proxies().set_proxy_header(...).doit()
-let r = hub.backend_services().update(...).doit()
-let r = hub.disks().remove_resource_policies(...).doit()
-let r = hub.region_disks().add_resource_policies(...).doit()
-let r = hub.node_groups().delete_nodes(...).doit()
-let r = hub.instance_groups().insert(...).doit()
-let r = hub.vpn_gateways().delete(...).doit()
-let r = hub.region_url_maps().delete(...).doit()
-let r = hub.licenses().delete(...).doit()
-let r = hub.region_disks().remove_resource_policies(...).doit()
-let r = hub.instance_group_managers().patch(...).doit()
-let r = hub.global_network_endpoint_groups().insert(...).doit()
-let r = hub.instance_group_managers().recreate_instances(...).doit()
-let r = hub.reservations().insert(...).doit()
-let r = hub.reservations().delete(...).doit()
-let r = hub.target_https_proxies().set_ssl_policy(...).doit()
-let r = hub.target_ssl_proxies().set_ssl_policy(...).doit()
-let r = hub.projects().set_common_instance_metadata(...).doit()
-let r = hub.node_templates().delete(...).doit()
-let r = hub.region_operations().get(...).doit()
-let r = hub.instances().add_resource_policies(...).doit()
-let r = hub.backend_buckets().insert(...).doit()
-let r = hub.node_groups().insert(...).doit()
-let r = hub.licenses().insert(...).doit()
-let r = hub.backend_services().patch(...).doit()
-let r = hub.target_http_proxies().set_url_map(...).doit()
-let r = hub.network_endpoint_groups().delete(...).doit()
-let r = hub.region_instance_group_managers().delete(...).doit()
-let r = hub.region_health_checks().patch(...).doit()
-let r = hub.http_health_checks().patch(...).doit()
-let r = hub.security_policies().patch_rule(...).doit()
-let r = hub.instance_templates().insert(...).doit()
-let r = hub.forwarding_rules().insert(...).doit()
-let r = hub.interconnect_attachments().patch(...).doit()
-let r = hub.images().insert(...).doit()
-let r = hub.backend_buckets().delete_signed_url_key(...).doit()
-let r = hub.url_maps().invalidate_cache(...).doit()
-let r = hub.region_backend_services().patch(...).doit()
-let r = hub.ssl_certificates().insert(...).doit()
-let r = hub.instances().remove_resource_policies(...).doit()
-let r = hub.networks().switch_to_custom_mode(...).doit()
-let r = hub.global_operations().wait(...).doit()
-let r = hub.projects().move_instance(...).doit()
-let r = hub.region_target_http_proxies().insert(...).doit()
-let r = hub.security_policies().patch(...).doit()
-let r = hub.autoscalers().delete(...).doit()
-let r = hub.region_instance_group_managers().set_target_pools(...).doit()
-let r = hub.region_health_checks().update(...).doit()
-let r = hub.subnetworks().patch(...).doit()
-let r = hub.https_health_checks().update(...).doit()
-let r = hub.region_ssl_certificates().delete(...).doit()
-let r = hub.url_maps().patch(...).doit()
-let r = hub.subnetworks().delete(...).doit()
-let r = hub.region_disks().delete(...).doit()
-let r = hub.instances().stop(...).doit()
-let r = hub.target_pools().add_instance(...).doit()
-let r = hub.target_pools().remove_instance(...).doit()
-let r = hub.network_endpoint_groups().detach_network_endpoints(...).doit()
-let r = hub.region_target_https_proxies().set_ssl_certificates(...).doit()
-let r = hub.target_pools().delete(...).doit()
-let r = hub.firewalls().update(...).doit()
-let r = hub.instances().insert(...).doit()
-let r = hub.projects().set_usage_export_bucket(...).doit()
-let r = hub.region_autoscalers().insert(...).doit()
-let r = hub.images().set_labels(...).doit()
-let r = hub.packet_mirrorings().patch(...).doit()
-let r = hub.node_groups().patch(...).doit()
-let r = hub.target_http_proxies().insert(...).doit()
-let r = hub.interconnect_attachments().insert(...).doit()
-let r = hub.networks().patch(...).doit()
-let r = hub.resource_policies().insert(...).doit()
-let r = hub.security_policies().remove_rule(...).doit()
-let r = hub.region_instance_groups().set_named_ports(...).doit()
-let r = hub.backend_services().insert(...).doit()
-let r = hub.external_vpn_gateways().set_labels(...).doit()
-let r = hub.region_notification_endpoints().delete(...).doit()
-let r = hub.target_instances().delete(...).doit()
-let r = hub.instance_templates().delete(...).doit()
-let r = hub.region_instance_group_managers().set_instance_template(...).doit()
-let r = hub.projects().enable_xpn_host(...).doit()
-let r = hub.global_network_endpoint_groups().attach_network_endpoints(...).doit()
-let r = hub.target_https_proxies().set_quic_override(...).doit()
-let r = hub.routers().delete(...).doit()
-let r = hub.forwarding_rules().patch(...).doit()
-let r = hub.target_vpn_gateways().delete(...).doit()
-let r = hub.external_vpn_gateways().delete(...).doit()
-let r = hub.health_checks().delete(...).doit()
-let r = hub.instances().set_labels(...).doit()
-let r = hub.region_backend_services().update(...).doit()
-let r = hub.interconnects().patch(...).doit()
-let r = hub.instances().set_shielded_instance_integrity_policy(...).doit()
-let r = hub.target_http_proxies().delete(...).doit()
-let r = hub.backend_buckets().patch(...).doit()
-let r = hub.global_addresses().delete(...).doit()
-let r = hub.instance_group_managers().apply_updates_to_instances(...).doit()
-let r = hub.https_health_checks().patch(...).doit()
-let r = hub.url_maps().update(...).doit()
-let r = hub.url_maps().delete(...).doit()
-let r = hub.routers().insert(...).doit()
-let r = hub.instances().reset(...).doit()
-let r = hub.region_health_checks().insert(...).doit()
-let r = hub.routers().patch(...).doit()
-let r = hub.networks().add_peering(...).doit()
-let r = hub.security_policies().delete(...).doit()
-let r = hub.vpn_gateways().set_labels(...).doit()
-let r = hub.target_ssl_proxies().set_proxy_header(...).doit()
-let r = hub.http_health_checks().delete(...).doit()
-let r = hub.target_instances().insert(...).doit()
-let r = hub.http_health_checks().insert(...).doit()
-let r = hub.instances().attach_disk(...).doit()
-let r = hub.region_instance_group_managers().abandon_instances(...).doit()
-let r = hub.packet_mirrorings().insert(...).doit()
-let r = hub.subnetworks().set_private_ip_google_access(...).doit()
-let r = hub.projects().enable_xpn_resource(...).doit()
-let r = hub.region_ssl_certificates().insert(...).doit()
-let r = hub.region_autoscalers().update(...).doit()
-let r = hub.target_ssl_proxies().insert(...).doit()
-let r = hub.instances().start_with_encryption_key(...).doit()
-let r = hub.instances().set_min_cpu_platform(...).doit()
-let r = hub.forwarding_rules().delete(...).doit()
-let r = hub.network_endpoint_groups().insert(...).doit()
-let r = hub.backend_buckets().update(...).doit()
-let r = hub.packet_mirrorings().delete(...).doit()
-let r = hub.region_health_check_services().delete(...).doit()
-let r = hub.firewalls().delete(...).doit()
-let r = hub.zone_operations().get(...).doit()
-let r = hub.http_health_checks().update(...).doit()
-let r = hub.routes().delete(...).doit()
-let r = hub.backend_services().delete_signed_url_key(...).doit()
+let r = hub.addresses().delete(...).doit().await
+let r = hub.addresses().insert(...).doit().await
+let r = hub.autoscalers().delete(...).doit().await
+let r = hub.autoscalers().insert(...).doit().await
+let r = hub.autoscalers().patch(...).doit().await
+let r = hub.autoscalers().update(...).doit().await
+let r = hub.backend_buckets().add_signed_url_key(...).doit().await
+let r = hub.backend_buckets().delete(...).doit().await
+let r = hub.backend_buckets().delete_signed_url_key(...).doit().await
+let r = hub.backend_buckets().insert(...).doit().await
+let r = hub.backend_buckets().patch(...).doit().await
+let r = hub.backend_buckets().update(...).doit().await
+let r = hub.backend_services().add_signed_url_key(...).doit().await
+let r = hub.backend_services().delete(...).doit().await
+let r = hub.backend_services().delete_signed_url_key(...).doit().await
+let r = hub.backend_services().insert(...).doit().await
+let r = hub.backend_services().patch(...).doit().await
+let r = hub.backend_services().set_security_policy(...).doit().await
+let r = hub.backend_services().update(...).doit().await
+let r = hub.disks().add_resource_policies(...).doit().await
+let r = hub.disks().create_snapshot(...).doit().await
+let r = hub.disks().delete(...).doit().await
+let r = hub.disks().insert(...).doit().await
+let r = hub.disks().remove_resource_policies(...).doit().await
+let r = hub.disks().resize(...).doit().await
+let r = hub.disks().set_labels(...).doit().await
+let r = hub.external_vpn_gateways().delete(...).doit().await
+let r = hub.external_vpn_gateways().insert(...).doit().await
+let r = hub.external_vpn_gateways().set_labels(...).doit().await
+let r = hub.firewall_policies().add_association(...).doit().await
+let r = hub.firewall_policies().add_rule(...).doit().await
+let r = hub.firewall_policies().clone_rules(...).doit().await
+let r = hub.firewall_policies().delete(...).doit().await
+let r = hub.firewall_policies().insert(...).doit().await
+let r = hub.firewall_policies().move_(...).doit().await
+let r = hub.firewall_policies().patch(...).doit().await
+let r = hub.firewall_policies().patch_rule(...).doit().await
+let r = hub.firewall_policies().remove_association(...).doit().await
+let r = hub.firewall_policies().remove_rule(...).doit().await
+let r = hub.firewalls().delete(...).doit().await
+let r = hub.firewalls().insert(...).doit().await
+let r = hub.firewalls().patch(...).doit().await
+let r = hub.firewalls().update(...).doit().await
+let r = hub.forwarding_rules().delete(...).doit().await
+let r = hub.forwarding_rules().insert(...).doit().await
+let r = hub.forwarding_rules().patch(...).doit().await
+let r = hub.forwarding_rules().set_labels(...).doit().await
+let r = hub.forwarding_rules().set_target(...).doit().await
+let r = hub.global_addresses().delete(...).doit().await
+let r = hub.global_addresses().insert(...).doit().await
+let r = hub.global_forwarding_rules().delete(...).doit().await
+let r = hub.global_forwarding_rules().insert(...).doit().await
+let r = hub.global_forwarding_rules().patch(...).doit().await
+let r = hub.global_forwarding_rules().set_labels(...).doit().await
+let r = hub.global_forwarding_rules().set_target(...).doit().await
+let r = hub.global_network_endpoint_groups().attach_network_endpoints(...).doit().await
+let r = hub.global_network_endpoint_groups().delete(...).doit().await
+let r = hub.global_network_endpoint_groups().detach_network_endpoints(...).doit().await
+let r = hub.global_network_endpoint_groups().insert(...).doit().await
+let r = hub.global_operations().get(...).doit().await
+let r = hub.global_operations().wait(...).doit().await
+let r = hub.global_organization_operations().get(...).doit().await
+let r = hub.global_public_delegated_prefixes().delete(...).doit().await
+let r = hub.global_public_delegated_prefixes().insert(...).doit().await
+let r = hub.global_public_delegated_prefixes().patch(...).doit().await
+let r = hub.health_checks().delete(...).doit().await
+let r = hub.health_checks().insert(...).doit().await
+let r = hub.health_checks().patch(...).doit().await
+let r = hub.health_checks().update(...).doit().await
+let r = hub.http_health_checks().delete(...).doit().await
+let r = hub.http_health_checks().insert(...).doit().await
+let r = hub.http_health_checks().patch(...).doit().await
+let r = hub.http_health_checks().update(...).doit().await
+let r = hub.https_health_checks().delete(...).doit().await
+let r = hub.https_health_checks().insert(...).doit().await
+let r = hub.https_health_checks().patch(...).doit().await
+let r = hub.https_health_checks().update(...).doit().await
+let r = hub.images().delete(...).doit().await
+let r = hub.images().deprecate(...).doit().await
+let r = hub.images().insert(...).doit().await
+let r = hub.images().patch(...).doit().await
+let r = hub.images().set_labels(...).doit().await
+let r = hub.instance_group_managers().abandon_instances(...).doit().await
+let r = hub.instance_group_managers().apply_updates_to_instances(...).doit().await
+let r = hub.instance_group_managers().create_instances(...).doit().await
+let r = hub.instance_group_managers().delete(...).doit().await
+let r = hub.instance_group_managers().delete_instances(...).doit().await
+let r = hub.instance_group_managers().delete_per_instance_configs(...).doit().await
+let r = hub.instance_group_managers().insert(...).doit().await
+let r = hub.instance_group_managers().patch(...).doit().await
+let r = hub.instance_group_managers().patch_per_instance_configs(...).doit().await
+let r = hub.instance_group_managers().recreate_instances(...).doit().await
+let r = hub.instance_group_managers().resize(...).doit().await
+let r = hub.instance_group_managers().set_instance_template(...).doit().await
+let r = hub.instance_group_managers().set_target_pools(...).doit().await
+let r = hub.instance_group_managers().update_per_instance_configs(...).doit().await
+let r = hub.instance_groups().add_instances(...).doit().await
+let r = hub.instance_groups().delete(...).doit().await
+let r = hub.instance_groups().insert(...).doit().await
+let r = hub.instance_groups().remove_instances(...).doit().await
+let r = hub.instance_groups().set_named_ports(...).doit().await
+let r = hub.instance_templates().delete(...).doit().await
+let r = hub.instance_templates().insert(...).doit().await
+let r = hub.instances().add_access_config(...).doit().await
+let r = hub.instances().add_resource_policies(...).doit().await
+let r = hub.instances().attach_disk(...).doit().await
+let r = hub.instances().bulk_insert(...).doit().await
+let r = hub.instances().delete(...).doit().await
+let r = hub.instances().delete_access_config(...).doit().await
+let r = hub.instances().detach_disk(...).doit().await
+let r = hub.instances().insert(...).doit().await
+let r = hub.instances().remove_resource_policies(...).doit().await
+let r = hub.instances().reset(...).doit().await
+let r = hub.instances().set_deletion_protection(...).doit().await
+let r = hub.instances().set_disk_auto_delete(...).doit().await
+let r = hub.instances().set_labels(...).doit().await
+let r = hub.instances().set_machine_resources(...).doit().await
+let r = hub.instances().set_machine_type(...).doit().await
+let r = hub.instances().set_metadata(...).doit().await
+let r = hub.instances().set_min_cpu_platform(...).doit().await
+let r = hub.instances().set_scheduling(...).doit().await
+let r = hub.instances().set_service_account(...).doit().await
+let r = hub.instances().set_shielded_instance_integrity_policy(...).doit().await
+let r = hub.instances().set_tags(...).doit().await
+let r = hub.instances().simulate_maintenance_event(...).doit().await
+let r = hub.instances().start(...).doit().await
+let r = hub.instances().start_with_encryption_key(...).doit().await
+let r = hub.instances().stop(...).doit().await
+let r = hub.instances().update(...).doit().await
+let r = hub.instances().update_access_config(...).doit().await
+let r = hub.instances().update_display_device(...).doit().await
+let r = hub.instances().update_network_interface(...).doit().await
+let r = hub.instances().update_shielded_instance_config(...).doit().await
+let r = hub.interconnect_attachments().delete(...).doit().await
+let r = hub.interconnect_attachments().insert(...).doit().await
+let r = hub.interconnect_attachments().patch(...).doit().await
+let r = hub.interconnects().delete(...).doit().await
+let r = hub.interconnects().insert(...).doit().await
+let r = hub.interconnects().patch(...).doit().await
+let r = hub.licenses().delete(...).doit().await
+let r = hub.licenses().insert(...).doit().await
+let r = hub.network_endpoint_groups().attach_network_endpoints(...).doit().await
+let r = hub.network_endpoint_groups().delete(...).doit().await
+let r = hub.network_endpoint_groups().detach_network_endpoints(...).doit().await
+let r = hub.network_endpoint_groups().insert(...).doit().await
+let r = hub.networks().add_peering(...).doit().await
+let r = hub.networks().delete(...).doit().await
+let r = hub.networks().insert(...).doit().await
+let r = hub.networks().patch(...).doit().await
+let r = hub.networks().remove_peering(...).doit().await
+let r = hub.networks().switch_to_custom_mode(...).doit().await
+let r = hub.networks().update_peering(...).doit().await
+let r = hub.node_groups().add_nodes(...).doit().await
+let r = hub.node_groups().delete(...).doit().await
+let r = hub.node_groups().delete_nodes(...).doit().await
+let r = hub.node_groups().insert(...).doit().await
+let r = hub.node_groups().patch(...).doit().await
+let r = hub.node_groups().set_node_template(...).doit().await
+let r = hub.node_templates().delete(...).doit().await
+let r = hub.node_templates().insert(...).doit().await
+let r = hub.packet_mirrorings().delete(...).doit().await
+let r = hub.packet_mirrorings().insert(...).doit().await
+let r = hub.packet_mirrorings().patch(...).doit().await
+let r = hub.projects().disable_xpn_host(...).doit().await
+let r = hub.projects().disable_xpn_resource(...).doit().await
+let r = hub.projects().enable_xpn_host(...).doit().await
+let r = hub.projects().enable_xpn_resource(...).doit().await
+let r = hub.projects().move_disk(...).doit().await
+let r = hub.projects().move_instance(...).doit().await
+let r = hub.projects().set_common_instance_metadata(...).doit().await
+let r = hub.projects().set_default_network_tier(...).doit().await
+let r = hub.projects().set_usage_export_bucket(...).doit().await
+let r = hub.public_advertised_prefixes().delete(...).doit().await
+let r = hub.public_advertised_prefixes().insert(...).doit().await
+let r = hub.public_advertised_prefixes().patch(...).doit().await
+let r = hub.public_delegated_prefixes().delete(...).doit().await
+let r = hub.public_delegated_prefixes().insert(...).doit().await
+let r = hub.public_delegated_prefixes().patch(...).doit().await
+let r = hub.region_autoscalers().delete(...).doit().await
+let r = hub.region_autoscalers().insert(...).doit().await
+let r = hub.region_autoscalers().patch(...).doit().await
+let r = hub.region_autoscalers().update(...).doit().await
+let r = hub.region_backend_services().delete(...).doit().await
+let r = hub.region_backend_services().insert(...).doit().await
+let r = hub.region_backend_services().patch(...).doit().await
+let r = hub.region_backend_services().update(...).doit().await
+let r = hub.region_commitments().insert(...).doit().await
+let r = hub.region_disks().add_resource_policies(...).doit().await
+let r = hub.region_disks().create_snapshot(...).doit().await
+let r = hub.region_disks().delete(...).doit().await
+let r = hub.region_disks().insert(...).doit().await
+let r = hub.region_disks().remove_resource_policies(...).doit().await
+let r = hub.region_disks().resize(...).doit().await
+let r = hub.region_disks().set_labels(...).doit().await
+let r = hub.region_health_check_services().delete(...).doit().await
+let r = hub.region_health_check_services().insert(...).doit().await
+let r = hub.region_health_check_services().patch(...).doit().await
+let r = hub.region_health_checks().delete(...).doit().await
+let r = hub.region_health_checks().insert(...).doit().await
+let r = hub.region_health_checks().patch(...).doit().await
+let r = hub.region_health_checks().update(...).doit().await
+let r = hub.region_instance_group_managers().abandon_instances(...).doit().await
+let r = hub.region_instance_group_managers().apply_updates_to_instances(...).doit().await
+let r = hub.region_instance_group_managers().create_instances(...).doit().await
+let r = hub.region_instance_group_managers().delete(...).doit().await
+let r = hub.region_instance_group_managers().delete_instances(...).doit().await
+let r = hub.region_instance_group_managers().delete_per_instance_configs(...).doit().await
+let r = hub.region_instance_group_managers().insert(...).doit().await
+let r = hub.region_instance_group_managers().patch(...).doit().await
+let r = hub.region_instance_group_managers().patch_per_instance_configs(...).doit().await
+let r = hub.region_instance_group_managers().recreate_instances(...).doit().await
+let r = hub.region_instance_group_managers().resize(...).doit().await
+let r = hub.region_instance_group_managers().set_instance_template(...).doit().await
+let r = hub.region_instance_group_managers().set_target_pools(...).doit().await
+let r = hub.region_instance_group_managers().update_per_instance_configs(...).doit().await
+let r = hub.region_instance_groups().set_named_ports(...).doit().await
+let r = hub.region_instances().bulk_insert(...).doit().await
+let r = hub.region_network_endpoint_groups().delete(...).doit().await
+let r = hub.region_network_endpoint_groups().insert(...).doit().await
+let r = hub.region_notification_endpoints().delete(...).doit().await
+let r = hub.region_notification_endpoints().insert(...).doit().await
+let r = hub.region_operations().get(...).doit().await
+let r = hub.region_operations().wait(...).doit().await
+let r = hub.region_ssl_certificates().delete(...).doit().await
+let r = hub.region_ssl_certificates().insert(...).doit().await
+let r = hub.region_target_http_proxies().delete(...).doit().await
+let r = hub.region_target_http_proxies().insert(...).doit().await
+let r = hub.region_target_http_proxies().set_url_map(...).doit().await
+let r = hub.region_target_https_proxies().delete(...).doit().await
+let r = hub.region_target_https_proxies().insert(...).doit().await
+let r = hub.region_target_https_proxies().set_ssl_certificates(...).doit().await
+let r = hub.region_target_https_proxies().set_url_map(...).doit().await
+let r = hub.region_url_maps().delete(...).doit().await
+let r = hub.region_url_maps().insert(...).doit().await
+let r = hub.region_url_maps().patch(...).doit().await
+let r = hub.region_url_maps().update(...).doit().await
+let r = hub.reservations().delete(...).doit().await
+let r = hub.reservations().insert(...).doit().await
+let r = hub.reservations().resize(...).doit().await
+let r = hub.resource_policies().delete(...).doit().await
+let r = hub.resource_policies().insert(...).doit().await
+let r = hub.routers().delete(...).doit().await
+let r = hub.routers().insert(...).doit().await
+let r = hub.routers().patch(...).doit().await
+let r = hub.routers().update(...).doit().await
+let r = hub.routes().delete(...).doit().await
+let r = hub.routes().insert(...).doit().await
+let r = hub.security_policies().add_rule(...).doit().await
+let r = hub.security_policies().delete(...).doit().await
+let r = hub.security_policies().insert(...).doit().await
+let r = hub.security_policies().patch(...).doit().await
+let r = hub.security_policies().patch_rule(...).doit().await
+let r = hub.security_policies().remove_rule(...).doit().await
+let r = hub.snapshots().delete(...).doit().await
+let r = hub.snapshots().set_labels(...).doit().await
+let r = hub.ssl_certificates().delete(...).doit().await
+let r = hub.ssl_certificates().insert(...).doit().await
+let r = hub.ssl_policies().delete(...).doit().await
+let r = hub.ssl_policies().insert(...).doit().await
+let r = hub.ssl_policies().patch(...).doit().await
+let r = hub.subnetworks().delete(...).doit().await
+let r = hub.subnetworks().expand_ip_cidr_range(...).doit().await
+let r = hub.subnetworks().insert(...).doit().await
+let r = hub.subnetworks().patch(...).doit().await
+let r = hub.subnetworks().set_private_ip_google_access(...).doit().await
+let r = hub.target_grpc_proxies().delete(...).doit().await
+let r = hub.target_grpc_proxies().insert(...).doit().await
+let r = hub.target_grpc_proxies().patch(...).doit().await
+let r = hub.target_http_proxies().delete(...).doit().await
+let r = hub.target_http_proxies().insert(...).doit().await
+let r = hub.target_http_proxies().patch(...).doit().await
+let r = hub.target_http_proxies().set_url_map(...).doit().await
+let r = hub.target_https_proxies().delete(...).doit().await
+let r = hub.target_https_proxies().insert(...).doit().await
+let r = hub.target_https_proxies().patch(...).doit().await
+let r = hub.target_https_proxies().set_quic_override(...).doit().await
+let r = hub.target_https_proxies().set_ssl_certificates(...).doit().await
+let r = hub.target_https_proxies().set_ssl_policy(...).doit().await
+let r = hub.target_https_proxies().set_url_map(...).doit().await
+let r = hub.target_instances().delete(...).doit().await
+let r = hub.target_instances().insert(...).doit().await
+let r = hub.target_pools().add_health_check(...).doit().await
+let r = hub.target_pools().add_instance(...).doit().await
+let r = hub.target_pools().delete(...).doit().await
+let r = hub.target_pools().insert(...).doit().await
+let r = hub.target_pools().remove_health_check(...).doit().await
+let r = hub.target_pools().remove_instance(...).doit().await
+let r = hub.target_pools().set_backup(...).doit().await
+let r = hub.target_ssl_proxies().delete(...).doit().await
+let r = hub.target_ssl_proxies().insert(...).doit().await
+let r = hub.target_ssl_proxies().set_backend_service(...).doit().await
+let r = hub.target_ssl_proxies().set_proxy_header(...).doit().await
+let r = hub.target_ssl_proxies().set_ssl_certificates(...).doit().await
+let r = hub.target_ssl_proxies().set_ssl_policy(...).doit().await
+let r = hub.target_tcp_proxies().delete(...).doit().await
+let r = hub.target_tcp_proxies().insert(...).doit().await
+let r = hub.target_tcp_proxies().set_backend_service(...).doit().await
+let r = hub.target_tcp_proxies().set_proxy_header(...).doit().await
+let r = hub.target_vpn_gateways().delete(...).doit().await
+let r = hub.target_vpn_gateways().insert(...).doit().await
+let r = hub.url_maps().delete(...).doit().await
+let r = hub.url_maps().insert(...).doit().await
+let r = hub.url_maps().invalidate_cache(...).doit().await
+let r = hub.url_maps().patch(...).doit().await
+let r = hub.url_maps().update(...).doit().await
+let r = hub.vpn_gateways().delete(...).doit().await
+let r = hub.vpn_gateways().insert(...).doit().await
+let r = hub.vpn_gateways().set_labels(...).doit().await
+let r = hub.vpn_tunnels().delete(...).doit().await
+let r = hub.vpn_tunnels().insert(...).doit().await
+let r = hub.zone_operations().get(...).doit().await
+let r = hub.zone_operations().wait(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -482,11 +536,11 @@ google-compute1 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -496,24 +550,25 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_compute1 as compute1;
-use compute1::Instance;
+use compute1::api::Instance;
 use compute1::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use compute1::Compute;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = Compute::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = Compute::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
@@ -523,16 +578,17 @@ let mut req = Instance::default();
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.instances().update(req, "project", "zone", "instance")
-             .request_id("sed")
-             .most_disruptive_allowed_action("et")
-             .minimal_action("dolores")
-             .doit();
+             .request_id("ipsum")
+             .most_disruptive_allowed_action("voluptua.")
+             .minimal_action("At")
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -548,17 +604,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -568,29 +624,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::RequestValue) and 
+[decodable](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-compute1/1.0.14+20200612/google_compute1/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-compute1/2.0.0+20210316/google_compute1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

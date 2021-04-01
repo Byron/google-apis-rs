@@ -5,18 +5,18 @@ DO NOT EDIT !
 -->
 The `google-firebasehosting1_beta1` library allows access to all features of the *Google Firebase Hosting* service.
 
-This documentation was generated from *Firebase Hosting* crate version *1.0.14+20200709*, where *20200709* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.14*.
+This documentation was generated from *Firebase Hosting* crate version *2.0.0+20210315*, where *20210315* is the exact revision of the *firebasehosting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
 
 Everything else about the *Firebase Hosting* *v1_beta1* API can be found at the
 [official documentation site](https://firebase.google.com/docs/hosting/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.FirebaseHosting.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/FirebaseHosting) ... 
 
 * projects
- * [*operations get*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectOperationGetCall.html), [*sites channels releases create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteChannelReleaseCreateCall.html), [*sites channels releases list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteChannelReleaseListCall.html), [*sites domains create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteDomainCreateCall.html), [*sites domains delete*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteDomainDeleteCall.html), [*sites domains get*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteDomainGetCall.html), [*sites domains list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteDomainListCall.html), [*sites domains update*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteDomainUpdateCall.html), [*sites get config*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteGetConfigCall.html), [*sites releases create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteReleaseCreateCall.html), [*sites releases list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteReleaseListCall.html), [*sites update config*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteUpdateConfigCall.html), [*sites versions create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteVersionCreateCall.html), [*sites versions delete*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteVersionDeleteCall.html), [*sites versions files list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteVersionFileListCall.html), [*sites versions list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteVersionListCall.html), [*sites versions patch*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteVersionPatchCall.html) and [*sites versions populate files*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.ProjectSiteVersionPopulateFileCall.html)
-* sites
- * [*channels releases create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteChannelReleaseCreateCall.html), [*channels releases list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteChannelReleaseListCall.html), [*domains create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteDomainCreateCall.html), [*domains delete*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteDomainDeleteCall.html), [*domains get*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteDomainGetCall.html), [*domains list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteDomainListCall.html), [*domains update*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteDomainUpdateCall.html), [*get config*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteGetConfigCall.html), [*releases create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteReleaseCreateCall.html), [*releases list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteReleaseListCall.html), [*update config*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteUpdateConfigCall.html), [*versions create*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteVersionCreateCall.html), [*versions delete*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteVersionDeleteCall.html), [*versions files list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteVersionFileListCall.html), [*versions list*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteVersionListCall.html), [*versions patch*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteVersionPatchCall.html) and [*versions populate files*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.SiteVersionPopulateFileCall.html)
+ * [*operations get*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectOperationGetCall), [*sites channels create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelCreateCall), [*sites channels delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelDeleteCall), [*sites channels get*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelGetCall), [*sites channels list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelListCall), [*sites channels patch*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelPatchCall), [*sites channels releases create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelReleaseCreateCall), [*sites channels releases list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteChannelReleaseListCall), [*sites create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteCreateCall), [*sites delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteDeleteCall), [*sites domains create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteDomainCreateCall), [*sites domains delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteDomainDeleteCall), [*sites domains get*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteDomainGetCall), [*sites domains list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteDomainListCall), [*sites domains update*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteDomainUpdateCall), [*sites get*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteGetCall), [*sites get config*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteGetConfigCall), [*sites list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteListCall), [*sites patch*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSitePatchCall), [*sites releases create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteReleaseCreateCall), [*sites releases list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteReleaseListCall), [*sites update config*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteUpdateConfigCall), [*sites versions clone*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionCloneCall), [*sites versions create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionCreateCall), [*sites versions delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionDeleteCall), [*sites versions files list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionFileListCall), [*sites versions list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionListCall), [*sites versions patch*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionPatchCall) and [*sites versions populate files*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::ProjectSiteVersionPopulateFileCall)
+* [sites](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::Site)
+ * [*channels create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelCreateCall), [*channels delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelDeleteCall), [*channels get*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelGetCall), [*channels list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelListCall), [*channels patch*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelPatchCall), [*channels releases create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelReleaseCreateCall), [*channels releases list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteChannelReleaseListCall), [*domains create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteDomainCreateCall), [*domains delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteDomainDeleteCall), [*domains get*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteDomainGetCall), [*domains list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteDomainListCall), [*domains update*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteDomainUpdateCall), [*get config*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteGetConfigCall), [*releases create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteReleaseCreateCall), [*releases list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteReleaseListCall), [*update config*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteUpdateConfigCall), [*versions clone*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionCloneCall), [*versions create*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionCreateCall), [*versions delete*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionDeleteCall), [*versions files list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionFileListCall), [*versions list*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionListCall), [*versions patch*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionPatchCall) and [*versions populate files*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/api::SiteVersionPopulateFileCall)
 
 
 
@@ -25,17 +25,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/struct.FirebaseHosting.html)**
+* **[Hub](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/FirebaseHosting)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -43,18 +43,38 @@ All *structures* are marked with applicable traits to further categorize them an
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).doit()
+let r = hub.resource().activity(...).doit().await
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.sites().domains_create(...).doit()
-let r = hub.projects().sites_domains_update(...).doit()
-let r = hub.projects().sites_domains_create(...).doit()
-let r = hub.sites().domains_update(...).doit()
-let r = hub.sites().domains_get(...).doit()
-let r = hub.projects().sites_domains_get(...).doit()
+let r = hub.projects().sites_create(...).doit().await
+let r = hub.projects().sites_get(...).doit().await
+let r = hub.projects().sites_patch(...).doit().await
+let r = hub.sites().channels_releases_create(...).doit().await
+let r = hub.sites().channels_releases_list(...).doit().await
+let r = hub.sites().channels_create(...).doit().await
+let r = hub.sites().channels_delete(...).doit().await
+let r = hub.sites().channels_get(...).doit().await
+let r = hub.sites().channels_list(...).doit().await
+let r = hub.sites().channels_patch(...).doit().await
+let r = hub.sites().domains_create(...).doit().await
+let r = hub.sites().domains_delete(...).doit().await
+let r = hub.sites().domains_get(...).doit().await
+let r = hub.sites().domains_list(...).doit().await
+let r = hub.sites().domains_update(...).doit().await
+let r = hub.sites().releases_create(...).doit().await
+let r = hub.sites().releases_list(...).doit().await
+let r = hub.sites().versions_files_list(...).doit().await
+let r = hub.sites().versions_clone(...).doit().await
+let r = hub.sites().versions_create(...).doit().await
+let r = hub.sites().versions_delete(...).doit().await
+let r = hub.sites().versions_list(...).doit().await
+let r = hub.sites().versions_patch(...).doit().await
+let r = hub.sites().versions_populate_files(...).doit().await
+let r = hub.sites().get_config(...).doit().await
+let r = hub.sites().update_config(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -74,11 +94,11 @@ google-firebasehosting1_beta1 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
-hyper = "^0.10"
-hyper-rustls = "^0.6"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^1.0"
+yup-oauth2 = "^5.0"
 ```
 
 ## A complete example
@@ -88,40 +108,39 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_firebasehosting1_beta1 as firebasehosting1_beta1;
-use firebasehosting1_beta1::Domain;
 use firebasehosting1_beta1::{Result, Error};
 use std::default::Default;
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use oauth2;
 use firebasehosting1_beta1::FirebaseHosting;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
-let secret: ApplicationSecret = Default::default();
+let secret: oauth2::ApplicationSecret = Default::default();
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-                              hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-                              <MemoryStorage as Default>::default(), None);
-let mut hub = FirebaseHosting::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = Domain::default();
-
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().await.unwrap();
+let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.sites().domains_create(req, "parent")
-             .doit();
+let result = hub.sites().versions_files_list("parent")
+             .status("magna")
+             .page_token("no")
+             .page_size(-55)
+             .doit().await;
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
          Error::HttpError(_)
+        |Error::Io(_)
         |Error::MissingAPIKey
         |Error::MissingToken(_)
         |Error::Cancelled
@@ -137,17 +156,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -157,29 +176,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::RequestValue) and 
+[decodable](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-firebasehosting1_beta1/1.0.14+20200709/google_firebasehosting1_beta1/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-firebasehosting1_beta1/2.0.0+20210315/google_firebasehosting1_beta1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

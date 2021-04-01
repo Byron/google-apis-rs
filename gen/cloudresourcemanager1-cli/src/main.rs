@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_cloudresourcemanager1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_cloudresourcemanager1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudResourceManager<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudResourceManager<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _folders_clear_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_clear_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,8 +65,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "constraint" => Some(("constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["constraint", "etag"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -117,7 +113,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -132,7 +128,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _folders_get_effective_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_get_effective_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -202,7 +198,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -217,7 +213,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _folders_get_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_get_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -287,7 +283,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -302,7 +298,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _folders_list_available_org_policy_constraints(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_list_available_org_policy_constraints(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -325,8 +321,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -373,7 +369,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -388,7 +384,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _folders_list_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_list_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -411,8 +407,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -459,7 +455,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -474,7 +470,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _folders_set_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_set_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -497,16 +493,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["all-values", "allowed-values", "boolean-policy", "constraint", "denied-values", "enforced", "etag", "inherit-from-parent", "list-policy", "policy", "suggested-value", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -553,7 +549,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -568,7 +564,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _liens_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _liens_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -591,12 +587,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "origin" => Some(("origin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "restrictions" => Some(("restrictions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "origin" => Some(("origin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restrictions" => Some(("restrictions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "name", "origin", "parent", "reason", "restrictions"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -643,7 +639,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -658,7 +654,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _liens_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _liens_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.liens().delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -695,7 +691,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -710,7 +706,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _liens_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _liens_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.liens().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -747,7 +743,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -762,7 +758,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _liens_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _liens_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.liens().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -809,7 +805,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -824,7 +820,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.operations().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -861,7 +857,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -876,7 +872,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_clear_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_clear_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -899,8 +895,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "constraint" => Some(("constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["constraint", "etag"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -947,7 +943,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -962,7 +958,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.organizations().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -999,7 +995,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1014,7 +1010,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_get_effective_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_get_effective_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1084,7 +1080,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1099,7 +1095,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1169,7 +1165,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1184,7 +1180,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_get_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_get_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1254,7 +1250,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1269,7 +1265,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_list_available_org_policy_constraints(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_list_available_org_policy_constraints(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1292,8 +1288,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1340,7 +1336,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1355,7 +1351,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_list_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_list_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1378,8 +1374,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1426,7 +1422,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1441,7 +1437,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1465,8 +1461,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1513,7 +1509,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1528,7 +1524,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1600,7 +1596,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1615,7 +1611,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_set_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_set_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1638,16 +1634,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["all-values", "allowed-values", "boolean-policy", "constraint", "denied-values", "enforced", "etag", "inherit-from-parent", "list-policy", "policy", "suggested-value", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1694,7 +1690,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1709,7 +1705,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _organizations_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _organizations_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1779,7 +1775,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1794,7 +1790,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_clear_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_clear_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1817,8 +1813,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "constraint" => Some(("constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["constraint", "etag"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1865,7 +1861,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1880,7 +1876,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1903,14 +1899,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent.type" => Some(("parent.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent.type" => Some(("parent.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1957,7 +1953,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1972,7 +1968,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().delete(opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2009,7 +2005,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2024,7 +2020,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get(opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2061,7 +2057,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2076,7 +2072,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get_ancestry(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_ancestry(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2145,7 +2141,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2160,7 +2156,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get_effective_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_effective_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2230,7 +2226,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2245,7 +2241,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2315,7 +2311,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2330,7 +2326,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_get_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_get_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2400,7 +2396,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2415,7 +2411,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2443,7 +2439,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "filter", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2462,7 +2458,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2477,7 +2473,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_list_available_org_policy_constraints(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_list_available_org_policy_constraints(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2500,8 +2496,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2548,7 +2544,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2563,7 +2559,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_list_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_list_org_policies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2586,8 +2582,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2634,7 +2630,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2649,7 +2645,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2721,7 +2717,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2736,7 +2732,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_set_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_set_org_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2759,16 +2755,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["all-values", "allowed-values", "boolean-policy", "constraint", "denied-values", "enforced", "etag", "inherit-from-parent", "list-policy", "policy", "suggested-value", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2815,7 +2811,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2830,7 +2826,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2900,7 +2896,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2915,7 +2911,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_undelete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_undelete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2984,7 +2980,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2999,7 +2995,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3022,14 +3018,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent.type" => Some(("parent.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent.type" => Some(("parent.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3076,7 +3072,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3091,7 +3087,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -3099,22 +3095,22 @@ impl<'n> Engine<'n> {
             ("folders", Some(opt)) => {
                 match opt.subcommand() {
                     ("clear-org-policy", Some(opt)) => {
-                        call_result = self._folders_clear_org_policy(opt, dry_run, &mut err);
+                        call_result = self._folders_clear_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("get-effective-org-policy", Some(opt)) => {
-                        call_result = self._folders_get_effective_org_policy(opt, dry_run, &mut err);
+                        call_result = self._folders_get_effective_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("get-org-policy", Some(opt)) => {
-                        call_result = self._folders_get_org_policy(opt, dry_run, &mut err);
+                        call_result = self._folders_get_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("list-available-org-policy-constraints", Some(opt)) => {
-                        call_result = self._folders_list_available_org_policy_constraints(opt, dry_run, &mut err);
+                        call_result = self._folders_list_available_org_policy_constraints(opt, dry_run, &mut err).await;
                     },
                     ("list-org-policies", Some(opt)) => {
-                        call_result = self._folders_list_org_policies(opt, dry_run, &mut err);
+                        call_result = self._folders_list_org_policies(opt, dry_run, &mut err).await;
                     },
                     ("set-org-policy", Some(opt)) => {
-                        call_result = self._folders_set_org_policy(opt, dry_run, &mut err);
+                        call_result = self._folders_set_org_policy(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("folders".to_string()));
@@ -3125,16 +3121,16 @@ impl<'n> Engine<'n> {
             ("liens", Some(opt)) => {
                 match opt.subcommand() {
                     ("create", Some(opt)) => {
-                        call_result = self._liens_create(opt, dry_run, &mut err);
+                        call_result = self._liens_create(opt, dry_run, &mut err).await;
                     },
                     ("delete", Some(opt)) => {
-                        call_result = self._liens_delete(opt, dry_run, &mut err);
+                        call_result = self._liens_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._liens_get(opt, dry_run, &mut err);
+                        call_result = self._liens_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._liens_list(opt, dry_run, &mut err);
+                        call_result = self._liens_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("liens".to_string()));
@@ -3145,7 +3141,7 @@ impl<'n> Engine<'n> {
             ("operations", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._operations_get(opt, dry_run, &mut err);
+                        call_result = self._operations_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("operations".to_string()));
@@ -3156,37 +3152,37 @@ impl<'n> Engine<'n> {
             ("organizations", Some(opt)) => {
                 match opt.subcommand() {
                     ("clear-org-policy", Some(opt)) => {
-                        call_result = self._organizations_clear_org_policy(opt, dry_run, &mut err);
+                        call_result = self._organizations_clear_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._organizations_get(opt, dry_run, &mut err);
+                        call_result = self._organizations_get(opt, dry_run, &mut err).await;
                     },
                     ("get-effective-org-policy", Some(opt)) => {
-                        call_result = self._organizations_get_effective_org_policy(opt, dry_run, &mut err);
+                        call_result = self._organizations_get_effective_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("get-iam-policy", Some(opt)) => {
-                        call_result = self._organizations_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._organizations_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("get-org-policy", Some(opt)) => {
-                        call_result = self._organizations_get_org_policy(opt, dry_run, &mut err);
+                        call_result = self._organizations_get_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("list-available-org-policy-constraints", Some(opt)) => {
-                        call_result = self._organizations_list_available_org_policy_constraints(opt, dry_run, &mut err);
+                        call_result = self._organizations_list_available_org_policy_constraints(opt, dry_run, &mut err).await;
                     },
                     ("list-org-policies", Some(opt)) => {
-                        call_result = self._organizations_list_org_policies(opt, dry_run, &mut err);
+                        call_result = self._organizations_list_org_policies(opt, dry_run, &mut err).await;
                     },
                     ("search", Some(opt)) => {
-                        call_result = self._organizations_search(opt, dry_run, &mut err);
+                        call_result = self._organizations_search(opt, dry_run, &mut err).await;
                     },
                     ("set-iam-policy", Some(opt)) => {
-                        call_result = self._organizations_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._organizations_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("set-org-policy", Some(opt)) => {
-                        call_result = self._organizations_set_org_policy(opt, dry_run, &mut err);
+                        call_result = self._organizations_set_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("test-iam-permissions", Some(opt)) => {
-                        call_result = self._organizations_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._organizations_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("organizations".to_string()));
@@ -3197,52 +3193,52 @@ impl<'n> Engine<'n> {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("clear-org-policy", Some(opt)) => {
-                        call_result = self._projects_clear_org_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_clear_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("create", Some(opt)) => {
-                        call_result = self._projects_create(opt, dry_run, &mut err);
+                        call_result = self._projects_create(opt, dry_run, &mut err).await;
                     },
                     ("delete", Some(opt)) => {
-                        call_result = self._projects_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._projects_get(opt, dry_run, &mut err);
+                        call_result = self._projects_get(opt, dry_run, &mut err).await;
                     },
                     ("get-ancestry", Some(opt)) => {
-                        call_result = self._projects_get_ancestry(opt, dry_run, &mut err);
+                        call_result = self._projects_get_ancestry(opt, dry_run, &mut err).await;
                     },
                     ("get-effective-org-policy", Some(opt)) => {
-                        call_result = self._projects_get_effective_org_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_get_effective_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("get-iam-policy", Some(opt)) => {
-                        call_result = self._projects_get_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_get_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("get-org-policy", Some(opt)) => {
-                        call_result = self._projects_get_org_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_get_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._projects_list(opt, dry_run, &mut err);
+                        call_result = self._projects_list(opt, dry_run, &mut err).await;
                     },
                     ("list-available-org-policy-constraints", Some(opt)) => {
-                        call_result = self._projects_list_available_org_policy_constraints(opt, dry_run, &mut err);
+                        call_result = self._projects_list_available_org_policy_constraints(opt, dry_run, &mut err).await;
                     },
                     ("list-org-policies", Some(opt)) => {
-                        call_result = self._projects_list_org_policies(opt, dry_run, &mut err);
+                        call_result = self._projects_list_org_policies(opt, dry_run, &mut err).await;
                     },
                     ("set-iam-policy", Some(opt)) => {
-                        call_result = self._projects_set_iam_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("set-org-policy", Some(opt)) => {
-                        call_result = self._projects_set_org_policy(opt, dry_run, &mut err);
+                        call_result = self._projects_set_org_policy(opt, dry_run, &mut err).await;
                     },
                     ("test-iam-permissions", Some(opt)) => {
-                        call_result = self._projects_test_iam_permissions(opt, dry_run, &mut err);
+                        call_result = self._projects_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
                     ("undelete", Some(opt)) => {
-                        call_result = self._projects_undelete(opt, dry_run, &mut err);
+                        call_result = self._projects_undelete(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._projects_update(opt, dry_run, &mut err);
+                        call_result = self._projects_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -3267,41 +3263,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "cloudresourcemanager1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "cloudresourcemanager1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "cloudresourcemanager1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/cloudresourcemanager1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudResourceManager::new(client, auth),
@@ -3317,22 +3298,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("folders", "methods: 'clear-org-policy', 'get-effective-org-policy', 'get-org-policy', 'list-available-org-policy-constraints', 'list-org-policies' and 'set-org-policy'", vec![
@@ -3365,11 +3347,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-effective-org-policy",
-                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging
-        `Policies` in the resource hierarchy. The returned `Policy` will not have
-        an `etag`set because it is a computed `Policy` across multiple resources.
-        Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
-        not be expanded."##),
+                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy. The returned `Policy` will not have an `etag`set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/folders_get-effective-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3397,12 +3375,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-org-policy",
-                    Some(r##"Gets a `Policy` on a resource.
-        
-        If no `Policy` is set on the resource, a `Policy` is returned with default
-        values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
-        `etag` value can be used with `SetOrgPolicy()` to create or update a
-        `Policy` during read-modify-write."##),
+                    Some(r##"Gets a `Policy` on a resource. If no `Policy` is set on the resource, a `Policy` is returned with default values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The `etag` value can be used with `SetOrgPolicy()` to create or update a `Policy` during read-modify-write."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/folders_get-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3486,11 +3459,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-org-policy",
-                    Some(r##"Updates the specified `Policy` on the resource. Creates a new `Policy` for
-        that `Constraint` on the resource if one does not exist.
-        
-        Not supplying an `etag` on the request `Policy` results in an unconditional
-        write of the `Policy`."##),
+                    Some(r##"Updates the specified `Policy` on the resource. Creates a new `Policy` for that `Constraint` on the resource if one does not exist. Not supplying an `etag` on the request `Policy` results in an unconditional write of the `Policy`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/folders_set-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3521,13 +3490,7 @@ fn main() {
         
         ("liens", "methods: 'create', 'delete', 'get' and 'list'", vec![
             ("create",
-                    Some(r##"Create a Lien which applies to the resource denoted by the `parent` field.
-        
-        Callers of this method will require permission on the `parent` resource.
-        For example, applying to `projects/1234` requires permission
-        `resourcemanager.projects.updateLiens`.
-        
-        NOTE: Some resources may limit the number of Liens which may be applied."##),
+                    Some(r##"Create a Lien which applies to the resource denoted by the `parent` field. Callers of this method will require permission on the `parent` resource. For example, applying to `projects/1234` requires permission `resourcemanager.projects.updateLiens`. NOTE: Some resources may limit the number of Liens which may be applied."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/liens_create",
                   vec![
                     (Some(r##"kv"##),
@@ -3549,11 +3512,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Delete a Lien by `name`.
-        
-        Callers of this method will require permission on the `parent` resource.
-        For example, a Lien with a `parent` of `projects/1234` requires permission
-        `resourcemanager.projects.updateLiens`."##),
+                    Some(r##"Delete a Lien by `name`. Callers of this method will require permission on the `parent` resource. For example, a Lien with a `parent` of `projects/1234` requires permission `resourcemanager.projects.updateLiens`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/liens_delete",
                   vec![
                     (Some(r##"name"##),
@@ -3575,12 +3534,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieve a Lien by `name`.
-        
-        Callers of this method will require permission on the `parent` resource.
-        For example, a Lien with a `parent` of `projects/1234` requires permission
-        requires permission `resourcemanager.projects.get` or
-        `resourcemanager.projects.updateLiens`."##),
+                    Some(r##"Retrieve a Lien by `name`. Callers of this method will require permission on the `parent` resource. For example, a Lien with a `parent` of `projects/1234` requires permission `resourcemanager.projects.get`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/liens_get",
                   vec![
                     (Some(r##"name"##),
@@ -3602,11 +3556,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all Liens applied to the `parent` resource.
-        
-        Callers of this method will require permission on the `parent` resource.
-        For example, a Lien with a `parent` of `projects/1234` requires permission
-        `resourcemanager.projects.get`."##),
+                    Some(r##"List all Liens applied to the `parent` resource. Callers of this method will require permission on the `parent` resource. For example, a Lien with a `parent` of `projects/1234` requires permission `resourcemanager.projects.get`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/liens_list",
                   vec![
                     (Some(r##"v"##),
@@ -3625,9 +3575,7 @@ fn main() {
         
         ("operations", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
-        method to poll the operation result at intervals as recommended by the API
-        service."##),
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/operations_get",
                   vec![
                     (Some(r##"name"##),
@@ -3685,9 +3633,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Organization to fetch. This is the organization's
-        relative path in the API, formatted as "organizations/[organizationId]".
-        For example, "organizations/1234"."##),
+                     Some(r##"The resource name of the Organization to fetch. This is the organization's relative path in the API, formatted as "organizations/[organizationId]". For example, "organizations/1234"."##),
                      Some(true),
                      Some(false)),
         
@@ -3704,11 +3650,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-effective-org-policy",
-                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging
-        `Policies` in the resource hierarchy. The returned `Policy` will not have
-        an `etag`set because it is a computed `Policy` across multiple resources.
-        Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
-        not be expanded."##),
+                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy. The returned `Policy` will not have an `etag`set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_get-effective-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3736,18 +3678,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-iam-policy",
-                    Some(r##"Gets the access control policy for an Organization resource. May be empty
-        if no such policy or resource exists. The `resource` field should be the
-        organization's resource name, e.g. "organizations/123".
-        
-        Authorization requires the Google IAM permission
-        `resourcemanager.organizations.getIamPolicy` on the specified organization"##),
+                    Some(r##"Gets the access control policy for an Organization resource. May be empty if no such policy or resource exists. The `resource` field should be the organization's resource name, e.g. "organizations/123". Authorization requires the Google IAM permission `resourcemanager.organizations.getIamPolicy` on the specified organization"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3770,12 +3706,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-org-policy",
-                    Some(r##"Gets a `Policy` on a resource.
-        
-        If no `Policy` is set on the resource, a `Policy` is returned with default
-        values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
-        `etag` value can be used with `SetOrgPolicy()` to create or update a
-        `Policy` during read-modify-write."##),
+                    Some(r##"Gets a `Policy` on a resource. If no `Policy` is set on the resource, a `Policy` is returned with default values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The `etag` value can be used with `SetOrgPolicy()` to create or update a `Policy` during read-modify-write."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_get-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3859,13 +3790,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches Organization resources that are visible to the user and satisfy
-        the specified filter. This method returns Organizations in an unspecified
-        order. New Organizations do not necessarily appear at the end of the
-        results.
-        
-        Search will only return organizations on which the user has the permission
-        `resourcemanager.organizations.get`"##),
+                    Some(r##"Searches Organization resources that are visible to the user and satisfy the specified filter. This method returns Organizations in an unspecified order. New Organizations do not necessarily appear at the end of the results. Search will only return organizations on which the user has the permission `resourcemanager.organizations.get`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_search",
                   vec![
                     (Some(r##"kv"##),
@@ -3887,18 +3812,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the access control policy on an Organization resource. Replaces any
-        existing policy. The `resource` field should be the organization's resource
-        name, e.g. "organizations/123".
-        
-        Authorization requires the Google IAM permission
-        `resourcemanager.organizations.setIamPolicy` on the specified organization"##),
+                    Some(r##"Sets the access control policy on an Organization resource. Replaces any existing policy. The `resource` field should be the organization's resource name, e.g. "organizations/123". Authorization requires the Google IAM permission `resourcemanager.organizations.setIamPolicy` on the specified organization"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -3921,11 +3840,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-org-policy",
-                    Some(r##"Updates the specified `Policy` on the resource. Creates a new `Policy` for
-        that `Constraint` on the resource if one does not exist.
-        
-        Not supplying an `etag` on the request `Policy` results in an unconditional
-        write of the `Policy`."##),
+                    Some(r##"Updates the specified `Policy` on the resource. Creates a new `Policy` for that `Constraint` on the resource if one does not exist. Not supplying an `etag` on the request `Policy` results in an unconditional write of the `Policy`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_set-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3953,17 +3868,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified Organization.
-        The `resource` field should be the organization's resource name,
-        e.g. "organizations/123".
-        
-        There are no permissions required for making this API call."##),
+                    Some(r##"Returns permissions that a caller has on the specified Organization. The `resource` field should be the organization's resource name, e.g. "organizations/123". There are no permissions required for making this API call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4017,21 +3927,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Request that a new Project be created. The result is an Operation which
-        can be used to track the creation process. This process usually takes a few
-        seconds, but can sometimes take much longer. The tracking Operation is
-        automatically deleted after a few hours, so there is no need to call
-        DeleteOperation.
-        
-        Authorization requires the Google IAM permission
-        `resourcemanager.projects.create` on the specified parent for the new
-        project. The parent is identified by a specified ResourceId,
-        which must include both an ID and a type, such as organization.
-        
-        This method does not associate the new project with a billing account.
-        You can set or update the billing account associated with a project using
-        the [`projects.updateBillingInfo`]
-        (/billing/reference/rest/v1/projects/updateBillingInfo) method."##),
+                    Some(r##"Request that a new Project be created. The result is an Operation which can be used to track the creation process. This process usually takes a few seconds, but can sometimes take much longer. The tracking Operation is automatically deleted after a few hours, so there is no need to call DeleteOperation. Authorization requires the Google IAM permission `resourcemanager.projects.create` on the specified parent for the new project. The parent is identified by a specified ResourceId, which must include both an ID and a type, such as organization. This method does not associate the new project with a billing account. You can set or update the billing account associated with a project using the [`projects.updateBillingInfo`] (/billing/reference/rest/v1/projects/updateBillingInfo) method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_create",
                   vec![
                     (Some(r##"kv"##),
@@ -4053,34 +3949,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Marks the Project identified by the specified
-        `project_id` (for example, `my-project-123`) for deletion.
-        This method will only affect the Project if it has a lifecycle state of
-        ACTIVE.
-        
-        This method changes the Project's lifecycle state from
-        ACTIVE
-        to DELETE_REQUESTED.
-        The deletion starts at an unspecified time,
-        at which point the Project is no longer accessible.
-        
-        Until the deletion completes, you can check the lifecycle state
-        checked by retrieving the Project with GetProject,
-        and the Project remains visible to ListProjects.
-        However, you cannot update the project.
-        
-        After the deletion completes, the Project is not retrievable by
-        the  GetProject and
-        ListProjects methods.
-        
-        The caller must have modify permissions for this Project."##),
+                    Some(r##"Marks the Project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the Project if it has a lifecycle state of ACTIVE. This method changes the Project's lifecycle state from ACTIVE to DELETE_REQUESTED. The deletion starts at an unspecified time, at which point the Project is no longer accessible. Until the deletion completes, you can check the lifecycle state checked by retrieving the Project with GetProject, and the Project remains visible to ListProjects. However, you cannot update the project. After the deletion completes, the Project is not retrievable by the GetProject and ListProjects methods. The caller must have delete permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_delete",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Project ID (for example, `foo-bar-123`).
-        
-        Required."##),
+                     Some(r##"The Project ID (for example, `foo-bar-123`). Required."##),
                      Some(true),
                      Some(false)),
         
@@ -4097,17 +3971,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the Project identified by the specified
-        `project_id` (for example, `my-project-123`).
-        
-        The caller must have read permissions for this Project."##),
+                    Some(r##"Retrieves the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have read permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Project ID (for example, `my-project-123`).
-        
-        Required."##),
+                     Some(r##"Required. The Project ID (for example, `my-project-123`)."##),
                      Some(true),
                      Some(false)),
         
@@ -4124,17 +3993,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-ancestry",
-                    Some(r##"Gets a list of ancestors in the resource hierarchy for the Project
-        identified by the specified `project_id` (for example, `my-project-123`).
-        
-        The caller must have read permissions for this Project."##),
+                    Some(r##"Gets a list of ancestors in the resource hierarchy for the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have read permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-ancestry",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The Project ID (for example, `my-project-123`).
-        
-        Required."##),
+                     Some(r##"Required. The Project ID (for example, `my-project-123`)."##),
                      Some(true),
                      Some(false)),
         
@@ -4157,11 +4021,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-effective-org-policy",
-                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging
-        `Policies` in the resource hierarchy. The returned `Policy` will not have
-        an `etag`set because it is a computed `Policy` across multiple resources.
-        Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
-        not be expanded."##),
+                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy. The returned `Policy` will not have an `etag`set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-effective-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4189,20 +4049,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-iam-policy",
-                    Some(r##"Returns the IAM access control policy for the specified Project.
-        Permission is denied if the policy or the resource does not exist.
-        
-        Authorization requires the Google IAM permission
-        `resourcemanager.projects.getIamPolicy` on the project.
-        
-        For additional information about `resource` (e.g. my-project-id) structure
-        and identification, see [Resource Names](/apis/design/resource_names)."##),
+                    Some(r##"Returns the IAM access control policy for the specified Project. Permission is denied if the policy or the resource does not exist. Authorization requires the Google IAM permission `resourcemanager.projects.getIamPolicy` on the project. For additional information about `resource` (e.g. my-project-id) structure and identification, see [Resource Names](https://cloud.google.com/apis/design/resource_names)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4225,12 +4077,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-org-policy",
-                    Some(r##"Gets a `Policy` on a resource.
-        
-        If no `Policy` is set on the resource, a `Policy` is returned with default
-        values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
-        `etag` value can be used with `SetOrgPolicy()` to create or update a
-        `Policy` during read-modify-write."##),
+                    Some(r##"Gets a `Policy` on a resource. If no `Policy` is set on the resource, a `Policy` is returned with default values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The `etag` value can be used with `SetOrgPolicy()` to create or update a `Policy` during read-modify-write."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4258,22 +4105,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists Projects that the caller has the `resourcemanager.projects.get`
-        permission on and satisfy the specified filter.
-        
-        This method returns Projects in an unspecified order.
-        This method is eventually consistent with project mutations; this means
-        that a newly created project may not appear in the results or recent
-        updates to an existing project may not be reflected in the results. To
-        retrieve the latest state of a project, use the
-        GetProject method.
-        
-        NOTE: If the request filter contains a `parent.type` and `parent.id` and
-        the caller has the `resourcemanager.projects.list` permission on the
-        parent, the results will be drawn from an alternate index which provides
-        more consistent results. In future versions of this API, this List method
-        will be split into List and Search to properly capture the behavorial
-        difference."##),
+                    Some(r##"Lists Projects that the caller has the `resourcemanager.projects.get` permission on and satisfy the specified filter. This method returns Projects in an unspecified order. This method is eventually consistent with project mutations; this means that a newly created project may not appear in the results or recent updates to an existing project may not be reflected in the results. To retrieve the latest state of a project, use the GetProject method. NOTE: If the request filter contains a `parent.type` and `parent.id` and the caller has the `resourcemanager.projects.list` permission on the parent, the results will be drawn from an alternate index which provides more consistent results. In future versions of this API, this List method will be split into List and Search to properly capture the behavioral difference."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -4345,62 +4177,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project.
-        
-        CAUTION: This method will replace the existing policy, and cannot be used
-        to append additional IAM settings.
-        
-        NOTE: Removing service accounts from policies or changing their roles can
-        render services completely inoperable. It is important to understand how
-        the service account is being used before removing or updating its roles.
-        
-        For additional information about `resource` (e.g. my-project-id) structure
-        and identification, see [Resource Names](/apis/design/resource_names).
-        
-        The following constraints apply when using `setIamPolicy()`:
-        
-        + Project does not support `allUsers` and `allAuthenticatedUsers` as
-        `members` in a `Binding` of a `Policy`.
-        
-        + The owner role can be granted to a `user`, `serviceAccount`, or a group
-        that is part of an organization. For example,
-        group@myownpersonaldomain.com could be added as an owner to a project in
-        the myownpersonaldomain.com organization, but not the examplepetstore.com
-        organization.
-        
-        + Service accounts can be made owners of a project directly
-        without any restrictions. However, to be added as an owner, a user must be
-        invited via Cloud Platform console and must accept the invitation.
-        
-        + A user cannot be granted the owner role using `setIamPolicy()`. The user
-        must be granted the owner role using the Cloud Platform Console and must
-        explicitly accept the invitation.
-        
-        + You can only grant ownership of a project to a member by using the
-        GCP Console. Inviting a member will deliver an invitation email that
-        they must accept. An invitation email is not generated if you are
-        granting a role other than owner, or if both the member you are inviting
-        and the project are part of your organization.
-        
-        + Membership changes that leave the project without any owners that have
-        accepted the Terms of Service (ToS) will be rejected.
-        
-        + If the project is not part of an organization, there must be at least
-        one owner who has accepted the Terms of Service (ToS) agreement in the
-        policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner
-        from the policy will fail. This restriction also applies to legacy
-        projects that no longer have owners who have accepted the ToS. Edits to
-        IAM policies will be rejected until the lack of a ToS-accepting owner is
-        rectified.
-        
-        Authorization requires the Google IAM permission
-        `resourcemanager.projects.setIamPolicy` on the project"##),
+                    Some(r##"Sets the IAM access control policy for the specified Project. CAUTION: This method will replace the existing policy, and cannot be used to append additional IAM settings. NOTE: Removing service accounts from policies or changing their roles can render services completely inoperable. It is important to understand how the service account is being used before removing or updating its roles. For additional information about `resource` (e.g. my-project-id) structure and identification, see [Resource Names](https://cloud.google.com/apis/design/resource_names). The following constraints apply when using `setIamPolicy()`: + Project does not support `allUsers` and `allAuthenticatedUsers` as `members` in a `Binding` of a `Policy`. + The owner role can be granted to a `user`, `serviceAccount`, or a group that is part of an organization. For example, group@myownpersonaldomain.com could be added as an owner to a project in the myownpersonaldomain.com organization, but not the examplepetstore.com organization. + Service accounts can be made owners of a project directly without any restrictions. However, to be added as an owner, a user must be invited via Cloud Platform console and must accept the invitation. + A user cannot be granted the owner role using `setIamPolicy()`. The user must be granted the owner role using the Cloud Platform Console and must explicitly accept the invitation. + You can only grant ownership of a project to a member by using the GCP Console. Inviting a member will deliver an invitation email that they must accept. An invitation email is not generated if you are granting a role other than owner, or if both the member you are inviting and the project are part of your organization. + Membership changes that leave the project without any owners that have accepted the Terms of Service (ToS) will be rejected. + If the project is not part of an organization, there must be at least one owner who has accepted the Terms of Service (ToS) agreement in the policy. Calling `setIamPolicy()` to remove the last ToS-accepted owner from the policy will fail. This restriction also applies to legacy projects that no longer have owners who have accepted the ToS. Edits to IAM policies will be rejected until the lack of a ToS-accepting owner is rectified. Authorization requires the Google IAM permission `resourcemanager.projects.setIamPolicy` on the project"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4423,11 +4205,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-org-policy",
-                    Some(r##"Updates the specified `Policy` on the resource. Creates a new `Policy` for
-        that `Constraint` on the resource if one does not exist.
-        
-        Not supplying an `etag` on the request `Policy` results in an unconditional
-        write of the `Policy`."##),
+                    Some(r##"Updates the specified `Policy` on the resource. Creates a new `Policy` for that `Constraint` on the resource if one does not exist. Not supplying an `etag` on the request `Policy` results in an unconditional write of the `Policy`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_set-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4455,18 +4233,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified Project.
-        
-        For additional information about `resource` (e.g. my-project-id) structure
-        and identification, see [Resource Names](/apis/design/resource_names).
-        
-        There are no permissions required for making this API call."##),
+                    Some(r##"Returns permissions that a caller has on the specified Project. For additional information about `resource` (e.g. my-project-id) structure and identification, see [Resource Names](https://cloud.google.com/apis/design/resource_names). There are no permissions required for making this API call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
-        See the operation documentation for the appropriate value for this field."##),
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -4489,20 +4261,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("undelete",
-                    Some(r##"Restores the Project identified by the specified
-        `project_id` (for example, `my-project-123`).
-        You can only use this method for a Project that has a lifecycle state of
-        DELETE_REQUESTED.
-        After deletion starts, the Project cannot be restored.
-        
-        The caller must have modify permissions for this Project."##),
+                    Some(r##"Restores the Project identified by the specified `project_id` (for example, `my-project-123`). You can only use this method for a Project that has a lifecycle state of DELETE_REQUESTED. After deletion starts, the Project cannot be restored. The caller must have undelete permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_undelete",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The project ID (for example, `foo-bar-123`).
-        
-        Required."##),
+                     Some(r##"Required. The project ID (for example, `foo-bar-123`)."##),
                      Some(true),
                      Some(false)),
         
@@ -4525,17 +4289,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the attributes of the Project identified by the specified
-        `project_id` (for example, `my-project-123`).
-        
-        The caller must have modify permissions for this Project."##),
+                    Some(r##"Updates the attributes of the Project identified by the specified `project_id` (for example, `my-project-123`). The caller must have modify permissions for this Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_update",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The project ID (for example, `my-project-123`).
-        
-        Required."##),
+                     Some(r##"The project ID (for example, `my-project-123`). Required."##),
                      Some(true),
                      Some(false)),
         
@@ -4563,7 +4322,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200629")
+           .version("2.0.0+20210328")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")
@@ -4578,12 +4337,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -4631,13 +4385,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

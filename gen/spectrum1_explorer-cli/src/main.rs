@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_spectrum1_explorer as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_spectrum1_explorer::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Spectrum<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Spectrum<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _paws_get_spectrum(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _paws_get_spectrum(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,58 +65,58 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "antenna.height-type" => Some(("antenna.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "antenna.height-uncertainty" => Some(("antenna.heightUncertainty", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "request-type" => Some(("requestType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.etsi-en-device-type" => Some(("masterDeviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.fcc-id" => Some(("masterDeviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.serial-number" => Some(("masterDeviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.etsi-en-technology-id" => Some(("masterDeviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.fcc-tvbd-device-type" => Some(("masterDeviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.etsi-en-device-category" => Some(("masterDeviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.ruleset-ids" => Some(("masterDeviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "master-device-desc.etsi-en-device-emissions-class" => Some(("masterDeviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.manufacturer-id" => Some(("masterDeviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.model-id" => Some(("masterDeviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "owner.operator.org.text" => Some(("owner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.tel.uri" => Some(("owner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-category" => Some(("masterDeviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-emissions-class" => Some(("masterDeviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-type" => Some(("masterDeviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-technology-id" => Some(("masterDeviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-id" => Some(("masterDeviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-tvbd-device-type" => Some(("masterDeviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.manufacturer-id" => Some(("masterDeviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.model-id" => Some(("masterDeviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.ruleset-ids" => Some(("masterDeviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "master-device-desc.serial-number" => Some(("masterDeviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.code" => Some(("owner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.country" => Some(("owner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.locality" => Some(("owner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.pobox" => Some(("owner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.region" => Some(("owner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.street" => Some(("owner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.operator.email.text" => Some(("owner.operator.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.operator.fn" => Some(("owner.operator.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.code" => Some(("owner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.locality" => Some(("owner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.country" => Some(("owner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.region" => Some(("owner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.pobox" => Some(("owner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.street" => Some(("owner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.org.text" => Some(("owner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.tel.uri" => Some(("owner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.org.text" => Some(("owner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.tel.uri" => Some(("owner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.code" => Some(("owner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.country" => Some(("owner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.locality" => Some(("owner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.pobox" => Some(("owner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.region" => Some(("owner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.street" => Some(("owner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.owner.email.text" => Some(("owner.owner.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.owner.fn" => Some(("owner.owner.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.code" => Some(("owner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.locality" => Some(("owner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.country" => Some(("owner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.region" => Some(("owner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.pobox" => Some(("owner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.street" => Some(("owner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.org.text" => Some(("owner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.tel.uri" => Some(("owner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-type" => Some(("requestType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "center", "code", "confidence", "country", "device-desc", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "latitude", "locality", "location", "longitude", "manufacturer-id", "master-device-desc", "model-id", "operator", "org", "orientation", "owner", "pobox", "point", "region", "request-type", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -164,7 +160,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -179,7 +175,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _paws_get_spectrum_batch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _paws_get_spectrum_batch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -202,52 +198,52 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "antenna.height-type" => Some(("antenna.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "antenna.height-uncertainty" => Some(("antenna.heightUncertainty", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "request-type" => Some(("requestType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.etsi-en-device-type" => Some(("masterDeviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.fcc-id" => Some(("masterDeviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.serial-number" => Some(("masterDeviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.etsi-en-technology-id" => Some(("masterDeviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.fcc-tvbd-device-type" => Some(("masterDeviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "master-device-desc.etsi-en-device-category" => Some(("masterDeviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "master-device-desc.ruleset-ids" => Some(("masterDeviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "master-device-desc.etsi-en-device-emissions-class" => Some(("masterDeviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-type" => Some(("masterDeviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-technology-id" => Some(("masterDeviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-id" => Some(("masterDeviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-tvbd-device-type" => Some(("masterDeviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "master-device-desc.manufacturer-id" => Some(("masterDeviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "master-device-desc.model-id" => Some(("masterDeviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.org.text" => Some(("owner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.tel.uri" => Some(("owner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.ruleset-ids" => Some(("masterDeviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "master-device-desc.serial-number" => Some(("masterDeviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.code" => Some(("owner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.country" => Some(("owner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.locality" => Some(("owner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.pobox" => Some(("owner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.region" => Some(("owner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.street" => Some(("owner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.operator.email.text" => Some(("owner.operator.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.operator.fn" => Some(("owner.operator.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.code" => Some(("owner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.locality" => Some(("owner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.country" => Some(("owner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.region" => Some(("owner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.pobox" => Some(("owner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.operator.adr.street" => Some(("owner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.org.text" => Some(("owner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.tel.uri" => Some(("owner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.org.text" => Some(("owner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.tel.uri" => Some(("owner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.code" => Some(("owner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.country" => Some(("owner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.locality" => Some(("owner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.pobox" => Some(("owner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.region" => Some(("owner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.street" => Some(("owner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.owner.email.text" => Some(("owner.owner.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.owner.fn" => Some(("owner.owner.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.code" => Some(("owner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.locality" => Some(("owner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.country" => Some(("owner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.region" => Some(("owner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.pobox" => Some(("owner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.owner.adr.street" => Some(("owner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.org.text" => Some(("owner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.tel.uri" => Some(("owner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-type" => Some(("requestType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "code", "country", "device-desc", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "locality", "manufacturer-id", "master-device-desc", "model-id", "operator", "org", "owner", "pobox", "region", "request-type", "ruleset-ids", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -291,7 +287,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -306,7 +302,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _paws_init(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _paws_init(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -329,23 +325,23 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["center", "confidence", "device-desc", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "latitude", "location", "longitude", "manufacturer-id", "model-id", "orientation", "point", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "type", "version"]);
@@ -390,7 +386,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -405,7 +401,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _paws_notify_spectrum_use(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _paws_notify_spectrum_use(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -428,23 +424,23 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["center", "confidence", "device-desc", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "latitude", "location", "longitude", "manufacturer-id", "model-id", "orientation", "point", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "type", "version"]);
@@ -489,7 +485,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -504,7 +500,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _paws_register(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _paws_register(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -527,47 +523,47 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "antenna.height-type" => Some(("antenna.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "antenna.height-uncertainty" => Some(("antenna.heightUncertainty", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "device-owner.operator.org.text" => Some(("deviceOwner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.tel.uri" => Some(("deviceOwner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.code" => Some(("deviceOwner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.country" => Some(("deviceOwner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.locality" => Some(("deviceOwner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.pobox" => Some(("deviceOwner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.region" => Some(("deviceOwner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.street" => Some(("deviceOwner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-owner.operator.email.text" => Some(("deviceOwner.operator.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-owner.operator.fn" => Some(("deviceOwner.operator.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.adr.code" => Some(("deviceOwner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.adr.locality" => Some(("deviceOwner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.adr.country" => Some(("deviceOwner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.adr.region" => Some(("deviceOwner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.adr.pobox" => Some(("deviceOwner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.operator.adr.street" => Some(("deviceOwner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.org.text" => Some(("deviceOwner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.tel.uri" => Some(("deviceOwner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.org.text" => Some(("deviceOwner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.tel.uri" => Some(("deviceOwner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.code" => Some(("deviceOwner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.country" => Some(("deviceOwner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.locality" => Some(("deviceOwner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.pobox" => Some(("deviceOwner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.region" => Some(("deviceOwner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.street" => Some(("deviceOwner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-owner.owner.email.text" => Some(("deviceOwner.owner.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-owner.owner.fn" => Some(("deviceOwner.owner.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.adr.code" => Some(("deviceOwner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.adr.locality" => Some(("deviceOwner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.adr.country" => Some(("deviceOwner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.adr.region" => Some(("deviceOwner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.adr.pobox" => Some(("deviceOwner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "device-owner.owner.adr.street" => Some(("deviceOwner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.org.text" => Some(("deviceOwner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.tel.uri" => Some(("deviceOwner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "center", "code", "confidence", "country", "device-desc", "device-owner", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "latitude", "locality", "location", "longitude", "manufacturer-id", "model-id", "operator", "org", "orientation", "owner", "pobox", "point", "region", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -611,7 +607,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -626,7 +622,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _paws_verify_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _paws_verify_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -649,8 +645,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["type", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -694,7 +690,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -709,7 +705,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -717,22 +713,22 @@ impl<'n> Engine<'n> {
             ("paws", Some(opt)) => {
                 match opt.subcommand() {
                     ("get-spectrum", Some(opt)) => {
-                        call_result = self._paws_get_spectrum(opt, dry_run, &mut err);
+                        call_result = self._paws_get_spectrum(opt, dry_run, &mut err).await;
                     },
                     ("get-spectrum-batch", Some(opt)) => {
-                        call_result = self._paws_get_spectrum_batch(opt, dry_run, &mut err);
+                        call_result = self._paws_get_spectrum_batch(opt, dry_run, &mut err).await;
                     },
                     ("init", Some(opt)) => {
-                        call_result = self._paws_init(opt, dry_run, &mut err);
+                        call_result = self._paws_init(opt, dry_run, &mut err).await;
                     },
                     ("notify-spectrum-use", Some(opt)) => {
-                        call_result = self._paws_notify_spectrum_use(opt, dry_run, &mut err);
+                        call_result = self._paws_notify_spectrum_use(opt, dry_run, &mut err).await;
                     },
                     ("register", Some(opt)) => {
-                        call_result = self._paws_register(opt, dry_run, &mut err);
+                        call_result = self._paws_register(opt, dry_run, &mut err).await;
                     },
                     ("verify-device", Some(opt)) => {
-                        call_result = self._paws_verify_device(opt, dry_run, &mut err);
+                        call_result = self._paws_verify_device(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("paws".to_string()));
@@ -757,41 +753,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "spectrum1-explorer-secret.json",
+            match client::application_secret_from_directory(&config_dir, "spectrum1-explorer-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "spectrum1-explorer",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/spectrum1-explorer", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Spectrum::new(client, auth),
@@ -804,22 +785,23 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("paws", "methods: 'get-spectrum', 'get-spectrum-batch', 'init', 'notify-spectrum-use', 'register' and 'verify-device'", vec![
@@ -961,7 +943,7 @@ fn main() {
     
     let mut app = App::new("spectrum1-explorer")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20170306")
+           .version("2.0.0+20170306")
            .about("API for spectrum-management functions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli")
            .arg(Arg::with_name("folder")
@@ -971,12 +953,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1024,13 +1001,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

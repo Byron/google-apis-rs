@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_clouddebugger2 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_clouddebugger2::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudDebugger<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::CloudDebugger<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _controller_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _controller_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.controller().debuggees_breakpoints_list(opt.value_of("debuggee-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -74,7 +70,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["agent-id", "wait-token", "success-on-timeout"].iter().map(|v|*v));
+                                                                           v.extend(["success-on-timeout", "wait-token", "agent-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -93,7 +89,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -108,7 +104,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _controller_debuggees_breakpoints_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _controller_debuggees_breakpoints_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -131,26 +127,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "breakpoint.status.description.parameters" => Some(("breakpoint.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "breakpoint.status.description.format" => Some(("breakpoint.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.status.refers-to" => Some(("breakpoint.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.status.is-error" => Some(("breakpoint.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "breakpoint.action" => Some(("breakpoint.action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.canary-expire-time" => Some(("breakpoint.canaryExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.condition" => Some(("breakpoint.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.create-time" => Some(("breakpoint.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.expressions" => Some(("breakpoint.expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "breakpoint.final-time" => Some(("breakpoint.finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.id" => Some(("breakpoint.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.is-final-state" => Some(("breakpoint.isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "breakpoint.labels" => Some(("breakpoint.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "breakpoint.location.column" => Some(("breakpoint.location.column", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "breakpoint.location.line" => Some(("breakpoint.location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "breakpoint.location.path" => Some(("breakpoint.location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.log-level" => Some(("breakpoint.logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.log-message-format" => Some(("breakpoint.logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.state" => Some(("breakpoint.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.log-level" => Some(("breakpoint.logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.labels" => Some(("breakpoint.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "breakpoint.status.description.format" => Some(("breakpoint.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.status.description.parameters" => Some(("breakpoint.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "breakpoint.status.is-error" => Some(("breakpoint.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "breakpoint.status.refers-to" => Some(("breakpoint.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.user-email" => Some(("breakpoint.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.id" => Some(("breakpoint.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.canary-expire-time" => Some(("breakpoint.canaryExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.location.column" => Some(("breakpoint.location.column", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "breakpoint.location.path" => Some(("breakpoint.location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.location.line" => Some(("breakpoint.location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "breakpoint.action" => Some(("breakpoint.action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.expressions" => Some(("breakpoint.expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "breakpoint.is-final-state" => Some(("breakpoint.isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "breakpoint.create-time" => Some(("breakpoint.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.condition" => Some(("breakpoint.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "breakpoint", "canary-expire-time", "column", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "state", "status", "user-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -197,7 +193,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -212,7 +208,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _controller_debuggees_register(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _controller_debuggees_register(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -235,19 +231,19 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "debuggee.status.description.parameters" => Some(("debuggee.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "debuggee.status.description.format" => Some(("debuggee.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.status.refers-to" => Some(("debuggee.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.status.is-error" => Some(("debuggee.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "debuggee.description" => Some(("debuggee.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.is-disabled" => Some(("debuggee.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "debuggee.labels" => Some(("debuggee.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "debuggee.uniquifier" => Some(("debuggee.uniquifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.project" => Some(("debuggee.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.canary-mode" => Some(("debuggee.canaryMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.agent-version" => Some(("debuggee.agentVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.is-inactive" => Some(("debuggee.isInactive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "debuggee.canary-mode" => Some(("debuggee.canaryMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "debuggee.description" => Some(("debuggee.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.id" => Some(("debuggee.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "debuggee.is-disabled" => Some(("debuggee.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "debuggee.is-inactive" => Some(("debuggee.isInactive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "debuggee.labels" => Some(("debuggee.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "debuggee.project" => Some(("debuggee.project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "debuggee.status.description.format" => Some(("debuggee.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "debuggee.status.description.parameters" => Some(("debuggee.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "debuggee.status.is-error" => Some(("debuggee.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "debuggee.status.refers-to" => Some(("debuggee.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "debuggee.uniquifier" => Some(("debuggee.uniquifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-version", "canary-mode", "debuggee", "description", "format", "id", "is-disabled", "is-error", "is-inactive", "labels", "parameters", "project", "refers-to", "status", "uniquifier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -294,7 +290,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -309,7 +305,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _debugger_debuggees_breakpoints_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_breakpoints_delete(opt.value_of("debuggee-id").unwrap_or(""), opt.value_of("breakpoint-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -350,7 +346,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -365,7 +361,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _debugger_debuggees_breakpoints_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_breakpoints_get(opt.value_of("debuggee-id").unwrap_or(""), opt.value_of("breakpoint-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -406,7 +402,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -421,7 +417,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _debugger_debuggees_breakpoints_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_breakpoints_list(opt.value_of("debuggee-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -458,7 +454,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["strip-results", "include-all-users", "client-version", "include-inactive", "wait-token", "action-value"].iter().map(|v|*v));
+                                                                           v.extend(["strip-results", "include-inactive", "client-version", "include-all-users", "wait-token", "action-value"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -477,7 +473,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -492,7 +488,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _debugger_debuggees_breakpoints_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _debugger_debuggees_breakpoints_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -515,26 +511,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status.description.parameters" => Some(("status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.description.format" => Some(("status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.refers-to" => Some(("status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.is-error" => Some(("status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "canary-expire-time" => Some(("canaryExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition" => Some(("condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expressions" => Some(("expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "final-time" => Some(("finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-final-state" => Some(("isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "location.column" => Some(("location.column", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.line" => Some(("location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.path" => Some(("location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-message-format" => Some(("logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "status.description.format" => Some(("status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.description.parameters" => Some(("status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.is-error" => Some(("status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.refers-to" => Some(("status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-email" => Some(("userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "canary-expire-time" => Some(("canaryExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.column" => Some(("location.column", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.path" => Some(("location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.line" => Some(("location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "expressions" => Some(("expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "is-final-state" => Some(("isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "condition" => Some(("condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "canary-expire-time", "column", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "state", "status", "user-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -588,7 +584,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -603,7 +599,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _debugger_debuggees_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _debugger_debuggees_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.debugger().debuggees_list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -631,7 +627,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["project", "include-inactive", "client-version"].iter().map(|v|*v));
+                                                                           v.extend(["client-version", "project", "include-inactive"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -650,7 +646,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -665,7 +661,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -673,13 +669,13 @@ impl<'n> Engine<'n> {
             ("controller", Some(opt)) => {
                 match opt.subcommand() {
                     ("debuggees-breakpoints-list", Some(opt)) => {
-                        call_result = self._controller_debuggees_breakpoints_list(opt, dry_run, &mut err);
+                        call_result = self._controller_debuggees_breakpoints_list(opt, dry_run, &mut err).await;
                     },
                     ("debuggees-breakpoints-update", Some(opt)) => {
-                        call_result = self._controller_debuggees_breakpoints_update(opt, dry_run, &mut err);
+                        call_result = self._controller_debuggees_breakpoints_update(opt, dry_run, &mut err).await;
                     },
                     ("debuggees-register", Some(opt)) => {
-                        call_result = self._controller_debuggees_register(opt, dry_run, &mut err);
+                        call_result = self._controller_debuggees_register(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("controller".to_string()));
@@ -690,19 +686,19 @@ impl<'n> Engine<'n> {
             ("debugger", Some(opt)) => {
                 match opt.subcommand() {
                     ("debuggees-breakpoints-delete", Some(opt)) => {
-                        call_result = self._debugger_debuggees_breakpoints_delete(opt, dry_run, &mut err);
+                        call_result = self._debugger_debuggees_breakpoints_delete(opt, dry_run, &mut err).await;
                     },
                     ("debuggees-breakpoints-get", Some(opt)) => {
-                        call_result = self._debugger_debuggees_breakpoints_get(opt, dry_run, &mut err);
+                        call_result = self._debugger_debuggees_breakpoints_get(opt, dry_run, &mut err).await;
                     },
                     ("debuggees-breakpoints-list", Some(opt)) => {
-                        call_result = self._debugger_debuggees_breakpoints_list(opt, dry_run, &mut err);
+                        call_result = self._debugger_debuggees_breakpoints_list(opt, dry_run, &mut err).await;
                     },
                     ("debuggees-breakpoints-set", Some(opt)) => {
-                        call_result = self._debugger_debuggees_breakpoints_set(opt, dry_run, &mut err);
+                        call_result = self._debugger_debuggees_breakpoints_set(opt, dry_run, &mut err).await;
                     },
                     ("debuggees-list", Some(opt)) => {
-                        call_result = self._debugger_debuggees_list(opt, dry_run, &mut err);
+                        call_result = self._debugger_debuggees_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("debugger".to_string()));
@@ -727,41 +723,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "clouddebugger2-secret.json",
+            match client::application_secret_from_directory(&config_dir, "clouddebugger2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "clouddebugger2",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/clouddebugger2", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::CloudDebugger::new(client, auth),
@@ -777,39 +758,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("controller", "methods: 'debuggees-breakpoints-list', 'debuggees-breakpoints-update' and 'debuggees-register'", vec![
             ("debuggees-breakpoints-list",
-                    Some(r##"Returns the list of all active breakpoints for the debuggee.
-        
-        The breakpoint specification (`location`, `condition`, and `expressions`
-        fields) is semantically immutable, although the field values may
-        change. For example, an agent may update the location line number
-        to reflect the actual line where the breakpoint was set, but this
-        doesn't change the breakpoint semantics.
-        
-        This means that an agent does not need to check if a breakpoint has changed
-        when it encounters the same breakpoint on a successive call.
-        Moreover, an agent should remember the breakpoints that are completed
-        until the controller removes them from the active list to avoid
-        setting those breakpoints again."##),
+                    Some(r##"Returns the list of all active breakpoints for the debuggee. The breakpoint specification (`location`, `condition`, and `expressions` fields) is semantically immutable, although the field values may change. For example, an agent may update the location line number to reflect the actual line where the breakpoint was set, but this doesn't change the breakpoint semantics. This means that an agent does not need to check if a breakpoint has changed when it encounters the same breakpoint on a successive call. Moreover, an agent should remember the breakpoints that are completed until the controller removes them from the active list to avoid setting those breakpoints again."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-breakpoints-list",
                   vec![
                     (Some(r##"debuggee-id"##),
@@ -831,14 +801,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("debuggees-breakpoints-update",
-                    Some(r##"Updates the breakpoint state or mutable fields.
-        The entire Breakpoint message must be sent back to the controller service.
-        
-        Updates to active breakpoint fields are only allowed if the new value
-        does not change the breakpoint specification. Updates to the `location`,
-        `condition` and `expressions` fields should not alter the breakpoint
-        semantics. These may only make changes such as canonicalizing a value
-        or snapping the location to the correct line of code."##),
+                    Some(r##"Updates the breakpoint state or mutable fields. The entire Breakpoint message must be sent back to the controller service. Updates to active breakpoint fields are only allowed if the new value does not change the breakpoint specification. Updates to the `location`, `condition` and `expressions` fields should not alter the breakpoint semantics. These may only make changes such as canonicalizing a value or snapping the location to the correct line of code."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-breakpoints-update",
                   vec![
                     (Some(r##"debuggee-id"##),
@@ -872,16 +835,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("debuggees-register",
-                    Some(r##"Registers the debuggee with the controller service.
-        
-        All agents attached to the same application must call this method with
-        exactly the same request content to get back the same stable `debuggee_id`.
-        Agents should call this method again whenever `google.rpc.Code.NOT_FOUND`
-        is returned from any controller method.
-        
-        This protocol allows the controller service to disable debuggees, recover
-        from data loss, or change the `debuggee_id` format. Agents must handle
-        `debuggee_id` value changing upon re-registration."##),
+                    Some(r##"Registers the debuggee with the controller service. All agents attached to the same application must call this method with exactly the same request content to get back the same stable `debuggee_id`. Agents should call this method again whenever `google.rpc.Code.NOT_FOUND` is returned from any controller method. This protocol allows the controller service to disable debuggees, recover from data loss, or change the `debuggee_id` format. Agents must handle `debuggee_id` value changing upon re-registration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli/controller_debuggees-register",
                   vec![
                     (Some(r##"kv"##),
@@ -1033,9 +987,8 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200703")
-           .about("Examines the call stack and variables of a running application without stopping or slowing it down.
-           ")
+           .version("2.0.0+20210326")
+           .about("Examines the call stack and variables of a running application without stopping or slowing it down. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1049,12 +1002,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -1102,13 +1050,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

@@ -1,4 +1,4 @@
-site_name: Cloud Shell v1.0.14+20200704
+site_name: Cloud Shell v2.0.0+20210326
 site_url: http://byron.github.io/google-apis-rs/google-cloudshell1-cli
 site_description: A complete library to interact with Cloud Shell (protocol v1)
 
@@ -13,6 +13,11 @@ pages:
 - ['operations_delete.md', 'Operations', 'Delete']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
+- ['users_environments-add-public-key.md', 'Users', 'Environments Add Public Key']
+- ['users_environments-authorize.md', 'Users', 'Environments Authorize']
+- ['users_environments-get.md', 'Users', 'Environments Get']
+- ['users_environments-remove-public-key.md', 'Users', 'Environments Remove Public Key']
+- ['users_environments-start.md', 'Users', 'Environments Start']
 
 theme: readthedocs
 

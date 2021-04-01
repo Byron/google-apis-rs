@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20200618*. The CLI is at version *1.0.14*.
+This documentation was generated from the *drive* API at revision *20210322*. The CLI is at version *2.0.0*.
 
 ```bash
 drive3 [options]
@@ -53,14 +53,14 @@ drive3 [options]
                 update <drive-id> (-r <kv>)... [-p <v>]... [-o <out>]
         files
                 copy <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                create (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                create (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 delete <file-id> [-p <v>]...
                 empty-trash [-p <v>]...
                 export <file-id> <mime-type> [-p <v>]... [-o <out>]
                 generate-ids [-p <v>]... [-o <out>]
                 get <file-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
-                update <file-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                update <file-id> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 watch <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
         permissions
                 create <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -96,12 +96,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -154,10 +148,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `drive3 --debug <resource> <method> [options] 2>debug.txt`.
 

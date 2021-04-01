@@ -3,50 +3,46 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_androidenterprise1 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_androidenterprise1::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::AndroidEnterprise<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::AndroidEnterprise<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _devices_force_report_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _devices_force_report_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.devices().force_report_upload(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -79,7 +75,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -90,7 +86,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.devices().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -127,7 +123,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -142,7 +138,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _devices_get_state(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _devices_get_state(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.devices().get_state(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -179,7 +175,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -194,7 +190,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.devices().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -231,7 +227,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -246,7 +242,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _devices_set_state(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _devices_set_state(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -316,7 +312,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -331,7 +327,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _devices_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _devices_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -354,14 +350,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "android-id" => Some(("androidId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.auto-update-policy" => Some(("policy.autoUpdatePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.maintenance-window.start-time-after-midnight-ms" => Some(("policy.maintenanceWindow.startTimeAfterMidnightMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.maintenance-window.duration-ms" => Some(("policy.maintenanceWindow.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.device-report-policy" => Some(("policy.deviceReportPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.maintenance-window.duration-ms" => Some(("policy.maintenanceWindow.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.maintenance-window.start-time-after-midnight-ms" => Some(("policy.maintenanceWindow.startTimeAfterMidnightMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.product-availability-policy" => Some(("policy.productAvailabilityPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "report.last-updated-timestamp-millis" => Some(("report.lastUpdatedTimestampMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "android-id" => Some(("androidId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "device-report-policy", "duration-ms", "last-updated-timestamp-millis", "maintenance-window", "management-type", "policy", "product-availability-policy", "report", "start-time-after-midnight-ms"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -412,7 +408,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -427,7 +423,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_acknowledge_notification_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_acknowledge_notification_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().acknowledge_notification_set();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -464,7 +460,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -475,7 +471,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_complete_signup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_complete_signup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().complete_signup();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -500,7 +496,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["enterprise-token", "completion-token"].iter().map(|v|*v));
+                                                                           v.extend(["completion-token", "enterprise-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -519,7 +515,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -534,7 +530,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_create_web_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_create_web_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -557,14 +553,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "store-builder.enabled" => Some(("storeBuilder.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "managed-configurations.enabled" => Some(("managedConfigurations.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permission" => Some(("permission", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "play-search.approve-apps" => Some(("playSearch.approveApps", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "play-search.enabled" => Some(("playSearch.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-apps.enabled" => Some(("privateApps.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "permission" => Some(("permission", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "store-builder.enabled" => Some(("storeBuilder.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "web-apps.enabled" => Some(("webApps.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "managed-configurations.enabled" => Some(("managedConfigurations.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["approve-apps", "enabled", "managed-configurations", "parent", "permission", "play-search", "private-apps", "store-builder", "web-apps"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -611,7 +607,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -626,7 +622,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_enroll(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_enroll(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -649,9 +645,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "primary-domain" => Some(("primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-domain" => Some(("primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "name", "primary-domain"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -698,7 +694,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -713,7 +709,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_generate_signup_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_generate_signup_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().generate_signup_url();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -754,7 +750,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -769,7 +765,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().get(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -806,7 +802,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -821,7 +817,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_get_service_account(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_get_service_account(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().get_service_account(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -862,7 +858,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -877,7 +873,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_get_store_layout(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_get_store_layout(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().get_store_layout(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -914,7 +910,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -929,7 +925,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().list(opt.value_of("domain").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -966,7 +962,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -981,7 +977,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_pull_notification_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_pull_notification_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().pull_notification_set();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1022,7 +1018,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1037,7 +1033,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_send_test_push_notification(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_send_test_push_notification(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().send_test_push_notification(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1074,7 +1070,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1089,7 +1085,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_set_account(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_set_account(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1159,7 +1155,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1174,7 +1170,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_set_store_layout(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_set_store_layout(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1245,7 +1241,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1260,7 +1256,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _enterprises_unenroll(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _enterprises_unenroll(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().unenroll(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1293,7 +1289,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1304,7 +1300,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _entitlements_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _entitlements_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.entitlements().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("entitlement-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1337,7 +1333,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1348,7 +1344,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _entitlements_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _entitlements_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.entitlements().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("entitlement-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1385,7 +1381,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1400,7 +1396,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _entitlements_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _entitlements_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.entitlements().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1437,7 +1433,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1452,7 +1448,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _entitlements_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _entitlements_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1475,8 +1471,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["product-id", "reason"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1527,7 +1523,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1542,7 +1538,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _grouplicenses_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _grouplicenses_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.grouplicenses().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("group-license-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1579,7 +1575,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1594,7 +1590,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _grouplicenses_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _grouplicenses_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.grouplicenses().list(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1631,7 +1627,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1646,7 +1642,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _grouplicenseusers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _grouplicenseusers_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.grouplicenseusers().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("group-license-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1683,7 +1679,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1698,7 +1694,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _installs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _installs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.installs().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""), opt.value_of("install-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1731,7 +1727,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1742,7 +1738,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _installs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _installs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.installs().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""), opt.value_of("install-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1779,7 +1775,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1794,7 +1790,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _installs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _installs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.installs().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1831,7 +1827,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1846,7 +1842,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _installs_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _installs_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1870,8 +1866,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "install-state" => Some(("installState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["install-state", "product-id", "version-code"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1918,7 +1914,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1933,7 +1929,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsfordevice_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsfordevice_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationsfordevice().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""), opt.value_of("managed-configuration-for-device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1966,7 +1962,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1977,7 +1973,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsfordevice_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsfordevice_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationsfordevice().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""), opt.value_of("managed-configuration-for-device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2014,7 +2010,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2029,7 +2025,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsfordevice_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsfordevice_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationsfordevice().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("device-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2066,7 +2062,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2081,7 +2077,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsfordevice_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsfordevice_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2104,8 +2100,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-variables.mcm-id" => Some(("configurationVariables.mcmId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["configuration-variables", "kind", "mcm-id", "product-id"]);
@@ -2153,7 +2149,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2168,7 +2164,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsforuser_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsforuser_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationsforuser().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("managed-configuration-for-user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2201,7 +2197,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2212,7 +2208,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsforuser_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsforuser_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationsforuser().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""), opt.value_of("managed-configuration-for-user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2249,7 +2245,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2264,7 +2260,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsforuser_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsforuser_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationsforuser().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2301,7 +2297,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2316,7 +2312,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationsforuser_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationsforuser_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2339,8 +2335,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "configuration-variables.mcm-id" => Some(("configurationVariables.mcmId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["configuration-variables", "kind", "mcm-id", "product-id"]);
@@ -2388,7 +2384,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2403,7 +2399,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _managedconfigurationssettings_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _managedconfigurationssettings_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.managedconfigurationssettings().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2440,7 +2436,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2455,7 +2451,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _permissions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _permissions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.permissions().get(opt.value_of("permission-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2496,7 +2492,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2511,7 +2507,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_approve(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_approve(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2534,8 +2530,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "approved-permissions" => Some(("approvedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "approval-url-info.approval-url" => Some(("approvalUrlInfo.approvalUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "approved-permissions" => Some(("approvedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["approval-url", "approval-url-info", "approved-permissions"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2578,7 +2574,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2589,7 +2585,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_generate_approval_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_generate_approval_url(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.products().generate_approval_url(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2630,7 +2626,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2645,7 +2641,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.products().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2686,7 +2682,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2701,7 +2697,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_get_app_restrictions_schema(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_get_app_restrictions_schema(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.products().get_app_restrictions_schema(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2742,7 +2738,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2757,7 +2753,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_get_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_get_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.products().get_permissions(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2794,7 +2790,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2809,7 +2805,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.products().list(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2843,7 +2839,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["query", "token", "language", "max-results", "approved"].iter().map(|v|*v));
+                                                                           v.extend(["approved", "query", "language", "max-results", "token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2862,7 +2858,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2877,7 +2873,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _products_unapprove(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _products_unapprove(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.products().unapprove(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2910,7 +2906,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2921,7 +2917,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _serviceaccountkeys_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _serviceaccountkeys_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.serviceaccountkeys().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("key-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2954,7 +2950,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2965,7 +2961,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _serviceaccountkeys_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _serviceaccountkeys_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2988,9 +2984,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "public-data" => Some(("publicData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data" => Some(("data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "public-data" => Some(("publicData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["data", "id", "public-data", "type"]);
@@ -3038,7 +3034,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3053,7 +3049,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _serviceaccountkeys_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _serviceaccountkeys_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.serviceaccountkeys().list(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3090,7 +3086,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3105,7 +3101,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutclusters_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutclusters_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.storelayoutclusters().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""), opt.value_of("cluster-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3138,7 +3134,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3149,7 +3145,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutclusters_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutclusters_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.storelayoutclusters().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""), opt.value_of("cluster-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3186,7 +3182,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3201,7 +3197,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutclusters_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutclusters_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3224,9 +3220,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "order-in-page" => Some(("orderInPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "order-in-page", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3273,7 +3269,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3288,7 +3284,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutclusters_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutclusters_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.storelayoutclusters().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3325,7 +3321,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3340,7 +3336,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutclusters_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutclusters_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3363,9 +3359,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "order-in-page" => Some(("orderInPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "order-in-page", "product-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3412,7 +3408,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3427,7 +3423,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutpages_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutpages_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.storelayoutpages().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3460,7 +3456,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3471,7 +3467,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutpages_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutpages_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.storelayoutpages().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3508,7 +3504,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3523,7 +3519,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutpages_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutpages_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3546,8 +3542,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3594,7 +3590,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3609,7 +3605,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutpages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutpages_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.storelayoutpages().list(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3646,7 +3642,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3661,7 +3657,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _storelayoutpages_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _storelayoutpages_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3684,8 +3680,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3732,7 +3728,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3747,7 +3743,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3780,7 +3776,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3791,7 +3787,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_generate_authentication_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_generate_authentication_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().generate_authentication_token(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3828,7 +3824,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3843,7 +3839,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3880,7 +3876,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3895,7 +3891,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_get_available_product_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_get_available_product_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().get_available_product_set(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3932,7 +3928,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3947,7 +3943,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3970,12 +3966,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-identifier" => Some(("accountIdentifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-type" => Some(("accountType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "account-type", "display-name", "id", "management-type", "primary-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4022,7 +4018,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4037,7 +4033,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("email").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4074,7 +4070,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4089,7 +4085,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_revoke_device_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_revoke_device_access(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().revoke_device_access(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4122,7 +4118,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4133,7 +4129,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_set_available_product_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_set_available_product_set(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4156,8 +4152,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "product-set-behavior" => Some(("productSetBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "product-set-behavior" => Some(("productSetBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["product-id", "product-set-behavior"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4204,7 +4200,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4219,7 +4215,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _users_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _users_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4242,12 +4238,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-identifier" => Some(("accountIdentifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-type" => Some(("accountType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-email" => Some(("primaryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "account-type", "display-name", "id", "management-type", "primary-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4294,7 +4290,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4309,7 +4305,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _webapps_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _webapps_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.webapps().delete(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("web-app-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4342,7 +4338,7 @@ impl<'n> Engine<'n> {
                 call = call.add_scope(scope);
             }
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4353,7 +4349,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _webapps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _webapps_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.webapps().get(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("web-app-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4390,7 +4386,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4405,7 +4401,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _webapps_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _webapps_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4428,12 +4424,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-mode" => Some(("displayMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-published" => Some(("isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "web-app-id" => Some(("webAppId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-url" => Some(("startUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-app-id" => Some(("webAppId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["display-mode", "is-published", "start-url", "title", "version-code", "web-app-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4480,7 +4476,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4495,7 +4491,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _webapps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _webapps_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.webapps().list(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -4532,7 +4528,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4547,7 +4543,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _webapps_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _webapps_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -4570,12 +4566,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-mode" => Some(("displayMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-published" => Some(("isPublished", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "web-app-id" => Some(("webAppId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-url" => Some(("startUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-code" => Some(("versionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-app-id" => Some(("webAppId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["display-mode", "is-published", "start-url", "title", "version-code", "web-app-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4622,7 +4618,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -4637,7 +4633,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
@@ -4645,22 +4641,22 @@ impl<'n> Engine<'n> {
             ("devices", Some(opt)) => {
                 match opt.subcommand() {
                     ("force-report-upload", Some(opt)) => {
-                        call_result = self._devices_force_report_upload(opt, dry_run, &mut err);
+                        call_result = self._devices_force_report_upload(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._devices_get(opt, dry_run, &mut err);
+                        call_result = self._devices_get(opt, dry_run, &mut err).await;
                     },
                     ("get-state", Some(opt)) => {
-                        call_result = self._devices_get_state(opt, dry_run, &mut err);
+                        call_result = self._devices_get_state(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._devices_list(opt, dry_run, &mut err);
+                        call_result = self._devices_list(opt, dry_run, &mut err).await;
                     },
                     ("set-state", Some(opt)) => {
-                        call_result = self._devices_set_state(opt, dry_run, &mut err);
+                        call_result = self._devices_set_state(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._devices_update(opt, dry_run, &mut err);
+                        call_result = self._devices_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("devices".to_string()));
@@ -4671,46 +4667,46 @@ impl<'n> Engine<'n> {
             ("enterprises", Some(opt)) => {
                 match opt.subcommand() {
                     ("acknowledge-notification-set", Some(opt)) => {
-                        call_result = self._enterprises_acknowledge_notification_set(opt, dry_run, &mut err);
+                        call_result = self._enterprises_acknowledge_notification_set(opt, dry_run, &mut err).await;
                     },
                     ("complete-signup", Some(opt)) => {
-                        call_result = self._enterprises_complete_signup(opt, dry_run, &mut err);
+                        call_result = self._enterprises_complete_signup(opt, dry_run, &mut err).await;
                     },
                     ("create-web-token", Some(opt)) => {
-                        call_result = self._enterprises_create_web_token(opt, dry_run, &mut err);
+                        call_result = self._enterprises_create_web_token(opt, dry_run, &mut err).await;
                     },
                     ("enroll", Some(opt)) => {
-                        call_result = self._enterprises_enroll(opt, dry_run, &mut err);
+                        call_result = self._enterprises_enroll(opt, dry_run, &mut err).await;
                     },
                     ("generate-signup-url", Some(opt)) => {
-                        call_result = self._enterprises_generate_signup_url(opt, dry_run, &mut err);
+                        call_result = self._enterprises_generate_signup_url(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._enterprises_get(opt, dry_run, &mut err);
+                        call_result = self._enterprises_get(opt, dry_run, &mut err).await;
                     },
                     ("get-service-account", Some(opt)) => {
-                        call_result = self._enterprises_get_service_account(opt, dry_run, &mut err);
+                        call_result = self._enterprises_get_service_account(opt, dry_run, &mut err).await;
                     },
                     ("get-store-layout", Some(opt)) => {
-                        call_result = self._enterprises_get_store_layout(opt, dry_run, &mut err);
+                        call_result = self._enterprises_get_store_layout(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._enterprises_list(opt, dry_run, &mut err);
+                        call_result = self._enterprises_list(opt, dry_run, &mut err).await;
                     },
                     ("pull-notification-set", Some(opt)) => {
-                        call_result = self._enterprises_pull_notification_set(opt, dry_run, &mut err);
+                        call_result = self._enterprises_pull_notification_set(opt, dry_run, &mut err).await;
                     },
                     ("send-test-push-notification", Some(opt)) => {
-                        call_result = self._enterprises_send_test_push_notification(opt, dry_run, &mut err);
+                        call_result = self._enterprises_send_test_push_notification(opt, dry_run, &mut err).await;
                     },
                     ("set-account", Some(opt)) => {
-                        call_result = self._enterprises_set_account(opt, dry_run, &mut err);
+                        call_result = self._enterprises_set_account(opt, dry_run, &mut err).await;
                     },
                     ("set-store-layout", Some(opt)) => {
-                        call_result = self._enterprises_set_store_layout(opt, dry_run, &mut err);
+                        call_result = self._enterprises_set_store_layout(opt, dry_run, &mut err).await;
                     },
                     ("unenroll", Some(opt)) => {
-                        call_result = self._enterprises_unenroll(opt, dry_run, &mut err);
+                        call_result = self._enterprises_unenroll(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("enterprises".to_string()));
@@ -4721,16 +4717,16 @@ impl<'n> Engine<'n> {
             ("entitlements", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._entitlements_delete(opt, dry_run, &mut err);
+                        call_result = self._entitlements_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._entitlements_get(opt, dry_run, &mut err);
+                        call_result = self._entitlements_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._entitlements_list(opt, dry_run, &mut err);
+                        call_result = self._entitlements_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._entitlements_update(opt, dry_run, &mut err);
+                        call_result = self._entitlements_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("entitlements".to_string()));
@@ -4741,10 +4737,10 @@ impl<'n> Engine<'n> {
             ("grouplicenses", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._grouplicenses_get(opt, dry_run, &mut err);
+                        call_result = self._grouplicenses_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._grouplicenses_list(opt, dry_run, &mut err);
+                        call_result = self._grouplicenses_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("grouplicenses".to_string()));
@@ -4755,7 +4751,7 @@ impl<'n> Engine<'n> {
             ("grouplicenseusers", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._grouplicenseusers_list(opt, dry_run, &mut err);
+                        call_result = self._grouplicenseusers_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("grouplicenseusers".to_string()));
@@ -4766,16 +4762,16 @@ impl<'n> Engine<'n> {
             ("installs", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._installs_delete(opt, dry_run, &mut err);
+                        call_result = self._installs_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._installs_get(opt, dry_run, &mut err);
+                        call_result = self._installs_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._installs_list(opt, dry_run, &mut err);
+                        call_result = self._installs_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._installs_update(opt, dry_run, &mut err);
+                        call_result = self._installs_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("installs".to_string()));
@@ -4786,16 +4782,16 @@ impl<'n> Engine<'n> {
             ("managedconfigurationsfordevice", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._managedconfigurationsfordevice_delete(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsfordevice_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._managedconfigurationsfordevice_get(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsfordevice_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._managedconfigurationsfordevice_list(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsfordevice_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._managedconfigurationsfordevice_update(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsfordevice_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("managedconfigurationsfordevice".to_string()));
@@ -4806,16 +4802,16 @@ impl<'n> Engine<'n> {
             ("managedconfigurationsforuser", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._managedconfigurationsforuser_delete(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsforuser_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._managedconfigurationsforuser_get(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsforuser_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._managedconfigurationsforuser_list(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsforuser_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._managedconfigurationsforuser_update(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationsforuser_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("managedconfigurationsforuser".to_string()));
@@ -4826,7 +4822,7 @@ impl<'n> Engine<'n> {
             ("managedconfigurationssettings", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._managedconfigurationssettings_list(opt, dry_run, &mut err);
+                        call_result = self._managedconfigurationssettings_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("managedconfigurationssettings".to_string()));
@@ -4837,7 +4833,7 @@ impl<'n> Engine<'n> {
             ("permissions", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
-                        call_result = self._permissions_get(opt, dry_run, &mut err);
+                        call_result = self._permissions_get(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("permissions".to_string()));
@@ -4848,25 +4844,25 @@ impl<'n> Engine<'n> {
             ("products", Some(opt)) => {
                 match opt.subcommand() {
                     ("approve", Some(opt)) => {
-                        call_result = self._products_approve(opt, dry_run, &mut err);
+                        call_result = self._products_approve(opt, dry_run, &mut err).await;
                     },
                     ("generate-approval-url", Some(opt)) => {
-                        call_result = self._products_generate_approval_url(opt, dry_run, &mut err);
+                        call_result = self._products_generate_approval_url(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._products_get(opt, dry_run, &mut err);
+                        call_result = self._products_get(opt, dry_run, &mut err).await;
                     },
                     ("get-app-restrictions-schema", Some(opt)) => {
-                        call_result = self._products_get_app_restrictions_schema(opt, dry_run, &mut err);
+                        call_result = self._products_get_app_restrictions_schema(opt, dry_run, &mut err).await;
                     },
                     ("get-permissions", Some(opt)) => {
-                        call_result = self._products_get_permissions(opt, dry_run, &mut err);
+                        call_result = self._products_get_permissions(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._products_list(opt, dry_run, &mut err);
+                        call_result = self._products_list(opt, dry_run, &mut err).await;
                     },
                     ("unapprove", Some(opt)) => {
-                        call_result = self._products_unapprove(opt, dry_run, &mut err);
+                        call_result = self._products_unapprove(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("products".to_string()));
@@ -4877,13 +4873,13 @@ impl<'n> Engine<'n> {
             ("serviceaccountkeys", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._serviceaccountkeys_delete(opt, dry_run, &mut err);
+                        call_result = self._serviceaccountkeys_delete(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._serviceaccountkeys_insert(opt, dry_run, &mut err);
+                        call_result = self._serviceaccountkeys_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._serviceaccountkeys_list(opt, dry_run, &mut err);
+                        call_result = self._serviceaccountkeys_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("serviceaccountkeys".to_string()));
@@ -4894,19 +4890,19 @@ impl<'n> Engine<'n> {
             ("storelayoutclusters", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._storelayoutclusters_delete(opt, dry_run, &mut err);
+                        call_result = self._storelayoutclusters_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._storelayoutclusters_get(opt, dry_run, &mut err);
+                        call_result = self._storelayoutclusters_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._storelayoutclusters_insert(opt, dry_run, &mut err);
+                        call_result = self._storelayoutclusters_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._storelayoutclusters_list(opt, dry_run, &mut err);
+                        call_result = self._storelayoutclusters_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._storelayoutclusters_update(opt, dry_run, &mut err);
+                        call_result = self._storelayoutclusters_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("storelayoutclusters".to_string()));
@@ -4917,19 +4913,19 @@ impl<'n> Engine<'n> {
             ("storelayoutpages", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._storelayoutpages_delete(opt, dry_run, &mut err);
+                        call_result = self._storelayoutpages_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._storelayoutpages_get(opt, dry_run, &mut err);
+                        call_result = self._storelayoutpages_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._storelayoutpages_insert(opt, dry_run, &mut err);
+                        call_result = self._storelayoutpages_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._storelayoutpages_list(opt, dry_run, &mut err);
+                        call_result = self._storelayoutpages_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._storelayoutpages_update(opt, dry_run, &mut err);
+                        call_result = self._storelayoutpages_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("storelayoutpages".to_string()));
@@ -4940,31 +4936,31 @@ impl<'n> Engine<'n> {
             ("users", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._users_delete(opt, dry_run, &mut err);
+                        call_result = self._users_delete(opt, dry_run, &mut err).await;
                     },
                     ("generate-authentication-token", Some(opt)) => {
-                        call_result = self._users_generate_authentication_token(opt, dry_run, &mut err);
+                        call_result = self._users_generate_authentication_token(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._users_get(opt, dry_run, &mut err);
+                        call_result = self._users_get(opt, dry_run, &mut err).await;
                     },
                     ("get-available-product-set", Some(opt)) => {
-                        call_result = self._users_get_available_product_set(opt, dry_run, &mut err);
+                        call_result = self._users_get_available_product_set(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._users_insert(opt, dry_run, &mut err);
+                        call_result = self._users_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._users_list(opt, dry_run, &mut err);
+                        call_result = self._users_list(opt, dry_run, &mut err).await;
                     },
                     ("revoke-device-access", Some(opt)) => {
-                        call_result = self._users_revoke_device_access(opt, dry_run, &mut err);
+                        call_result = self._users_revoke_device_access(opt, dry_run, &mut err).await;
                     },
                     ("set-available-product-set", Some(opt)) => {
-                        call_result = self._users_set_available_product_set(opt, dry_run, &mut err);
+                        call_result = self._users_set_available_product_set(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._users_update(opt, dry_run, &mut err);
+                        call_result = self._users_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("users".to_string()));
@@ -4975,19 +4971,19 @@ impl<'n> Engine<'n> {
             ("webapps", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
-                        call_result = self._webapps_delete(opt, dry_run, &mut err);
+                        call_result = self._webapps_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._webapps_get(opt, dry_run, &mut err);
+                        call_result = self._webapps_get(opt, dry_run, &mut err).await;
                     },
                     ("insert", Some(opt)) => {
-                        call_result = self._webapps_insert(opt, dry_run, &mut err);
+                        call_result = self._webapps_insert(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._webapps_list(opt, dry_run, &mut err);
+                        call_result = self._webapps_list(opt, dry_run, &mut err).await;
                     },
                     ("update", Some(opt)) => {
-                        call_result = self._webapps_update(opt, dry_run, &mut err);
+                        call_result = self._webapps_update(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("webapps".to_string()));
@@ -5012,41 +5008,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "androidenterprise1-secret.json",
+            match client::application_secret_from_directory(&config_dir, "androidenterprise1-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "androidenterprise1",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/androidenterprise1", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::AndroidEnterprise::new(client, auth),
@@ -5062,31 +5043,28 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
         ("devices", "methods: 'force-report-upload', 'get', 'get-state', 'list', 'set-state' and 'update'", vec![
             ("force-report-upload",
-                    Some(r##"Uploads a report containing any changes in app states on the device since
-        the last report was generated. You can call this method up to 3 times every
-        24 hours for a given device.
-        If you exceed the quota, then the Google Play EMM API returns <code>HTTP
-        429 Too Many Requests</code>."##),
+                    Some(r##"Uploads a report containing any changes in app states on the device since the last report was generated. You can call this method up to 3 times every 24 hours for a given device. If you exceed the quota, then the Google Play EMM API returns HTTP 429 Too Many Requests."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_force-report-upload",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5148,13 +5126,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-state",
-                    Some(r##"Retrieves whether a device's access to Google services is enabled or
-        disabled.
-        The device state takes effect only if enforcing EMM policies on Android
-        devices is enabled in the Google Admin Console.
-        Otherwise, the device state is ignored and all devices are allowed access
-        to Google services.
-        This is only supported for Google-managed users."##),
+                    Some(r##"Retrieves whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_get-state",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5216,12 +5188,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-state",
-                    Some(r##"Sets whether a device's access to Google services is enabled or disabled.
-        The device state takes effect only if enforcing EMM policies on Android
-        devices is enabled in the Google Admin Console.
-        Otherwise, the device state is ignored and all devices are allowed access
-        to Google services.
-        This is only supported for Google-managed users."##),
+                    Some(r##"Sets whether a device's access to Google services is enabled or disabled. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services. This is only supported for Google-managed users."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_set-state",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5261,7 +5228,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the device policy"##),
+                    Some(r##"Updates the device policy. To ensure the policy is properly enforced, you need to prevent unmanaged accounts from accessing Google Play by setting the allowed_accounts in the managed configuration for the Google Play package. See restrict accounts in Google Play."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/devices_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5304,9 +5271,7 @@ fn main() {
         
         ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
             ("acknowledge-notification-set",
-                    Some(r##"Acknowledges notifications that were received from
-        Enterprises.PullNotificationSet to prevent subsequent calls from returning
-        the same notifications."##),
+                    Some(r##"Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_acknowledge-notification-set",
                   vec![
                     (Some(r##"v"##),
@@ -5316,10 +5281,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("complete-signup",
-                    Some(r##"Completes the signup flow, by specifying the Completion token and
-        Enterprise token.
-        This request must not be called multiple times for a given Enterprise
-        Token."##),
+                    Some(r##"Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_complete-signup",
                   vec![
                     (Some(r##"v"##),
@@ -5335,10 +5297,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("create-web-token",
-                    Some(r##"Returns a unique token to access an embeddable UI. To generate a
-        web UI, pass the generated token into the managed Google Play javascript
-        API. Each token may only be used to start one UI session. See the
-        javascript API documentation for further information."##),
+                    Some(r##"Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the managed Google Play javascript API. Each token may only be used to start one UI session. See the javascript API documentation for further information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_create-web-token",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5432,21 +5391,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-service-account",
-                    Some(r##"Returns a service account and credentials. The service account
-        can be bound to the enterprise by calling setAccount. The service account
-        is unique to this enterprise and EMM, and will be deleted if the enterprise
-        is unbound. The credentials contain private key data and are not stored
-        server-side.
-        <br> <br>
-        This method can only be called after calling
-        Enterprises.Enroll or Enterprises.CompleteSignup, and before
-        Enterprises.SetAccount; at other times it will return an error.
-        <br> <br>
-        Subsequent calls after the first will generate a new, unique set of
-        credentials, and invalidate the previously generated credentials.
-        <br> <br>
-        Once the service account is bound to the enterprise, it can be managed
-        using the serviceAccountKeys resource."##),
+                    Some(r##"Returns a service account and credentials. The service account can be bound to the enterprise by calling setAccount. The service account is unique to this enterprise and EMM, and will be deleted if the enterprise is unbound. The credentials contain private key data and are not stored server-side. This method can only be called after calling Enterprises.Enroll or Enterprises.CompleteSignup, and before Enterprises.SetAccount; at other times it will return an error. Subsequent calls after the first will generate a new, unique set of credentials, and invalidate the previously generated credentials. Once the service account is bound to the enterprise, it can be managed using the serviceAccountKeys resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_get-service-account",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5468,9 +5413,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-store-layout",
-                    Some(r##"Returns the store layout for the enterprise. If the store layout
-        has not been set, returns "basic" as the store layout type and no
-        homepage."##),
+                    Some(r##"Returns the store layout for the enterprise. If the store layout has not been set, returns "basic" as the store layout type and no homepage."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_get-store-layout",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5492,11 +5435,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Looks up an enterprise by domain name.
-        This is only supported for enterprises created via the Google-initiated
-        creation flow.  Lookup of the id is not needed for enterprises created via
-        the EMM-initiated flow since the EMM learns the enterprise ID in the
-        callback specified in the Enterprises.generateSignupUrl call."##),
+                    Some(r##"Looks up an enterprise by domain name. This is only supported for enterprises created via the Google-initiated creation flow. Lookup of the id is not needed for enterprises created via the EMM-initiated flow since the EMM learns the enterprise ID in the callback specified in the Enterprises.generateSignupUrl call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_list",
                   vec![
                     (Some(r##"domain"##),
@@ -5518,26 +5457,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("pull-notification-set",
-                    Some(r##"Pulls and returns a notification set for the enterprises associated with
-        the service account authenticated for the request. The notification set may
-        be empty if no notification are pending.
-        <br>
-        A notification set returned needs to be acknowledged within 20 seconds
-        by calling Enterprises.AcknowledgeNotificationSet, unless the
-        notification set is empty.
-        <br>
-        Notifications that are not acknowledged within the 20 seconds will
-        eventually be included again in the response to another PullNotificationSet
-        request, and those that are never acknowledged will ultimately be deleted
-        according to the Google Cloud Platform Pub/Sub system policy.
-        <br>
-        Multiple requests might be performed concurrently to retrieve
-        notifications, in which case the pending notifications (if any) will be
-        split among each caller, if any are pending.
-        <br>
-        If no notifications are present, an empty notification list is returned.
-        Subsequent requests may return more notifications once they become
-        available."##),
+                    Some(r##"Pulls and returns a notification set for the enterprises associated with the service account authenticated for the request. The notification set may be empty if no notification are pending. A notification set returned needs to be acknowledged within 20 seconds by calling Enterprises.AcknowledgeNotificationSet, unless the notification set is empty. Notifications that are not acknowledged within the 20 seconds will eventually be included again in the response to another PullNotificationSet request, and those that are never acknowledged will ultimately be deleted according to the Google Cloud Platform Pub/Sub system policy. Multiple requests might be performed concurrently to retrieve notifications, in which case the pending notifications (if any) will be split among each caller, if any are pending. If no notifications are present, an empty notification list is returned. Subsequent requests may return more notifications once they become available."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_pull-notification-set",
                   vec![
                     (Some(r##"v"##),
@@ -5553,8 +5473,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("send-test-push-notification",
-                    Some(r##"Sends a test notification to validate the EMM integration with
-        the Google Cloud Pub/Sub service for this enterprise."##),
+                    Some(r##"Sends a test notification to validate the EMM integration with the Google Cloud Pub/Sub service for this enterprise."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_send-test-push-notification",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5576,8 +5495,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-account",
-                    Some(r##"Sets the account that will be used to authenticate to the API as the
-        enterprise."##),
+                    Some(r##"Sets the account that will be used to authenticate to the API as the enterprise."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_set-account",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5605,15 +5523,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-store-layout",
-                    Some(r##"Sets the store layout for the enterprise. By default, storeLayoutType
-        is set to "basic" and the basic store layout is enabled. The basic
-        layout only contains apps approved by the admin, and that have
-        been added to the available product set for a user (using the
-        <a href="/android/work/play/emm-api/v1/users/setAvailableProductSet">
-        setAvailableProductSet</a> call). Apps on the page are sorted in order of
-        their product ID value. If you create a custom store layout (by setting
-        storeLayoutType = "custom" and setting a homepage), the basic store
-        layout is disabled."##),
+                    Some(r##"Sets the store layout for the enterprise. By default, storeLayoutType is set to "basic" and the basic store layout is enabled. The basic layout only contains apps approved by the admin, and that have been added to the available product set for a user (using the setAvailableProductSet call). Apps on the page are sorted in order of their product ID value. If you create a custom store layout (by setting storeLayoutType = "custom" and setting a homepage), the basic store layout is disabled."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_set-store-layout",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5804,8 +5714,7 @@ fn main() {
         
                     (Some(r##"group-license-id"##),
                      None,
-                     Some(r##"The ID of the product the group license is for, e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product the group license is for, e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5847,8 +5756,7 @@ fn main() {
         
         ("grouplicenseusers", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Retrieves the IDs of the users who have been granted entitlements
-        under the license."##),
+                    Some(r##"Retrieves the IDs of the users who have been granted entitlements under the license."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/grouplicenseusers_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5859,8 +5767,7 @@ fn main() {
         
                     (Some(r##"group-license-id"##),
                      None,
-                     Some(r##"The ID of the product the group license is for, e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product the group license is for, e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5880,9 +5787,7 @@ fn main() {
         
         ("installs", "methods: 'delete', 'get', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Requests to remove an app from a device. A call to <code>get</code> or
-        <code>list</code> will still show the app as installed on the device until
-        it is actually removed."##),
+                    Some(r##"Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/installs_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -5905,8 +5810,7 @@ fn main() {
         
                     (Some(r##"install-id"##),
                      None,
-                     Some(r##"The ID of the product represented by the install, e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product represented by the install, e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5940,8 +5844,7 @@ fn main() {
         
                     (Some(r##"install-id"##),
                      None,
-                     Some(r##"The ID of the product represented by the install, e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product represented by the install, e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -5992,9 +5895,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Requests to install the latest version of an app to a device. If the app
-        is already installed, then it is updated to the latest version if
-        necessary."##),
+                    Some(r##"Requests to install the latest version of an app to a device. If the app is already installed, then it is updated to the latest version if necessary."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/installs_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6017,8 +5918,7 @@ fn main() {
         
                     (Some(r##"install-id"##),
                      None,
-                     Some(r##"The ID of the product represented by the install, e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the product represented by the install, e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6044,8 +5944,7 @@ fn main() {
         
         ("managedconfigurationsfordevice", "methods: 'delete', 'get', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Removes a per-device managed configuration for an app for the specified
-        device."##),
+                    Some(r##"Removes a per-device managed configuration for an app for the specified device."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsfordevice_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6068,8 +5967,7 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-device-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6103,8 +6001,7 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-device-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6121,8 +6018,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all the per-device managed configurations for the specified device.
-        Only the ID is set."##),
+                    Some(r##"Lists all the per-device managed configurations for the specified device. Only the ID is set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsfordevice_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6156,8 +6052,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Adds or updates a per-device managed configuration for an app for the
-        specified device."##),
+                    Some(r##"Adds or updates a per-device managed configuration for an app for the specified device."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsfordevice_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6180,8 +6075,7 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-device-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6224,8 +6118,7 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-user-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6236,8 +6129,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieves details of a per-user managed configuration for an app for the
-        specified user."##),
+                    Some(r##"Retrieves details of a per-user managed configuration for an app for the specified user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsforuser_get",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6254,8 +6146,7 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-user-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6272,8 +6163,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all the per-user managed configurations for the specified user. Only
-        the ID is set."##),
+                    Some(r##"Lists all the per-user managed configurations for the specified user. Only the ID is set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsforuser_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6301,17 +6191,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Adds or updates the managed configuration settings for an app for the
-        specified user.
-        If you support the <a
-        href="https://developers.google.com/android/work/play/emm-api/managed-configurations-iframe">Managed
-        configurations iframe</a>,
-        you can apply managed configurations to a user by specifying an
-        <code>mcmId</code>
-        and its associated configuration variables (if any) in the request.
-        Alternatively,
-        all EMMs can apply managed configurations by passing a list of managed
-        properties."##),
+                    Some(r##"Adds or updates the managed configuration settings for an app for the specified user. If you support the Managed configurations iframe, you can apply managed configurations to a user by specifying an mcmId and its associated configuration variables (if any) in the request. Alternatively, all EMMs can apply managed configurations by passing a list of managed properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/managedconfigurationsforuser_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6328,8 +6208,7 @@ fn main() {
         
                     (Some(r##"managed-configuration-for-user-id"##),
                      None,
-                     Some(r##"The ID of the managed configuration (a product ID), e.g.
-        "app:com.google.android.gm"."##),
+                     Some(r##"The ID of the managed configuration (a product ID), e.g. "app:com.google.android.gm"."##),
                      Some(true),
                      Some(false)),
         
@@ -6366,8 +6245,7 @@ fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"The ID of the product for which the managed configurations settings applies
-        to."##),
+                     Some(r##"The ID of the product for which the managed configurations settings applies to."##),
                      Some(true),
                      Some(false)),
         
@@ -6387,8 +6265,7 @@ fn main() {
         
         ("permissions", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Retrieves details of an Android app permission for display to an enterprise
-        admin."##),
+                    Some(r##"Retrieves details of an Android app permission for display to an enterprise admin."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/permissions_get",
                   vec![
                     (Some(r##"permission-id"##),
@@ -6413,13 +6290,7 @@ fn main() {
         
         ("products", "methods: 'approve', 'generate-approval-url', 'get', 'get-app-restrictions-schema', 'get-permissions', 'list' and 'unapprove'", vec![
             ("approve",
-                    Some(r##"<p>Approves the specified product and the relevant app permissions, if any.
-        The maximum number of products that you can approve per enterprise customer
-        is 1,000.</p>
-        <p>To learn how to use managed Google Play to design and create a store
-        layout to display approved products to your users,
-        see <a href="/android/work/play/emm-api/store-layout">Store Layout
-        Design</a>.</p>"##),
+                    Some(r##" Approves the specified product and the relevant app permissions, if any. The maximum number of products that you can approve per enterprise customer is 1,000. To learn how to use managed Google Play to design and create a store layout to display approved products to your users, see Store Layout Design. "##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_approve",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6447,16 +6318,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("generate-approval-url",
-                    Some(r##"Generates a URL that can be rendered in an iframe to display the
-        permissions (if any) of a product. An enterprise admin must view these
-        permissions and accept them on behalf of their organization in order to
-        approve that product. <br><br>
-        Admins should accept the displayed permissions by
-        interacting with a separate UI element in the EMM console, which in turn
-        should trigger the use of this URL as the
-        <code>approvalUrlInfo.approvalUrl</code> property in a
-        <code>Products.approve</code> call to approve the product.
-        This URL can only be used to display permissions for up to 1 day."##),
+                    Some(r##"Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product. Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_generate-approval-url",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6512,14 +6374,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-app-restrictions-schema",
-                    Some(r##"Retrieves the schema that defines the configurable properties for this
-        product. All products have a schema, but this schema may be empty if no
-        managed configurations have been defined. This schema can be used to
-        populate a UI that allows an admin to configure the product.
-        To apply a managed configuration based on the schema obtained using this
-        API, see
-        <a href="/android/work/play/emm-api/managed-configurations">Managed
-        Configurations through Play</a>."##),
+                    Some(r##"Retrieves the schema that defines the configurable properties for this product. All products have a schema, but this schema may be empty if no managed configurations have been defined. This schema can be used to populate a UI that allows an admin to configure the product. To apply a managed configuration based on the schema obtained using this API, see Managed Configurations through Play."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_get-app-restrictions-schema",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6575,8 +6430,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Finds approved products that match a query, or all approved products
-        if there is no query."##),
+                    Some(r##"Finds approved products that match a query, or all approved products if there is no query."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/products_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6623,10 +6477,7 @@ fn main() {
         
         ("serviceaccountkeys", "methods: 'delete', 'insert' and 'list'", vec![
             ("delete",
-                    Some(r##"Removes and invalidates the specified credentials for the service account
-        associated with this enterprise. The calling service account must have been
-        retrieved by calling Enterprises.GetServiceAccount and must have been set
-        as the enterprise service account by calling Enterprises.SetAccount."##),
+                    Some(r##"Removes and invalidates the specified credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/serviceaccountkeys_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6648,12 +6499,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",
-                    Some(r##"Generates new credentials for the service account associated with this
-        enterprise. The calling service account must have been retrieved by calling
-        Enterprises.GetServiceAccount and must have been set as the enterprise
-        service account by calling Enterprises.SetAccount. <br><br>
-        Only the type of the key should be populated in the resource to be
-        inserted."##),
+                    Some(r##"Generates new credentials for the service account associated with this enterprise. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount. Only the type of the key should be populated in the resource to be inserted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/serviceaccountkeys_insert",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6681,11 +6527,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all active credentials for the service account associated with this
-        enterprise. Only the ID and key type are returned. The calling service
-        account must have been retrieved by calling Enterprises.GetServiceAccount
-        and must have been set as the enterprise service account by calling
-        Enterprises.SetAccount."##),
+                    Some(r##"Lists all active credentials for the service account associated with this enterprise. Only the ID and key type are returned. The calling service account must have been retrieved by calling Enterprises.GetServiceAccount and must have been set as the enterprise service account by calling Enterprises.SetAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/serviceaccountkeys_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7036,13 +6878,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("generate-authentication-token",
-                    Some(r##"Generates an authentication token which the device policy client can use to
-        provision the given EMM-managed user account on a device.
-        The generated token is single-use and expires after a few minutes.
-        
-        You can provision a maximum of 10 devices per user.
-        
-        This call only works with EMM-managed accounts."##),
+                    Some(r##"Generates an authentication token which the device policy client can use to provision the given EMM-managed user account on a device. The generated token is single-use and expires after a few minutes. You can provision a maximum of 10 devices per user. This call only works with EMM-managed accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_generate-authentication-token",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7126,14 +6962,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new EMM-managed user.
-        
-        The <a href="/android/work/play/emm-api/v1/users.html">Users</a> resource
-        passed in the body of the request should include an
-        <code>accountIdentifier</code> and an <code>accountType</code>.
-        <p>If a corresponding user already exists with the same account identifier,
-        the user will be updated with the resource. In this case only the
-        <code>displayName</code> field can be changed."##),
+                    Some(r##"Creates a new EMM-managed user. The Users resource passed in the body of the request should include an accountIdentifier and an accountType. If a corresponding user already exists with the same account identifier, the user will be updated with the resource. In this case only the displayName field can be changed."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_insert",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7161,10 +6990,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Looks up a user by primary email address.
-        This is only supported for Google-managed users.  Lookup of the id is not
-        needed for EMM-managed users because the id is already returned in the
-        result of the Users.insert call."##),
+                    Some(r##"Looks up a user by primary email address. This is only supported for Google-managed users. Lookup of the id is not needed for EMM-managed users because the id is already returned in the result of the Users.insert call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_list",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7192,11 +7018,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("revoke-device-access",
-                    Some(r##"Revokes access to all devices currently provisioned to the user. The user
-        will no longer be able to use the managed Play store on any of their
-        managed devices.
-        
-        This call only works with EMM-managed accounts."##),
+                    Some(r##"Revokes access to all devices currently provisioned to the user. The user will no longer be able to use the managed Play store on any of their managed devices. This call only works with EMM-managed accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_revoke-device-access",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7218,11 +7040,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("set-available-product-set",
-                    Some(r##"Modifies the set of products that a user is entitled to access (referred to
-        as <em>whitelisted</em> products). Only products that are
-        <a href="/android/work/play/emm-api/v1/products/approve">approved</a>
-        or products that were previously approved (products with revoked approval)
-        can be whitelisted."##),
+                    Some(r##"Modifies the set of products that a user is entitled to access (referred to as *whitelisted* products). Only products that are approved or products that were previously approved (products with revoked approval) can be whitelisted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_set-available-product-set",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7256,14 +7074,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates the details of an EMM-managed user.
-        
-        Can be used with EMM-managed users only (not Google managed users).
-        Pass the new details in the
-        <a href="/android/work/play/emm-api/v1/users.html">Users</a>
-        resource in the request body. Only the <code>displayName</code> field
-        can be changed. Other fields must either be unset or have the
-        currently active value."##),
+                    Some(r##"Updates the details of an EMM-managed user. Can be used with EMM-managed users only (not Google managed users). Pass the new details in the Users resource in the request body. Only the displayName field can be changed. Other fields must either be unset or have the currently active value."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_update",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7439,7 +7250,7 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200707")
+           .version("2.0.0+20210324")
            .about("Manages the deployment of apps to Android Enterprise devices.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")
@@ -7454,12 +7265,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -7507,13 +7313,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {

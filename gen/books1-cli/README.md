@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *books* API at revision *20200707*. The CLI is at version *1.0.14*.
+This documentation was generated from the *books* API at revision *20210326*. The CLI is at version *2.0.0*.
 
 ```bash
 books1 [options]
@@ -35,44 +35,44 @@ books1 [options]
                 volumes-list <user-id> <shelf> [-p <v>]... [-o <out>]
         cloudloading
                 add-book [-p <v>]... [-o <out>]
-                delete-book [-p <v>]... [-o <out>]
+                delete-book <volume-id> [-p <v>]... [-o <out>]
                 update-book (-r <kv>)... [-p <v>]... [-o <out>]
         dictionary
-                list-offline-metadata [-p <v>]... [-o <out>]
+                list-offline-metadata <cpksver> [-p <v>]... [-o <out>]
         familysharing
                 get-family-info [-p <v>]... [-o <out>]
                 share [-p <v>]... [-o <out>]
                 unshare [-p <v>]... [-o <out>]
         layers
-                annotation-data-get <volume-id> <layer-id> <annotation-data-id> [-p <v>]... [-o <out>]
-                annotation-data-list <volume-id> <layer-id> [-p <v>]... [-o <out>]
+                annotation-data-get <volume-id> <layer-id> <annotation-data-id> <content-version> [-p <v>]... [-o <out>]
+                annotation-data-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
                 get <volume-id> <summary-id> [-p <v>]... [-o <out>]
                 list <volume-id> [-p <v>]... [-o <out>]
                 volume-annotations-get <volume-id> <layer-id> <annotation-id> [-p <v>]... [-o <out>]
-                volume-annotations-list <volume-id> <layer-id> [-p <v>]... [-o <out>]
+                volume-annotations-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
         myconfig
                 get-user-settings [-p <v>]... [-o <out>]
-                release-download-access [-p <v>]... [-o <out>]
-                request-access [-p <v>]... [-o <out>]
-                sync-volume-licenses [-p <v>]... [-o <out>]
+                release-download-access <cpksver> <volume-ids>... [-p <v>]... [-o <out>]
+                request-access <cpksver> <nonce> <source> <volume-id> [-p <v>]... [-o <out>]
+                sync-volume-licenses <cpksver> <nonce> <source> [-p <v>]... [-o <out>]
                 update-user-settings (-r <kv>)... [-p <v>]... [-o <out>]
         mylibrary
                 annotations-delete <annotation-id> [-p <v>]... [-o <out>]
                 annotations-insert (-r <kv>)... [-p <v>]... [-o <out>]
                 annotations-list [-p <v>]... [-o <out>]
-                annotations-summary [-p <v>]... [-o <out>]
+                annotations-summary <layer-ids>... <volume-id> [-p <v>]... [-o <out>]
                 annotations-update <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                bookshelves-add-volume <shelf> [-p <v>]... [-o <out>]
+                bookshelves-add-volume <shelf> <volume-id> [-p <v>]... [-o <out>]
                 bookshelves-clear-volumes <shelf> [-p <v>]... [-o <out>]
                 bookshelves-get <shelf> [-p <v>]... [-o <out>]
                 bookshelves-list [-p <v>]... [-o <out>]
-                bookshelves-move-volume <shelf> [-p <v>]... [-o <out>]
-                bookshelves-remove-volume <shelf> [-p <v>]... [-o <out>]
+                bookshelves-move-volume <shelf> <volume-id> <volume-position> [-p <v>]... [-o <out>]
+                bookshelves-remove-volume <shelf> <volume-id> [-p <v>]... [-o <out>]
                 bookshelves-volumes-list <shelf> [-p <v>]... [-o <out>]
                 readingpositions-get <volume-id> [-p <v>]... [-o <out>]
-                readingpositions-set-position <volume-id> [-p <v>]... [-o <out>]
+                readingpositions-set-position <volume-id> <position> <timestamp> [-p <v>]... [-o <out>]
         notification
-                get [-p <v>]... [-o <out>]
+                get <notification-id> [-p <v>]... [-o <out>]
         onboarding
                 list-categories [-p <v>]... [-o <out>]
                 list-category-volumes [-p <v>]... [-o <out>]
@@ -83,15 +83,15 @@ books1 [options]
                 dismiss [-p <v>]... [-o <out>]
                 get [-p <v>]... [-o <out>]
         series
-                get [-p <v>]... [-o <out>]
-                membership-get [-p <v>]... [-o <out>]
+                get <series-id>... [-p <v>]... [-o <out>]
+                membership-get <series-id> [-p <v>]... [-o <out>]
         volumes
                 associated-list <volume-id> [-p <v>]... [-o <out>]
                 get <volume-id> [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
+                list <q> [-p <v>]... [-o <out>]
                 mybooks-list [-p <v>]... [-o <out>]
                 recommended-list [-p <v>]... [-o <out>]
-                recommended-rate [-p <v>]... [-o <out>]
+                recommended-rate <rating> <volume-id> [-p <v>]... [-o <out>]
                 useruploaded-list [-p <v>]... [-o <out>]
   books1 --help
 
@@ -104,12 +104,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -162,10 +156,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `books1 --debug <resource> <method> [options] 2>debug.txt`.
 

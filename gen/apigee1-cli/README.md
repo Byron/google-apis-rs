@@ -25,13 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Apigee* API at revision *20200625*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Apigee* API at revision *20210319*. The CLI is at version *2.0.0*.
 
 ```bash
 apigee1 [options]
         hybrid
                 issuers-list <name> [-p <v>]... [-o <out>]
         organizations
+                analytics-datastores-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                analytics-datastores-delete <name> [-p <v>]... [-o <out>]
+                analytics-datastores-get <name> [-p <v>]... [-o <out>]
+                analytics-datastores-list <parent> [-p <v>]... [-o <out>]
+                analytics-datastores-test <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                analytics-datastores-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 apiproducts-attributes <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 apiproducts-attributes-delete <name> [-p <v>]... [-o <out>]
                 apiproducts-attributes-get <name> [-p <v>]... [-o <out>]
@@ -56,6 +62,12 @@ apigee1 [options]
                 apps-get <name> [-p <v>]... [-o <out>]
                 apps-list <parent> [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
+                datacollectors-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                datacollectors-delete <name> [-p <v>]... [-o <out>]
+                datacollectors-get <name> [-p <v>]... [-o <out>]
+                datacollectors-list <parent> [-p <v>]... [-o <out>]
+                datacollectors-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
                 deployments-list <parent> [-p <v>]... [-o <out>]
                 developers-apps-attributes <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 developers-apps-attributes-delete <name> [-p <v>]... [-o <out>]
@@ -87,15 +99,30 @@ apigee1 [options]
                 developers-list <parent> [-p <v>]... [-o <out>]
                 developers-set-developer-status <name> [-p <v>]... [-o <out>]
                 developers-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                envgroups-attachments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                envgroups-attachments-delete <name> [-p <v>]... [-o <out>]
+                envgroups-attachments-get <name> [-p <v>]... [-o <out>]
+                envgroups-attachments-list <parent> [-p <v>]... [-o <out>]
+                envgroups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                envgroups-delete <name> [-p <v>]... [-o <out>]
+                envgroups-get <name> [-p <v>]... [-o <out>]
+                envgroups-list <parent> [-p <v>]... [-o <out>]
+                envgroups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-analytics-admin-get-schemav2 <name> [-p <v>]... [-o <out>]
+                environments-analytics-exports-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                environments-analytics-exports-get <name> [-p <v>]... [-o <out>]
+                environments-analytics-exports-list <parent> [-p <v>]... [-o <out>]
                 environments-apis-deployments-list <parent> [-p <v>]... [-o <out>]
                 environments-apis-revisions-debugsessions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-apis-revisions-debugsessions-data-get <name> [-p <v>]... [-o <out>]
                 environments-apis-revisions-debugsessions-delete-data <name> [-p <v>]... [-o <out>]
                 environments-apis-revisions-debugsessions-get <name> [-p <v>]... [-o <out>]
                 environments-apis-revisions-debugsessions-list <parent> [-p <v>]... [-o <out>]
-                environments-apis-revisions-deployments <name> [-p <v>]... [-o <out>]
+                environments-apis-revisions-deploy <name> [-p <v>]... [-o <out>]
+                environments-apis-revisions-deployments-generate-deploy-change-report <name> [-p <v>]... [-o <out>]
+                environments-apis-revisions-deployments-generate-undeploy-change-report <name> [-p <v>]... [-o <out>]
                 environments-apis-revisions-get-deployments <name> [-p <v>]... [-o <out>]
+                environments-apis-revisions-undeploy <name> [-p <v>]... [-o <out>]
                 environments-caches-delete <name> [-p <v>]... [-o <out>]
                 environments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-delete <name> [-p <v>]... [-o <out>]
@@ -107,6 +134,7 @@ apigee1 [options]
                 environments-get-debugmask <name> [-p <v>]... [-o <out>]
                 environments-get-deployed-config <name> [-p <v>]... [-o <out>]
                 environments-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                environments-get-trace-config <name> [-p <v>]... [-o <out>]
                 environments-keystores-aliases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-keystores-aliases-csr <name> [-p <v>]... [-o <out>]
                 environments-keystores-aliases-delete <name> [-p <v>]... [-o <out>]
@@ -135,8 +163,9 @@ apigee1 [options]
                 environments-resourcefiles-update <parent> <type> <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-sharedflows-deployments-list <parent> [-p <v>]... [-o <out>]
-                environments-sharedflows-revisions-deployments <name> [-p <v>]... [-o <out>]
+                environments-sharedflows-revisions-deploy <name> [-p <v>]... [-o <out>]
                 environments-sharedflows-revisions-get-deployments <name> [-p <v>]... [-o <out>]
+                environments-sharedflows-revisions-undeploy <name> [-p <v>]... [-o <out>]
                 environments-stats-get <name> [-p <v>]... [-o <out>]
                 environments-subscribe <parent> [-p <v>]... [-o <out>]
                 environments-targetservers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -144,17 +173,47 @@ apigee1 [options]
                 environments-targetservers-get <name> [-p <v>]... [-o <out>]
                 environments-targetservers-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                environments-trace-config-overrides-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                environments-trace-config-overrides-delete <name> [-p <v>]... [-o <out>]
+                environments-trace-config-overrides-get <name> [-p <v>]... [-o <out>]
+                environments-trace-config-overrides-list <parent> [-p <v>]... [-o <out>]
+                environments-trace-config-overrides-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-unsubscribe <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-update-debugmask <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-update-environment <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                environments-update-trace-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
+                get-deployed-ingress-config <name> [-p <v>]... [-o <out>]
                 get-sync-authorization <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                host-queries-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                host-queries-get <name> [-p <v>]... [-o <out>]
+                host-queries-get-result <name> [-p <v>]... [-o <out>]
+                host-queries-get-result-view <name> [-p <v>]... [-o <out>]
+                host-queries-list <parent> [-p <v>]... [-o <out>]
+                host-stats-get <name> [-p <v>]... [-o <out>]
+                instances-attachments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-attachments-delete <name> [-p <v>]... [-o <out>]
+                instances-attachments-get <name> [-p <v>]... [-o <out>]
+                instances-attachments-list <parent> [-p <v>]... [-o <out>]
+                instances-canaryevaluations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-canaryevaluations-get <name> [-p <v>]... [-o <out>]
+                instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-delete <name> [-p <v>]... [-o <out>]
+                instances-get <name> [-p <v>]... [-o <out>]
+                instances-list <parent> [-p <v>]... [-o <out>]
+                instances-nat-addresses-activate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-nat-addresses-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-nat-addresses-delete <name> [-p <v>]... [-o <out>]
+                instances-nat-addresses-get <name> [-p <v>]... [-o <out>]
+                instances-nat-addresses-list <parent> [-p <v>]... [-o <out>]
+                instances-report-status <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 keyvaluemaps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 keyvaluemaps-delete <name> [-p <v>]... [-o <out>]
                 list <parent> [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]
                 operations-list <name> [-p <v>]... [-o <out>]
+                optimized-host-stats-get <name> [-p <v>]... [-o <out>]
                 reports-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 reports-delete <name> [-p <v>]... [-o <out>]
                 reports-get <name> [-p <v>]... [-o <out>]
@@ -170,7 +229,14 @@ apigee1 [options]
                 sharedflows-revisions-deployments-list <parent> [-p <v>]... [-o <out>]
                 sharedflows-revisions-get <name> [-p <v>]... [-o <out>]
                 sharedflows-revisions-update-shared-flow-revision <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-apicategories-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-apicategories-delete <name> [-p <v>]... [-o <out>]
+                sites-apicategories-get <name> [-p <v>]... [-o <out>]
+                sites-apicategories-list <parent> [-p <v>]... [-o <out>]
+                sites-apicategories-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        projects
+                provision-organization <project> (-r <kv>)... [-p <v>]... [-o <out>]
   apigee1 --help
 
 Configuration:
@@ -182,12 +248,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -240,10 +300,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `apigee1 --debug <resource> <method> [options] 2>debug.txt`.
 

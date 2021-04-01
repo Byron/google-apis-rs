@@ -1,4 +1,4 @@
-site_name: Cloud Asset v1.0.14+20200613
+site_name: Cloud Asset v2.0.0+20210319
 site_url: http://byron.github.io/google-apis-rs/google-cloudasset1_beta1-cli
 site_description: A complete library to interact with Cloud Asset (protocol v1beta1)
 

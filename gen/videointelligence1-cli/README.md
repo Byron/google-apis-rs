@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Video Intelligence* API at revision *20200706*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Cloud Video Intelligence* API at revision *20210325*. The CLI is at version *2.0.0*.
 
 ```bash
 videointelligence1 [options]
@@ -34,7 +34,6 @@ videointelligence1 [options]
                 projects-locations-operations-delete <name> [-p <v>]... [-o <out>]
                 projects-locations-operations-get <name> [-p <v>]... [-o <out>]
         projects
-                locations-corpura-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
@@ -52,12 +51,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -110,10 +103,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `videointelligence1 --debug <resource> <method> [options] 2>debug.txt`.
 

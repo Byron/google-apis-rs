@@ -25,19 +25,38 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Real-time Bidding* API at revision *20200709*. The CLI is at version *1.0.14*.
+This documentation was generated from the *Real-time Bidding* API at revision *20210331*. The CLI is at version *2.0.0*.
 
 ```bash
 realtimebidding1 [options]
         bidders
                 creatives-list <parent> [-p <v>]... [-o <out>]
                 creatives-watch <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                endpoints-get <name> [-p <v>]... [-o <out>]
+                endpoints-list <parent> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                pretargeting-configs-activate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-add-targeted-apps <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-add-targeted-publishers <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-add-targeted-sites <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-delete <name> [-p <v>]... [-o <out>]
+                pretargeting-configs-get <name> [-p <v>]... [-o <out>]
+                pretargeting-configs-list <parent> [-p <v>]... [-o <out>]
+                pretargeting-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-remove-targeted-apps <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-remove-targeted-publishers <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-remove-targeted-sites <pretargeting-config> (-r <kv>)... [-p <v>]... [-o <out>]
+                pretargeting-configs-suspend <name> (-r <kv>)... [-p <v>]... [-o <out>]
         buyers
                 creatives-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-get <name> [-p <v>]... [-o <out>]
                 creatives-list <parent> [-p <v>]... [-o <out>]
                 creatives-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
                 get-remarketing-tag <name> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
                 user-lists-close <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 user-lists-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 user-lists-get <name> [-p <v>]... [-o <out>]
@@ -56,12 +75,6 @@ Configuration:
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx`
-            and `rx` are placed into the same stream.
 
 ```
 
@@ -114,10 +127,7 @@ Even though the CLI does its best to provide usable error messages, sometimes it
 what exactly led to a particular issue. This is done by allowing all client-server communication to be 
 output to standard error *as-is*.
 
-The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
-will cause all communication related to authentication to standard error.
-If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
-issue at hand.
+The `--debug` flag will print errors using the `Debug` representation to standard error.
 
 You may consider redirecting standard error into a file for ease of use, e.g. `realtimebidding1 --debug <resource> <method> [options] 2>debug.txt`.
 

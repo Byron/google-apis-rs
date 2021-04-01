@@ -3,50 +3,242 @@
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+extern crate tokio;
+
 #[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
-extern crate yup_hyper_mock as mock;
-extern crate hyper_rustls;
-extern crate serde;
-extern crate serde_json;
-extern crate hyper;
-extern crate mime;
-extern crate strsim;
-extern crate google_monitoring3 as api;
 
 use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
-mod cmn;
+use google_monitoring3::{api, Error};
 
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
+mod client;
+
+use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, FlowType};
 use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
     IoError(String, io::Error),
-    ApiError(api::Error),
+    ApiError(Error),
 }
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Monitoring<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::Monitoring<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
+    >,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
 impl<'n> Engine<'n> {
-    fn _projects_alert_policies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _folders_time_series_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().time_series_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                },
+                "secondary-aggregation-per-series-aligner" => {
+                    call = call.secondary_aggregation_per_series_aligner(value.unwrap_or(""));
+                },
+                "secondary-aggregation-group-by-fields" => {
+                    call = call.add_secondary_aggregation_group_by_fields(value.unwrap_or(""));
+                },
+                "secondary-aggregation-cross-series-reducer" => {
+                    call = call.secondary_aggregation_cross_series_reducer(value.unwrap_or(""));
+                },
+                "secondary-aggregation-alignment-period" => {
+                    call = call.secondary_aggregation_alignment_period(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "interval-start-time" => {
+                    call = call.interval_start_time(value.unwrap_or(""));
+                },
+                "interval-end-time" => {
+                    call = call.interval_end_time(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                "aggregation-per-series-aligner" => {
+                    call = call.aggregation_per_series_aligner(value.unwrap_or(""));
+                },
+                "aggregation-group-by-fields" => {
+                    call = call.add_aggregation_group_by_fields(value.unwrap_or(""));
+                },
+                "aggregation-cross-series-reducer" => {
+                    call = call.aggregation_cross_series_reducer(value.unwrap_or(""));
+                },
+                "aggregation-alignment-period" => {
+                    call = call.aggregation_alignment_period(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["secondary-aggregation-cross-series-reducer", "view", "aggregation-cross-series-reducer", "secondary-aggregation-per-series-aligner", "interval-start-time", "filter", "interval-end-time", "aggregation-per-series-aligner", "secondary-aggregation-alignment-period", "page-token", "page-size", "order-by", "aggregation-group-by-fields", "secondary-aggregation-group-by-fields", "aggregation-alignment-period"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_time_series_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().time_series_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                },
+                "secondary-aggregation-per-series-aligner" => {
+                    call = call.secondary_aggregation_per_series_aligner(value.unwrap_or(""));
+                },
+                "secondary-aggregation-group-by-fields" => {
+                    call = call.add_secondary_aggregation_group_by_fields(value.unwrap_or(""));
+                },
+                "secondary-aggregation-cross-series-reducer" => {
+                    call = call.secondary_aggregation_cross_series_reducer(value.unwrap_or(""));
+                },
+                "secondary-aggregation-alignment-period" => {
+                    call = call.secondary_aggregation_alignment_period(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "interval-start-time" => {
+                    call = call.interval_start_time(value.unwrap_or(""));
+                },
+                "interval-end-time" => {
+                    call = call.interval_end_time(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                "aggregation-per-series-aligner" => {
+                    call = call.aggregation_per_series_aligner(value.unwrap_or(""));
+                },
+                "aggregation-group-by-fields" => {
+                    call = call.add_aggregation_group_by_fields(value.unwrap_or(""));
+                },
+                "aggregation-cross-series-reducer" => {
+                    call = call.aggregation_cross_series_reducer(value.unwrap_or(""));
+                },
+                "aggregation-alignment-period" => {
+                    call = call.aggregation_alignment_period(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["secondary-aggregation-cross-series-reducer", "view", "aggregation-cross-series-reducer", "secondary-aggregation-per-series-aligner", "interval-start-time", "filter", "interval-end-time", "aggregation-per-series-aligner", "secondary-aggregation-alignment-period", "page-token", "page-size", "order-by", "aggregation-group-by-fields", "secondary-aggregation-group-by-fields", "aggregation-alignment-period"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_alert_policies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -70,19 +262,19 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "combiner" => Some(("combiner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-record.mutated-by" => Some(("creationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-record.mutate-time" => Some(("creationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-record.mutated-by" => Some(("creationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.content" => Some(("documentation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.mime-type" => Some(("documentation.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mutation-record.mutate-time" => Some(("mutationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "user-labels", "validity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -129,7 +321,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -144,7 +336,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_alert_policies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_alert_policies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().alert_policies_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -181,7 +373,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -196,7 +388,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_alert_policies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_alert_policies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().alert_policies_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -233,7 +425,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -248,7 +440,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_alert_policies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_alert_policies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().alert_policies_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -279,7 +471,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "order-by", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -298,7 +490,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -313,7 +505,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_alert_policies_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_alert_policies_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -337,19 +529,19 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "combiner" => Some(("combiner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creation-record.mutated-by" => Some(("creationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-record.mutate-time" => Some(("creationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-record.mutated-by" => Some(("creationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.content" => Some(("documentation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.mime-type" => Some(("documentation.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mutation-record.mutate-time" => Some(("mutationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "user-labels", "validity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -400,7 +592,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -415,7 +607,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_collectd_time_series_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_collectd_time_series_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -438,9 +630,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "collectd-version" => Some(("collectdVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource.labels" => Some(("resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "resource.type" => Some(("resource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "collectd-version" => Some(("collectdVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["collectd-version", "labels", "resource", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -487,7 +679,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -502,7 +694,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -525,11 +717,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-name" => Some(("parentName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-cluster" => Some(("isCluster", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-name" => Some(("parentName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "filter", "is-cluster", "name", "parent-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -580,7 +772,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -595,7 +787,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().groups_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -636,7 +828,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -651,7 +843,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().groups_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -688,7 +880,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -703,7 +895,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().groups_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -737,7 +929,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["children-of-group", "page-token", "ancestors-of-group", "descendants-of-group", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["ancestors-of-group", "children-of-group", "page-size", "descendants-of-group", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -756,7 +948,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -771,7 +963,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_members_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_members_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().groups_members_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -805,7 +997,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["interval-start-time", "page-token", "filter", "page-size", "interval-end-time"].iter().map(|v|*v));
+                                                                           v.extend(["interval-start-time", "filter", "interval-end-time", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -824,7 +1016,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -839,7 +1031,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_groups_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_groups_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -862,11 +1054,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-name" => Some(("parentName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-cluster" => Some(("isCluster", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-name" => Some(("parentName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "filter", "is-cluster", "name", "parent-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -917,7 +1109,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -932,7 +1124,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_metric_descriptors_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_metric_descriptors_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -955,18 +1147,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-kind" => Some(("metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "value-type" => Some(("valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "launch-stage" => Some(("launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "unit" => Some(("unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "monitored-resource-types" => Some(("monitoredResourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "metadata.launch-stage" => Some(("metadata.launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.ingest-delay" => Some(("metadata.ingestDelay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.launch-stage" => Some(("metadata.launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.sample-period" => Some(("metadata.samplePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-kind" => Some(("metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitored-resource-types" => Some(("monitoredResourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unit" => Some(("unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "value-type" => Some(("valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "ingest-delay", "launch-stage", "metadata", "metric-kind", "monitored-resource-types", "name", "sample-period", "type", "unit", "value-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1013,7 +1205,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1028,7 +1220,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_metric_descriptors_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_metric_descriptors_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().metric_descriptors_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1065,7 +1257,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1080,7 +1272,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_metric_descriptors_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_metric_descriptors_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().metric_descriptors_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1117,7 +1309,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1132,7 +1324,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_metric_descriptors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_metric_descriptors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().metric_descriptors_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1160,7 +1352,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1179,7 +1371,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1194,7 +1386,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_monitored_resource_descriptors_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_monitored_resource_descriptors_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().monitored_resource_descriptors_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1231,7 +1423,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1246,7 +1438,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_monitored_resource_descriptors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_monitored_resource_descriptors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().monitored_resource_descriptors_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1274,7 +1466,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1293,7 +1485,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1308,7 +1500,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channel_descriptors_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channel_descriptors_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().notification_channel_descriptors_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1345,7 +1537,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1360,7 +1552,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channel_descriptors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channel_descriptors_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().notification_channel_descriptors_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1385,7 +1577,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1404,7 +1596,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1419,7 +1611,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1442,16 +1634,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-record.mutate-time" => Some(("creationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-record.mutated-by" => Some(("creationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "verification-status" => Some(("verificationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "verification-status" => Some(("verificationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "enabled", "labels", "name", "type", "user-labels", "verification-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-record", "description", "display-name", "enabled", "labels", "mutate-time", "mutated-by", "name", "type", "user-labels", "verification-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1496,7 +1690,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1511,7 +1705,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().notification_channels_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1552,7 +1746,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1567,7 +1761,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().notification_channels_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1604,7 +1798,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1619,7 +1813,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_get_verification_code(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_get_verification_code(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1689,7 +1883,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1704,7 +1898,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().notification_channels_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -1735,7 +1929,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "filter", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "order-by", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1754,7 +1948,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1769,7 +1963,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1792,16 +1986,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-record.mutate-time" => Some(("creationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-record.mutated-by" => Some(("creationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "verification-status" => Some(("verificationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "verification-status" => Some(("verificationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "enabled", "labels", "name", "type", "user-labels", "verification-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-record", "description", "display-name", "enabled", "labels", "mutate-time", "mutated-by", "name", "type", "user-labels", "verification-status"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1850,7 +2046,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1865,7 +2061,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_send_verification_code(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_send_verification_code(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1934,7 +2130,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -1949,7 +2145,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_notification_channels_verify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_notification_channels_verify(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2019,7 +2215,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2034,7 +2230,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_time_series_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_time_series_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2103,7 +2299,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2118,7 +2314,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_time_series_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_time_series_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().time_series_list(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2126,6 +2322,18 @@ impl<'n> Engine<'n> {
             match key {
                 "view" => {
                     call = call.view(value.unwrap_or(""));
+                },
+                "secondary-aggregation-per-series-aligner" => {
+                    call = call.secondary_aggregation_per_series_aligner(value.unwrap_or(""));
+                },
+                "secondary-aggregation-group-by-fields" => {
+                    call = call.add_secondary_aggregation_group_by_fields(value.unwrap_or(""));
+                },
+                "secondary-aggregation-cross-series-reducer" => {
+                    call = call.secondary_aggregation_cross_series_reducer(value.unwrap_or(""));
+                },
+                "secondary-aggregation-alignment-period" => {
+                    call = call.secondary_aggregation_alignment_period(value.unwrap_or(""));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -2170,7 +2378,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-size", "interval-start-time", "aggregation-alignment-period", "aggregation-per-series-aligner", "filter", "page-token", "aggregation-cross-series-reducer", "interval-end-time", "aggregation-group-by-fields", "view"].iter().map(|v|*v));
+                                                                           v.extend(["secondary-aggregation-cross-series-reducer", "view", "aggregation-cross-series-reducer", "secondary-aggregation-per-series-aligner", "interval-start-time", "filter", "interval-end-time", "aggregation-per-series-aligner", "secondary-aggregation-alignment-period", "page-token", "page-size", "order-by", "aggregation-group-by-fields", "secondary-aggregation-group-by-fields", "aggregation-alignment-period"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2189,7 +2397,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2204,7 +2412,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_time_series_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_time_series_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2227,8 +2435,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token", "query"]);
@@ -2276,7 +2484,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2291,7 +2499,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_uptime_check_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_uptime_check_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2314,27 +2522,27 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "resource-group.resource-type" => Some(("resourceGroup.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "period" => Some(("period", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "monitored-resource.labels" => Some(("monitoredResource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "monitored-resource.type" => Some(("monitoredResource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.auth-info.password" => Some(("httpCheck.authInfo.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.mask-headers" => Some(("httpCheck.maskHeaders", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.path" => Some(("httpCheck.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "monitored-resource.labels" => Some(("monitoredResource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "monitored-resource.type" => Some(("monitoredResource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "period" => Some(("period", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-group.resource-type" => Some(("resourceGroup.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "request-method", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
@@ -2382,7 +2590,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2397,7 +2605,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_uptime_check_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_uptime_check_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().uptime_check_configs_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2434,7 +2642,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2449,7 +2657,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_uptime_check_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_uptime_check_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().uptime_check_configs_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2486,7 +2694,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2501,7 +2709,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_uptime_check_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_uptime_check_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().uptime_check_configs_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2526,7 +2734,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2545,7 +2753,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2560,7 +2768,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_uptime_check_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_uptime_check_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2583,27 +2791,27 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "resource-group.resource-type" => Some(("resourceGroup.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "period" => Some(("period", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "monitored-resource.labels" => Some(("monitoredResource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "monitored-resource.type" => Some(("monitoredResource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.auth-info.password" => Some(("httpCheck.authInfo.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.mask-headers" => Some(("httpCheck.maskHeaders", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.path" => Some(("httpCheck.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "monitored-resource.labels" => Some(("monitoredResource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "monitored-resource.type" => Some(("monitoredResource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "period" => Some(("period", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-group.resource-type" => Some(("resourceGroup.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "request-method", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
@@ -2655,7 +2863,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2670,7 +2878,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2693,20 +2901,23 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cloud-endpoints.service" => Some(("cloudEndpoints.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mesh-istio.mesh-uid" => Some(("meshIstio.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mesh-istio.service-namespace" => Some(("meshIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mesh-istio.service-name" => Some(("meshIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "telemetry.resource-name" => Some(("telemetry.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.cluster-name" => Some(("clusterIstio.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.service-namespace" => Some(("clusterIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.service-name" => Some(("clusterIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.location" => Some(("clusterIstio.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine.module-id" => Some(("appEngine.moduleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-endpoints.service" => Some(("cloudEndpoints.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.cluster-name" => Some(("clusterIstio.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.location" => Some(("clusterIstio.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-name" => Some(("clusterIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-namespace" => Some(("clusterIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "istio-canonical-service.canonical-service" => Some(("istioCanonicalService.canonicalService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "istio-canonical-service.canonical-service-namespace" => Some(("istioCanonicalService.canonicalServiceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "istio-canonical-service.mesh-uid" => Some(("istioCanonicalService.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.mesh-uid" => Some(("meshIstio.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-name" => Some(("meshIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-namespace" => Some(("meshIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "telemetry.resource-name" => Some(("telemetry.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine", "cloud-endpoints", "cluster-istio", "cluster-name", "display-name", "location", "mesh-istio", "mesh-uid", "module-id", "name", "resource-name", "service", "service-name", "service-namespace", "telemetry"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine", "canonical-service", "canonical-service-namespace", "cloud-endpoints", "cluster-istio", "cluster-name", "display-name", "istio-canonical-service", "location", "mesh-istio", "mesh-uid", "module-id", "name", "resource-name", "service", "service-name", "service-namespace", "telemetry"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2755,7 +2966,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2770,7 +2981,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.services().delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2807,7 +3018,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2822,7 +3033,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.services().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2859,7 +3070,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2874,7 +3085,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.services().list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -2902,7 +3113,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "filter"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2921,7 +3132,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -2936,7 +3147,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -2959,20 +3170,23 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cloud-endpoints.service" => Some(("cloudEndpoints.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mesh-istio.mesh-uid" => Some(("meshIstio.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mesh-istio.service-namespace" => Some(("meshIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mesh-istio.service-name" => Some(("meshIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "telemetry.resource-name" => Some(("telemetry.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.cluster-name" => Some(("clusterIstio.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.service-namespace" => Some(("clusterIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.service-name" => Some(("clusterIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-istio.location" => Some(("clusterIstio.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine.module-id" => Some(("appEngine.moduleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-endpoints.service" => Some(("cloudEndpoints.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.cluster-name" => Some(("clusterIstio.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.location" => Some(("clusterIstio.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-name" => Some(("clusterIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-namespace" => Some(("clusterIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "istio-canonical-service.canonical-service" => Some(("istioCanonicalService.canonicalService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "istio-canonical-service.canonical-service-namespace" => Some(("istioCanonicalService.canonicalServiceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "istio-canonical-service.mesh-uid" => Some(("istioCanonicalService.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.mesh-uid" => Some(("meshIstio.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-name" => Some(("meshIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-namespace" => Some(("meshIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "telemetry.resource-name" => Some(("telemetry.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine", "cloud-endpoints", "cluster-istio", "cluster-name", "display-name", "location", "mesh-istio", "mesh-uid", "module-id", "name", "resource-name", "service", "service-name", "service-namespace", "telemetry"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine", "canonical-service", "canonical-service-namespace", "cloud-endpoints", "cluster-istio", "cluster-name", "display-name", "istio-canonical-service", "location", "mesh-istio", "mesh-uid", "module-id", "name", "resource-name", "service", "service-name", "service-namespace", "telemetry"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3021,7 +3235,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3036,7 +3250,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_service_level_objectives_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_service_level_objectives_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3059,40 +3273,40 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "calendar-period" => Some(("calendarPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "goal" => Some(("goal", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "calendar-period" => Some(("calendarPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rolling-period" => Some(("rollingPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-level-indicator.basic-sli.latency.threshold" => Some(("serviceLevelIndicator.basicSli.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.basic-sli.version" => Some(("serviceLevelIndicator.basicSli.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.basic-sli.method" => Some(("serviceLevelIndicator.basicSli.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "service-level-indicator.basic-sli.location" => Some(("serviceLevelIndicator.basicSli.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.method" => Some(("serviceLevelIndicator.basicSli.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.version" => Some(("serviceLevelIndicator.basicSli.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.request-based.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.requestBased.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.max" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.min" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-bad-metric-filter" => Some(("serviceLevelIndicator.windowsBased.goodBadMetricFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.latency.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.location" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.method" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.version" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.max" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.min" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.threshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-mean-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-mean-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-mean-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-bad-metric-filter" => Some(("serviceLevelIndicator.windowsBased.goodBadMetricFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.threshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.latency.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.version" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.method" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.location" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.max" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.min" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-sum-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-sum-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-sum-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.window-period" => Some(("serviceLevelIndicator.windowsBased.windowPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.distribution-cut.range.max" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.distribution-cut.range.min" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.requestBased.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rolling-period" => Some(("rollingPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["bad-service-filter", "basic-sli", "basic-sli-performance", "calendar-period", "display-name", "distribution-cut", "distribution-filter", "goal", "good-bad-metric-filter", "good-service-filter", "good-total-ratio", "good-total-ratio-threshold", "latency", "location", "max", "method", "metric-mean-in-range", "metric-sum-in-range", "min", "name", "performance", "range", "request-based", "rolling-period", "service-level-indicator", "threshold", "time-series", "total-service-filter", "version", "window-period", "windows-based"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3143,7 +3357,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3158,7 +3372,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_service_level_objectives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_service_level_objectives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.services().service_level_objectives_delete(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3195,7 +3409,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3210,7 +3424,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_service_level_objectives_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_service_level_objectives_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.services().service_level_objectives_get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3251,7 +3465,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3266,7 +3480,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_service_level_objectives_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_service_level_objectives_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.services().service_level_objectives_list(opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3297,7 +3511,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size", "view"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "view", "filter", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3316,7 +3530,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3331,7 +3545,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _services_service_level_objectives_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _services_service_level_objectives_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -3354,40 +3568,40 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "calendar-period" => Some(("calendarPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "goal" => Some(("goal", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "calendar-period" => Some(("calendarPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rolling-period" => Some(("rollingPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-level-indicator.basic-sli.latency.threshold" => Some(("serviceLevelIndicator.basicSli.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.basic-sli.version" => Some(("serviceLevelIndicator.basicSli.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.basic-sli.method" => Some(("serviceLevelIndicator.basicSli.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "service-level-indicator.basic-sli.location" => Some(("serviceLevelIndicator.basicSli.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.method" => Some(("serviceLevelIndicator.basicSli.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.version" => Some(("serviceLevelIndicator.basicSli.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.request-based.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.requestBased.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.max" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.min" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-bad-metric-filter" => Some(("serviceLevelIndicator.windowsBased.goodBadMetricFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.latency.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.location" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.method" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.version" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.max" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.min" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.threshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-mean-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-mean-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-mean-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-bad-metric-filter" => Some(("serviceLevelIndicator.windowsBased.goodBadMetricFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.threshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.latency.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.version" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.method" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.location" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.max" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.min" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-sum-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-sum-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.metric-sum-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-level-indicator.windows-based.window-period" => Some(("serviceLevelIndicator.windowsBased.windowPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.distribution-cut.range.max" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.distribution-cut.range.min" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.requestBased.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-level-indicator.request-based.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rolling-period" => Some(("rollingPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["bad-service-filter", "basic-sli", "basic-sli-performance", "calendar-period", "display-name", "distribution-cut", "distribution-filter", "goal", "good-bad-metric-filter", "good-service-filter", "good-total-ratio", "good-total-ratio-threshold", "latency", "location", "max", "method", "metric-mean-in-range", "metric-sum-in-range", "min", "name", "performance", "range", "request-based", "rolling-period", "service-level-indicator", "threshold", "time-series", "total-service-filter", "version", "window-period", "windows-based"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3438,7 +3652,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3453,7 +3667,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _uptime_check_ips_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _uptime_check_ips_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.uptime_check_ips().list();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
@@ -3478,7 +3692,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3497,7 +3711,7 @@ impl<'n> Engine<'n> {
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
             match match protocol {
-                CallType::Standard => call.doit(),
+                CallType::Standard => call.doit().await,
                 _ => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -3512,120 +3726,142 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("folders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("time-series-list", Some(opt)) => {
+                        call_result = self._folders_time_series_list(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("folders".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("organizations", Some(opt)) => {
+                match opt.subcommand() {
+                    ("time-series-list", Some(opt)) => {
+                        call_result = self._organizations_time_series_list(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("organizations".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("alert-policies-create", Some(opt)) => {
-                        call_result = self._projects_alert_policies_create(opt, dry_run, &mut err);
+                        call_result = self._projects_alert_policies_create(opt, dry_run, &mut err).await;
                     },
                     ("alert-policies-delete", Some(opt)) => {
-                        call_result = self._projects_alert_policies_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_alert_policies_delete(opt, dry_run, &mut err).await;
                     },
                     ("alert-policies-get", Some(opt)) => {
-                        call_result = self._projects_alert_policies_get(opt, dry_run, &mut err);
+                        call_result = self._projects_alert_policies_get(opt, dry_run, &mut err).await;
                     },
                     ("alert-policies-list", Some(opt)) => {
-                        call_result = self._projects_alert_policies_list(opt, dry_run, &mut err);
+                        call_result = self._projects_alert_policies_list(opt, dry_run, &mut err).await;
                     },
                     ("alert-policies-patch", Some(opt)) => {
-                        call_result = self._projects_alert_policies_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_alert_policies_patch(opt, dry_run, &mut err).await;
                     },
                     ("collectd-time-series-create", Some(opt)) => {
-                        call_result = self._projects_collectd_time_series_create(opt, dry_run, &mut err);
+                        call_result = self._projects_collectd_time_series_create(opt, dry_run, &mut err).await;
                     },
                     ("groups-create", Some(opt)) => {
-                        call_result = self._projects_groups_create(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_create(opt, dry_run, &mut err).await;
                     },
                     ("groups-delete", Some(opt)) => {
-                        call_result = self._projects_groups_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_delete(opt, dry_run, &mut err).await;
                     },
                     ("groups-get", Some(opt)) => {
-                        call_result = self._projects_groups_get(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_get(opt, dry_run, &mut err).await;
                     },
                     ("groups-list", Some(opt)) => {
-                        call_result = self._projects_groups_list(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_list(opt, dry_run, &mut err).await;
                     },
                     ("groups-members-list", Some(opt)) => {
-                        call_result = self._projects_groups_members_list(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_members_list(opt, dry_run, &mut err).await;
                     },
                     ("groups-update", Some(opt)) => {
-                        call_result = self._projects_groups_update(opt, dry_run, &mut err);
+                        call_result = self._projects_groups_update(opt, dry_run, &mut err).await;
                     },
                     ("metric-descriptors-create", Some(opt)) => {
-                        call_result = self._projects_metric_descriptors_create(opt, dry_run, &mut err);
+                        call_result = self._projects_metric_descriptors_create(opt, dry_run, &mut err).await;
                     },
                     ("metric-descriptors-delete", Some(opt)) => {
-                        call_result = self._projects_metric_descriptors_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_metric_descriptors_delete(opt, dry_run, &mut err).await;
                     },
                     ("metric-descriptors-get", Some(opt)) => {
-                        call_result = self._projects_metric_descriptors_get(opt, dry_run, &mut err);
+                        call_result = self._projects_metric_descriptors_get(opt, dry_run, &mut err).await;
                     },
                     ("metric-descriptors-list", Some(opt)) => {
-                        call_result = self._projects_metric_descriptors_list(opt, dry_run, &mut err);
+                        call_result = self._projects_metric_descriptors_list(opt, dry_run, &mut err).await;
                     },
                     ("monitored-resource-descriptors-get", Some(opt)) => {
-                        call_result = self._projects_monitored_resource_descriptors_get(opt, dry_run, &mut err);
+                        call_result = self._projects_monitored_resource_descriptors_get(opt, dry_run, &mut err).await;
                     },
                     ("monitored-resource-descriptors-list", Some(opt)) => {
-                        call_result = self._projects_monitored_resource_descriptors_list(opt, dry_run, &mut err);
+                        call_result = self._projects_monitored_resource_descriptors_list(opt, dry_run, &mut err).await;
                     },
                     ("notification-channel-descriptors-get", Some(opt)) => {
-                        call_result = self._projects_notification_channel_descriptors_get(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channel_descriptors_get(opt, dry_run, &mut err).await;
                     },
                     ("notification-channel-descriptors-list", Some(opt)) => {
-                        call_result = self._projects_notification_channel_descriptors_list(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channel_descriptors_list(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-create", Some(opt)) => {
-                        call_result = self._projects_notification_channels_create(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_create(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-delete", Some(opt)) => {
-                        call_result = self._projects_notification_channels_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_delete(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-get", Some(opt)) => {
-                        call_result = self._projects_notification_channels_get(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_get(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-get-verification-code", Some(opt)) => {
-                        call_result = self._projects_notification_channels_get_verification_code(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_get_verification_code(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-list", Some(opt)) => {
-                        call_result = self._projects_notification_channels_list(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_list(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-patch", Some(opt)) => {
-                        call_result = self._projects_notification_channels_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_patch(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-send-verification-code", Some(opt)) => {
-                        call_result = self._projects_notification_channels_send_verification_code(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_send_verification_code(opt, dry_run, &mut err).await;
                     },
                     ("notification-channels-verify", Some(opt)) => {
-                        call_result = self._projects_notification_channels_verify(opt, dry_run, &mut err);
+                        call_result = self._projects_notification_channels_verify(opt, dry_run, &mut err).await;
                     },
                     ("time-series-create", Some(opt)) => {
-                        call_result = self._projects_time_series_create(opt, dry_run, &mut err);
+                        call_result = self._projects_time_series_create(opt, dry_run, &mut err).await;
                     },
                     ("time-series-list", Some(opt)) => {
-                        call_result = self._projects_time_series_list(opt, dry_run, &mut err);
+                        call_result = self._projects_time_series_list(opt, dry_run, &mut err).await;
                     },
                     ("time-series-query", Some(opt)) => {
-                        call_result = self._projects_time_series_query(opt, dry_run, &mut err);
+                        call_result = self._projects_time_series_query(opt, dry_run, &mut err).await;
                     },
                     ("uptime-check-configs-create", Some(opt)) => {
-                        call_result = self._projects_uptime_check_configs_create(opt, dry_run, &mut err);
+                        call_result = self._projects_uptime_check_configs_create(opt, dry_run, &mut err).await;
                     },
                     ("uptime-check-configs-delete", Some(opt)) => {
-                        call_result = self._projects_uptime_check_configs_delete(opt, dry_run, &mut err);
+                        call_result = self._projects_uptime_check_configs_delete(opt, dry_run, &mut err).await;
                     },
                     ("uptime-check-configs-get", Some(opt)) => {
-                        call_result = self._projects_uptime_check_configs_get(opt, dry_run, &mut err);
+                        call_result = self._projects_uptime_check_configs_get(opt, dry_run, &mut err).await;
                     },
                     ("uptime-check-configs-list", Some(opt)) => {
-                        call_result = self._projects_uptime_check_configs_list(opt, dry_run, &mut err);
+                        call_result = self._projects_uptime_check_configs_list(opt, dry_run, &mut err).await;
                     },
                     ("uptime-check-configs-patch", Some(opt)) => {
-                        call_result = self._projects_uptime_check_configs_patch(opt, dry_run, &mut err);
+                        call_result = self._projects_uptime_check_configs_patch(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -3636,34 +3872,34 @@ impl<'n> Engine<'n> {
             ("services", Some(opt)) => {
                 match opt.subcommand() {
                     ("create", Some(opt)) => {
-                        call_result = self._services_create(opt, dry_run, &mut err);
+                        call_result = self._services_create(opt, dry_run, &mut err).await;
                     },
                     ("delete", Some(opt)) => {
-                        call_result = self._services_delete(opt, dry_run, &mut err);
+                        call_result = self._services_delete(opt, dry_run, &mut err).await;
                     },
                     ("get", Some(opt)) => {
-                        call_result = self._services_get(opt, dry_run, &mut err);
+                        call_result = self._services_get(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
-                        call_result = self._services_list(opt, dry_run, &mut err);
+                        call_result = self._services_list(opt, dry_run, &mut err).await;
                     },
                     ("patch", Some(opt)) => {
-                        call_result = self._services_patch(opt, dry_run, &mut err);
+                        call_result = self._services_patch(opt, dry_run, &mut err).await;
                     },
                     ("service-level-objectives-create", Some(opt)) => {
-                        call_result = self._services_service_level_objectives_create(opt, dry_run, &mut err);
+                        call_result = self._services_service_level_objectives_create(opt, dry_run, &mut err).await;
                     },
                     ("service-level-objectives-delete", Some(opt)) => {
-                        call_result = self._services_service_level_objectives_delete(opt, dry_run, &mut err);
+                        call_result = self._services_service_level_objectives_delete(opt, dry_run, &mut err).await;
                     },
                     ("service-level-objectives-get", Some(opt)) => {
-                        call_result = self._services_service_level_objectives_get(opt, dry_run, &mut err);
+                        call_result = self._services_service_level_objectives_get(opt, dry_run, &mut err).await;
                     },
                     ("service-level-objectives-list", Some(opt)) => {
-                        call_result = self._services_service_level_objectives_list(opt, dry_run, &mut err);
+                        call_result = self._services_service_level_objectives_list(opt, dry_run, &mut err).await;
                     },
                     ("service-level-objectives-patch", Some(opt)) => {
-                        call_result = self._services_service_level_objectives_patch(opt, dry_run, &mut err);
+                        call_result = self._services_service_level_objectives_patch(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("services".to_string()));
@@ -3674,7 +3910,7 @@ impl<'n> Engine<'n> {
             ("uptime-check-ips", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
-                        call_result = self._uptime_check_ips_list(opt, dry_run, &mut err);
+                        call_result = self._uptime_check_ips_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("uptime-check-ips".to_string()));
@@ -3699,41 +3935,26 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "monitoring3-secret.json",
+            match client::application_secret_from_directory(&config_dir, "monitoring3-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.is_present("debug-auth") {
-                                            hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                                                })
-                                        } else {
-                                            hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-                                        },
-                                        JsonTokenStorage {
-                                          program_name: "monitoring3",
-                                          db_dir: config_dir.clone(),
-                                        }, Some(FlowType::InstalledRedirect(54324)));
+        let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+            secret,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        ).persist_tokens_to_disk(format!("{}/monitoring3", config_dir)).build().await.unwrap();
 
-        let client =
-            if opt.is_present("debug") {
-                hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())
-                    })
-            } else {
-                hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new()))
-            };
+        let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
         let engine = Engine {
             opt: opt,
             hub: api::Monitoring::new(client, auth),
@@ -3749,24 +3970,75 @@ impl<'n> Engine<'n> {
                 ]
         };
 
-        match engine._doit(true) {
+        match engine._doit(true).await {
             Err(Some(err)) => Err(err),
             Err(None)      => Ok(engine),
             Ok(_)          => unreachable!(),
         }
     }
 
-    fn doit(&self) -> Result<(), DoitError> {
-        match self._doit(false) {
+    async fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false).await {
             Ok(res) => res,
             Err(_) => unreachable!(),
         }
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("folders", "methods: 'time-series-list'", vec![
+            ("time-series-list",
+                    Some(r##"Lists time series that match a filter. This method does not require a Workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/folders_time-series-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The project, organization or folder on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] organizations/[ORGANIZATION_ID] folders/[FOLDER_ID] "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("organizations", "methods: 'time-series-list'", vec![
+            ("time-series-list",
+                    Some(r##"Lists time series that match a filter. This method does not require a Workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/organizations_time-series-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The project, organization or folder on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] organizations/[ORGANIZATION_ID] folders/[FOLDER_ID] "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("projects", "methods: 'alert-policies-create', 'alert-policies-delete', 'alert-policies-get', 'alert-policies-list', 'alert-policies-patch', 'collectd-time-series-create', 'groups-create', 'groups-delete', 'groups-get', 'groups-list', 'groups-members-list', 'groups-update', 'metric-descriptors-create', 'metric-descriptors-delete', 'metric-descriptors-get', 'metric-descriptors-list', 'monitored-resource-descriptors-get', 'monitored-resource-descriptors-list', 'notification-channel-descriptors-get', 'notification-channel-descriptors-list', 'notification-channels-create', 'notification-channels-delete', 'notification-channels-get', 'notification-channels-get-verification-code', 'notification-channels-list', 'notification-channels-patch', 'notification-channels-send-verification-code', 'notification-channels-verify', 'time-series-create', 'time-series-list', 'time-series-query', 'uptime-check-configs-create', 'uptime-check-configs-delete', 'uptime-check-configs-get', 'uptime-check-configs-list' and 'uptime-check-configs-patch'", vec![
             ("alert-policies-create",
                     Some(r##"Creates a new alerting policy."##),
@@ -3774,9 +4046,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project in which to create the alerting policy. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. |name| must be a host project of a workspace, otherwise INVALID_ARGUMENT error will return. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container."##),
+                     Some(r##"Required. The project in which to create the alerting policy. The format is: projects/[PROJECT_ID_OR_NUMBER] Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. |name| must be a host project of a workspace, otherwise INVALID_ARGUMENT error will return. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container."##),
                      Some(true),
                      Some(false)),
         
@@ -3804,9 +4074,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The alerting policy to delete. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
-        For more information, see AlertPolicy."##),
+                     Some(r##"Required. The alerting policy to delete. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID] For more information, see AlertPolicy."##),
                      Some(true),
                      Some(false)),
         
@@ -3828,9 +4096,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The alerting policy to retrieve. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
-        "##),
+                     Some(r##"Required. The alerting policy to retrieve. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -3852,9 +4118,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project whose alert policies are to be listed. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        Note that this field names the parent container in which the alerting policies to be listed are stored. To retrieve a single alerting policy by name, use the GetAlertPolicy operation, instead."##),
+                     Some(r##"Required. The project whose alert policies are to be listed. The format is: projects/[PROJECT_ID_OR_NUMBER] Note that this field names the parent container in which the alerting policies to be listed are stored. To retrieve a single alerting policy by name, use the GetAlertPolicy operation, instead."##),
                      Some(true),
                      Some(false)),
         
@@ -3876,9 +4140,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required if the policy exists. The resource name for this policy. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
-        [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request."##),
+                     Some(r##"Required if the policy exists. The resource name for this policy. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID] [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request."##),
                      Some(true),
                      Some(false)),
         
@@ -3901,14 +4163,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("collectd-time-series-create",
-                    Some(r##"Stackdriver Monitoring Agent only: Creates a new time series.<aside class="caution">This method is only for use by the Stackdriver Monitoring Agent. Use projects.timeSeries.create instead.</aside>"##),
+                    Some(r##"Stackdriver Monitoring Agent only: Creates a new time series.This method is only for use by the Stackdriver Monitoring Agent. Use projects.timeSeries.create instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_collectd-time-series-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project in which to create the time series. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"The project in which to create the time series. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -3936,9 +4196,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project in which to create the group. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project in which to create the group. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -3966,9 +4224,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The group to delete. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
-        "##),
+                     Some(r##"Required. The group to delete. The format is: projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -3990,9 +4246,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The group to retrieve. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
-        "##),
+                     Some(r##"Required. The group to retrieve. The format is: projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4014,9 +4268,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project whose groups are to be listed. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project whose groups are to be listed. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4038,9 +4290,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The group whose members are listed. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
-        "##),
+                     Some(r##"Required. The group whose members are listed. The format is: projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4062,9 +4312,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The name of this group. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
-        When creating a group, this field is ignored and a new name is created consisting of the project specified in the call to CreateGroup and a unique [GROUP_ID] that is generated automatically."##),
+                     Some(r##"Output only. The name of this group. The format is: projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID] When creating a group, this field is ignored and a new name is created consisting of the project specified in the call to CreateGroup and a unique [GROUP_ID] that is generated automatically."##),
                      Some(true),
                      Some(false)),
         
@@ -4092,9 +4340,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4122,9 +4368,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The metric descriptor on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/metricDescriptors/[METRIC_ID]
-        An example of [METRIC_ID] is: "custom.googleapis.com/my_test_metric"."##),
+                     Some(r##"Required. The metric descriptor on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER]/metricDescriptors/[METRIC_ID] An example of [METRIC_ID] is: "custom.googleapis.com/my_test_metric"."##),
                      Some(true),
                      Some(false)),
         
@@ -4146,9 +4390,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The metric descriptor on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/metricDescriptors/[METRIC_ID]
-        An example value of [METRIC_ID] is "compute.googleapis.com/instance/disk/read_bytes_count"."##),
+                     Some(r##"Required. The metric descriptor on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER]/metricDescriptors/[METRIC_ID] An example value of [METRIC_ID] is "compute.googleapis.com/instance/disk/read_bytes_count"."##),
                      Some(true),
                      Some(false)),
         
@@ -4170,9 +4412,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4194,9 +4434,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The monitored resource descriptor to get. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/monitoredResourceDescriptors/[RESOURCE_TYPE]
-        The [RESOURCE_TYPE] is a predefined type, such as cloudsql_database."##),
+                     Some(r##"Required. The monitored resource descriptor to get. The format is: projects/[PROJECT_ID_OR_NUMBER]/monitoredResourceDescriptors/[RESOURCE_TYPE] The [RESOURCE_TYPE] is a predefined type, such as cloudsql_database."##),
                      Some(true),
                      Some(false)),
         
@@ -4218,9 +4456,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4242,9 +4478,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The channel type for which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/notificationChannelDescriptors/[CHANNEL_TYPE]
-        "##),
+                     Some(r##"Required. The channel type for which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannelDescriptors/[CHANNEL_TYPE] "##),
                      Some(true),
                      Some(false)),
         
@@ -4266,9 +4500,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The REST resource name of the parent from which to retrieve the notification channel descriptors. The expected syntax is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        Note that this names the parent container in which to look for the descriptors; to retrieve a single descriptor by name, use the GetNotificationChannelDescriptor operation, instead."##),
+                     Some(r##"Required. The REST resource name of the parent from which to retrieve the notification channel descriptors. The expected syntax is: projects/[PROJECT_ID_OR_NUMBER] Note that this names the parent container in which to look for the descriptors; to retrieve a single descriptor by name, use the GetNotificationChannelDescriptor operation, instead."##),
                      Some(true),
                      Some(false)),
         
@@ -4290,9 +4522,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        This names the container into which the channel will be written, this does not name the newly created channel. The resulting channel's name will have a normalized version of this field as a prefix, but will add /notificationChannels/[CHANNEL_ID] to identify the channel."##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] This names the container into which the channel will be written, this does not name the newly created channel. The resulting channel's name will have a normalized version of this field as a prefix, but will add /notificationChannels/[CHANNEL_ID] to identify the channel."##),
                      Some(true),
                      Some(false)),
         
@@ -4320,9 +4550,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The channel for which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
-        "##),
+                     Some(r##"Required. The channel for which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4344,9 +4572,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The channel for which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
-        "##),
+                     Some(r##"Required. The channel for which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4396,9 +4622,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        This names the container in which to look for the notification channels; it does not name a specific channel. To query a specific channel by REST resource name, use the GetNotificationChannel operation."##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] This names the container in which to look for the notification channels; it does not name a specific channel. To query a specific channel by REST resource name, use the GetNotificationChannel operation."##),
                      Some(true),
                      Some(false)),
         
@@ -4420,9 +4644,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The full REST resource name for this channel. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
-        The [CHANNEL_ID] is automatically assigned by the server on creation."##),
+                     Some(r##"The full REST resource name for this channel. The format is: projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID] The [CHANNEL_ID] is automatically assigned by the server on creation."##),
                      Some(true),
                      Some(false)),
         
@@ -4506,9 +4728,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4536,9 +4756,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project, organization or folder on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] organizations/[ORGANIZATION_ID] folders/[FOLDER_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4560,9 +4778,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The project on which to execute the request. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project on which to execute the request. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4590,9 +4806,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The project in which to create the Uptime check. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project in which to create the Uptime check. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4620,9 +4834,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The Uptime check configuration to delete. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID]
-        "##),
+                     Some(r##"Required. The Uptime check configuration to delete. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4644,9 +4856,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The Uptime check configuration to retrieve. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID]
-        "##),
+                     Some(r##"Required. The Uptime check configuration to retrieve. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4668,9 +4878,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The project whose Uptime check configurations are listed. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. The project whose Uptime check configurations are listed. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4692,9 +4900,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"A unique resource name for this Uptime check configuration. The format is:
-         projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID]
-        This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response."##),
+                     Some(r##"A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response."##),
                      Some(true),
                      Some(false)),
         
@@ -4725,9 +4931,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent workspace. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. Resource name of the parent workspace. The format is: projects/[PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4755,9 +4959,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the Service to delete. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
-        "##),
+                     Some(r##"Required. Resource name of the Service to delete. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4779,9 +4981,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the Service. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
-        "##),
+                     Some(r##"Required. Resource name of the Service. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4803,10 +5003,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent containing the listed services, either a project or a Monitoring Workspace. The formats are:
-        projects/[PROJECT_ID_OR_NUMBER]
-        workspaces/[HOST_PROJECT_ID_OR_NUMBER]
-        "##),
+                     Some(r##"Required. Resource name of the parent containing the listed services, either a project or a Monitoring Workspace. The formats are: projects/[PROJECT_ID_OR_NUMBER] workspaces/[HOST_PROJECT_ID_OR_NUMBER] "##),
                      Some(true),
                      Some(false)),
         
@@ -4828,9 +5025,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Resource name for this Service. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
-        "##),
+                     Some(r##"Resource name for this Service. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4858,9 +5053,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent Service. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
-        "##),
+                     Some(r##"Required. Resource name of the parent Service. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -4888,9 +5081,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the ServiceLevelObjective to delete. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME]
-        "##),
+                     Some(r##"Required. Resource name of the ServiceLevelObjective to delete. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME] "##),
                      Some(true),
                      Some(false)),
         
@@ -4912,9 +5103,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the ServiceLevelObjective to get. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME]
-        "##),
+                     Some(r##"Required. Resource name of the ServiceLevelObjective to get. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME] "##),
                      Some(true),
                      Some(false)),
         
@@ -4936,10 +5125,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent containing the listed SLOs, either a project or a Monitoring Workspace. The formats are:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
-        workspaces/[HOST_PROJECT_ID_OR_NUMBER]/services/-
-        "##),
+                     Some(r##"Required. Resource name of the parent containing the listed SLOs, either a project or a Monitoring Workspace. The formats are: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] workspaces/[HOST_PROJECT_ID_OR_NUMBER]/services/- "##),
                      Some(true),
                      Some(false)),
         
@@ -4961,9 +5147,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Resource name for this ServiceLevelObjective. The format is:
-        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME]
-        "##),
+                     Some(r##"Resource name for this ServiceLevelObjective. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME] "##),
                      Some(true),
                      Some(false)),
         
@@ -5010,7 +5194,7 @@ fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.14+20200708")
+           .version("2.0.0+20210322")
            .about("Manages your Cloud Monitoring data and configurations. Most projects must be associated with a Workspace, with a few exceptions as noted on the individual method pages. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the Cloud Monitoring documentation.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")
@@ -5025,12 +5209,7 @@ fn main() {
                    .takes_value(true))
            .arg(Arg::with_name("debug")
                    .long("debug")
-                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .multiple(false)
-                   .takes_value(false))
-           .arg(Arg::with_name("debug-auth")
-                   .long("debug-auth")
-                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
            
@@ -5078,13 +5257,13 @@ fn main() {
         let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
-    match Engine::new(matches) {
+    match Engine::new(matches).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Err(doit_err) = engine.doit() {
+            if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
