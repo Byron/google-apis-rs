@@ -320,8 +320,9 @@ if dry_run {
             % endif
             % if supports_media_download:
             ## Download is the only option - nothing else matters
-            io::copy(&mut response, &mut ostream).unwrap();
-            ostream.flush().unwrap();
+            let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+            ostream.write_all(&bytes).expect("write to be complete");
+            ostream.flush().expect("io to never fail which should really be fixed one day");
             % endif
             % if track_download_flag:
             }
