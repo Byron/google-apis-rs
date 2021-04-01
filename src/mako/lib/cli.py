@@ -91,7 +91,8 @@ def new_method_context(resource, method, c):
     m = c.fqan_map[util.to_fqan(c.rtc_map[resource], resource, method)]
     response_schema = util.method_response(c, m)
     params, request_value = util.build_all_params(c, m)
-    media_params = util.method_media_params(m)
+    # let CLIs not support resumable downloads or uploads for now, but don't affect the APIs
+    media_params = list(filter(lambda mp: mp.protocol == "simple", util.method_media_params(m)))
     required_props, optional_props, part_prop = util.organize_params(params, request_value)
 
     return MethodContext(m, response_schema, params, request_value, media_params,
