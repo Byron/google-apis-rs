@@ -11,8 +11,8 @@ make:
   target_name: CLIs
   target_suffix: -cli
   aggregated_target_suffix: -cli
-  depends_on_suffix: ''
-  depends_on_id: 'api'
+  depends_on_suffix: ""
+  depends_on_id: "api"
   documentation_engine: mkdocs
   templates:
     - source: ../LICENSE.md
@@ -28,6 +28,6 @@ cargo:
   doc_base_url: http://byron.github.io/google-apis-rs
   dependencies:
     - strsim = "^0.5"
-    - hyper-rustls = "^0.6"
-    - yup-hyper-mock = "^2.0"
     - clap = "^2.0"
+    - hyper = { version = "0.14", features = ["full"] }
+    - tokio = { version = "^ 1.0", features = ["full"] }

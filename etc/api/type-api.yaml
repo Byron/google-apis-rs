@@ -2,13 +2,13 @@ api:
   base_path: "etc/api"
   properties:
     # additional fields specified by the user
-    params: '_additional_params'
+    params: "_additional_params"
     # custom scopes for authentication
-    scopes: '_scopes'
+    scopes: "_scopes"
 make:
   id: api
   target_name: APIs
-  target_suffix: ''
+  target_suffix: ""
   aggregated_target_suffix: -api
   depends_on_suffix:
   global_targets: Yes
@@ -26,4 +26,5 @@ cargo:
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs
   dependencies:
+    - hyper = "^ 0.14"
     - url = "= 1.7"
